@@ -44,6 +44,10 @@ class ImageExtras {
         return ImageStorage.size(ofImage: imageFileName(url:url), withPath: largeImageDirectoryURL)
     }
     
+    static func fullSizedImage(url:URL) -> UIImage {
+        return ImageStorage.image(fromFile:imageFileName(url:url), withPath:largeImageDirectoryURL)
+    }
+    
     // Get the size of the icon without distorting the aspect ratio. Adapted from https://gist.github.com/tomasbasham/10533743
     static func boundingImageSizeFor(originalSize:CGSize, boundingSize:CGSize) -> CGSize {
         let aspectWidth = boundingSize.width / originalSize.width
