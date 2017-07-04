@@ -20,8 +20,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     
-        SetupSignIn.session.appLaunch()
-
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Shared Images"
 
@@ -46,6 +44,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window!.rootViewController = tabBarController
         
+        // Putting this after setting up the `tabBarController` because it can lead to access to the tabBarController.
+        SetupSignIn.session.appLaunch()
+        
         // The default UI displayed tab is .signIn
         if let signedIn = SignInManager.session.currentSignIn?.userIsSignedIn, signedIn {
             selectTabInController(tab: .images)
@@ -64,7 +65,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let minimumBackgroundFetchIntervalOneHour:TimeInterval = 60 * 60
         application.setMinimumBackgroundFetchInterval(minimumBackgroundFetchIntervalOneHour)
-        
+
         return true
     }
     

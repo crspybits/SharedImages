@@ -35,7 +35,7 @@ class SignInVC : GoogleSignInViewController {
         return SignInVC.rawSharingPermission.stringValue == "" ? nil : SharingPermission(rawValue: SignInVC.rawSharingPermission.stringValue)
     }
     
-    var googleSignInButton:GoogleSignInOutButton!
+    var googleSignInButton:UIView!
     var sharingBarButton:UIBarButtonItem!
     
     private var _acceptSharingInvitation:Bool = false
@@ -55,7 +55,8 @@ class SignInVC : GoogleSignInViewController {
         
         // TODO: *2* Signing out and then signing in as a different user will mess up this app. What we're really assuming is that the user may sign out, but will then again sign in as the same user. If the user signs in as a different user, we need to alert them that this is going to remove all local files. And, signing in again as the prior user will cause redownload of the prior files. This may be something we want to fix in the future: To enable the client to handle multiple users. This would require indexing the meta data by user.
         
-        googleSignInButton = SetupSignIn.session.googleSignIn.getSignInButton(params: ["delegate": self]) as! GoogleSignInOutButton
+        // TODO: *0* Fix this !UIView coercision.
+        googleSignInButton = SetupSignIn.session.googleSignIn.getSignInButton(params: ["delegate": self]) as! UIView
         googleSignInButton.frameY = 100
         view.addSubview(googleSignInButton)
         googleSignInButton.centerHorizontallyInSuperview()
@@ -80,6 +81,14 @@ class SignInVC : GoogleSignInViewController {
         
         setSharingButtonState()
         setSignInTypeState()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        coordinator.animate(alongsideTransition: {[unowned self] context in
+            self.googleSignInButton.centerHorizontallyInSuperview()
+        })
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -177,7 +186,7 @@ extension SignInVC : SharingInvitationDelegate {
             })
             alert.addAction(UIAlertAction(title: "Share", style: .default) {alert in
                 self.acceptSharingInvitation = true
-                self.googleSignInButton.tap()
+                (self.googleSignInButton as! TappableSignInButton).tap()
             })
             self.present(alert, animated: true, completion: nil)
         }
