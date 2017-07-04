@@ -11,6 +11,7 @@ import UIKit
 import SMCoreLib
 import SyncServer
 import SevenSwitch
+import SyncServer_Shared
 
 // This view controller doesn't load upon initial launch of the app, if the user is signed in (silent sign in), and the AppDelegate takes the user directly to the ImagesVC.
 

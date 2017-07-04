@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		2732DEE9F55439017415A76A /* Pods_SharedImages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B908205C67FEB8F896E15398 /* Pods_SharedImages.framework */; };
-		8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */; };
 		2987D796FBECCBAD42606057 /* Pods_SharedImagesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */; };
 		830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */; };
 		830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */; };
+		8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */; };
 		8324EE301E75EC62000656AF /* SignInVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE2F1E75EC62000656AF /* SignInVC.swift */; };
 		8324EE331E764907000656AF /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE321E764907000656AF /* SyncController.swift */; };
 		8324EE351E7649E3000656AF /* TabControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE341E7649E3000656AF /* TabControllerDelegate.swift */; };
@@ -19,7 +19,7 @@
 		8324EE521E778623000656AF /* ODRefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE4D1E778623000656AF /* ODRefreshControl.m */; };
 		8324EE541E77873F000656AF /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE531E77873F000656AF /* SyncSpinner.swift */; };
 		8347BA651EF109F9002763F6 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347BA641EF109F9002763F6 /* Alert.swift */; };
-		83B5F7881F04F30B0069A1D7 /* GoogleUserSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B5F7871F04F30B0069A1D7 /* GoogleUserSignIn.swift */; };
+		836873B01F0B544B002A93D7 /* GoogleUserSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836873AF1F0B544B002A93D7 /* GoogleUserSignIn.swift */; };
 		83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D1FE331EAB074A00DD468F /* LargeImages.swift */; };
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
 		83F58ACB1EE3BA140081C3D1 /* AppBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F58ACA1EE3BA140081C3D1 /* AppBadge.swift */; };
@@ -49,12 +49,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupSignIn.swift; sourceTree = "<group>"; };
 		3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SharedImagesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
 		830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedImagesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedImagesTests.swift; sourceTree = "<group>"; };
 		830B1DFA1EFCC03E0022FCC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupSignIn.swift; sourceTree = "<group>"; };
 		8324EE2F1E75EC62000656AF /* SignInVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInVC.swift; sourceTree = "<group>"; };
 		8324EE321E764907000656AF /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
 		8324EE341E7649E3000656AF /* TabControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabControllerDelegate.swift; sourceTree = "<group>"; };
@@ -65,7 +65,7 @@
 		8324EE4D1E778623000656AF /* ODRefreshControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ODRefreshControl.m; sourceTree = "<group>"; };
 		8324EE531E77873F000656AF /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
 		8347BA641EF109F9002763F6 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
-		83B5F7871F04F30B0069A1D7 /* GoogleUserSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GoogleUserSignIn.swift; path = ../../Client/SignIn/GoogleUserSignIn.swift; sourceTree = "<group>"; };
+		836873AF1F0B544B002A93D7 /* GoogleUserSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GoogleUserSignIn.swift; path = "../../SyncServer-iOSClient/Client/SignIn/GoogleUserSignIn.swift"; sourceTree = "<group>"; };
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
 		83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageExtras.swift; sourceTree = "<group>"; };
@@ -146,7 +146,7 @@
 			isa = PBXGroup;
 			children = (
 				8324EE2F1E75EC62000656AF /* SignInVC.swift */,
-				83B5F7871F04F30B0069A1D7 /* GoogleUserSignIn.swift */,
+				836873AF1F0B544B002A93D7 /* GoogleUserSignIn.swift */,
 			);
 			name = SignIn;
 			sourceTree = "<group>";
@@ -489,6 +489,7 @@
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83F8824D1E712004008F644A /* AppDelegate.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
+				836873B01F0B544B002A93D7 /* GoogleUserSignIn.swift in Sources */,
 				8324EE301E75EC62000656AF /* SignInVC.swift in Sources */,
 				83F882561E73B2DC008F644A /* Image.swift in Sources */,
 				8324EE351E7649E3000656AF /* TabControllerDelegate.swift in Sources */,
@@ -501,7 +502,6 @@
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
 				83F58ACB1EE3BA140081C3D1 /* AppBadge.swift in Sources */,
-				83B5F7881F04F30B0069A1D7 /* GoogleUserSignIn.swift in Sources */,
 				8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */,
 				8347BA651EF109F9002763F6 /* Alert.swift in Sources */,
 			);
