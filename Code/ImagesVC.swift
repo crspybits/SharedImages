@@ -29,6 +29,8 @@ class ImagesVC: UIViewController {
     
     var timeThatSpinnerStarts:CFTimeInterval!
     
+    fileprivate var navigatedToLargeImages = false
+    
     fileprivate var imageCache:LRUCache<Image>! {
         return ImageExtras.imageCache
     }
@@ -148,7 +150,13 @@ class ImagesVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        scrollIfNeeded(animated: true)
+        // If we navigated to the large images and are just coming back now, don't bother with the scrolling.
+        if navigatedToLargeImages {
+            navigatedToLargeImages = false
+        }
+        else {
+            scrollIfNeeded(animated: true)
+        }
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
         setAddButtonState()
@@ -316,6 +324,7 @@ extension ImagesVC : UICollectionViewDelegate {
         let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
         largeImages.startItem = indexPath.item
         largeImages.syncController = syncController
+        navigatedToLargeImages = true
         navigationController!.pushViewController(largeImages, animated: true)
     }
     
