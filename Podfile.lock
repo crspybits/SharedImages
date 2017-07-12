@@ -14,6 +14,24 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
+  - Bolts (1.8.4):
+    - Bolts/AppLinks (= 1.8.4)
+    - Bolts/Tasks (= 1.8.4)
+  - Bolts/AppLinks (1.8.4):
+    - Bolts/Tasks
+  - Bolts/Tasks (1.8.4)
+  - FacebookCore (0.2.0):
+    - Bolts (~> 1.8)
+    - FBSDKCoreKit (~> 4.15)
+  - FacebookLogin (0.2.0):
+    - Bolts (~> 1.8)
+    - FacebookCore (~> 0.2)
+    - FBSDKCoreKit (~> 4.15)
+    - FBSDKLoginKit (~> 4.15)
+  - FBSDKCoreKit (4.24.0):
+    - Bolts (~> 1.7)
+  - FBSDKLoginKit (4.24.0):
+    - FBSDKCoreKit
   - FirebaseAnalytics (3.9.0):
     - FirebaseCore (~> 3.6)
     - FirebaseInstanceID (~> 1.0)
@@ -53,7 +71,7 @@ PODS:
   - HPTextViewTapGestureRecognizer (0.1)
   - Reachability (3.2)
   - SevenSwitch (2.1.0)
-  - SMCoreLib (0.0.29):
+  - SMCoreLib (0.0.30):
     - AFNetworking
     - HPTextViewTapGestureRecognizer (~> 0.1)
     - Reachability
@@ -64,10 +82,12 @@ PODS:
     - Gloss
     - SMCoreLib
     - SyncServer-Shared
-  - SyncServer-Shared (0.0.5):
+  - SyncServer-Shared (0.0.6):
     - Gloss
 
 DEPENDENCIES:
+  - FacebookCore
+  - FacebookLogin
   - Google/SignIn
   - SevenSwitch (~> 2.1)
   - SMCoreLib
@@ -80,6 +100,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
+  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
+  FacebookCore: 2cb3f0fbff218e9d3119cec84bae983b232412de
+  FacebookLogin: c9d606504735780a9e3002465a615512e0a691a5
+  FBSDKCoreKit: f8c9eb0dd34a9cd277c7b60da4b32226d142502d
+  FBSDKLoginKit: 1214c6d5a1c4995b694d8db8a9ba6910c6028acf
   FirebaseAnalytics: e5fe8486efc01bec33f6bf82e2fa9fce4b124052
   FirebaseCore: 9691ee2ade70c098d7cf92440f4303f16d83ca75
   FirebaseInstanceID: b9eedd6846fb5e1f0f7279e1deaa7a7e4cf8392e
@@ -92,11 +117,11 @@ SPEC CHECKSUMS:
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SevenSwitch: 5543327829b7bec5b29b73bad5f3cc3f92c1736d
-  SMCoreLib: bfb5b7004a95077cc91e28b1e5f4a7bfaa879306
+  SMCoreLib: 137e74c69f3fe66328b104cbd119a769c62b7418
   SwiftyBeaver: d4b551ba34b4206c52cc4684ae90444b8aaa5afd
   SyncServer: 71b1aeffb372621380f97d97a5eb65222a4a9b5d
-  SyncServer-Shared: 05d83f5ad74213d5f0e2fc0dd7199b63d90c0f5d
+  SyncServer-Shared: b7bccc109930a9cf805771a419af5764eb54b5d8
 
-PODFILE CHECKSUM: 72c0fd2f9737f5d62a85ee87f0a29a4fae319f19
+PODFILE CHECKSUM: 5f223f7db80413f45b3bbc91048161ab43ae8ed4
 
 COCOAPODS: 1.2.0

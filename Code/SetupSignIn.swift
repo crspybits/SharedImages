@@ -14,11 +14,12 @@ class SetupSignIn {
     static let session = SetupSignIn()
     
     var googleSignIn:GoogleSignIn!
-    
+    var facebookSignIn:FacebookSignIn!
+
     private init() {
     }
     
-    func appLaunch() {
+    func appLaunch(options: [UIApplicationLaunchOptionsKey: Any]?) {
         var serverClientId:String!
         var appClientId:String!
         
@@ -34,7 +35,10 @@ class SetupSignIn {
         
         googleSignIn = GoogleSignIn(serverClientId: serverClientId, appClientId: appClientId)
         googleSignIn.signOutDelegate = self
-        SignInManager.session.addSignIn(googleSignIn)
+        SignInManager.session.addSignIn(googleSignIn, launchOptions: options)
+        
+        facebookSignIn = FacebookSignIn()
+        SignInManager.session.addSignIn(facebookSignIn, launchOptions: options)
     }
 }
 

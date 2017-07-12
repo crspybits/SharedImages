@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = tabBarController
         
         // Putting this after setting up the `tabBarController` because it can lead to access to the tabBarController.
-        SetupSignIn.session.appLaunch()
+        SetupSignIn.session.appLaunch(options: launchOptions)
         
         // The default UI displayed tab is .signIn
         if let signedIn = SignInManager.session.currentSignIn?.userIsSignedIn, signedIn {
@@ -80,8 +80,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        return SignInManager.session.application(app, openURL: url, sourceApplication: options[UIApplicationOpenURLOptionsKey.sourceApplication] as! String, annotation: options[UIApplicationOpenURLOptionsKey.annotation] as AnyObject) ||
-        SharingInvitation.session.application(application: app, openURL: url, sourceApplication: options[UIApplicationOpenURLOptionsKey.sourceApplication] as! String, annotation: options[UIApplicationOpenURLOptionsKey.annotation] as AnyObject)
+        return SignInManager.session.application(app, open: url, options: options) ||
+        SharingInvitation.session.application(app, open: url, options: options)
     }
     
     func application(_ application: UIApplication,

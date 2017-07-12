@@ -15,6 +15,8 @@ target 'SharedImages' do
 	pod 'SyncServer-Shared'
 	
     pod 'Google/SignIn'
+	pod 'FacebookLogin'
+	pod 'FacebookCore'	
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

@@ -92,7 +92,7 @@ class ImagesVC: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         ImageExtras.resetToSmallerImageCache() {
-            collectionView.reloadData()
+            collectionView?.reloadData()
         }
     }
     

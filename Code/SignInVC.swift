@@ -35,8 +35,10 @@ class SignInVC : GoogleSignInViewController {
         return SignInVC.rawSharingPermission.stringValue == "" ? nil : SharingPermission(rawValue: SignInVC.rawSharingPermission.stringValue)
     }
     
-    var googleSignInButton:UIView!
+    var googleSignInButton:TappableButton!
+    var facebookSignInButton:TappableButton!
     var sharingBarButton:UIBarButtonItem!
+    var stackOfSignIns = UIStackView()
     
     private var _acceptSharingInvitation:Bool = false
     var acceptSharingInvitation: Bool {
@@ -55,45 +57,65 @@ class SignInVC : GoogleSignInViewController {
         
         // TODO: *2* Signing out and then signing in as a different user will mess up this app. What we're really assuming is that the user may sign out, but will then again sign in as the same user. If the user signs in as a different user, we need to alert them that this is going to remove all local files. And, signing in again as the prior user will cause redownload of the prior files. This may be something we want to fix in the future: To enable the client to handle multiple users. This would require indexing the meta data by user.
         
-        // TODO: *0* Fix this !UIView coercision.
-        googleSignInButton = SetupSignIn.session.googleSignIn.getSignInButton(params: ["delegate": self]) as! UIView
-        googleSignInButton.frameY = 100
-        view.addSubview(googleSignInButton)
-        googleSignInButton.centerHorizontallyInSuperview()
-
+        stackOfSignIns.frameY = 300
+        stackOfSignIns.debugBorderColor = UIColor.red
+        stackOfSignIns.axis = .vertical
+        stackOfSignIns.alignment = .center
+        stackOfSignIns.distribution = .equalSpacing
+        stackOfSignIns.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Is there a better way to phrase this negation??
+        if #available(iOS 11.0, *) {
+        }
+        else {
+            stackOfSignIns.spacing = 20
+        }
+        
+        googleSignInButton = SetupSignIn.session.googleSignIn.setupSignInButton(params: ["delegate": self])
+        googleSignInButton.setAnchorsFromSize()
+        stackOfSignIns.addArrangedSubview(googleSignInButton)
+        if #available(iOS 11.0, *) {
+            stackOfSignIns.setCustomSpacing(20, after: googleSignInButton)
+        }
+        
+        SetupSignIn.session.googleSignIn.delegate = self
+        
+        facebookSignInButton = SetupSignIn.session.facebookSignIn.setupSignInButton(params:nil)
+        facebookSignInButton.frameWidth = googleSignInButton.frameWidth
+        facebookSignInButton.setAnchorsFromSize()
+        stackOfSignIns.addArrangedSubview(facebookSignInButton)
+        SetupSignIn.session.facebookSignIn.delegate = self
+        if #available(iOS 11.0, *) {
+            stackOfSignIns.setCustomSpacing(30, after: facebookSignInButton)
+        }
+        
         signinTypeSwitch = SevenSwitch()
         signinTypeSwitch.offLabel.text = "Existing user"
         signinTypeSwitch.offLabel.textColor = UIColor.black
         signinTypeSwitch.onLabel.text = "New user"
         signinTypeSwitch.onLabel.textColor = UIColor.black
-        signinTypeSwitch.frameY = googleSignInButton.frameMaxY + 30
         signinTypeSwitch.frameWidth = 120
         signinTypeSwitch.inactiveColor =  UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)
         signinTypeSwitch.onTintColor = UIColor(red: 16.0/255.0, green: 125.0/255.0, blue: 247.0/255.0, alpha: 1)
-        view.addSubview(signinTypeSwitch)
-        signinTypeSwitch.centerHorizontallyInSuperview()
-
+        signinTypeSwitch.setAnchorsFromSize()
+        stackOfSignIns.addArrangedSubview(signinTypeSwitch)
+        
         sharingBarButton = UIBarButtonItem(title: "Share", style: .plain, target: self, action: #selector(shareAction))
         navigationItem.rightBarButtonItem = sharingBarButton
         
         SharingInvitation.session.delegate = self
-        SetupSignIn.session.googleSignIn.delegate = self
         
         setSharingButtonState()
         setSignInTypeState()
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
         
-        coordinator.animate(alongsideTransition: {[unowned self] context in
-            self.googleSignInButton.centerHorizontallyInSuperview()
-        })
+        view.addSubview(stackOfSignIns)
+        
+        stackOfSignIns.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        stackOfSignIns.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
         setSignInTypeState()
     }
     
@@ -146,10 +168,10 @@ class SignInVC : GoogleSignInViewController {
             if error == nil {
                 let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
                 if let email = SMEmail(parentViewController: self) {
-                    let message = "I'd like to share my images with you through the SharedImages app and your Google account. To share my images, you need to:\n" +
+                    let message = "I'd like to share my images with you through the SharedImages app and your Google or Facebook account. To share my images, you need to:\n" +
                         "1) download the SharedImages iOS app onto your iPhone or iPad,\n" +
                         "2) tap the link below in the Apple Mail app, and\n" +
-                        "3) follow the instructions within the app to sign in to your Google account to access my images.\n" +
+                        "3) follow the instructions within the app to sign in to your Google or Facebook account to access my images.\n" +
                         "You will have " + permission.userFriendlyText() + " access to my images.\n\n" +
                             sharingURLString
                     
@@ -186,7 +208,7 @@ extension SignInVC : SharingInvitationDelegate {
             })
             alert.addAction(UIAlertAction(title: "Share", style: .default) {alert in
                 self.acceptSharingInvitation = true
-                (self.googleSignInButton as! TappableSignInButton).tap()
+                self.googleSignInButton.tap()
             })
             self.present(alert, animated: true, completion: nil)
         }
@@ -195,7 +217,7 @@ extension SignInVC : SharingInvitationDelegate {
 
 extension SignInVC : GenericSignInDelegate {
     func shouldDoUserAction(signIn:GenericSignIn) -> UserActionNeeded {
-        var result:UserActionNeeded
+        var result:UserActionNeeded = .none
         
         if SignInManager.currentUserId.stringValue != "" &&
             signIn.credentials?.userId != nil &&
@@ -217,13 +239,17 @@ extension SignInVC : GenericSignInDelegate {
             alert.addAction(UIAlertAction(title: "OK", style: .cancel) {alert in
             })
             self.present(alert, animated: true, completion: nil)
-            result = .none
         }
         else if acceptSharingInvitation {
-            result = .createSharingUser(invitationCode: SharingInvitation.session.sharingInvitationCode!)
+            if signIn.signInTypesAllowed.contains(.sharingUser) {
+                result = .createSharingUser(invitationCode: SharingInvitation.session.sharingInvitationCode!)
+            }
         }
         else if signinTypeSwitch.isOn() {
-            result = .createOwningUser
+            // User wants to create a new user. We only allow the user to request this directly in the case of a sign in that allows owning users. E.g., Google Drive. For a sign-in that only allows sharing users (e.g., Facebook), the user first needs a sharing invitation.
+            if signIn.signInTypesAllowed.contains(.owningUser) {
+                result = .createOwningUser
+            }
         }
         else {
             result = .signInExistingUser
@@ -265,5 +291,13 @@ extension SignInVC : GenericSignInDelegate {
         
         setSharingButtonState()
         setSignInTypeState()
+    }
+}
+
+extension UIView {
+    // Calling this multiple times creates multiple sets of constraints.
+    func setAnchorsFromSize() {
+        heightAnchor.constraint(equalToConstant: frame.size.height).isActive = true
+        widthAnchor.constraint(equalToConstant: frame.size.width).isActive = true
     }
 }
