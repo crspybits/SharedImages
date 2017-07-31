@@ -35,8 +35,8 @@ class SignInVC : GoogleSignInViewController {
         return SignInVC.rawSharingPermission.stringValue == "" ? nil : SharingPermission(rawValue: SignInVC.rawSharingPermission.stringValue)
     }
     
-    var googleSignInButton:TappableButton!
-    var facebookSignInButton:TappableButton!
+    var googleSignInButton: /*TappableButton*/ UIView!
+    var facebookSignInButton:/*TappableButton*/ UIView!
     var sharingBarButton:UIBarButtonItem!
     var stackOfSignIns = UIStackView()
     
@@ -71,23 +71,29 @@ class SignInVC : GoogleSignInViewController {
             stackOfSignIns.spacing = 20
         }
         
-        googleSignInButton = SetupSignIn.session.googleSignIn.setupSignInButton(params: ["delegate": self])
+        googleSignInButton = SetupSignIn.session.googleSignIn.setupSignInButton(params: ["delegate": self]) as! UIView
         googleSignInButton.setAnchorsFromSize()
         stackOfSignIns.addArrangedSubview(googleSignInButton)
+        
+        // Put this back in when I'm working with Xcode9
+        /*
         if #available(iOS 11.0, *) {
             stackOfSignIns.setCustomSpacing(20, after: googleSignInButton)
-        }
+        }*/
         
         SetupSignIn.session.googleSignIn.delegate = self
         
-        facebookSignInButton = SetupSignIn.session.facebookSignIn.setupSignInButton(params:nil)
+        facebookSignInButton = SetupSignIn.session.facebookSignIn.setupSignInButton(params:nil) as! UIView
         facebookSignInButton.frameWidth = googleSignInButton.frameWidth
         facebookSignInButton.setAnchorsFromSize()
         stackOfSignIns.addArrangedSubview(facebookSignInButton)
         SetupSignIn.session.facebookSignIn.delegate = self
+        
+        // Put these back when working with Xcode9 again.
+        /*
         if #available(iOS 11.0, *) {
             stackOfSignIns.setCustomSpacing(30, after: facebookSignInButton)
-        }
+        }*/
         
         signinTypeSwitch = SevenSwitch()
         signinTypeSwitch.offLabel.text = "Existing user"
@@ -208,7 +214,9 @@ extension SignInVC : SharingInvitationDelegate {
             })
             alert.addAction(UIAlertAction(title: "Share", style: .default) {alert in
                 self.acceptSharingInvitation = true
-                self.googleSignInButton.tap()
+                
+                // TappableButton changes
+                ((self.googleSignInButton) as! Tappable).tap()
             })
             self.present(alert, animated: true, completion: nil)
         }

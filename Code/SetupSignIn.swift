@@ -13,8 +13,8 @@ import SyncServer
 class SetupSignIn {
     static let session = SetupSignIn()
     
-    var googleSignIn:GoogleSignIn!
-    var facebookSignIn:FacebookSignIn!
+    var googleSignIn:GoogleSyncServerSignIn!
+    var facebookSignIn:FacebookSyncServerSignIn!
 
     private init() {
     }
@@ -33,11 +33,11 @@ class SetupSignIn {
             serverClientId = value
         }
         
-        googleSignIn = GoogleSignIn(serverClientId: serverClientId, appClientId: appClientId)
+        googleSignIn = GoogleSyncServerSignIn(serverClientId: serverClientId, appClientId: appClientId)
         googleSignIn.signOutDelegate = self
         SignInManager.session.addSignIn(googleSignIn, launchOptions: options)
         
-        facebookSignIn = FacebookSignIn()
+        facebookSignIn = FacebookSyncServerSignIn()
         SignInManager.session.addSignIn(facebookSignIn, launchOptions: options)
     }
 }
