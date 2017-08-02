@@ -8,21 +8,21 @@ target 'SharedImages' do
 	# pod 'ODRefreshControl', '~> 1.2'
 	
 	pod 'SevenSwitch', '~> 2.1'
-	pod 'SyncServer', :path => '../SyncServer-iOSClient/'
 	
-	# These two should only be needed right now because I've not pushed the SyncServer pod up to a repo yet.
-	pod 'SMCoreLib'
-	pod 'SyncServer-Shared'
+	pod 'SyncServer'
+	pod 'SyncServer/Facebook'
 	
-    pod 'Google/SignIn'
+    pod 'GoogleSignIn', '4.0.2'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     	
 		pod 'SevenSwitch', '~> 2.1'
-		pod 'SyncServer', :path => '../SyncServer-iOSClient/'
-		pod 'SMCoreLib'
-		pod 'Google/SignIn'
+		
+		pod 'SyncServer'
+		pod 'SyncServer/Facebook'
+
+		pod 'GoogleSignIn', '4.0.2'
   	end
 end
 
