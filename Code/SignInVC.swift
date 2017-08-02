@@ -15,7 +15,7 @@ import SyncServer_Shared
 
 // This view controller doesn't load upon initial launch of the app, if the user is signed in (silent sign in), and the AppDelegate takes the user directly to the ImagesVC.
 
-class SignInVC : GoogleSignInViewController {
+class SignInVC : UIViewController, GoogleSignInUIProtocol {
     fileprivate var signinTypeSwitch:SevenSwitch!
     
     static private var rawSharingPermission:SMPersistItemString = SMPersistItemString(name: "SignInVC.rawSharingPermission", initialStringValue: "", persistType: .userDefaults)
