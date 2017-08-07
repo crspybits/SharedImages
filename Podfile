@@ -10,8 +10,8 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '3.0.0'
-	pod 'SyncServer/Facebook', '3.0.0'
+	pod 'SyncServer', '3.1.0'
+	pod 'SyncServer/Facebook', '3.1.0'
 	
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
@@ -21,8 +21,8 @@ target 'SharedImages' do
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     			
-		pod 'SyncServer', '3.0.0'
-		pod 'SyncServer/Facebook', '3.0.0'
+		pod 'SyncServer', '3.1.0'
+		pod 'SyncServer/Facebook', '3.1.0'
 		
 # 		pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'

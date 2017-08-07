@@ -22,6 +22,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     
+        let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
+        let urlString = try! plist.getString(varName: "ServerURL")
+        let serverURL = URL(string: urlString)!
+        let cloudFolderName = try! plist.getString(varName: "CloudFolderName")
+        
+        // Call this as soon as possible in your launch sequence.
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName)
+    
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Shared Images"
 
@@ -33,13 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ]);
         
         CoreData.registerSession(coreDataSession, forName: CoreDataExtras.sessionName)
-        
-        let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
-        let urlString = try! plist.getString(varName: "ServerURL")
-        let serverURL = URL(string: urlString)!
-        let cloudFolderName = try! plist.getString(varName: "CloudFolderName")
-        
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName)
         
         tabBarController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TabBarController") as! UITabBarController
         tabBarController.delegate = tabBarDelegate
