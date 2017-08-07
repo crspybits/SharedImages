@@ -10,14 +10,12 @@ import Foundation
 import UIKit
 import SMCoreLib
 import SyncServer
-import SevenSwitch
 import SyncServer_Shared
 
 // This view controller doesn't load upon initial launch of the app, if the user is signed in (silent sign in), and the AppDelegate takes the user directly to the ImagesVC.
 
 class SignInVC : UIViewController, GoogleSignInUIProtocol {
-    fileprivate var signinTypeSwitch:SevenSwitch!
-    
+    @IBOutlet weak var signInContainer: UIView!
     static private var rawSharingPermission:SMPersistItemString = SMPersistItemString(name: "SignInVC.rawSharingPermission", initialStringValue: "", persistType: .userDefaults)
     
     // If user is signed in as a sharing user, this persistently gives their permissions.
@@ -38,7 +36,6 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     var googleSignInButton: /*TappableButton*/ UIView!
     var facebookSignInButton:/*TappableButton*/ UIView!
     var sharingBarButton:UIBarButtonItem!
-    var stackOfSignIns = UIStackView()
     
     private var _acceptSharingInvitation:Bool = false
     var acceptSharingInvitation: Bool {
@@ -57,54 +54,15 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         
         // TODO: *2* Signing out and then signing in as a different user will mess up this app. What we're really assuming is that the user may sign out, but will then again sign in as the same user. If the user signs in as a different user, we need to alert them that this is going to remove all local files. And, signing in again as the prior user will cause redownload of the prior files. This may be something we want to fix in the future: To enable the client to handle multiple users. This would require indexing the meta data by user.
         
-        stackOfSignIns.frameY = 300
-        stackOfSignIns.debugBorderColor = UIColor.red
-        stackOfSignIns.axis = .vertical
-        stackOfSignIns.alignment = .center
-        stackOfSignIns.distribution = .equalSpacing
-        stackOfSignIns.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Is there a better way to phrase this negation??
-        if #available(iOS 11.0, *) {
-        }
-        else {
-            stackOfSignIns.spacing = 20
-        }
-        
         googleSignInButton = SetupSignIn.session.googleSignIn.setupSignInButton(params: ["delegate": self]) as! UIView
-        googleSignInButton.setAnchorsFromSize()
-        stackOfSignIns.addArrangedSubview(googleSignInButton)
-        
-        // Put this back in when I'm working with Xcode9
-        /*
-        if #available(iOS 11.0, *) {
-            stackOfSignIns.setCustomSpacing(20, after: googleSignInButton)
-        }*/
-        
         SetupSignIn.session.googleSignIn.delegate = self
         
         facebookSignInButton = SetupSignIn.session.facebookSignIn.setupSignInButton(params:nil) as! UIView
         facebookSignInButton.frameWidth = googleSignInButton.frameWidth
-        facebookSignInButton.setAnchorsFromSize()
-        stackOfSignIns.addArrangedSubview(facebookSignInButton)
         SetupSignIn.session.facebookSignIn.delegate = self
         
-        // Put these back when working with Xcode9 again.
-        /*
-        if #available(iOS 11.0, *) {
-            stackOfSignIns.setCustomSpacing(30, after: facebookSignInButton)
-        }*/
-        
-        signinTypeSwitch = SevenSwitch()
-        signinTypeSwitch.offLabel.text = "Existing user"
-        signinTypeSwitch.offLabel.textColor = UIColor.black
-        signinTypeSwitch.onLabel.text = "New user"
-        signinTypeSwitch.onLabel.textColor = UIColor.black
-        signinTypeSwitch.frameWidth = 120
-        signinTypeSwitch.inactiveColor =  UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)
-        signinTypeSwitch.onTintColor = UIColor(red: 16.0/255.0, green: 125.0/255.0, blue: 247.0/255.0, alpha: 1)
-        signinTypeSwitch.setAnchorsFromSize()
-        stackOfSignIns.addArrangedSubview(signinTypeSwitch)
+        let signIn = SignIn.create()!
+        signInContainer.addSubview(signIn)
         
         sharingBarButton = UIBarButtonItem(title: "Share", style: .plain, target: self, action: #selector(shareAction))
         navigationItem.rightBarButtonItem = sharingBarButton
@@ -112,17 +70,10 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         SharingInvitation.session.delegate = self
         
         setSharingButtonState()
-        setSignInTypeState()
-        
-        view.addSubview(stackOfSignIns)
-        
-        stackOfSignIns.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        stackOfSignIns.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setSignInTypeState()
     }
     
     func setSharingButtonState() {
@@ -135,15 +86,11 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         }
     }
     
-    func setSignInTypeState() {
-        signinTypeSwitch?.isHidden = SignInManager.session.userIsSignIn
-    }
-    
     func shareAction() {
         var alert:UIAlertController
         
         if SignInManager.session.userIsSignIn {
-            alert = UIAlertController(title: "Share your images with a Google user?", message: nil, preferredStyle: .actionSheet)
+            alert = UIAlertController(title: "Share your images with a Google or Facebook user?", message: nil, preferredStyle: .actionSheet)
 
             func addAlertAction(_ permission:SharingPermission) {
                 alert.addAction(UIAlertAction(title: permission.userFriendlyText(), style: .default){alert in
@@ -253,14 +200,17 @@ extension SignInVC : GenericSignInDelegate {
                 result = .createSharingUser(invitationCode: SharingInvitation.session.sharingInvitationCode!)
             }
         }
-        else if signinTypeSwitch.isOn() {
-            // User wants to create a new user. We only allow the user to request this directly in the case of a sign in that allows owning users. E.g., Google Drive. For a sign-in that only allows sharing users (e.g., Facebook), the user first needs a sharing invitation.
-            if signIn.signInTypesAllowed.contains(.owningUser) {
-                result = .createOwningUser
-            }
-        }
         else {
-            result = .signInExistingUser
+            switch SignIn.userInterfaceState {
+            case .createNewAccount:
+                result = .createOwningUser
+            
+            case .existingAccount:
+                result = .signInExistingUser
+                
+            case .initialSignInViewShowing:
+                break
+            }
         }
         
         return result
@@ -281,8 +231,8 @@ extension SignInVC : GenericSignInDelegate {
             break
             
         case .userNotFoundOnSignInAttempt:
-            // TODO: *2* Need to inform user.
-            break
+            SMCoreLib.Alert.show(withTitle: "Alert!", message: "User not found on system.")
+            // Don't need to sign the user out-- already signed out when delegate called.
             
         case .existingUserSignedIn(let sharingPermission):
             self.sharingPermission = sharingPermission
@@ -298,7 +248,6 @@ extension SignInVC : GenericSignInDelegate {
         }
         
         setSharingButtonState()
-        setSignInTypeState()
     }
 }
 

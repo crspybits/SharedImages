@@ -298,6 +298,7 @@
 				83F8821D1E711600008F644A /* Resources */,
 				C1556D21C4BD5BF879CF9960 /* [CP] Embed Pods Frameworks */,
 				7BAE33266BEE9E3F633FC8A4 /* [CP] Copy Pods Resources */,
+				83611DEC1F3802C700464E49 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -434,7 +435,6 @@
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/SMCoreLib/SMCoreLib.framework",
-				"${BUILT_PRODUCTS_DIR}/SevenSwitch/SevenSwitch.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
@@ -454,7 +454,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SMCoreLib.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SevenSwitch.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
@@ -481,6 +480,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		83611DEC1F3802C700464E49 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 237a6efa41c3712c4dc41003288df88ae5178ace be4decc6d7607c046cfeb875f6566953c885689481a0b1517f8ebe420708cc08";
 		};
 		85165C831E6E583405C214AA /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -520,7 +532,6 @@
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/SMCoreLib/SMCoreLib.framework",
-				"${BUILT_PRODUCTS_DIR}/SevenSwitch/SevenSwitch.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
@@ -540,7 +551,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SMCoreLib.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SevenSwitch.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
