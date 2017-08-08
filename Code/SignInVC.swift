@@ -61,7 +61,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         facebookSignInButton.frameWidth = googleSignInButton.frameWidth
         SetupSignIn.session.facebookSignIn.delegate = self
         
-        let signIn = SignIn.create()!
+        let signIn:SignIn = SignIn.createFromXib()!
         signInContainer.addSubview(signIn)
         
         sharingBarButton = UIBarButtonItem(title: "Share", style: .plain, target: self, action: #selector(shareAction))
