@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 import SMCoreLib
 
+protocol LargeImageCellDelegate {
+    func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize)
+}
+
 class ImageCollectionVC : UICollectionViewCell {
     // For large images only, the imageView's are embedded in a scroll view to enable pinch/zoom. Because these only apply to large images, referenced as scrollView? below.
     @IBOutlet weak var scrollView: UIScrollView!
@@ -22,6 +26,9 @@ class ImageCollectionVC : UICollectionViewCell {
     private(set) var image:Image!
     private(set) weak var syncController:SyncController!
     weak var imageCache:LRUCache<Image>!
+    
+    var delegate:LargeImageCellDelegate!
+    var originalSize:CGSize!
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -29,16 +36,17 @@ class ImageCollectionVC : UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        scrollView?.zoomScale = 1.0
         switchedToFullScaleImageForZooming = false
     }
     
     func setProperties(image:Image, syncController:SyncController, cache: LRUCache<Image>) {
         self.image = image
+
         self.syncController = syncController
         title.text = image.title
         imageCache = cache
         
+        scrollView?.zoomScale = 1.0
         scrollView?.maximumZoomScale = 6.0
         scrollView?.delegate = self
     }
@@ -52,6 +60,8 @@ class ImageCollectionVC : UICollectionViewCell {
         
         let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: imageView.frameSize)
         imageView.image = imageCache.getItem(from: image, with: smallerSize)
+        
+        originalSize = smallerSize
     }
     
     func remove() {
@@ -69,6 +79,9 @@ extension ImageCollectionVC : UIScrollViewDelegate {
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        delegate.cellZoomed(cell: self, toZoomSize: imageView.frame.size, withOriginalSize: originalSize)
+        //Log.msg("imageView.frame.size: \(imageView.frame.size)")
+        
         if !switchedToFullScaleImageForZooming {
             switchedToFullScaleImageForZooming = true
             

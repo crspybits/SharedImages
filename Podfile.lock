@@ -57,6 +57,7 @@ PODS:
   - GTMSessionFetcher/Full (1.1.11):
     - GTMSessionFetcher/Core (= 1.1.11)
   - HPTextViewTapGestureRecognizer (0.1)
+  - ODRefreshControl (1.2)
   - Reachability (3.2)
   - SMCoreLib (0.1.0):
     - AFNetworking
@@ -86,8 +87,18 @@ DEPENDENCIES:
   - Crashlytics
   - Fabric
   - GoogleSignIn (= 4.0.2)
+  - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - SyncServer (= 3.1.1)
   - SyncServer/Facebook (= 3.1.1)
+
+EXTERNAL SOURCES:
+  ODRefreshControl:
+    :git: https://github.com/crspybits/ODRefreshControl.git
+
+CHECKOUT OPTIONS:
+  ODRefreshControl:
+    :commit: ffaaf9d7d44306d36c9959a26a0132f62851bcfb
+    :git: https://github.com/crspybits/ODRefreshControl.git
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
@@ -104,12 +115,13 @@ SPEC CHECKSUMS:
   GTMOAuth2: 7fc9c10f5c745f4d9850419ea88889fe3baa6b7d
   GTMSessionFetcher: 5ad62e8200fa00ed011fe5e08d27fef72c5b1429
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
+  ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SMCoreLib: ff4726822b976fe8edaef419d1c283de06d0f9c7
   SwiftyBeaver: d4b551ba34b4206c52cc4684ae90444b8aaa5afd
   SyncServer: 3ce4d2038993a3b96422034605440eb63a684d53
   SyncServer-Shared: 20f100002e98e4b74d9332d3b633f4d3789fc120
 
-PODFILE CHECKSUM: fbc3ecaf30b6499c368fdf21cc35f9575117d8e9
+PODFILE CHECKSUM: b52779dfa8bc2536a7e4ed639355414c4291dcc7
 
 COCOAPODS: 1.3.1

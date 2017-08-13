@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class Alert {
     static func styleForIPad(_ alert:UIAlertController) {

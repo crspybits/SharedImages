@@ -9,6 +9,7 @@
 import UIKit
 import SMCoreLib
 import SyncServer
+import ODRefreshControl
 
 class ImagesVC: UIViewController {
     let reuseIdentifier = "ImageIcon"
@@ -427,6 +428,9 @@ extension ImagesVC : SyncControllerDelegate {
             }
             
         case .syncDone:
+            // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
+            AppBadge.setBadge(number: 0)
+            
             // If we don't let the spinner show for a minimum amount of time, it looks odd.
             let minimumDuration:CFTimeInterval = 2
             let difference:CFTimeInterval = CFAbsoluteTimeGetCurrent() - timeThatSpinnerStarts

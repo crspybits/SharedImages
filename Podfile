@@ -4,9 +4,6 @@ source 'https://github.com/crspybits/Specs.git'
 use_frameworks!
 
 target 'SharedImages' do
-	# Not using this because I made some mods to the ODRefreshControl code.
-	# pod 'ODRefreshControl', '~> 1.2'
-
 	pod 'Fabric'
 	pod 'Crashlytics'
 
@@ -15,6 +12,9 @@ target 'SharedImages' do
 	
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+
+	# Using my fork because of changes I made
+	pod 'ODRefreshControl', :git => 'https://github.com/crspybits/ODRefreshControl.git'
 	
     pod 'GoogleSignIn', '4.0.2'
     
