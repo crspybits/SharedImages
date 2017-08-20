@@ -79,6 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     enum Tab : Int {
         case signIn = 0
         case images = 1
+        case settings = 2
     }
     
     func selectTabInController(tab:Tab) {

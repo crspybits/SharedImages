@@ -217,11 +217,15 @@ extension SignInVC : GenericSignInDelegate {
     }
     
     func userActionOccurred(action:UserActionOccurred, signIn:GenericSignIn) {
-        func successfulSignIn() {
+        func successfulSignIn(switchToImagesTab:Bool = false) {
             if SignInManager.currentUserId.stringValue == "" {
                 // No user signed in yet.
                 SignInManager.currentUIDisplayName.stringValue = signIn.credentials?.uiDisplayName ?? ""
                 SignInManager.currentUserId.stringValue = signIn.credentials?.userId ?? ""
+            }
+
+            if switchToImagesTab {
+                (UIApplication.shared.delegate as! AppDelegate).selectTabInController(tab: .images)
             }
         }
         
@@ -236,7 +240,7 @@ extension SignInVC : GenericSignInDelegate {
             
         case .existingUserSignedIn(let sharingPermission):
             self.sharingPermission = sharingPermission
-            successfulSignIn()
+            successfulSignIn(switchToImagesTab: true)
             
         case .owningUserCreated:
             sharingPermission = nil

@@ -7,3 +7,16 @@ Version 0.7; 8/12/17
 		
 	* Narrow images.
 		https://github.com/crspybits/SharedImages/issues/6
+		
+	* Share image in other ways
+		https://github.com/crspybits/SharedImages/issues/17
+		Added new tab for Settings because of this too.
+		I've relocated the image deletion functionality to the "Action" button too because a long-press now selects images to get ready for the "Action operaton.
+	
+	* Reconsider spinners
+		Moved rotating black & white spinner up to right of Action button (on the upper left)
+		because with new Settings tab, we can no longer have a spinner in the middle of the tab bar.
+		https://github.com/crspybits/SharedImages/issues/22
+		
+	* Make images first screen on launch if signed in
+		https://github.com/crspybits/SharedImages/issues/20

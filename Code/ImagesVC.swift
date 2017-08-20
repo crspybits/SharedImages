@@ -15,19 +15,17 @@ class ImagesVC: UIViewController {
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
     var addImageBarButton:UIBarButtonItem!
-    var sortingOrder:UIBarButtonItem!
+    var actionButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
     var syncController = SyncController()
     
-    // To enable pulling down on the table view to do a sync with server.
+    // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
     var refreshControl:ODRefreshControl!
-    
-    static let spinnerContainerSize:CGFloat = 25
-    var spinnerContainer:UIView!
-    let spinner = SyncSpinner(frame: CGRect(x: 0, y: 0, width: spinnerContainerSize, height: spinnerContainerSize))
     
     @IBOutlet weak var collectionView: UICollectionView!
     
+    // Spinner for controlling/indicating sync with SyncServer. This spinner is displayed for as long as the synchronization operation with the SyncServer takes. It's not visible or available afterwards, unless an error occurs.
+    var spinner:SyncSpinner!
     var timeThatSpinnerStarts:CFTimeInterval!
     
     fileprivate var navigatedToLargeImages = false
@@ -36,16 +34,14 @@ class ImagesVC: UIViewController {
         return ImageExtras.imageCache
     }
     
+    // Selection (via long-press) to allow user to select images for sending via text messages, email (etc), or for deletion.
+    typealias UUIDString = String
+    fileprivate var selectedImages = Set<UUIDString>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
-  
-        // Spinner that shows when syncing
-        createSpinnerContainer()
-        spinnerContainer.addSubview(spinner)
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(spinnerTapGestureAction))
-        self.spinner.addGestureRecognizer(tapGesture)
         
         // Adding images
         addImageBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addImageAction))
@@ -69,11 +65,11 @@ class ImagesVC: UIViewController {
         
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
         
-        // Long press on image to delete.
+        // Long press on image to select.
         collectionView.alwaysBounceVertical = true
-        let imageDeletionLongPress = UILongPressGestureRecognizer(target: self, action: #selector(imageDeletionLongPressAction(gesture:)))
-        imageDeletionLongPress.delaysTouchesBegan = true
-        collectionView?.addGestureRecognizer(imageDeletionLongPress)
+        let imageSelectionLongPress = UILongPressGestureRecognizer(target: self, action: #selector(imageSelectionLongPressAction(gesture:)))
+        imageSelectionLongPress.delaysTouchesBegan = true
+        collectionView?.addGestureRecognizer(imageSelectionLongPress)
         collectionView?.delegate = self
         
         // A label and a means to do a consistency check.
@@ -85,9 +81,28 @@ class ImagesVC: UIViewController {
         titleLabel.addGestureRecognizer(lp)
         titleLabel.isUserInteractionEnabled = true
         
-        // Controlling sorting order of images
-        sortingOrder = UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(sortingOrderAction))
-        navigationItem.leftBarButtonItem = sortingOrder
+        // Spinner that shows when syncing
+        let spinnerSize:CGFloat = 25
+        spinner = SyncSpinner(frame: CGRect(x: 0, y: 0, width: spinnerSize, height: spinnerSize))
+        let spinnerButton = UIButton()
+        spinnerButton.backgroundColor = UIColor.clear
+        spinnerButton.frame = CGRect(x: 0, y: 0, width: spinnerSize, height: spinnerSize)
+        spinnerButton.addSubview(spinner)
+        let spinnerBarButtonItem = UIBarButtonItem(customView: spinnerButton)
+        
+        // For sharing images via email, text messages, and for deleting images.
+        let actionImage = UIImage(named: "Action")
+        actionButton = UIBarButtonItem(image: actionImage, style: .plain, target: self, action: #selector(actionButtonAction))
+        
+        navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
+    }
+    
+    func remove(image:Image) {
+        // The sync/remote remove must happen before the local remove-- or we lose the reference!
+        syncController.remove(image: image)
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
     
     override func didReceiveMemoryWarning() {
@@ -131,11 +146,7 @@ class ImagesVC: UIViewController {
         super.viewWillTransition(to: size, with: coordinator)
         
         // The collection view reload in the completion is my solution to an annoying problem: I need to reload the images at their changed size after rotation. This is how I'm getting a callback *after* the rotation has completed when the cells have been sized properly.
-        coordinator.animate(alongsideTransition: {[unowned self] context in
-            // Like below, can get here without having natigated to this tab!
-            if self.spinnerContainer != nil {
-                self.positionSpinnerContainer(usingScreenSize: UIScreen.main.bounds.size)
-            }
+        coordinator.animate(alongsideTransition: { context in
         }) {[unowned self] context in
             // I made this an optional because, oddly, I can get in here when I've never navigated to this tab.
             self.collectionView?.reloadData()
@@ -145,7 +156,6 @@ class ImagesVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         coreDataSource.fetchData()
-        positionSpinnerContainer(usingScreenSize: UIScreen.main.bounds.size)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -161,23 +171,6 @@ class ImagesVC: UIViewController {
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
         setAddButtonState()
-    }
-    
-    func createSpinnerContainer() {
-        spinnerContainer = UIView()
-        spinnerContainer.backgroundColor = UIColor.clear
-        spinnerContainer.frame = CGRect(x: 0, y: 0, width: ImagesVC.spinnerContainerSize, height: ImagesVC.spinnerContainerSize)
-        self.tabBarController!.view.addSubview(spinnerContainer)
-    }
-    
-    func positionSpinnerContainer(usingScreenSize size:CGSize) {
-        var frame = spinnerContainer.frame
-        
-        // The - 5 is a fudge to get the spinner lined near the top of the tab bar graphics, so it looks about right.
-        frame.origin.y = size.height - tabBarController!.tabBar.frame.height/2.0 - ImagesVC.spinnerContainerSize/2.0 - 5.0
-        frame.origin.x = size.width/2.0 - ImagesVC.spinnerContainerSize/2.0
-        
-        spinnerContainer.frame = frame
     }
 
     func setAddButtonState() {
@@ -200,54 +193,6 @@ class ImagesVC: UIViewController {
         }
     }
     
-    @objc private func imageDeletionLongPressAction(gesture : UILongPressGestureRecognizer!) {
-        // Flash a red border around the image when the pressing starts-- to give an indication that something is going on.
-        if gesture.state == .began {
-            let p = gesture.location(in: self.collectionView)
-            if let indexPath = collectionView.indexPathForItem(at: p) {
-                let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
-                let layer = cell.layer
-                layer.borderColor = UIColor.red.cgColor
-                layer.borderWidth = 4.0
-                cell.layoutIfNeeded()
-                TimedCallback.withDuration(0.3) {
-                    layer.borderColor = nil
-                    layer.borderWidth = 0.0
-                    cell.layoutIfNeeded()
-                }
-            }
-        }
-        if gesture.state != .ended {
-            return
-        }
-        
-        let p = gesture.location(in: self.collectionView)
-
-        // Confirm the deletion with the user.
-        
-        if let indexPath = collectionView.indexPathForItem(at: p) {
-            let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
-            
-            var message:String?
-            if cell.image.title != nil {
-                message = "title: \(cell.image.title!)"
-            }
-            
-            let alert = UIAlertController(title: "Remove this image?", message: message, preferredStyle: .actionSheet)
-            alert.popoverPresentationController?.sourceView = cell
-            Alert.styleForIPad(alert)
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) {alert in
-            })
-            alert.addAction(UIAlertAction(title: "Remove", style: .default) {alert in
-                cell.remove()
-            })
-            self.present(alert, animated: true, completion: nil)
-        } else {
-            Log.msg("couldn't find index path")
-        }
-    }
-    
     @objc private func refresh() {
         self.refreshControl.endRefreshing()
         syncController.sync()
@@ -261,32 +206,6 @@ class ImagesVC: UIViewController {
     
     func addImageAction() {
         self.acquireImage.showAlert(fromBarButton: addImageBarButton)
-    }
-    
-    func sortingOrderAction() {
-        let alert = UIAlertController(title: "Sorting order of images:", message: "Newer images at the top or the bottom?", preferredStyle: .actionSheet)
-        alert.popoverPresentationController?.barButtonItem = sortingOrder
-        Alert.styleForIPad(alert)
-        
-        alert.addAction(UIAlertAction(title: "Newer at top", style: .default) {alert in
-            if ImageExtras.currentSortingOrder.stringValue != SortingOrder.newerAtTop.rawValue {
-                ImageExtras.currentSortingOrder.stringValue = SortingOrder.newerAtTop.rawValue
-                self.coreDataSource.fetchData()
-                self.collectionView.reloadData()
-                self.scrollIfNeeded(animated:true)
-            }
-        })
-        alert.addAction(UIAlertAction(title: "Newer at bottom", style: .default) {alert in
-            if ImageExtras.currentSortingOrder.stringValue != SortingOrder.newerAtBottom.rawValue {
-                ImageExtras.currentSortingOrder.stringValue = SortingOrder.newerAtBottom.rawValue
-                self.coreDataSource.fetchData()
-                self.collectionView.reloadData()
-                self.scrollIfNeeded(animated:true)
-            }
-        })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) {alert in
-        })
-        self.present(alert, animated: true, completion: nil)
     }
     
     @discardableResult
@@ -348,8 +267,11 @@ extension ImagesVC : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
-        cell.setProperties(image: self.coreDataSource.object(at: indexPath) as! Image, syncController: syncController, cache: imageCache)
-                
+        let imageObj = self.coreDataSource.object(at: indexPath) as! Image
+        cell.setProperties(image: imageObj, syncController: syncController, cache: imageCache)
+        
+        showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+
         return cell
     }
 }
@@ -474,5 +396,70 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10.0
+    }
+}
+
+// MARK: Sharing and deletion activity.
+extension ImagesVC {
+    @objc fileprivate func actionButtonAction() {
+        // Create an array containing both UIImage's and Image's. The UIActivityViewController will use the UIImage's. The TrashActivity will use the Image's.
+        var images = [Any]()
+        for uuidString in selectedImages {
+            if let imageObj = Image.fetchObjectWithUUID(uuid: uuidString) {
+                let uiImage = ImageExtras.fullSizedImage(url: imageObj.url! as URL)
+                images.append(uiImage)
+                images.append(imageObj)
+            }
+        }
+        
+        if images.count == 0 {
+            Log.warning("No images selected!")
+            SMCoreLib.Alert.show(withTitle:  "No images selected!", message: "Long-press on image(s) to select, and then try again.")
+            return
+        }
+        
+        // 8/19/17; It looks like you can't control the order of the actions in the list supplied by this control. See https://stackoverflow.com/questions/19060535/how-to-rearrange-activities-on-a-uiactivityviewcontroller
+        // Unfortunately, this means the deletion control occurs off to the right-- and I can't see it w/o scrolling on my iPhone6
+        let trashActivity = TrashActivity(withParentVC: self, removeImage: { image in
+            self.remove(image: image)
+        })
+        let activityViewController = UIActivityViewController(activityItems: images, applicationActivities: [trashActivity])
+        
+        activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, error in
+            if completed {
+                // Action has been carried out (e.g., image has been deleted), remove selected icons.
+                self.selectedImages.removeAll()
+                
+                self.collectionView.reloadData()
+            }
+        }
+        present(activityViewController, animated: true, completion: {})
+    }
+    
+    @objc fileprivate func imageSelectionLongPressAction(gesture : UILongPressGestureRecognizer!) {
+        if gesture.state == .began {
+            let p = gesture.location(in: self.collectionView)
+            if let indexPath = collectionView.indexPathForItem(at: p) {
+                let imageObj = coreDataSource.object(at: indexPath) as! Image
+                
+                if selectedImages.contains(imageObj.uuid!) {
+                    // Deselect image
+                    selectedImages.remove(imageObj.uuid!)
+                }
+                else {
+                    // Select image
+                    selectedImages.insert(imageObj.uuid!)
+                }
+
+                let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
+                showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+            }
+        }
+    }
+    
+    fileprivate func showSelectedState(imageUUID:String, cell:UICollectionViewCell) {        
+        if let cell = cell as? ImageCollectionVC {
+            cell.userSelected = selectedImages.contains(imageUUID)
+        }
     }
 }

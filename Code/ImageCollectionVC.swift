@@ -29,6 +29,33 @@ class ImageCollectionVC : UICollectionViewCell {
     
     var delegate:LargeImageCellDelegate!
     var originalSize:CGSize!
+    
+    private var selectedImage:UIImageView!
+    var userSelected:Bool = false {
+        didSet {
+            if userSelected {
+                if selectedImage == nil {
+                    let selected = UIImage(named: "Selected")
+                    
+                    selectedImage = UIImageView()
+                    selectedImage.image = selected
+                    
+                    let size = min(25, imageView.frameWidth, imageView.frameHeight)
+                    selectedImage.frameSize = CGSize(width: size, height: size)
+                    
+                    selectedImage.frameMaxX = imageView.frameMaxX
+                    selectedImage.frameMaxY = imageView.frameMaxY
+                    imageView.addSubview(selectedImage)
+                }
+            }
+            else {
+                selectedImage?.removeFromSuperview()
+                selectedImage = nil
+            }
+            
+            setNeedsDisplay()
+        }
+    }
 
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -62,14 +89,6 @@ class ImageCollectionVC : UICollectionViewCell {
         imageView.image = imageCache.getItem(from: image, with: smallerSize)
         
         originalSize = smallerSize
-    }
-    
-    func remove() {
-        // The sync/remote remove must happen before the local remove-- or we lose the reference!
-        syncController.remove(image: image)
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
 }
 
