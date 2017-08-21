@@ -1,4 +1,4 @@
-Version 0.7; 8/12/17
+Version 0.7; 8/20/17
 	* Clear badge after downloading images
 		https://github.com/crspybits/SharedImages/issues/13
 		
