@@ -59,7 +59,7 @@ class AppBadge {
             SyncServer.session.getStats() { stats in
                 if let stats = stats {
                     let total = stats.downloadDeletionsAvailable + stats.downloadsAvailable
-                    UIApplication.shared.applicationIconBadgeNumber = total
+                    setBadge(number: total)
                     if total > 0 {
                         completionHandler?(.newData)
                     }
@@ -74,6 +74,13 @@ class AppBadge {
         }
         else {
             completionHandler?(.noData)
+        }
+    }
+    
+    // Set to 0 to hide badge.
+    static func setBadge(number:Int) {
+        if AppBadge.badgesAuthorized.boolValue {
+            UIApplication.shared.applicationIconBadgeNumber = number
         }
     }
 }

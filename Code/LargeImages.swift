@@ -23,6 +23,9 @@ class LargeImages : UIViewController {
     var coreDataSource:CoreDataSource!
     let reuseIdentifier = "largeImage"
     
+    typealias FirstTimeZoomed = Bool
+    var zoomedCells = [IndexPath: FirstTimeZoomed]()
+    
     fileprivate var imageCache:LRUCache<Image>! {
         return ImageExtras.imageCache
     }
@@ -33,7 +36,7 @@ class LargeImages : UIViewController {
         collectionView.delegate = self
 
         coreDataSource = CoreDataSource(delegate: self)
-        self.edgesForExtendedLayout = []
+        edgesForExtendedLayout = []
     }
     
     override func didReceiveMemoryWarning() {
@@ -60,6 +63,9 @@ class LargeImages : UIViewController {
         
         seekToIndexPath = sortedArray[0]
         
+        // I get some odd effects if I retain zooming across the rotation-- cells show up as being empty.
+        zoomedCells.removeAll()
+        
         // This is my solution to an annoying problem: I need to reload the images at their changed size after rotation. This is how I'm getting a callback *after* the rotation has completed when the cells have been sized properly.
         coordinator.animate(alongsideTransition: nil) { context in
             self.collectionView.reloadData()
@@ -71,7 +77,18 @@ class LargeImages : UIViewController {
 
         // To resize cells when we rotate the device or first enter into this view controller.
         if seekToIndexPath != nil {
-            if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            invalidateLayout()
+        }
+    }
+    
+    func invalidateLayout(withAnimation animation: Bool = false) {
+        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            if animation {
+                collectionView.performBatchUpdates({
+                    flowLayout.invalidateLayout()
+                }, completion: nil)
+                }
+            else {
                 flowLayout.invalidateLayout()
             }
         }
@@ -121,7 +138,19 @@ extension LargeImages : CoreDataSourceDelegate {
 // MARK: UICollectionViewDelegate
 extension LargeImages : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as! ImageCollectionVC).cellSizeHasBeenChanged()
+    
+        let cell = cell as! ImageCollectionVC
+        cell.cellSizeHasBeenChanged()
+        cell.delegate = self
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    
+        if zoomedCells[indexPath] != nil {
+            // When we come back to a zoomed cell after it goes out of sight, we want it to be back to normal.
+            zoomedCells.removeValue(forKey: indexPath)
+            invalidateLayout(withAnimation: true)
+        }
     }
 }
 
@@ -149,12 +178,44 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     
         // Because we can scroll horizontally, let the width be large
-        let width = max(collectionView.frame.height, collectionView.frame.width)
-        let boundingCellSize = CGSize(width: width, height: collectionView.frame.height)
+        let maxWidth = max(collectionView.frame.height, collectionView.frame.width)
+        let boundingCellSize = CGSize(width: maxWidth, height: collectionView.frame.height)
         
         let image = self.coreDataSource.object(at: indexPath) as! Image
-        let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
-
+        var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
+        
+        if let firstTimeZoomed = zoomedCells[indexPath], firstTimeZoomed {
+            // I first tried zooming the item size along with the image. That didn't work very well, oddly enough. I get the item size growing far too large. Instead, what works better, is the first time I get zooming, just expand out the size of the item.
+            boundedImageSize.width = maxWidth
+            boundedImageSize.height = collectionView.frame.height
+        }
+        
         return CGSize(width: boundedImageSize.width + IMAGE_WIDTH_PADDING, height: boundedImageSize.height)
+    }
+}
+
+extension LargeImages : LargeImageCellDelegate {
+    func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize) {
+    
+        if let indexPath = collectionView.indexPath(for: cell) {
+            // Don't let the cell shrink too small-- get odd effects here. The cell can get so small it shrinks out of sight. Don't know why that is. I thought the minimum scaling I put in the collection view cell would handle it.
+            if zoomSize.width > originalSize.width && zoomSize.height > originalSize.height {
+                if zoomedCells[indexPath] == nil {
+                    // This is the first attempt to make the cell larger.
+                    zoomedCells[indexPath] = true
+                    invalidateLayout(withAnimation: true)
+                }
+                else {
+                    zoomedCells[indexPath] = false
+                }
+            }
+            else {
+                if zoomedCells[indexPath] != nil {
+                    // The cell has gone back to it's original size-- let's go back to the `sizeForItemAt` we were using originally for it.
+                    zoomedCells.removeValue(forKey: indexPath)
+                    invalidateLayout(withAnimation: true)
+                }
+            }
+        }
     }
 }
