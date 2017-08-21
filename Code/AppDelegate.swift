@@ -70,7 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let minimumBackgroundFetchIntervalOneHour:TimeInterval = 60 * 60
         application.setMinimumBackgroundFetchInterval(minimumBackgroundFetchIntervalOneHour)
 
-         Fabric.with([Crashlytics.self])
+        Fabric.with([Crashlytics.self])
 
         return true
     }
