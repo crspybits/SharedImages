@@ -122,6 +122,8 @@ extension LargeImages : CoreDataSourceDelegate {
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasDeleted indexPathOfDeletedObject: IndexPath!) {
+    
+        // 8/24/17; Looks like this is where the crash happens.
         collectionView.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
     }
     
@@ -190,7 +192,7 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
             boundedImageSize.height = collectionView.frame.height
         }
         
-        return CGSize(width: boundedImageSize.width + IMAGE_WIDTH_PADDING, height: boundedImageSize.height)
+        return CGSize(width: boundedImageSize.width + IMAGE_WIDTH_PADDING, height: boundedImageSize.height + ImageCollectionVC.largeTitleHeight)
     }
 }
 

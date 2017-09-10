@@ -1,3 +1,24 @@
+SharedImages
+
+Version 0.89; (NEXT)
+
+	* TODO: With recent changes, in large images, can no longer see image captions with taller images.
+	
+Version 0.75; 9/9/17
+
+	* Compatibility change for NGINX use on server. Using lower-case http response headers.
+	
+	* Changed image deletion so that multiple images can be deleted together, in an atomic manner, based on changes to SyncServer client.
+			
+	* Fixed: Crashes on using Share Button
+		https://github.com/crspybits/SharedImages/issues/29
+		
+	* Fixed: Super-wide images crash the app
+		https://github.com/crspybits/SharedImages/issues/24
+		
+	* Fixed issue where deleting multiple images was not done correctly.
+		Images were previously not deleted atomically.
+
 Version 0.7; 8/20/17
 	* Clear badge after downloading images
 		https://github.com/crspybits/SharedImages/issues/13

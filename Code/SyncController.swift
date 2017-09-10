@@ -19,7 +19,7 @@ enum SyncControllerEvent {
 protocol SyncControllerDelegate : class {
     func addLocalImage(syncController:SyncController, url:SMRelativeLocalURL, uuid:String, mimeType:String, title:String?, creationDate: NSDate?)
     func completedAddingLocalImages()
-    func removeLocalImage(syncController:SyncController, uuid:String)
+    func removeLocalImages(syncController:SyncController, uuids:[String])
     func syncEvent(syncController:SyncController, event:SyncControllerEvent)
 }
 
@@ -51,13 +51,18 @@ class SyncController {
         }
     }
     
-    func remove(image:Image) {
+    func remove(images:[Image]) -> Bool {
+        let uuids = images.map({$0.uuid!})
+        
         do {
-            try SyncServer.session.delete(fileWithUUID: image.uuid!)
-            SyncServer.session.sync()
+            try SyncServer.session.delete(filesWithUUIDs: uuids)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
+            return false
         }
+        
+        SyncServer.session.sync()
+        return true
     }
 }
 
@@ -94,9 +99,8 @@ extension SyncController : SyncServerDelegate {
     }
 
     func shouldDoDeletions(downloadDeletions:[SyncAttributes]) {
-        for deletion in downloadDeletions {
-            delegate.removeLocalImage(syncController: self, uuid: deletion.fileUUID)
-        }
+        let uuids = downloadDeletions.map({$0.fileUUID!})
+        delegate.removeLocalImages(syncController: self, uuids: uuids)
     }
     
     func syncServerErrorOccurred(error:Error) {

@@ -13,11 +13,11 @@ import SMCoreLib
 class TrashActivity : UIActivity {
     var images: [Image]!
     weak var parentVC: UIViewController!
-    var removeImage:((Image)->())!
+    var removeImages:(([Image])->())!
     
-    init(withParentVC parentVC: UIViewController, removeImage:@escaping (Image)->()) {
+    init(withParentVC parentVC: UIViewController, removeImages:@escaping ([Image])->()) {
         self.parentVC = parentVC
-        self.removeImage = removeImage
+        self.removeImages = removeImages
     }
     
     // default returns nil. subclass may override to return custom activity type that is reported to completion handler
@@ -61,10 +61,7 @@ class TrashActivity : UIActivity {
         alert.popoverPresentationController?.sourceView = parentVC.view
     
         alert.addAction(UIAlertAction(title: "OK", style: .destructive) { alert in
-            for image in self.images {
-                self.removeImage(image)
-            }
-            
+            self.removeImages(self.images)
             self.activityDidFinish(true)
         })
         

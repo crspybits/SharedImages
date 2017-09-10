@@ -22,7 +22,13 @@ class ImageCollectionVC : UICollectionViewCell {
     fileprivate var switchedToFullScaleImageForZooming = false
 
     @IBOutlet weak var imageView: UIImageView!
+    
+    // These are oversized to give space for padding.
+    static let smallTitleHeight:CGFloat = 15
+    static let largeTitleHeight:CGFloat = 25
+    
     @IBOutlet weak var title: UILabel!
+    
     private(set) var image:Image!
     private(set) weak var syncController:SyncController!
     weak var imageCache:LRUCache<Image>!
@@ -83,9 +89,16 @@ class ImageCollectionVC : UICollectionViewCell {
         // For some reason, when I get here, the cell is sized correctly, but it's subviews are not. And more specifically, the image view subview is not sized correctly all the time. And since I'm basing my image fetch/resize on the image view size, I need it correctly sized right now.
         layoutIfNeeded()
         
-        scrollView?.contentSize = imageView.frame.size
+        // 8/29/17; In some edge cases, the `imageView.frame.size` can have a dimension that is too small-- e.g., 0 for height. This can happen with a really wide image that is short.
+        let minimumImageDimension:CGFloat = 15
+        var size = imageView.frame.size
+        size.height = max(size.height, minimumImageDimension)
+        size.width = max(size.width, minimumImageDimension)
+        imageView.frameSize = size
         
-        let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: imageView.frameSize)
+        scrollView?.contentSize = size
+        
+        let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: size)
         imageView.image = imageCache.getItem(from: image, with: smallerSize)
         
         originalSize = smallerSize

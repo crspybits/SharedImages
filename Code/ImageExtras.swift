@@ -57,13 +57,22 @@ class ImageExtras {
         return CGSize(width: originalSize.width * aspectRatio, height: originalSize.height * aspectRatio)
     }
 
-    static func removeLocalImage(uuid:String) {
-        guard let image = Image.fetchObjectWithUUID(uuid: uuid) else {
-            Log.error("Cannot find image with UUID: \(uuid)")
-            return
+    static func removeLocalImages(uuids:[String]) {
+        var images = [Image]()
+        
+        for uuid in uuids {
+            guard let image = Image.fetchObjectWithUUID(uuid: uuid) else {
+                Log.error("Cannot find image with UUID: \(uuid)")
+                return
+            }
+            
+            images.append(image)
         }
         
-        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+        for image in images {
+            CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+        }
+    
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
 }

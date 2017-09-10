@@ -70,7 +70,6 @@ class ImagesVC: UIViewController {
         let imageSelectionLongPress = UILongPressGestureRecognizer(target: self, action: #selector(imageSelectionLongPressAction(gesture:)))
         imageSelectionLongPress.delaysTouchesBegan = true
         collectionView?.addGestureRecognizer(imageSelectionLongPress)
-        collectionView?.delegate = self
         
         // A label and a means to do a consistency check.
         let titleLabel = UILabel()
@@ -97,12 +96,25 @@ class ImagesVC: UIViewController {
         navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
     }
     
-    func remove(image:Image) {
+    func remove(images:[Image]) {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
-        syncController.remove(image: image)
         
-        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+        if !syncController.remove(images: images) {
+            var message = "Could not delete image"
+            if images.count > 1 {
+                message += "s"
+            }
+            
+            SMCoreLib.Alert.show(withTitle: "Error", message: message)
+            return
+        }
+        
+        for image in images {
+            CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+        }
+        
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        // 8/24/17; Looks like I got a crash here. This may have been because I was not deleting a set of images atomically.
     }
     
     override func didReceiveMemoryWarning() {
@@ -234,8 +246,8 @@ class ImagesVC: UIViewController {
         return newImage
     }
     
-    func removeLocalImage(uuid:String) {
-        ImageExtras.removeLocalImage(uuid:uuid)
+    func removeLocalImages(uuids:[String]) {
+        ImageExtras.removeLocalImages(uuids:uuids)
     }
 }
 
@@ -337,8 +349,8 @@ extension ImagesVC : SyncControllerDelegate {
         addLocalImage(newImageURL: url, mimeType: mimeType, uuid:uuid, title:title, creationDate: creationDate)
     }
     
-    func removeLocalImage(syncController:SyncController, uuid:String) {
-        removeLocalImage(uuid: uuid)
+    func removeLocalImages(syncController: SyncController, uuids: [String]) {
+        removeLocalImages(uuids: uuids)
     }
     
     func syncEvent(syncController:SyncController, event:SyncControllerEvent) {
@@ -391,7 +403,7 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
         let image = self.coreDataSource.object(at: indexPath) as! Image
         let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
 
-        return CGSize(width: boundedImageSize.width, height: boundedImageSize.height)
+        return CGSize(width: boundedImageSize.width, height: boundedImageSize.height + ImageCollectionVC.smallTitleHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -420,8 +432,8 @@ extension ImagesVC {
         
         // 8/19/17; It looks like you can't control the order of the actions in the list supplied by this control. See https://stackoverflow.com/questions/19060535/how-to-rearrange-activities-on-a-uiactivityviewcontroller
         // Unfortunately, this means the deletion control occurs off to the right-- and I can't see it w/o scrolling on my iPhone6
-        let trashActivity = TrashActivity(withParentVC: self, removeImage: { image in
-            self.remove(image: image)
+        let trashActivity = TrashActivity(withParentVC: self, removeImages: { images in
+            self.remove(images: images)
         })
         let activityViewController = UIActivityViewController(activityItems: images, applicationActivities: [trashActivity])
         
@@ -433,6 +445,10 @@ extension ImagesVC {
                 self.collectionView.reloadData()
             }
         }
+        
+        // 8/26/17; https://github.com/crspybits/SharedImages/issues/29
+        activityViewController.popoverPresentationController?.sourceView = view
+        
         present(activityViewController, animated: true, completion: {})
     }
     
