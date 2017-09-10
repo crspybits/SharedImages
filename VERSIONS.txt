@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.89; (NEXT)
+Version 0.80; (NEXT)
 
 	* TODO: With recent changes, in large images, can no longer see image captions with taller images.
 	
