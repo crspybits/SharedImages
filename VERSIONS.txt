@@ -4,6 +4,10 @@ Version 0.80; (NEXT)
 
 	* TODO: With recent changes, in large images, can no longer see image captions with taller images.
 	
+	* Progress indication when downloading images
+		https://github.com/crspybits/SharedImages/issues/12
+		As part of this, enabled user to stop downloading images. 
+	
 Version 0.75; 9/9/17
 
 	* Compatibility change for NGINX use on server. Using lower-case http response headers.

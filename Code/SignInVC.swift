@@ -86,7 +86,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         }
     }
     
-    func shareAction() {
+    @objc func shareAction() {
         var alert:UIAlertController
         
         if SignInManager.session.userIsSignIn {

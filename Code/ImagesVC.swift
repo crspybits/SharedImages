@@ -216,7 +216,7 @@ class ImagesVC: UIViewController {
         refresh()
     }
     
-    func addImageAction() {
+    @objc func addImageAction() {
         self.acquireImage.showAlert(fromBarButton: addImageBarButton)
     }
     
