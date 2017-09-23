@@ -10,6 +10,7 @@ import UIKit
 import SMCoreLib
 import SyncServer
 import ODRefreshControl
+import LottiesBottom
 
 class ImagesVC: UIViewController {
     let reuseIdentifier = "ImageIcon"
@@ -33,6 +34,8 @@ class ImagesVC: UIViewController {
     fileprivate var imageCache:LRUCache<Image>! {
         return ImageExtras.imageCache
     }
+    
+    private var bottomAnimation:LottiesBottom!
     
     // Selection (via long-press) to allow user to select images for sending via text messages, email (etc), or for deletion.
     typealias UUIDString = String
@@ -94,6 +97,19 @@ class ImagesVC: UIViewController {
         actionButton = UIBarButtonItem(image: actionImage, style: .plain, target: self, action: #selector(actionButtonAction))
         
         navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
+        
+        let size = CGSize(width: 200, height: 300)
+        let animationLetters = ["C", "R", "D", "N"]
+        let whichAnimation = Int(arc4random_uniform(UInt32(animationLetters.count)))
+        let animationLetter = animationLetters[whichAnimation]
+        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetterkï.l;/, withSize: size, scrollView: self.collectionView, scrollViewParent: view) {[unowned self] in
+            self.syncController.sync()
+            self.bottomAnimation.hide()
+        }
+        bottomAnimation.completionThreshold = 0.5
+        
+        // Getting an odd effect-- of LottiesBottom showing initially or if we have newer at bottom.
+        bottomAnimation.animating = false
     }
     
     func remove(images:[Image]) {
@@ -140,9 +156,16 @@ class ImagesVC: UIViewController {
         else {
             indexPath = IndexPath(item: count-1, section: 0)
             position = .top
+            
+            // Getting an odd effect-- of LottiesBottom showing if we have newer at bottom.
+            bottomAnimation.animating = false
         }
-        
-        collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
+
+        UIView.animate(withDuration: 0.3, animations: {
+            self.collectionView.scrollToItem(at: indexPath, at: position, animated: false)
+        }) { success in
+            self.bottomAnimation.animating = true
+        }
     }
     
     override func viewWillLayoutSubviews() {
@@ -262,7 +285,7 @@ extension ImagesVC : UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as! ImageCollectionVC).cellSizeHasBeenChanged()
-        print("cell.frame: \(cell.frame)")
+        Log.msg("cell.frame: \(cell.frame)")
     }
 }
 

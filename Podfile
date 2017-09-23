@@ -22,6 +22,9 @@ target 'SharedImages' do
     
     pod 'SDCAlertView', '~> 7.1'
     
+    # pod 'LottiesBottom', :git => 'https://github.com/crspybits/LottiesBottom.git'
+    pod 'LottiesBottom', '~> 0.1'
+    
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     			

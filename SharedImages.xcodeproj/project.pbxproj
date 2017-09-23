@@ -21,6 +21,10 @@
 		8347BA651EF109F9002763F6 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347BA641EF109F9002763F6 /* Alert.swift */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
+		83A2E6AB1F76F84500A2E303 /* C.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A71F76F83300A2E303 /* C.json */; };
+		83A2E6AC1F76F84500A2E303 /* D.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A81F76F83300A2E303 /* D.json */; };
+		83A2E6AD1F76F84500A2E303 /* N.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A91F76F83300A2E303 /* N.json */; };
+		83A2E6AE1F76F84500A2E303 /* R.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6AA1F76F83300A2E303 /* R.json */; };
 		83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D1FE331EAB074A00DD468F /* LargeImages.swift */; };
 		83D49C981F49468200409B0F /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D49C971F49468200409B0F /* SettingsVC.swift */; };
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
@@ -69,6 +73,10 @@
 		8347BA641EF109F9002763F6 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
+		83A2E6A71F76F83300A2E303 /* C.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = C.json; sourceTree = "<group>"; };
+		83A2E6A81F76F83300A2E303 /* D.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = D.json; sourceTree = "<group>"; };
+		83A2E6A91F76F83300A2E303 /* N.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = N.json; sourceTree = "<group>"; };
+		83A2E6AA1F76F83300A2E303 /* R.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = R.json; sourceTree = "<group>"; };
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83D49C971F49468200409B0F /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
@@ -200,6 +208,18 @@
 			path = "CALayer+MBAnimationPersistence";
 			sourceTree = "<group>";
 		};
+		83A2E6A61F76F83300A2E303 /* LottieAnimations */ = {
+			isa = PBXGroup;
+			children = (
+				83A2E6A71F76F83300A2E303 /* C.json */,
+				83A2E6A81F76F83300A2E303 /* D.json */,
+				83A2E6A91F76F83300A2E303 /* N.json */,
+				83A2E6AA1F76F83300A2E303 /* R.json */,
+			);
+			name = LottieAnimations;
+			path = Resources/LottieAnimations;
+			sourceTree = "<group>";
+		};
 		83D49C961F49466600409B0F /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -234,6 +254,7 @@
 		83F8823C1E711F80008F644A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				83A2E6A61F76F83300A2E303 /* LottieAnimations */,
 				83F8823D1E711FC6008F644A /* Assets.xcassets */,
 				83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */,
 				83F882401E711FC6008F644A /* Main.storyboard */,
@@ -385,8 +406,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83A2E6AC1F76F84500A2E303 /* D.json in Resources */,
 				83F882471E711FC6008F644A /* Main.storyboard in Resources */,
+				83A2E6AB1F76F84500A2E303 /* C.json in Resources */,
 				83F882671E74A600008F644A /* Server.plist in Resources */,
+				83A2E6AE1F76F84500A2E303 /* R.json in Resources */,
+				83A2E6AD1F76F84500A2E303 /* N.json in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
@@ -544,6 +569,7 @@
 				"${BUILT_PRODUCTS_DIR}/Gloss/Gloss.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
+				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
 				"${BUILT_PRODUCTS_DIR}/ODRefreshControl/ODRefreshControl.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/SDCAlertView/SDCAlertView.framework",
@@ -551,6 +577,7 @@
 				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
+				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -564,6 +591,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gloss.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ODRefreshControl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDCAlertView.framework",
@@ -571,6 +599,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

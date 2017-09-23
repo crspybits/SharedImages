@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -38,7 +39,7 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="64" width="375" height="554"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="554"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="oqP-Vl-6zd">
@@ -147,16 +148,43 @@
                                     <constraint firstItem="PjW-Cs-lvK" firstAttribute="leading" secondItem="pZQ-Rb-DO3" secondAttribute="leading" constant="10" id="noA-Ez-ACs"/>
                                 </constraints>
                             </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version/Build:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a9B-v0-YII">
+                                <rect key="frame" x="132" y="541" width="111.5" height="21"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.8/201709202324" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YF8-46-uiZ">
+                                <rect key="frame" x="113.5" y="567" width="148" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H85-Q5-Pwl">
+                                <rect key="frame" x="92" y="480" width="191" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Email log to developer"/>
+                                <connections>
+                                    <action selector="emailLogAction:" destination="LgV-c1-lQr" eventType="touchUpInside" id="KdW-Z9-ofb"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="YF8-46-uiZ" firstAttribute="top" secondItem="a9B-v0-YII" secondAttribute="bottom" constant="5" id="1Ll-dQ-MFQ"/>
+                            <constraint firstItem="H85-Q5-Pwl" firstAttribute="centerX" secondItem="FOZ-xL-pWb" secondAttribute="centerX" id="5tL-6H-VRz"/>
+                            <constraint firstItem="a9B-v0-YII" firstAttribute="top" secondItem="H85-Q5-Pwl" secondAttribute="bottom" constant="25" id="QWK-MQ-twe"/>
                             <constraint firstItem="pZQ-Rb-DO3" firstAttribute="centerX" secondItem="FOZ-xL-pWb" secondAttribute="centerX" id="c05-S7-bRc"/>
                             <constraint firstItem="pZQ-Rb-DO3" firstAttribute="top" secondItem="hNa-4E-d61" secondAttribute="bottom" constant="34" id="lkx-oW-kKe"/>
+                            <constraint firstItem="eo5-e7-6ws" firstAttribute="top" secondItem="YF8-46-uiZ" secondAttribute="bottom" constant="30" id="p9z-Cq-AGJ"/>
+                            <constraint firstItem="YF8-46-uiZ" firstAttribute="centerX" secondItem="FOZ-xL-pWb" secondAttribute="centerX" id="uOE-qa-FDO"/>
+                            <constraint firstItem="a9B-v0-YII" firstAttribute="centerX" secondItem="FOZ-xL-pWb" secondAttribute="centerX" id="z9n-8u-maX"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="yoi-hr-8Pq"/>
                     <connections>
                         <outlet property="imageOrderSwitch" destination="J7U-aW-d5P" id="Lsu-VH-g89"/>
+                        <outlet property="versionAndBuild" destination="YF8-46-uiZ" id="YZh-a5-ZFQ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GkJ-PH-tB1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -176,7 +204,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ZdO-Nh-jZh">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="dqh-mu-NQ4">
                                     <size key="itemSize" width="375" height="446"/>
@@ -186,7 +214,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" reuseIdentifier="largeImage" id="jFk-xt-pcJ" customClass="ImageCollectionVC" customModule="SharedImages" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="110.5" width="375" height="446"/>
+                                        <rect key="frame" x="0.0" y="100.5" width="375" height="446"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="446"/>
@@ -264,7 +292,7 @@
                         <viewControllerLayoutGuide type="bottom" id="Cgq-RN-DzA"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="bdX-aF-BjN">
-                        <rect key="frame" x="0.0" y="64" width="375" height="554"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="554"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1iE-kj-9D9" userLabel="SignIn Container">
@@ -300,7 +328,7 @@
                     </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="9q4-aK-g6R">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="barTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </navigationBar>
@@ -320,7 +348,7 @@
                     <tabBarItem key="tabBarItem" title="Images" image="images" selectedImage="images" id="Zwn-MX-8e3"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="eEP-EW-VdI">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="barTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </navigationBar>
@@ -340,7 +368,7 @@
                     <tabBarItem key="tabBarItem" title="Settings" image="Settings" id="fEX-8P-G3I"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="9ns-FS-23k">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>

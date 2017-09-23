@@ -2,7 +2,17 @@ SharedImages
 
 Version 0.80; (NEXT)
 
+	* TODO: When you have images sorted with newest on bottom, it's hard to refresh.
+		Pull from bottom to refresh?
+		Tap on "Shared Images" title to refresh?
+		
 	* TODO: With recent changes, in large images, can no longer see image captions with taller images.
+	
+	* Add emailing of log from users
+		https://github.com/crspybits/SharedImages/issues/33
+		
+	* Add Build number/Version number into Settings
+		https://github.com/crspybits/SharedImages/issues/32
 	
 	* Progress indication when downloading images
 		https://github.com/crspybits/SharedImages/issues/12
