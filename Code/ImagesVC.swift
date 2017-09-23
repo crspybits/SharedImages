@@ -102,7 +102,7 @@ class ImagesVC: UIViewController {
         let animationLetters = ["C", "R", "D", "N"]
         let whichAnimation = Int(arc4random_uniform(UInt32(animationLetters.count)))
         let animationLetter = animationLetters[whichAnimation]
-        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetterkï.l;/, withSize: size, scrollView: self.collectionView, scrollViewParent: view) {[unowned self] in
+        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetter, withSize: size, scrollView: self.collectionView, scrollViewParent: view) {[unowned self] in
             self.syncController.sync()
             self.bottomAnimation.hide()
         }
