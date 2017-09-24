@@ -1,14 +1,15 @@
 SharedImages
 
-Version 0.80; (NEXT)
-
-	* TODO: When you have images sorted with newest on bottom, it's hard to refresh.
-		Pull from bottom to refresh?
-		Tap on "Shared Images" title to refresh?
-		
-	* TODO: With recent changes, in large images, can no longer see image captions with taller images.
+Version 0.80; 9/23/17
+	* Fixed: Functional problem with refresh, if sorting with newest at the bottom
+		https://github.com/crspybits/SharedImages/issues/25
+		Added feature: Pull from bottom to refresh, using new Cocoapod: LottiesBottom
+	
+	* Fixed: Can't see captions large, taller, images
+		https://github.com/crspybits/SharedImages/issues/35
 	
 	* Add emailing of log from users
+		Will work only for debug builds.
 		https://github.com/crspybits/SharedImages/issues/33
 		
 	* Add Build number/Version number into Settings
@@ -19,7 +20,6 @@ Version 0.80; (NEXT)
 		As part of this, enabled user to stop downloading images. 
 	
 Version 0.75; 9/9/17
-
 	* Compatibility change for NGINX use on server. Using lower-case http response headers.
 	
 	* Changed image deletion so that multiple images can be deleted together, in an atomic manner, based on changes to SyncServer client.
