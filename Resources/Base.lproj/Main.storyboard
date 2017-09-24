@@ -261,7 +261,7 @@
         <!--Large Images-->
         <scene sceneID="efv-cU-CzA">
             <objects>
-                <viewController storyboardIdentifier="LargeImages" id="7QN-xT-tOc" customClass="LargeImages" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LargeImages" automaticallyAdjustsScrollViewInsets="NO" id="7QN-xT-tOc" customClass="LargeImages" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ASX-tC-PLm"/>
                         <viewControllerLayoutGuide type="bottom" id="xtK-xN-Iu2"/>
@@ -271,7 +271,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ZdO-Nh-jZh">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="dqh-mu-NQ4">
                                     <size key="itemSize" width="375" height="446"/>
@@ -281,17 +281,17 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" reuseIdentifier="largeImage" id="jFk-xt-pcJ" customClass="ImageCollectionVC" customModule="SharedImages" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="100.5" width="375" height="446"/>
+                                        <rect key="frame" x="0.0" y="78.5" width="375" height="446"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="446"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p1e-vt-Zhp">
-                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="413"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="394"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ehS-fV-uhh">
-                                                            <rect key="frame" x="0.0" y="0.0" width="375" height="446"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="375" height="427"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                         </imageView>
                                                     </subviews>
@@ -305,7 +305,7 @@
                                                     </constraints>
                                                 </scrollView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v3d-KG-LOK">
-                                                    <rect key="frame" x="0.0" y="414" width="375" height="21"/>
+                                                    <rect key="frame" x="0.0" y="395" width="375" height="21"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="21" id="Bma-52-VWI"/>
                                                     </constraints>
@@ -317,9 +317,9 @@
                                         </view>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                         <constraints>
-                                            <constraint firstAttribute="bottom" secondItem="v3d-KG-LOK" secondAttribute="bottom" constant="11" id="3c5-Qm-ayu"/>
+                                            <constraint firstAttribute="bottom" secondItem="v3d-KG-LOK" secondAttribute="bottom" constant="30" id="3c5-Qm-ayu"/>
                                             <constraint firstAttribute="trailing" secondItem="v3d-KG-LOK" secondAttribute="trailing" id="NQR-Od-zPE"/>
-                                            <constraint firstAttribute="bottom" secondItem="p1e-vt-Zhp" secondAttribute="bottom" constant="33" id="Yql-oe-1Gt"/>
+                                            <constraint firstItem="v3d-KG-LOK" firstAttribute="top" secondItem="p1e-vt-Zhp" secondAttribute="bottom" constant="1" id="TLq-Vc-f3g"/>
                                             <constraint firstItem="p1e-vt-Zhp" firstAttribute="top" secondItem="jFk-xt-pcJ" secondAttribute="top" id="b5l-TK-ovf"/>
                                             <constraint firstItem="v3d-KG-LOK" firstAttribute="leading" secondItem="jFk-xt-pcJ" secondAttribute="leading" id="dHF-oi-vjB"/>
                                             <constraint firstAttribute="trailing" secondItem="p1e-vt-Zhp" secondAttribute="trailing" id="hUP-4i-uI3"/>
@@ -342,13 +342,14 @@
                             <constraint firstAttribute="trailing" secondItem="ZdO-Nh-jZh" secondAttribute="trailing" id="zAr-LG-PBc"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="QrN-Lb-CDD"/>
                     <connections>
                         <outlet property="collectionView" destination="ZdO-Nh-jZh" id="yfe-x5-HmR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pt9-uX-zAW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1165.5999999999999" y="160.56971514242881"/>
+            <point key="canvasLocation" x="1943" y="161"/>
         </scene>
         <!--Sign InVC-->
         <scene sceneID="VPd-vH-GDK">
@@ -446,6 +447,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="exs-Fr-FTA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-490" y="896"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="b2k-gI-Fr3">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="v6U-xw-f5b" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="3RJ-oy-OVe">
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="7QN-xT-tOc" kind="relationship" relationship="rootViewController" id="7aU-Om-Qdj"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kzj-aM-IBt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1164.8" y="160.11994002998503"/>
         </scene>
     </scenes>
     <resources>
