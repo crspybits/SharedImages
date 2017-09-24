@@ -40,7 +40,7 @@ public class Image: NSManagedObject {
             }
             else {
                 let url = NSKeyedUnarchiver.unarchiveObject(with: urlInternal! as Data) as? SMRelativeLocalURL
-                Assert.If(url == nil, thenPrintThisString: "Yikes: No URL!")
+                Assert.If(url == nil, thenPrintThisString: "Image: Yikes: No URL!")
                 return url
             }
         }

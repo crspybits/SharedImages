@@ -24,9 +24,13 @@ protocol SyncControllerDelegate : class {
 }
 
 class SyncController {
+    private var progressIndicator: ProgressIndicator!
+    private var numberImagesToDownload: UInt!
+    private var numberDownloadedSoFar: UInt!
+    
     init() {
         SyncServer.session.delegate = self
-        SyncServer.session.eventsDesired = [EventDesired.syncStarted, EventDesired.syncDone]
+        SyncServer.session.eventsDesired = [EventDesired.syncStarted, EventDesired.syncDone, EventDesired.willStartDownloads]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -67,35 +71,36 @@ class SyncController {
 }
 
 extension SyncController : SyncServerDelegate {
-    func shouldSaveDownloads(downloads: [(downloadedFile: NSURL, downloadedFileAttributes: SyncAttributes)]) {
-        for download in downloads {
-            let url = FileExtras().newURLForImage()
-            
-            // The files we get back from the SyncServer are in a temporary location.
-            do {
-                try FileManager.default.moveItem(at: download.downloadedFile as URL, to: url as URL)
-            } catch (let error) {
-                Log.error("An error occurred moving a file: \(error)")
-            }
-            
-            var title:String?
-            
-            if download.downloadedFileAttributes.appMetaData != nil {
-                Log.msg("download.downloadedFileAttributes.appMetaData: \(download.downloadedFileAttributes.appMetaData!)")
-            }
-            
-            // If present, the appMetaData will be a JSON string
-            if let jsonData = download.downloadedFileAttributes.appMetaData?.data(using: String.Encoding.utf8, allowLossyConversion: false) {
-            
-                if let appMetaDataJSON = try? JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: AnyObject] {
-                    title = appMetaDataJSON[ImageExtras.appMetaDataTitleKey] as? String
-                }
-            }
-
-            delegate.addLocalImage(syncController: self, url: url, uuid: download.downloadedFileAttributes.fileUUID, mimeType: download.downloadedFileAttributes.mimeType, title:title, creationDate:download.downloadedFileAttributes.creationDate as NSDate?)
+    func singleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
+        // The files we get back from the SyncServer are in a temporary location.
+        let newImageURL = FileExtras().newURLForImage()
+        do {
+            try FileManager.default.moveItem(at: url as URL, to: newImageURL as URL)
+        } catch (let error) {
+            Log.error("An error occurred moving a file: \(error)")
         }
+    
+        var title:String?
+    
+        Log.msg("attr.appMetaData: \(String(describing: attr.appMetaData))")
+    
+        // If present, the appMetaData will be a JSON string
+        if let jsonData = attr.appMetaData?.data(using: String.Encoding.utf8, allowLossyConversion: false) {
+        
+            if let appMetaDataJSON = try? JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: AnyObject] {
+                title = appMetaDataJSON[ImageExtras.appMetaDataTitleKey] as? String
+            }
+        }
+
+        delegate.addLocalImage(syncController: self, url: newImageURL, uuid: attr.fileUUID, mimeType: attr.mimeType, title:title, creationDate:attr.creationDate as NSDate?)
         
         delegate.completedAddingLocalImages()
+        
+        numberDownloadedSoFar! += UInt(1)
+        progressIndicator?.updateProgress(withNumberDownloaded: numberDownloadedSoFar)
+        if numberDownloadedSoFar >= numberImagesToDownload {
+            progressIndicator?.dismiss()
+        }
     }
 
     func shouldDoDeletions(downloadDeletions:[SyncAttributes]) {
@@ -114,6 +119,24 @@ extension SyncController : SyncServerDelegate {
         switch event {
         case .syncStarted:
             delegate.syncEvent(syncController: self, event: .syncStarted)
+        
+        case .willStartDownloads(numberDownloads: let numberDownloads):
+            numberImagesToDownload = numberDownloads
+            numberDownloadedSoFar = 0
+            
+            // In case there's already one. Seems unlikely, but willStartDownloads can be repeated if we get a master version update.
+            progressIndicator?.dismiss()
+            
+            // TESTING
+            // TimedCallback.withDuration(30, andCallback: {
+            //     Network.session().debugNetworkOff = true
+            // })
+            // TESTING
+            
+            progressIndicator = ProgressIndicator(totalImagesToDownload: numberDownloads, withStopHandler: {
+                SyncServer.session.stopSync()
+            })
+            progressIndicator.show()
             
         case .syncDone:
             delegate.syncEvent(syncController: self, event: .syncDone)
@@ -125,10 +148,6 @@ extension SyncController : SyncServerDelegate {
     
 #if DEBUG
     public func syncServerSingleFileUploadCompleted(next: @escaping () -> ()) {
-        next()
-    }
-    
-    public func syncServerSingleFileDownloadCompleted(next: @escaping () -> ()) {
         next()
     }
 #endif
