@@ -7,13 +7,13 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-# 	pod 'SyncServer', '~> 4.0'
-# 	pod 'SyncServer/Facebook', '~> 4.0'
+	pod 'SyncServer', '~> 4.0'
+	pod 'SyncServer/Facebook', '~> 4.0'
 	
-	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-	
-	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
+# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+# 	
+# 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
 
 	# Using my fork because of changes I made
 	pod 'ODRefreshControl', :git => 'https://github.com/crspybits/ODRefreshControl.git'
@@ -28,12 +28,12 @@ target 'SharedImages' do
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     			
-# 	pod 'SyncServer', '~> 4.0'
-# 	pod 'SyncServer/Facebook', '~> 4.0'
+		pod 'SyncServer', '~> 4.0'
+		pod 'SyncServer/Facebook', '~> 4.0'
 
-		pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-		pod 'SyncServer', :path => '../SyncServer-iOSClient'
-		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+# 		pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
+# 		pod 'SyncServer', :path => '../SyncServer-iOSClient'
+# 		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
 
     	pod 'GoogleSignIn', '~> 4.0'
   	end
@@ -43,7 +43,7 @@ target 'SharedImages' do
 	
 	post_install do |installer|
 	
-		myTargets = ['Gloss', 'SDCAlertView', 'SyncServer-Shared', 'FacebookCore', 'SyncServer']
+		myTargets = ['Gloss', 'SDCAlertView', 'SyncServer-Shared', 'FacebookCore', 'SyncServer', 'SMCoreLib']
 		
 		installer.pods_project.targets.each do |target|
 			if myTargets.include? target.name
