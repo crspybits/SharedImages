@@ -98,11 +98,15 @@ class ImagesVC: UIViewController {
         
         navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
         
-        let size = CGSize(width: 200, height: 300)
+        let size = CGSize(width: 200, height: 85)
         let animationLetters = ["C", "R", "D", "N"]
         let whichAnimation = Int(arc4random_uniform(UInt32(animationLetters.count)))
         let animationLetter = animationLetters[whichAnimation]
-        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetter, withSize: size, scrollView: self.collectionView, scrollViewParent: view) {[unowned self] in
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let tabBarHeight = appDelegate.tabBarController.tabBar.frame.size.height
+        
+        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetter, withSize: size, scrollView: self.collectionView, scrollViewParent: appDelegate.tabBarController.view, bottomYOffset: -tabBarHeight) {[unowned self] in
             self.syncController.sync()
             self.bottomAnimation.hide()
         }
