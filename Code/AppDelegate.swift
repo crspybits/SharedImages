@@ -22,6 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     
+        // TODO: When I actually ship a production app, take away the comments below.
+//#if DEBUG
+        Log.minLevel = .verbose
+//#else
+//        Log.minLevel = .error
+//#endif
+    
         let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
         let urlString = try! plist.getString(varName: "ServerURL")
         let serverURL = URL(string: urlString)!

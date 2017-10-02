@@ -1,5 +1,10 @@
 SharedImages
 
+Version 0.81; 10/1/17
+	* Fixed: Logging should now enable reporting of logs to developer.
+	
+	* Fixed: Problems relating to accepting a sharing invitation as a Facebook user.
+
 Version 0.80; 9/23/17
 	* Fixed: Functional problem with refresh, if sorting with newest at the bottom
 		https://github.com/crspybits/SharedImages/issues/25

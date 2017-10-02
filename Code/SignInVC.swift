@@ -36,6 +36,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     var googleSignInButton: /*TappableButton*/ UIView!
     var facebookSignInButton:/*TappableButton*/ UIView!
     var sharingBarButton:UIBarButtonItem!
+    var signIn:SignIn!
     
     private var _acceptSharingInvitation:Bool = false
     var acceptSharingInvitation: Bool {
@@ -61,7 +62,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         facebookSignInButton.frameWidth = googleSignInButton.frameWidth
         SetupSignIn.session.facebookSignIn.delegate = self
         
-        let signIn:SignIn = SignIn.createFromXib()!
+        signIn = SignIn.createFromXib()!
         signInContainer.addSubview(signIn)
         
         sharingBarButton = UIBarButtonItem(title: "Share", style: .plain, target: self, action: #selector(shareAction))
@@ -150,20 +151,25 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
 
 extension SignInVC : SharingInvitationDelegate {
     func sharingInvitationReceived(_ sharingInvitation:SharingInvitation) {
-        
-        let userFriendlyText = sharingInvitation.sharingInvitationPermission!.userFriendlyText()
+#if false
+        SMCoreLib.Alert.show(withTitle: "SharingInvitation", message: "code: \(String(describing: sharingInvitation.sharingInvitationCode))")
+#endif
+
         if !SignInManager.session.userIsSignIn {
+            let userFriendlyText = sharingInvitation.sharingInvitationPermission!.userFriendlyText()
             let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: .actionSheet)
             Alert.styleForIPad(alert)
-            alert.popoverPresentationController?.barButtonItem = sharingBarButton
+            alert.popoverPresentationController?.barButtonItem = self.sharingBarButton
 
             alert.addAction(UIAlertAction(title: "Not now", style: .cancel) {alert in
             })
             alert.addAction(UIAlertAction(title: "Share", style: .default) {alert in
                 self.acceptSharingInvitation = true
-                
+                self.signIn.signInStart.showSignIns(for: .sharingUser)
+
+                // YARK: Why in the heck is this tapping on the `googleSignInButton`??? This is not specific to Google!!!
                 // TappableButton changes
-                ((self.googleSignInButton) as! Tappable).tap()
+                // ((self.googleSignInButton) as! Tappable).tap()
             })
             self.present(alert, animated: true, completion: nil)
         }
