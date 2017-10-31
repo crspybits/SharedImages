@@ -1,5 +1,9 @@
 SharedImages
 
+Version 0.82; 10/31/17
+	* Sticky sign-in-- making sign-in's less frequent-- to improve the UX.
+		https://github.com/crspybits/SharedImages/issues/30
+		
 Version 0.81; 10/1/17
 	* Fixed: Logging should now enable reporting of logs to developer.
 	

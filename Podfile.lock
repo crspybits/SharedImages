@@ -5,9 +5,9 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
-  - Crashlytics (3.9.0):
-    - Fabric (~> 1.7.0)
-  - Fabric (1.7.1)
+  - Crashlytics (3.9.3):
+    - Fabric (~> 1.7.2)
+  - Fabric (1.7.2)
   - FacebookCore (0.2.0):
     - Bolts (~> 1.8)
     - FBSDKCoreKit (~> 4.15)
@@ -42,7 +42,7 @@ PODS:
   - GTMSessionFetcher/Full (1.1.12):
     - GTMSessionFetcher/Core (= 1.1.12)
   - HPTextViewTapGestureRecognizer (0.1)
-  - lottie-ios (2.1.3)
+  - lottie-ios (2.1.4)
   - LottiesBottom (0.2.0):
     - lottie-ios (~> 2.1)
   - ODRefreshControl (1.2)
@@ -53,20 +53,20 @@ PODS:
     - Reachability
     - SwiftyBeaver
   - SwiftyBeaver (1.4.2)
-  - SyncServer (4.1.1):
+  - SyncServer (5.0.0):
     - Gloss
     - SMCoreLib (~> 1.0)
     - SyncServer-Shared (~> 2.1)
-    - SyncServer/Lite (= 4.1.1)
+    - SyncServer/Lite (= 5.0.0)
   - SyncServer-Shared (2.1.0):
     - Gloss
-  - SyncServer/Facebook (4.1.1):
+  - SyncServer/Facebook (5.0.0):
     - FacebookCore (= 0.2.0)
     - FacebookLogin (= 0.2.0)
     - Gloss
     - SMCoreLib (~> 1.0)
     - SyncServer-Shared (~> 2.1)
-  - SyncServer/Lite (4.1.1):
+  - SyncServer/Lite (5.0.0):
     - Gloss
     - SMCoreLib (~> 1.0)
     - SyncServer-Shared (~> 2.1)
@@ -78,17 +78,12 @@ DEPENDENCIES:
   - LottiesBottom (~> 0.2)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (from `../SyncServer-iOSClient`)
-  - SyncServer-Shared (from `../SyncServer-Shared`)
-  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
+  - SyncServer (~> 5.0)
+  - SyncServer/Facebook (~> 5.0)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
-  SyncServer:
-    :path: ../SyncServer-iOSClient
-  SyncServer-Shared:
-    :path: ../SyncServer-Shared
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -97,8 +92,8 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Crashlytics: 64aad5dd97249dd3ff94b979fea140144590cdd3
-  Fabric: c7cfc652f036180a72fe2539646c8a624420419d
+  Crashlytics: dbb07d01876c171c5ccbdf7826410380189e452c
+  Fabric: 9cd6a848efcf1b8b07497e0b6a2e7d336353ba15
   FacebookCore: 2cb3f0fbff218e9d3119cec84bae983b232412de
   FacebookLogin: c9d606504735780a9e3002465a615512e0a691a5
   FBSDKCoreKit: 03365dad5d790249196ffad8be4f6d8a2d98f932
@@ -109,16 +104,16 @@ SPEC CHECKSUMS:
   GTMOAuth2: be83fd28d63ae3087e7d351b1f39c1a7e24ab6e7
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
-  lottie-ios: 8c150606598931621e927377f1426d2d3e99282d
+  lottie-ios: 94fa2d82547ce3adf1e61157653ba99999fd279f
   LottiesBottom: abb6174d9d77253359e379c41e52248cd789b465
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
   SMCoreLib: 02aee83cbf49c3295da6ec3ac043682ef68eed4c
   SwiftyBeaver: 91057725648ee4980308f1650af077d04b3654a0
-  SyncServer: cecba9b8da1163d4e5b13942e3c88a5980ae1c0a
-  SyncServer-Shared: 2505a31d8cdd41d93f56bccc7d26df67156e001b
+  SyncServer: 5f4c39445434db67000e0e5248385f6710e3b228
+  SyncServer-Shared: 62daa091acb31080c8e1a744f926991f9ddf045e
 
-PODFILE CHECKSUM: 70cc3a5833837a4066cb769df2ea52274db7cfc1
+PODFILE CHECKSUM: fe83389e2d332680beee4fcde5fbb2f0a98948ff
 
 COCOAPODS: 1.3.1

@@ -7,14 +7,12 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-# 	pod 'SyncServer', '~> 4.1'
-# 	pod 'SyncServer/Facebook', '~> 4.1'
+	pod 'SyncServer', '~> 5.0'
+	pod 'SyncServer/Facebook', '~> 5.0'
 	
-	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-	
-	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
-# 	
+# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
 
 	# Using my fork because of changes I made
@@ -30,13 +28,13 @@ target 'SharedImages' do
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     			
-# 		pod 'SyncServer', '~> 4.1'
-# 		pod 'SyncServer/Facebook', '~> 4.1'
+		pod 'SyncServer', '~> 5.0'
+		pod 'SyncServer/Facebook', '~> 5.0'
 
 # 		pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-		pod 'SyncServer', :path => '../SyncServer-iOSClient'
-		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-		pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
+# 		pod 'SyncServer', :path => '../SyncServer-iOSClient'
+# 		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+# 		pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 
     	pod 'GoogleSignIn', '~> 4.0'
   	end
