@@ -93,8 +93,7 @@ class ImagesVC: UIViewController {
         let spinnerBarButtonItem = UIBarButtonItem(customView: spinnerButton)
         
         // For sharing images via email, text messages, and for deleting images.
-        let actionImage = UIImage(named: "Action")
-        actionButton = UIBarButtonItem(image: actionImage, style: .plain, target: self, action: #selector(actionButtonAction))
+        actionButton = UIBarButtonItem(image: #imageLiteral(resourceName: "Action"), style: .plain, target: self, action: #selector(actionButtonAction))
         
         navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
         

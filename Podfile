@@ -7,11 +7,13 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 4.1'
-	pod 'SyncServer/Facebook', '~> 4.1'
+# 	pod 'SyncServer', '~> 4.1'
+# 	pod 'SyncServer/Facebook', '~> 4.1'
 	
-# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+	
+	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 # 	
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
 
@@ -28,12 +30,13 @@ target 'SharedImages' do
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     			
-		pod 'SyncServer', '~> 4.1'
-		pod 'SyncServer/Facebook', '~> 4.1'
+# 		pod 'SyncServer', '~> 4.1'
+# 		pod 'SyncServer/Facebook', '~> 4.1'
 
 # 		pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-# 		pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+		pod 'SyncServer', :path => '../SyncServer-iOSClient'
+		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+		pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 
     	pod 'GoogleSignIn', '~> 4.0'
   	end

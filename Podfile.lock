@@ -5,9 +5,9 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
-  - Crashlytics (3.8.6):
-    - Fabric (~> 1.6.3)
-  - Fabric (1.6.13)
+  - Crashlytics (3.9.0):
+    - Fabric (~> 1.7.0)
+  - Fabric (1.7.1)
   - FacebookCore (0.2.0):
     - Bolts (~> 1.8)
     - FBSDKCoreKit (~> 4.15)
@@ -16,24 +16,24 @@ PODS:
     - FacebookCore (~> 0.2)
     - FBSDKCoreKit (~> 4.15)
     - FBSDKLoginKit (~> 4.15)
-  - FBSDKCoreKit (4.27.0):
+  - FBSDKCoreKit (4.27.1):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.27.0):
+  - FBSDKLoginKit (4.27.1):
     - FBSDKCoreKit
   - Gloss (1.2.4)
-  - GoogleSignIn (4.1.0):
+  - GoogleSignIn (4.1.1):
     - GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)
     - GoogleToolboxForMac/NSString+URLArguments (~> 2.1)
     - GTMOAuth2 (~> 1.0)
     - GTMSessionFetcher/Core (~> 1.1)
-  - GoogleToolboxForMac/DebugUtils (2.1.1):
-    - GoogleToolboxForMac/Defines (= 2.1.1)
-  - GoogleToolboxForMac/Defines (2.1.1)
-  - GoogleToolboxForMac/NSDictionary+URLArguments (2.1.1):
-    - GoogleToolboxForMac/DebugUtils (= 2.1.1)
-    - GoogleToolboxForMac/Defines (= 2.1.1)
-    - GoogleToolboxForMac/NSString+URLArguments (= 2.1.1)
-  - GoogleToolboxForMac/NSString+URLArguments (2.1.1)
+  - GoogleToolboxForMac/DebugUtils (2.1.3):
+    - GoogleToolboxForMac/Defines (= 2.1.3)
+  - GoogleToolboxForMac/Defines (2.1.3)
+  - GoogleToolboxForMac/NSDictionary+URLArguments (2.1.3):
+    - GoogleToolboxForMac/DebugUtils (= 2.1.3)
+    - GoogleToolboxForMac/Defines (= 2.1.3)
+    - GoogleToolboxForMac/NSString+URLArguments (= 2.1.3)
+  - GoogleToolboxForMac/NSString+URLArguments (2.1.3)
   - GTMOAuth2 (1.1.5):
     - GTMSessionFetcher (~> 1.1)
   - GTMSessionFetcher (1.1.12):
@@ -78,12 +78,17 @@ DEPENDENCIES:
   - LottiesBottom (~> 0.2)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (~> 4.1)
-  - SyncServer/Facebook (~> 4.1)
+  - SyncServer (from `../SyncServer-iOSClient`)
+  - SyncServer-Shared (from `../SyncServer-Shared`)
+  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
+  SyncServer:
+    :path: ../SyncServer-iOSClient
+  SyncServer-Shared:
+    :path: ../SyncServer-Shared
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -92,15 +97,15 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Crashlytics: 95d05f4e4c19a771250c4bd9ce344d996de32bbf
-  Fabric: 2fb5676bc811af011a04513451f463dac6803206
+  Crashlytics: 64aad5dd97249dd3ff94b979fea140144590cdd3
+  Fabric: c7cfc652f036180a72fe2539646c8a624420419d
   FacebookCore: 2cb3f0fbff218e9d3119cec84bae983b232412de
   FacebookLogin: c9d606504735780a9e3002465a615512e0a691a5
-  FBSDKCoreKit: ebc6c5f5b3f0e72396041050e2266781a38ac587
-  FBSDKLoginKit: 887be4b7452e1c5a3cc4485ce152529965a0c41e
+  FBSDKCoreKit: 03365dad5d790249196ffad8be4f6d8a2d98f932
+  FBSDKLoginKit: 66ff53b73cffd967ab773e32fac39e90a60e6d46
   Gloss: 4e036074610fdb993abcb958ebcd7332588e2333
-  GoogleSignIn: 8c599fc10d25b2af86a3f82fd9631e863f2b1400
-  GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
+  GoogleSignIn: 3fdaa34a2ba04dbd7a25d7db39aecb0da98d5bdc
+  GoogleToolboxForMac: 2501e2ad72a52eb3dfe7bd9aee7dad11b858bd20
   GTMOAuth2: be83fd28d63ae3087e7d351b1f39c1a7e24ab6e7
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
@@ -111,9 +116,9 @@ SPEC CHECKSUMS:
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
   SMCoreLib: 02aee83cbf49c3295da6ec3ac043682ef68eed4c
   SwiftyBeaver: 91057725648ee4980308f1650af077d04b3654a0
-  SyncServer: 8bd1769080f8e1e139bd1021d1f9d5d7026e1339
-  SyncServer-Shared: 62daa091acb31080c8e1a744f926991f9ddf045e
+  SyncServer: cecba9b8da1163d4e5b13942e3c88a5980ae1c0a
+  SyncServer-Shared: 2505a31d8cdd41d93f56bccc7d26df67156e001b
 
-PODFILE CHECKSUM: 5c4760473215e5146239f8356fe21e0bcfaa9d8c
+PODFILE CHECKSUM: 70cc3a5833837a4066cb769df2ea52274db7cfc1
 
 COCOAPODS: 1.3.1

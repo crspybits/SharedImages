@@ -90,7 +90,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     @objc func shareAction() {
         var alert:UIAlertController
         
-        if SignInManager.session.userIsSignIn {
+        if SignInManager.session.userIsSignedIn {
             alert = UIAlertController(title: "Share your images with a Google or Facebook user?", message: nil, preferredStyle: .actionSheet)
 
             func addAlertAction(_ permission:SharingPermission) {
@@ -155,7 +155,7 @@ extension SignInVC : SharingInvitationDelegate {
         SMCoreLib.Alert.show(withTitle: "SharingInvitation", message: "code: \(String(describing: sharingInvitation.sharingInvitationCode))")
 #endif
 
-        if !SignInManager.session.userIsSignIn {
+        if !SignInManager.session.userIsSignedIn {
             let userFriendlyText = sharingInvitation.sharingInvitationPermission!.userFriendlyText()
             let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: .actionSheet)
             Alert.styleForIPad(alert)
@@ -165,11 +165,7 @@ extension SignInVC : SharingInvitationDelegate {
             })
             alert.addAction(UIAlertAction(title: "Share", style: .default) {alert in
                 self.acceptSharingInvitation = true
-                self.signIn.signInStart.showSignIns(for: .sharingUser)
-
-                // YARK: Why in the heck is this tapping on the `googleSignInButton`??? This is not specific to Google!!!
-                // TappableButton changes
-                // ((self.googleSignInButton) as! Tappable).tap()
+                self.signIn.showSignIns(for: .sharingAccount)
             })
             self.present(alert, animated: true, completion: nil)
         }
@@ -178,7 +174,7 @@ extension SignInVC : SharingInvitationDelegate {
 
 extension SignInVC : GenericSignInDelegate {
     func shouldDoUserAction(signIn:GenericSignIn) -> UserActionNeeded {
-        var result:UserActionNeeded = .none
+        var result:UserActionNeeded = .error
         
         if SignInManager.currentUserId.stringValue != "" &&
             signIn.credentials?.userId != nil &&
@@ -231,13 +227,15 @@ extension SignInVC : GenericSignInDelegate {
             }
 
             if switchToImagesTab {
-                (UIApplication.shared.delegate as! AppDelegate).selectTabInController(tab: .images)
+                if SignInManager.session.lastStateChangeSignedUserIn {
+                    (UIApplication.shared.delegate as! AppDelegate).selectTabInController(tab: .images)
+                }
             }
         }
         
         switch action {
         case .userSignedOut:
-            // Don't need to switch the tab to the SignInVC-- that's already done by the `GoogleUserSignOutDelegate`.
+            // Don't need to switch the tab to the SignInVC-- that's already done.
             break
             
         case .userNotFoundOnSignInAttempt:

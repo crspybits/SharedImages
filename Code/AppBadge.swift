@@ -55,7 +55,8 @@ class AppBadge {
     }
     
     static func setBadge(completionHandler: ((UIBackgroundFetchResult) -> Void)?=nil) {
-        if AppBadge.badgesAuthorized.boolValue {
+        // 10/31/17; Don't want to call `getStats` if a user is not signed in because (a) it makes no sense-- how can we interact with the server without a user signed in? and (b) because with the Facebook sign-in, the sign-in process itself causes the app to go into the background and we have badge setting itself operating if the app goes into the background-- and this all messes up the signin.
+        if AppBadge.badgesAuthorized.boolValue && SignInManager.session.userIsSignedIn {
             SyncServer.session.getStats() { stats in
                 if let stats = stats {
                     let total = stats.downloadDeletionsAvailable + stats.downloadsAvailable
@@ -80,7 +81,9 @@ class AppBadge {
     // Set to 0 to hide badge.
     static func setBadge(number:Int) {
         if AppBadge.badgesAuthorized.boolValue {
-            UIApplication.shared.applicationIconBadgeNumber = number
+            Thread.runSync(onMainThread: {
+                UIApplication.shared.applicationIconBadgeNumber = number
+            })
         }
     }
 }

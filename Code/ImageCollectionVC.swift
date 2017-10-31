@@ -99,6 +99,9 @@ class ImageCollectionVC : UICollectionViewCell {
         scrollView?.contentSize = size
         
         let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: size)
+        Log.msg("smallerSize: \(smallerSize)")
+        
+        // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode
         imageView.image = imageCache.getItem(from: image, with: smallerSize)
         
         originalSize = smallerSize

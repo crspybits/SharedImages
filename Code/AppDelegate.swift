@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SetupSignIn.session.appLaunch(options: launchOptions)
         
         // The default UI displayed tab is .signIn
-        if let signedIn = SignInManager.session.currentSignIn?.userIsSignedIn, signedIn {
+        if SignInManager.session.userIsSignedIn {
             selectTabInController(tab: .images)
         }
         
