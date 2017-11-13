@@ -12,6 +12,7 @@ import SMCoreLib
 import SyncServer
 import Fabric
 import Crashlytics
+import rosterdev
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -30,9 +31,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //#endif
     
         let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
-        let urlString = try! plist.getString(varName: "ServerURL")
-        let serverURL = URL(string: urlString)!
-        let cloudFolderName = try! plist.getString(varName: "CloudFolderName")
+        
+        var serverURL:URL
+        var cloudFolderName:String
+        
+        switch Environment.current {
+        case .production:
+            let urlString = try! plist.getString(varName: "ServerURL")
+            serverURL = URL(string: urlString)!
+            cloudFolderName = try! plist.getString(varName: "CloudFolderName")
+            
+        // Only used in debug builds.
+        case .staging:
+            let urlString = try! plist.getString(varName: "StagingServerURL")
+            serverURL = URL(string: urlString)!
+            cloudFolderName = try! plist.getString(varName: "StagingCloudFolderName")
+        }
         
         // Call this as soon as possible in your launch sequence.
         SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName)
@@ -148,4 +162,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
+#if DEBUG
+extension UIWindow {
+    override open func motionBegan(_ motion: UIEventSubtype, with event: UIEvent?) {
+        if motion == .motionShake {
+            if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
+                RosterDevVC.show(fromViewController: rootVC, rowContents:DebugDashboardData.session.sections(), options: .all)
+            }
+        }
+    }
+}
+#endif
 

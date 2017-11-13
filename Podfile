@@ -7,11 +7,11 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 5.0'
-	pod 'SyncServer/Facebook', '~> 5.0'
+# 	pod 'SyncServer', '~> 5.0'
+# 	pod 'SyncServer/Facebook', '~> 5.0'
 	
-# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
 
@@ -22,18 +22,22 @@ target 'SharedImages' do
     
     pod 'SDCAlertView', '~> 7.1'
     
+    # pull-up from the bottom to refresh
     pod 'LottiesBottom', '~> 0.2'
     # pod 'LottiesBottom', :path => '../LottiesBottom/'
+    
+    # developer dashbaord
+    pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git', :branch => 'Renamings'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths
     			
-		pod 'SyncServer', '~> 5.0'
-		pod 'SyncServer/Facebook', '~> 5.0'
+# 		pod 'SyncServer', '~> 5.0'
+# 		pod 'SyncServer/Facebook', '~> 5.0'
 
 # 		pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-# 		pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+		pod 'SyncServer', :path => '../SyncServer-iOSClient'
+		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
 # 		pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 
     	pod 'GoogleSignIn', '~> 4.0'

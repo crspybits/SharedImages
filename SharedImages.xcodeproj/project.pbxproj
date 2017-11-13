@@ -19,6 +19,8 @@
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
 		8324EE541E77873F000656AF /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE531E77873F000656AF /* SyncSpinner.swift */; };
 		8347BA651EF109F9002763F6 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347BA641EF109F9002763F6 /* Alert.swift */; };
+		835A3E451FB94FD6009DB032 /* DebugDashboardData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A3E441FB94FD6009DB032 /* DebugDashboardData.swift */; };
+		835A3E471FB954AF009DB032 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A3E461FB954AF009DB032 /* Environment.swift */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
 		83A2E6AB1F76F84500A2E303 /* C.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A71F76F83300A2E303 /* C.json */; };
@@ -71,6 +73,8 @@
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
 		8324EE531E77873F000656AF /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
 		8347BA641EF109F9002763F6 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		835A3E441FB94FD6009DB032 /* DebugDashboardData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugDashboardData.swift; sourceTree = "<group>"; };
+		835A3E461FB954AF009DB032 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
 		83A2E6A71F76F83300A2E303 /* C.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = C.json; sourceTree = "<group>"; };
@@ -208,6 +212,14 @@
 			path = "CALayer+MBAnimationPersistence";
 			sourceTree = "<group>";
 		};
+		835A3E431FB94FC4009DB032 /* Developer */ = {
+			isa = PBXGroup;
+			children = (
+				835A3E441FB94FD6009DB032 /* DebugDashboardData.swift */,
+			);
+			name = Developer;
+			sourceTree = "<group>";
+		};
 		83A2E6A61F76F83300A2E303 /* LottieAnimations */ = {
 			isa = PBXGroup;
 			children = (
@@ -270,6 +282,7 @@
 			isa = PBXGroup;
 			children = (
 				83F8824B1E712004008F644A /* AppDelegate.swift */,
+				835A3E461FB954AF009DB032 /* Environment.swift */,
 				8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */,
 				83F882601E749C18008F644A /* Consts.swift */,
 				8324EE361E7649E8000656AF /* Misc UI */,
@@ -277,6 +290,7 @@
 				8324EE311E763DBE000656AF /* Images */,
 				83D49C961F49466600409B0F /* Settings */,
 				83F882511E73B156008F644A /* Core Data */,
+				835A3E431FB94FC4009DB032 /* Developer */,
 				8324EE441E778623000656AF /* SDKs */,
 			);
 			path = Code;
@@ -578,6 +592,7 @@
 				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
+				"${BUILT_PRODUCTS_DIR}/rosterdev/rosterdev.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -600,6 +615,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/rosterdev.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -641,7 +657,9 @@
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
+				835A3E471FB954AF009DB032 /* Environment.swift in Sources */,
 				83FAF3A21F4554B90009111B /* TrashActivity.swift in Sources */,
+				835A3E451FB94FD6009DB032 /* DebugDashboardData.swift in Sources */,
 				83F58ACB1EE3BA140081C3D1 /* AppBadge.swift in Sources */,
 				8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */,
 				8347BA651EF109F9002763F6 /* Alert.swift in Sources */,

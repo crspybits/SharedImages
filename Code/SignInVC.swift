@@ -211,7 +211,7 @@ extension SignInVC : GenericSignInDelegate {
                 result = .signInExistingUser
                 
             case .initialSignInViewShowing:
-                break
+                Log.error("initialSignInViewShowing")
             }
         }
         
