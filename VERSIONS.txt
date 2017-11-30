@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.83 (11/29/17)
+Version 0.8.3 (11/29/17)
 	* Using SyncServer-iOSClient 5.0.1 to try to fix issue with sticky sign-in
 	* Added developer dashboard-- and ability to change between production and staging server environments in debug builds. (Shake device to access developer dashboard)
 		https://github.com/crspybits/SharedImages/issues/34
