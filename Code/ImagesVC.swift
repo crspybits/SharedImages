@@ -97,7 +97,7 @@ class ImagesVC: UIViewController {
         
         navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
         
-        let size = CGSize(width: 200, height: 85)
+        let size = CGSize(width: 200, height: 100)
         let animationLetters = ["C", "R", "D", "N"]
         let whichAnimation = Int(arc4random_uniform(UInt32(animationLetters.count)))
         let animationLetter = animationLetters[whichAnimation]
@@ -188,6 +188,8 @@ class ImagesVC: UIViewController {
         }) {[unowned self] context in
             // I made this an optional because, oddly, I can get in here when I've never navigated to this tab.
             self.collectionView?.reloadData()
+            
+            self.bottomAnimation.didRotate()
         }
     }
     
@@ -404,6 +406,8 @@ extension ImagesVC : SyncControllerDelegate {
                     self.spinner.stop()
                 }
             }
+            
+            self.bottomAnimation.reset()
             
         case .syncError:
             self.spinner.stop(withBackgroundColor: .red)

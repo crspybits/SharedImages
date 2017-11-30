@@ -31,7 +31,7 @@ class ImageCollectionVC : UICollectionViewCell {
     
     private(set) var image:Image!
     private(set) weak var syncController:SyncController!
-    weak var imageCache:LRUCache<Image>!
+    weak var imageCache:LRUCache<Image>?
     
     var delegate:LargeImageCellDelegate!
     var originalSize:CGSize!
@@ -86,6 +86,10 @@ class ImageCollectionVC : UICollectionViewCell {
     
     // I had problems knowing when the cell was sized correctly so that I could call `ImageStorage.getImage`. `layoutSubviews` seems to not be the right place. And neither is `setProperties` (which gets called by cellForItemAt). When the UICollectionView is first displayed, I get small sizes (less than 1/2 of correct sizes) at least on iPad. Odd.
     func cellSizeHasBeenChanged() {
+        guard let imageCache = imageCache else {
+            return
+        }
+        
         // For some reason, when I get here, the cell is sized correctly, but it's subviews are not. And more specifically, the image view subview is not sized correctly all the time. And since I'm basing my image fetch/resize on the image view size, I need it correctly sized right now.
         layoutIfNeeded()
         
@@ -102,6 +106,7 @@ class ImageCollectionVC : UICollectionViewCell {
         Log.msg("smallerSize: \(smallerSize)")
         
         // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode
+        // 11/29/17; I just got it again, while running attached to the debugger. In this case, `imageCache` was nil. I added a guard statement above to deal with this.
         imageView.image = imageCache.getItem(from: image, with: smallerSize)
         
         originalSize = smallerSize

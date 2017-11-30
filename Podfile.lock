@@ -43,13 +43,13 @@ PODS:
     - GTMSessionFetcher/Core (= 1.1.12)
   - HPTextViewTapGestureRecognizer (0.1)
   - lottie-ios (2.1.4)
-  - LottiesBottom (0.2.0):
+  - LottiesBottom (0.4.0):
     - lottie-ios (~> 2.1)
   - ODRefreshControl (1.2)
   - Reachability (3.2)
   - rosterdev (0.1.0)
   - SDCAlertView (7.1.2)
-  - SMCoreLib (1.0.3):
+  - SMCoreLib (1.1.0):
     - HPTextViewTapGestureRecognizer (~> 0.1)
     - Reachability
     - SwiftyBeaver
@@ -76,28 +76,25 @@ DEPENDENCIES:
   - Crashlytics
   - Fabric
   - GoogleSignIn (~> 4.0)
-  - LottiesBottom (~> 0.2)
+  - LottiesBottom (~> 0.4)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
-  - rosterdev (from `https://github.com/RosterHQ/rosterdev.git`, branch `Renamings`)
+  - rosterdev (from `https://github.com/RosterHQ/rosterdev.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (from `../SyncServer-iOSClient`)
-  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
+  - SyncServer (~> 5.0)
+  - SyncServer/Facebook (~> 5.0)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
   rosterdev:
-    :branch: Renamings
     :git: https://github.com/RosterHQ/rosterdev.git
-  SyncServer:
-    :path: ../SyncServer-iOSClient
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
     :commit: ffaaf9d7d44306d36c9959a26a0132f62851bcfb
     :git: https://github.com/crspybits/ODRefreshControl.git
   rosterdev:
-    :commit: e3a18fc8ea852418b961d12e8cc0b7172df9faa3
+    :commit: b888e5c910b79215cbcab52f76065b703d31e37f
     :git: https://github.com/RosterHQ/rosterdev.git
 
 SPEC CHECKSUMS:
@@ -115,16 +112,16 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
   lottie-ios: 94fa2d82547ce3adf1e61157653ba99999fd279f
-  LottiesBottom: abb6174d9d77253359e379c41e52248cd789b465
+  LottiesBottom: 576ecb1cd2dfd6fc0eba2d56595d77c045e10533
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   rosterdev: f615d97636d1e1449fa31e4ea3637cfccc1c98ff
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
-  SMCoreLib: 02aee83cbf49c3295da6ec3ac043682ef68eed4c
+  SMCoreLib: 726e3d55313d30cfe5b3ab6b892c4cdb8ada574e
   SwiftyBeaver: e10b1668e0512229c36c34769b97eed3dfae2ca3
-  SyncServer: d097531eda1ecebbfaf8135f3b4d307f33f70ef1
+  SyncServer: 3fb30065fe215e38567227ec738e5285c76c34d2
   SyncServer-Shared: 62daa091acb31080c8e1a744f926991f9ddf045e
 
-PODFILE CHECKSUM: ed3d3867b6e0552146f848c469cdc71d34a141b2
+PODFILE CHECKSUM: e1bbf3277a9e6d798b32ac5c11ab014b1d3abff5
 
 COCOAPODS: 1.3.1
