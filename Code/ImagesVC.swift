@@ -325,7 +325,11 @@ extension ImagesVC : SMAcquireImageDelegate {
     // Called after the image is acquired.
     func smAcquireImage(_ acquireImage:SMAcquireImage, newImageURL: SMRelativeLocalURL, mimeType:String) {
     
-        let userName = SignInManager.session.currentSignIn!.credentials!.username
+        // There was a crash here when I force unwrapped both of these. Not sure how. I've changed to to optional chaining. See https://github.com/crspybits/SharedImages/issues/57 We'll get an empty/nil title in that case.
+        let userName = SignInManager.session.currentSignIn?.credentials?.username
+        if userName == nil {
+            Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
+        }
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = addLocalImage(newImageURL:newImageURL, mimeType:mimeType, title:userName)
