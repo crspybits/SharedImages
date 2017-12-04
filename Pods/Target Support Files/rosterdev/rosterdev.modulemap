@@ -1,0 +1,6 @@
+framework module rosterdev {
+  umbrella header "rosterdev-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "SyncServer-Shared",
+  "version": "2.1.0",
+  "summary": "Swift code shared between the SyncServerII server and iOS client",
+  "description": "Swift code shared between the SyncServerII server and iOS client",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Christopher Prince": "chris@SpasticMuffin.biz"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "homepage": "https://github.com/crspybits/SyncServer-Shared",
+  "source": {
+    "git": "https://github.com/crspybits/SyncServer-Shared.git",
+    "tag": "2.1.0"
+  },
+  "pod_target_xcconfig": {
+    "OTHER_SWIFT_FLAGS[config=Debug]": "-DDEBUG"
+  },
+  "source_files": "Sources/**/*.{swift}",
+  "requires_arc": true,
+  "dependencies": {
+    "Gloss": [
+
+    ]
+  }
+}

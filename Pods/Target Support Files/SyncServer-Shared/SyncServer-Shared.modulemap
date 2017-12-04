@@ -1,0 +1,6 @@
+framework module SyncServer_Shared {
+  umbrella header "SyncServer-Shared-umbrella.h"
+
+  export *
+  module * { export * }
+}

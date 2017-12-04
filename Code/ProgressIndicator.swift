@@ -9,17 +9,42 @@
 import Foundation
 import UIKit
 import SDCAlertView
+import SMCoreLib
 
 class ProgressIndicator {
     private let label = UILabel()
     private let alert:AlertController
     private let totalImagesToDownload:UInt
     
-    init(totalImagesToDownload: UInt, withStopHandler stop: @escaping ()->()) {
-        self.totalImagesToDownload = totalImagesToDownload
+    // So that the progress indicator shows up for at least a moment. Otherwise, for example-- with deleting files-- you can't tell what the app is doing.
+    private var startTime:Double!
+    let minDisplaySeconds = 2.0
+    
+    init(imagesToDownload: UInt, imagesToDelete:UInt, withStopHandler stop: @escaping ()->()) {
+        self.totalImagesToDownload = imagesToDownload + imagesToDelete
         label.translatesAutoresizingMaskIntoConstraints = false
+        
+        var title = ""
+        if imagesToDownload > 0 && imagesToDelete > 0 {
+            title = "Downloading & Deleting Images"
+        }
+        else if imagesToDownload > 0 {
+            title = "Downloading Image"
+            if imagesToDownload > 1 {
+                title += "s"
+            }
+        }
+        else if imagesToDelete > 0 {
+            title = "Deleting Image"
+            if imagesToDelete > 1 {
+                title += "s"
+            }
+        }
+        else {
+            assert(false)
+        }
 
-        alert = AlertController(title: "Downloading Images", message: "Please wait...")
+        alert = AlertController(title: title, message: "Please wait...")
         alert.contentView.addSubview(label)
 
         label.centerXAnchor.constraint(equalTo: alert.contentView.centerXAnchor).isActive = true
@@ -34,11 +59,24 @@ class ProgressIndicator {
     }
     
     func show() {
+        // See https://stackoverflow.com/questions/358207/iphone-how-to-get-current-milliseconds
+        startTime = CACurrentMediaTime()
+        
         alert.present()
     }
     
     func dismiss() {
-        alert.dismiss(animated: true, completion: nil)
+        // Make sure that we display the progress indicator for the minimum time.
+        let endTime = CACurrentMediaTime()
+        let diff = endTime - startTime
+        if diff >= minDisplaySeconds {
+            alert.dismiss(animated: true, completion: nil)
+        }
+        else {
+            TimedCallback.withDuration(Float(minDisplaySeconds - diff)) {[unowned self] in
+                self.alert.dismiss(animated: true, completion: nil)
+            }
+        }
     }
     
     func updateProgress(withNumberDownloaded numberDownloaded:UInt) {

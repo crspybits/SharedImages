@@ -1,0 +1,6 @@
+framework module SMCoreLib {
+  umbrella header "SMCoreLib-umbrella.h"
+
+  export *
+  module * { export * }
+}

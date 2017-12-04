@@ -1,0 +1,6 @@
+framework module HPTextViewTapGestureRecognizer {
+  umbrella header "HPTextViewTapGestureRecognizer-umbrella.h"
+
+  export *
+  module * { export * }
+}

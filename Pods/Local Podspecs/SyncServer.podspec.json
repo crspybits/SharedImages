@@ -1,0 +1,61 @@
+{
+  "name": "SyncServer",
+  "version": "5.0.1",
+  "summary": "iOS Client for the SyncServerII server",
+  "description": "SyncServerII enables apps to save user files in users cloud storage, and\nenables safe sharing of those files.",
+  "homepage": "https://github.com/crspybits/SyncServer-iOSClient",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Christopher Prince": "chris@SpasticMuffin.biz"
+  },
+  "source": {
+    "git": "https://github.com/crspybits/SyncServer-iOSClient.git",
+    "tag": "5.0.1"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "pod_target_xcconfig": {
+    "OTHER_SWIFT_FLAGS[config=Debug]": "$(inherited) -DDEBUG"
+  },
+  "source_files": "Client/Classes/**/*.{swift}",
+  "resources": [
+    "Client/Assets/**/*",
+    "Client/Classes/**/*.{xib}"
+  ],
+  "preserve_paths": "Client/Assets/**/*",
+  "dependencies": {
+    "SMCoreLib": [
+      "~> 1.0"
+    ],
+    "Gloss": [
+
+    ],
+    "SyncServer-Shared": [
+      "~> 2.1"
+    ]
+  },
+  "default_subspecs": "Lite",
+  "subspecs": [
+    {
+      "name": "Lite"
+    },
+    {
+      "name": "Facebook",
+      "xcconfig": {
+        "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_FACEBOOK_SIGNIN"
+      },
+      "dependencies": {
+        "FacebookLogin": [
+          "0.2.0"
+        ],
+        "FacebookCore": [
+          "0.2.0"
+        ]
+      }
+    }
+  ]
+}

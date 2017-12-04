@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment version="2352" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Roster DevVC-->
+        <scene sceneID="OWF-jf-xMP">
+            <objects>
+                <viewController storyboardIdentifier="RosterDevVC" id="0mQ-vl-Zzz" customClass="RosterDevVC" customModule="rosterdev" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="G2Z-h1-HBX"/>
+                        <viewControllerLayoutGuide type="bottom" id="K3H-iA-iah"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Lx9-bg-ITw">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="7zY-UE-Tgz">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="K3H-iA-iah" firstAttribute="top" secondItem="7zY-UE-Tgz" secondAttribute="bottom" id="ECI-Nc-7rb"/>
+                            <constraint firstAttribute="trailing" secondItem="7zY-UE-Tgz" secondAttribute="trailing" id="VOg-39-KQ8"/>
+                            <constraint firstItem="7zY-UE-Tgz" firstAttribute="top" secondItem="Lx9-bg-ITw" secondAttribute="top" id="k0x-99-qmS"/>
+                            <constraint firstItem="7zY-UE-Tgz" firstAttribute="leading" secondItem="Lx9-bg-ITw" secondAttribute="leading" id="xQJ-ED-24C"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="jpk-Gq-QkQ">
+                        <barButtonItem key="rightBarButtonItem" title="Done" id="kkg-12-HPj">
+                            <connections>
+                                <action selector="doneAction:" destination="0mQ-vl-Zzz" id="Ch9-MN-oqq"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="7zY-UE-Tgz" id="sl4-vU-wzp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rf0-JE-wYS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1087.2" y="-34.632683658170919"/>
+        </scene>
+        <!--Injection Tests-->
+        <scene sceneID="KPC-sZ-jWD">
+            <objects>
+                <viewController storyboardIdentifier="InjectionTestVC" title="Injection Tests" id="Gva-oR-FBt" customClass="InjectionTestVC" customModule="rosterdev" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Vq0-vO-LIT"/>
+                        <viewControllerLayoutGuide type="bottom" id="qyq-Xu-AQs"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="cLp-oe-s3U">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="enf-gT-gWo">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="enf-gT-gWo" firstAttribute="top" secondItem="cLp-oe-s3U" secondAttribute="top" id="4QA-0c-xKk"/>
+                            <constraint firstItem="qyq-Xu-AQs" firstAttribute="top" secondItem="enf-gT-gWo" secondAttribute="bottom" id="Of2-me-ceI"/>
+                            <constraint firstItem="enf-gT-gWo" firstAttribute="leading" secondItem="cLp-oe-s3U" secondAttribute="leading" id="WWB-dG-96A"/>
+                            <constraint firstAttribute="trailing" secondItem="enf-gT-gWo" secondAttribute="trailing" id="ZMS-8g-Ehx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="enf-gT-gWo" id="kpE-Hu-G2t"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QkK-tt-UGP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1845.5999999999999" y="-34.632683658170919"/>
+        </scene>
+    </scenes>
+</document>

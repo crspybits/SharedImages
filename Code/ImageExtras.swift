@@ -57,22 +57,18 @@ class ImageExtras {
         return CGSize(width: originalSize.width * aspectRatio, height: originalSize.height * aspectRatio)
     }
 
-    static func removeLocalImages(uuids:[String]) {
-        var images = [Image]()
-        
+    static func removeLocalImages(uuids:[String]) {        
         for uuid in uuids {
             guard let image = Image.fetchObjectWithUUID(uuid: uuid) else {
                 Log.error("Cannot find image with UUID: \(uuid)")
                 return
             }
             
-            images.append(image)
-        }
-        
-        for image in images {
+            Log.msg("Deleting image with uuid: \(uuid)")
+            
+            // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
             CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         }
-    
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
 }

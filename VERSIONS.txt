@@ -1,8 +1,18 @@
 SharedImages
 
-Version 0.8.4 (TBD)
-	* Another crash: Bushrod
+Version 0.8.4 (12/3/17)
+	* Fixed-- Another crash: Bushrod-- came up when adding an image
 		https://github.com/crspybits/SharedImages/issues/57
+	* Fixed: Selected two images and deleted: Caused a crash
+		https://github.com/crspybits/SharedImages/issues/61
+	* Fixed a bug where LottiesLottom would cause a crash-- on app launch on iPad
+	* Refresh when doing download deletions: "Downloading images" alert is incorrect and stays up.
+		https://github.com/crspybits/SharedImages/issues/62
+	* Fixed: Just got a crash when deleting an image 
+		https://github.com/crspybits/SharedImages/issues/56
+	* Fixed: Deleting someone elses images crashes app 
+		https://github.com/crspybits/SharedImages/issues/28
+	* Using updated SyncServer-iOSClient repo (6.0.1)-- with some sign-in fixes.
 	
 Version 0.8.3 (11/29/17)
 	* Using SyncServer-iOSClient 5.0.1 to try to fix issue with sticky sign-in

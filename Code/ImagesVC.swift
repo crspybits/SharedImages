@@ -118,22 +118,26 @@ class ImagesVC: UIViewController {
     func remove(images:[Image]) {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
         
+        // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
         if !syncController.remove(images: images) {
-            var message = "Could not delete image"
+            var message = "Image"
             if images.count > 1 {
                 message += "s"
             }
             
+            message += " already deleted on server."
+            
             SMCoreLib.Alert.show(withTitle: "Error", message: message)
-            return
+            Log.error("Error: \(message)")
+            
+            // I'm not going to return here. Even if somehow the image was already deleted on the server, let's make sure it was deleted locally.
         }
         
         for image in images {
+            // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
             CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        // 8/24/17; Looks like I got a crash here. This may have been because I was not deleting a set of images atomically.
     }
     
     override func didReceiveMemoryWarning() {
@@ -189,7 +193,7 @@ class ImagesVC: UIViewController {
             // I made this an optional because, oddly, I can get in here when I've never navigated to this tab.
             self.collectionView?.reloadData()
             
-            self.bottomAnimation.didRotate()
+            self.bottomAnimation?.didRotate()
         }
     }
     
@@ -358,6 +362,7 @@ extension ImagesVC : CoreDataSourceDelegate {
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasDeleted indexPathOfDeletedObject: IndexPath!) {
+        Log.msg("objectWasDeleted: indexPathOfDeletedObject: \(indexPathOfDeletedObject)")
         collectionView.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
     }
     

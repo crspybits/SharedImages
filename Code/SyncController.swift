@@ -25,7 +25,7 @@ protocol SyncControllerDelegate : class {
 
 class SyncController {
     private var progressIndicator: ProgressIndicator!
-    private var numberImagesToDownload: UInt!
+    private var numberDownloads: UInt!
     private var numberDownloadedSoFar: UInt!
     
     init() {
@@ -58,6 +58,7 @@ class SyncController {
     func remove(images:[Image]) -> Bool {
         let uuids = images.map({$0.uuid!})
         
+        // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
         do {
             try SyncServer.session.delete(filesWithUUIDs: uuids)
         } catch (let error) {
@@ -95,17 +96,24 @@ extension SyncController : SyncServerDelegate {
         delegate.addLocalImage(syncController: self, url: newImageURL, uuid: attr.fileUUID, mimeType: attr.mimeType, title:title, creationDate:attr.creationDate as NSDate?)
         
         delegate.completedAddingLocalImages()
-        
-        numberDownloadedSoFar! += UInt(1)
-        progressIndicator?.updateProgress(withNumberDownloaded: numberDownloadedSoFar)
-        if numberDownloadedSoFar >= numberImagesToDownload {
-            progressIndicator?.dismiss()
+        updateDownloadProgress()
+    }
+    
+    private func updateDownloadProgress(count:UInt = 1) {
+        // 12/3/17; We can get here from a call to `shouldDoDeletions`-- when the app is just recovering -- doing deletions on a refresh without having actually done any server interaction. i.e., the client interface has just cached some deletions.
+        if numberDownloadedSoFar != nil {
+            numberDownloadedSoFar! += count
+            progressIndicator?.updateProgress(withNumberDownloaded: numberDownloadedSoFar)
+            if numberDownloadedSoFar! >= numberDownloads {
+                progressIndicator?.dismiss()
+            }
         }
     }
 
     func shouldDoDeletions(downloadDeletions:[SyncAttributes]) {
         let uuids = downloadDeletions.map({$0.fileUUID!})
         delegate.removeLocalImages(syncController: self, uuids: uuids)
+        updateDownloadProgress(count: UInt(uuids.count))
     }
     
     func syncServerErrorOccurred(error:Error) {
@@ -120,8 +128,8 @@ extension SyncController : SyncServerDelegate {
         case .syncStarted:
             delegate.syncEvent(syncController: self, event: .syncStarted)
         
-        case .willStartDownloads(numberDownloads: let numberDownloads):
-            numberImagesToDownload = numberDownloads
+        case .willStartDownloads(numberFileDownloads: let numberFileDownloads, numberDownloadDeletions: let numberDownloadDeletions):
+            numberDownloads = numberFileDownloads + numberDownloadDeletions
             numberDownloadedSoFar = 0
             
             // In case there's already one. Seems unlikely, but willStartDownloads can be repeated if we get a master version update.
@@ -133,7 +141,7 @@ extension SyncController : SyncServerDelegate {
             // })
             // TESTING
             
-            progressIndicator = ProgressIndicator(totalImagesToDownload: numberDownloads, withStopHandler: {
+            progressIndicator = ProgressIndicator(imagesToDownload: numberFileDownloads, imagesToDelete: numberDownloadDeletions, withStopHandler: {
                 SyncServer.session.stopSync()
             })
             progressIndicator.show()

@@ -1,0 +1,6 @@
+framework module LottiesBottom {
+  umbrella header "LottiesBottom-umbrella.h"
+
+  export *
+  module * { export * }
+}
