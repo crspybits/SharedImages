@@ -394,7 +394,7 @@ private class DropboxSignInButton : UIView, Tappable {
         dropboxIconView = UIImageView(image: SMIcons.DropboxIcon)
         dropboxIconView.contentMode = .scaleAspectFit
         
-        label.font = UIFont.boldSystemFont(ofSize: 15.0)
+        label.font = UIFont.boldSystemFont(ofSize: 14.0)
         
         button.addSubview(dropboxIconView)
         button.addSubview(label)

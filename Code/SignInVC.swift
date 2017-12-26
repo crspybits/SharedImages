@@ -66,7 +66,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         SetupSignIn.session.facebookSignIn.delegate = self
         
         dropboxSignInButton = SetupSignIn.session.dropboxSignIn.setupSignInButton(params: ["viewController": self])
-        dropboxSignInButton.frameSize = CGSize(width: googleSignInButton.frameWidth * 1.1, height: googleSignInButton.frameHeight * 0.75)
+        dropboxSignInButton.frameSize = CGSize(width: googleSignInButton.frameWidth, height: googleSignInButton.frameHeight * 0.75)
         SetupSignIn.session.dropboxSignIn.delegate = self
         
         signIn = SignIn.createFromXib()!

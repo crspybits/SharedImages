@@ -1,6 +1,6 @@
 {
   "name": "SyncServer",
-  "version": "6.1.0",
+  "version": "7.0.3",
   "summary": "iOS Client for the SyncServerII server",
   "description": "SyncServerII enables apps to save user files in users cloud storage, and\nenables safe sharing of those files.",
   "homepage": "https://github.com/crspybits/SyncServer-iOSClient",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/crspybits/SyncServer-iOSClient.git",
-    "tag": "6.1.0"
+    "tag": "7.0.3"
   },
   "platforms": {
     "ios": "9.0"
@@ -29,7 +29,7 @@
   "preserve_paths": "Client/Assets/**/*",
   "dependencies": {
     "SMCoreLib": [
-      "~> 1.1"
+      "~> 1.2"
     ],
     "Gloss": [
       "~> 1.2"
