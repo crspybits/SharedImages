@@ -1,10 +1,10 @@
 SharedImages
 
-Version 0.8.5
+Version 0.8.5 (12/25/17)
 	* Removed tap method for signin's-- no longer need Tappable protocol.
 	* Fixed crash: "Save image"-- Kudos to Bushrod
 		https://github.com/crspybits/SharedImages/issues/65
-	* Updated to SyncServer client 7.0.0
+	* Updated to SyncServer client 7.0
 		
 Version 0.8.4 (12/3/17)
 	* Fixed-- Another crash: Bushrod-- came up when adding an image
