@@ -15,14 +15,16 @@ class SetupSignIn {
     
     var googleSignIn:GoogleSyncServerSignIn!
     var facebookSignIn:FacebookSyncServerSignIn!
-
+    var dropboxSignIn:DropboxSyncServerSignIn!
+    
     private init() {
     }
     
     func appLaunch(options: [UIApplicationLaunchOptionsKey: Any]?) {
         var serverClientId:String!
         var appClientId:String!
-        
+        var dropboxAppKey:String!
+
         let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
         
         if case .stringValue(let value) = try! plist.getRequired(varName: "GoogleClientId") {
@@ -33,12 +35,21 @@ class SetupSignIn {
             serverClientId = value
         }
         
+        if case .stringValue(let value) = try! plist.getRequired(varName: "DropboxAppKey") {
+            dropboxAppKey = value
+        }
+        
+        // NOTE: When adding a new sign-in-- you need to add it here, and in SignInVC.swift.
+        
         googleSignIn = GoogleSyncServerSignIn(serverClientId: serverClientId, appClientId: appClientId)
         googleSignIn.signOutDelegate = self
         SignInManager.session.addSignIn(googleSignIn, launchOptions: options)
         
         facebookSignIn = FacebookSyncServerSignIn()
         SignInManager.session.addSignIn(facebookSignIn, launchOptions: options)
+        
+        dropboxSignIn = DropboxSyncServerSignIn(appKey: dropboxAppKey)
+        SignInManager.session.addSignIn(dropboxSignIn, launchOptions: options)
     }
 }
 

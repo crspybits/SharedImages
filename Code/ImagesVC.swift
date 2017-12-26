@@ -41,6 +41,8 @@ class ImagesVC: UIViewController {
     typealias UUIDString = String
     fileprivate var selectedImages = Set<UUIDString>()
     
+    private var deletedImages:[IndexPath]?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
@@ -133,11 +135,13 @@ class ImagesVC: UIViewController {
             // I'm not going to return here. Even if somehow the image was already deleted on the server, let's make sure it was deleted locally.
         }
         
+        // 12/2/17, 12/25/17; This is tricky. See https://github.com/crspybits/SharedImages/issues/61 and https://stackoverflow.com/questions/47614583/delete-multiple-core-data-objects-issue-with-nsfetchedresultscontroller
+        // I'm dealing with this below. See the reference to this SO issue below.
         for image in images {
-            // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
             CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
-            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
     
     override func didReceiveMemoryWarning() {
@@ -355,6 +359,19 @@ extension ImagesVC : CoreDataSourceDelegate {
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
         return CoreData.sessionNamed(CoreDataExtras.sessionName).context
     }
+
+    // 12/25/17; See https://github.com/crspybits/SharedImages/issues/61 and https://stackoverflow.com/questions/47614583/delete-multiple-core-data-objects-issue-with-nsfetchedresultscontroller Going to deal with this issue by accumulating index paths of images we're deleting, and then doing all of the deletions at once.
+    func coreDataSourceWillChangeContent(_ cds: CoreDataSource!) {
+        deletedImages = []
+    }
+    
+    func coreDataSourceDidChangeContent(_ cds: CoreDataSource!) {
+        if let deletedImages = deletedImages, deletedImages.count > 0 {
+            collectionView.deleteItems(at: deletedImages)
+        }
+        
+        deletedImages = nil
+    }
     
     // Should return YES iff the context save was successful.
     func coreDataSourceSaveContext(_ cds: CoreDataSource!) -> Bool {
@@ -363,7 +380,7 @@ extension ImagesVC : CoreDataSourceDelegate {
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasDeleted indexPathOfDeletedObject: IndexPath!) {
         Log.msg("objectWasDeleted: indexPathOfDeletedObject: \(indexPathOfDeletedObject)")
-        collectionView.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
+        deletedImages?.append(indexPathOfDeletedObject)
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasInserted indexPathOfInsertedObject: IndexPath!) {

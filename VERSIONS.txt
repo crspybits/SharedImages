@@ -1,10 +1,11 @@
 SharedImages
 
-Version 0.8.5 (12/25/17)
+Version 0.8.5 (TBD)
 	* Removed tap method for signin's-- no longer need Tappable protocol.
 	* Fixed crash: "Save image"-- Kudos to Bushrod
 		https://github.com/crspybits/SharedImages/issues/65
-	* Updated to SyncServer client 7.0
+	* Updated to SyncServer client 7.0, and integrated Dropbox sign-in for owning users.
+	* Fixed another crash issue with image deletion.
 		
 Version 0.8.4 (12/3/17)
 	* Fixed-- Another crash: Bushrod-- came up when adding an image
