@@ -1,5 +1,5 @@
 //
-//  FacebookUserSignIn.swift
+//  FacebookSignIn.swift
 //  SyncServer
 //
 //  Created by Christopher Prince on 6/11/16.
@@ -107,7 +107,7 @@ public class FacebookSyncServerSignIn : GenericSignIn {
         return signInOutButton
     }
     
-    public var signInButton: /* TappableButton */ UIView? {
+    public var signInButton: TappableButton? {
         return signInOutButton
     }
     
@@ -278,7 +278,7 @@ private class FacebookSignInButton : UIControl, Tappable {
             signIn.managerDelegate?.signInStateChanged(to: .signInStarted, for: signIn)
             
             let loginManager = LoginManager()
-            loginManager.logIn(permissions, viewController: nil) { (loginResult) in
+            loginManager.logIn(readPermissions: permissions, viewController: nil) { (loginResult) in
                 switch loginResult {
                 case .failed(let error):
                     print(error)

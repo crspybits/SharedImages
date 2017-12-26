@@ -36,7 +36,7 @@ public enum SharingPermission : String {
     case admin // read, write, and invite
 
     public static func maxStringLength() -> Int {
-        return max(SharingPermission.read.rawValue.characters.count, SharingPermission.write.rawValue.characters.count, SharingPermission.admin.rawValue.characters.count)
+        return max(SharingPermission.read.rawValue.count, SharingPermission.write.rawValue.count, SharingPermission.admin.rawValue.count)
     }
     
     public func hasMinimumPermission(_ min:SharingPermission) -> Bool {
@@ -83,6 +83,6 @@ public enum UserType : String {
     case owning // user owns the data
 
     public static func maxStringLength() -> Int {
-        return max(UserType.sharing.rawValue.characters.count, UserType.owning.rawValue.characters.count)
+        return max(UserType.sharing.rawValue.count, UserType.owning.rawValue.count)
     }
 }

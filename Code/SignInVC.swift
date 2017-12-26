@@ -33,8 +33,8 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         return SignInVC.rawSharingPermission.stringValue == "" ? nil : SharingPermission(rawValue: SignInVC.rawSharingPermission.stringValue)
     }
     
-    var googleSignInButton: /*TappableButton*/ UIView!
-    var facebookSignInButton:/*TappableButton*/ UIView!
+    var googleSignInButton: TappableButton!
+    var facebookSignInButton: TappableButton!
     var sharingBarButton:UIBarButtonItem!
     var signIn:SignIn!
     
@@ -55,10 +55,10 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         
         // TODO: *2* Signing out and then signing in as a different user will mess up this app. What we're really assuming is that the user may sign out, but will then again sign in as the same user. If the user signs in as a different user, we need to alert them that this is going to remove all local files. And, signing in again as the prior user will cause redownload of the prior files. This may be something we want to fix in the future: To enable the client to handle multiple users. This would require indexing the meta data by user.
         
-        googleSignInButton = SetupSignIn.session.googleSignIn.setupSignInButton(params: ["delegate": self]) as! UIView
+        googleSignInButton = SetupSignIn.session.googleSignIn.setupSignInButton(params: ["delegate": self])
         SetupSignIn.session.googleSignIn.delegate = self
         
-        facebookSignInButton = SetupSignIn.session.facebookSignIn.setupSignInButton(params:nil) as! UIView
+        facebookSignInButton = SetupSignIn.session.facebookSignIn.setupSignInButton(params:nil)
         facebookSignInButton.frameWidth = googleSignInButton.frameWidth
         SetupSignIn.session.facebookSignIn.delegate = self
         

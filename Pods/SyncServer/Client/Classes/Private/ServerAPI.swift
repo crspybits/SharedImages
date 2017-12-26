@@ -26,7 +26,7 @@ class ServerAPI {
     // These need to be set by user of this class.
     var baseURL:String!
     weak var delegate:ServerAPIDelegate!
-    weak var syncServerDelegate:SyncServerDelegate!
+    weak var syncServerDelegate:SyncServerDelegate?
     var desiredEvents:EventDesired = .defaults
 
 #if DEBUG

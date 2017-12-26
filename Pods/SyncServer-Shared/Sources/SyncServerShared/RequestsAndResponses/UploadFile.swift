@@ -27,9 +27,9 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public static let mimeTypeKey = "mimeType"
     public var mimeType:String!
     
-    // A root-level folder in the cloud file service.
+    // A root-level folder in the cloud file service. This is only used by some of the cloud file servces. E.g., Google Drive. It's not used by Dropbox.
     public static let cloudFolderNameKey = "cloudFolderName"
-    public var cloudFolderName:String!
+    public var cloudFolderName:String?
     
     public static let appMetaDataKey = "appMetaData"
     public var appMetaData:String!
@@ -47,11 +47,11 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public var sizeOfDataInBytes:Int!
     
     public func nonNilKeys() -> [String] {
-        return [UploadFileRequest.fileUUIDKey, UploadFileRequest.mimeTypeKey, UploadFileRequest.cloudFolderNameKey, UploadFileRequest.fileVersionKey, UploadFileRequest.masterVersionKey]
+        return [UploadFileRequest.fileUUIDKey, UploadFileRequest.mimeTypeKey, UploadFileRequest.fileVersionKey, UploadFileRequest.masterVersionKey]
     }
     
     public func allKeys() -> [String] {
-        return self.nonNilKeys() + [UploadFileRequest.appMetaDataKey]
+        return self.nonNilKeys() + [UploadFileRequest.appMetaDataKey, UploadFileRequest.cloudFolderNameKey]
     }
     
     

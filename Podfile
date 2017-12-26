@@ -7,8 +7,8 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 6.0'
-	pod 'SyncServer/Facebook', '~> 6.0'
+	pod 'SyncServer', '~> 7.0'
+	pod 'SyncServer/Facebook', '~> 7.0'
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
 
@@ -18,7 +18,7 @@ target 'SharedImages' do
 	# Using my fork because of changes I made
 	pod 'ODRefreshControl', :git => 'https://github.com/crspybits/ODRefreshControl.git'
 	
-    pod 'GoogleSignIn', '~> 4.0'
+    pod 'GoogleSignIn', '~> 4.1'
     
     pod 'SDCAlertView', '~> 7.1'
     
@@ -31,17 +31,6 @@ target 'SharedImages' do
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths
-    			
-		pod 'SyncServer', '~> 6.0'
-		pod 'SyncServer/Facebook', '~> 6.0'
-# 		pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-# 		pod 'SyncServer', :path => '../SyncServer-iOSClient'
-
-# 		pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
-
-# 		pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-
-    	pod 'GoogleSignIn', '~> 4.0'
   	end
   	
   	# 9/14/17; Cocoapods isn't quite ready for Xcode9. This is a workaround:

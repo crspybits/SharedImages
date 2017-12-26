@@ -14,7 +14,14 @@ public class ServerConstants {
     public static let HTTPOAuth2AccessTokenKey = "access_token"
     
     // HTTP request header keys specific to Google
+    @available(*, deprecated, message: "Use: HTTPOAuth2AuthorizationCodeKey")
     public static let GoogleHTTPServerAuthCodeKey = "SyncServer-Google-server-auth-code"
+
+    // OAuth2 authorization code, e.g., from Google
+    public static let HTTPOAuth2AuthorizationCodeKey = "SyncServer-authorization-code"
+    
+    // Necessary for some authorization systems, e.g., Dropbox.
+    public static let HTTPAccountIdKey = "X-account-id"
 
 #if DEBUG
     // Give this key any string value to test failing of an endpoint.
@@ -26,8 +33,7 @@ public class ServerConstants {
     public static let httpRequestDeviceUUID = "SyncServer-Device-UUID"
     
     // HTTP response header keys
-    // 9/7/17; If you add new response header keys to this and you are using NGINX (see https://crspybits.github.io/SyncServerII/nginx.html), you will need to add those keys in the nginx.conf file and restart NGINX.
-    // 97/17; Keep these header keys in *lower case* to be compatible with NGNIX-- which sends them back in lower case.
+    // 9/9/17; Keep these header keys in *lower case* to be compatible with NGNIX-- which sends them back in lower case.
     
     // Used when downloading a file to return parameters (as a HTTP header response header).
     public static let httpResponseMessageParams = "syncserver-message-params"
@@ -38,6 +44,7 @@ public class ServerConstants {
     public enum AuthTokenType : String {
         case GoogleToken
         case FacebookToken
+        case DropboxToken
     }
 }
 
@@ -55,7 +62,7 @@ public struct ServerEndpoint {
     // Don't put a trailing "/" on the pathName.
     public init(_ pathName:String, method:ServerHTTPMethod, authenticationLevel:AuthenticationLevel = .secondary, needsLock:Bool = false, minSharingPermission: SharingPermission = .read) {
         
-        assert(pathName.characters.count > 0 && pathName.characters.last != "/")
+        assert(pathName.count > 0 && pathName.characters.last != "/")
         
         self.pathName = pathName
         self.method = method

@@ -29,7 +29,7 @@ private class RequestWithRetries {
     let updateCreds:((_ creds:GenericCredentials?)->())
     let checkForError:(_ statusCode:Int?, _ error:Error?) -> Error?
     let desiredEvents:EventDesired!
-    weak var delegate:SyncServerDelegate!
+    weak var delegate:SyncServerDelegate?
     
     private var triedToRefreshCreds = false
     private var numberTries = 0
@@ -41,7 +41,7 @@ private class RequestWithRetries {
     // When we get a 401 response from server.
     var userUnauthorized:(()->())!
     
-    init(retryIfError:Bool = true, creds:GenericCredentials?, desiredEvents:EventDesired, delegate:SyncServerDelegate, updateCreds:@escaping (_ creds:GenericCredentials?)->(), checkForError:@escaping (_ statusCode:Int?, _ error:Error?) -> Error?, userUnauthorized:@escaping ()->()) {
+    init(retryIfError:Bool = true, creds:GenericCredentials?, desiredEvents:EventDesired, delegate:SyncServerDelegate?, updateCreds:@escaping (_ creds:GenericCredentials?)->(), checkForError:@escaping (_ statusCode:Int?, _ error:Error?) -> Error?, userUnauthorized:@escaping ()->()) {
         self.creds = creds
         self.updateCreds = updateCreds
         self.checkForError = checkForError

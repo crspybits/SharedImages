@@ -64,7 +64,7 @@ public protocol SignInManagerDelegate : class {
 }
 
 // A `UIView` is used to enable a broader description-- we're really thinking UIControl or UIButton.
-public typealias TappableButton = /* UIView & */ Tappable
+public typealias TappableButton = UIView & Tappable
 public protocol Tappable {
     // The intent is that this will cause a touchUpInside action to be sent to the underlying button.
     func tap()
@@ -95,7 +95,7 @@ public protocol GenericSignIn : class {
     func setupSignInButton(params:[String:Any]?) -> TappableButton?
     
     // Returns the last value returned from `setupSignInButton`.
-    var signInButton:/* TappableButton*/ UIView? {get}
+    var signInButton: TappableButton? {get}
     
     // Sign-in is sticky. Once signed-in, they tend to stay signed-in.
     var userIsSignedIn: Bool {get}
