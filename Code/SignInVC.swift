@@ -256,11 +256,15 @@ extension SignInVC : GenericSignInDelegate {
             
         case .owningUserCreated:
             sharingPermission = nil
-            successfulSignIn()
+            
+            // 12/26/17;  https://github.com/crspybits/SharedImages/issues/54
+            successfulSignIn(switchToImagesTab: true)
             
         case .sharingUserCreated:
             self.sharingPermission = SharingInvitation.session.sharingInvitationPermission!
-            successfulSignIn()
+            
+            // 12/26/17; https://github.com/crspybits/SharedImages/issues/54
+            successfulSignIn(switchToImagesTab: true)
         }
         
         setSharingButtonState()

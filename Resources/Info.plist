@@ -15,17 +15,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.8.4</string>
+	<string>0.9.0</string>
 	<key>CFBundleURLTypes</key>
 	<array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>db-5kjw9df8nocjgbm</string>
-            </array>
-        </dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>db-5kjw9df8nocjgbm</string>
+			</array>
+		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
@@ -45,7 +45,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>201712031838</string>
+	<string>201712261227</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -70,8 +70,8 @@
 		<string>fb-messenger-api</string>
 		<string>fbauth2</string>
 		<string>fbshareextension</string>
-        <string>dbapi-8-emm</string>
-        <string>dbapi-2</string>
+		<string>dbapi-8-emm</string>
+		<string>dbapi-2</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -92,10 +92,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>to take photos to store in your cloud storage</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app requires access to the photo library to save your image.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to the photo library.</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>This app requires access to the photo library to save your image.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

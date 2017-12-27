@@ -116,8 +116,16 @@ extension SyncController : SyncServerDelegate {
         updateDownloadProgress(count: UInt(uuids.count))
     }
     
-    func syncServerErrorOccurred(error:Error) {
+    func syncServerErrorOccurred(error:SyncServerError) {
         Log.error("Server error occurred: \(error)")
+        
+        switch error {
+        case .noNetworkError:
+            SMCoreLib.Alert.show(withTitle: "The network connection was lost!", message: "Please try again later.")
+        default:
+            break
+        }
+        
         delegate.syncEvent(syncController: self, event: .syncError)
     }
 

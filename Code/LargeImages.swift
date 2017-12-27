@@ -97,10 +97,13 @@ class LargeImages : UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
-        if seekToIndexPath != nil {
-            collectionView.scrollToItem(at: seekToIndexPath!, at: .left, animated: false)
-            seekToIndexPath = nil
+        // 12/26/17; Adding the DispatchQueue call to cure: https://github.com/crspybits/SharedImages/issues/58
+        DispatchQueue.main.async {[unowned self] in
+            // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
+            if self.seekToIndexPath != nil {
+                self.collectionView.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
+                self.seekToIndexPath = nil
+            }
         }
     }
 }
