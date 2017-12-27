@@ -123,32 +123,31 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GWH-6c-1MQ" userLabel="Container">
-                                <rect key="frame" x="4" y="64" width="760" height="911"/>
+                                <rect key="frame" x="196.5" y="64" width="375" height="911"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pZQ-Rb-DO3" userLabel="Image order">
-                                        <rect key="frame" x="0.0" y="0.0" width="760" height="70"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Newest images at top" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PjW-Cs-lvK">
-                                                <rect key="frame" x="20" y="25.5" width="647" height="21"/>
+                                                <rect key="frame" x="20" y="25.5" width="262" height="21"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J7U-aW-d5P">
-                                                <rect key="frame" x="691" y="20.5" width="51" height="31"/>
+                                                <rect key="frame" x="306" y="20.5" width="51" height="31"/>
                                                 <connections>
                                                     <action selector="imageOrderSwitchAction:" destination="LgV-c1-lQr" eventType="valueChanged" id="ZkI-2v-Cqe"/>
                                                 </connections>
                                             </switch>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OE1-i8-nLE" userLabel="Separator">
-                                                <rect key="frame" x="0.0" y="70" width="760" height="1"/>
+                                                <rect key="frame" x="0.0" y="70" width="375" height="1"/>
                                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="UMV-gW-gdQ"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="70" id="ECU-o2-vVe"/>
                                             <constraint firstAttribute="trailing" secondItem="J7U-aW-d5P" secondAttribute="trailing" constant="20" id="J6a-8p-H3G"/>
@@ -162,17 +161,17 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Xb-gd-QUp" userLabel="Email">
-                                        <rect key="frame" x="0.0" y="771" width="760" height="70"/>
+                                        <rect key="frame" x="0.0" y="771" width="375" height="70"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7yL-wr-xLO" userLabel="Separator">
-                                                <rect key="frame" x="0.0" y="0.0" width="760" height="1"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="1"/>
                                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="NZK-8W-gWw"/>
                                                 </constraints>
                                             </view>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H85-Q5-Pwl">
-                                                <rect key="frame" x="284.5" y="17" width="191" height="36"/>
+                                                <rect key="frame" x="92" y="17" width="191" height="36"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                 <state key="normal" title="Email log to developer"/>
                                                 <connections>
@@ -180,7 +179,6 @@
                                                 </connections>
                                             </button>
                                         </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstItem="7yL-wr-xLO" firstAttribute="leading" secondItem="0Xb-gd-QUp" secondAttribute="leading" id="9Do-5a-UU5"/>
                                             <constraint firstItem="H85-Q5-Pwl" firstAttribute="centerY" secondItem="0Xb-gd-QUp" secondAttribute="centerY" id="BEU-5t-ayb"/>
@@ -191,17 +189,17 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4SX-2Q-Mb8" userLabel="Version/Build">
-                                        <rect key="frame" x="0.0" y="841" width="760" height="70"/>
+                                        <rect key="frame" x="0.0" y="841" width="375" height="70"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vpm-Um-Cnf" userLabel="Separator">
-                                                <rect key="frame" x="0.0" y="0.0" width="760" height="1"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="1"/>
                                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="1" id="PnJ-oW-iol"/>
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n6l-LH-tHU" userLabel="Container">
-                                                <rect key="frame" x="285.5" y="13" width="188" height="44"/>
+                                                <rect key="frame" x="93" y="13" width="188" height="44"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version/Build:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a9B-v0-YII">
                                                         <rect key="frame" x="38" y="0.0" width="111.5" height="21"/>
@@ -216,7 +214,6 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstItem="a9B-v0-YII" firstAttribute="top" secondItem="n6l-LH-tHU" secondAttribute="top" id="0hp-ki-zuR"/>
                                                     <constraint firstAttribute="height" constant="44" id="7YP-9S-GMm"/>
@@ -227,7 +224,6 @@
                                                 </constraints>
                                             </view>
                                         </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstItem="n6l-LH-tHU" firstAttribute="centerX" secondItem="4SX-2Q-Mb8" secondAttribute="centerX" id="GdK-Wi-YQy"/>
                                             <constraint firstItem="Vpm-Um-Cnf" firstAttribute="top" secondItem="4SX-2Q-Mb8" secondAttribute="top" id="NMO-mT-PFK"/>
@@ -240,6 +236,7 @@
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
+                                    <constraint firstAttribute="width" constant="375" id="2Qc-qo-9mt"/>
                                     <constraint firstItem="pZQ-Rb-DO3" firstAttribute="leading" secondItem="GWH-6c-1MQ" secondAttribute="leading" id="5ua-GN-xh0"/>
                                     <constraint firstItem="pZQ-Rb-DO3" firstAttribute="top" secondItem="GWH-6c-1MQ" secondAttribute="top" id="Jdg-N9-Jaf"/>
                                     <constraint firstAttribute="bottom" secondItem="4SX-2Q-Mb8" secondAttribute="bottom" id="QTw-oX-VFu"/>
@@ -250,15 +247,41 @@
                                     <constraint firstItem="4SX-2Q-Mb8" firstAttribute="top" secondItem="0Xb-gd-QUp" secondAttribute="bottom" id="rx0-kP-cq1"/>
                                     <constraint firstAttribute="trailing" secondItem="pZQ-Rb-DO3" secondAttribute="trailing" id="vRZ-z5-XiI"/>
                                 </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="2Qc-qo-9mt"/>
+                                    </mask>
+                                </variation>
+                                <variation key="widthClass=regular">
+                                    <mask key="constraints">
+                                        <include reference="2Qc-qo-9mt"/>
+                                    </mask>
+                                </variation>
+                                <variation key="heightClass=regular-widthClass=regular">
+                                    <color key="backgroundColor" white="0.86490885416666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </variation>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="GWH-6c-1MQ" firstAttribute="centerX" secondItem="FOZ-xL-pWb" secondAttribute="centerX" id="MAN-DE-Q97"/>
                             <constraint firstItem="GWH-6c-1MQ" firstAttribute="top" secondItem="hNa-4E-d61" secondAttribute="bottom" id="a0v-cb-PS2"/>
                             <constraint firstAttribute="trailingMargin" secondItem="GWH-6c-1MQ" secondAttribute="trailing" constant="-16" id="gsB-Th-smL"/>
                             <constraint firstItem="GWH-6c-1MQ" firstAttribute="leading" secondItem="FOZ-xL-pWb" secondAttribute="leadingMargin" constant="-16" id="mAF-iE-mGD"/>
                             <constraint firstItem="eo5-e7-6ws" firstAttribute="top" secondItem="GWH-6c-1MQ" secondAttribute="bottom" id="rKh-b0-yhe"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="MAN-DE-Q97"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=regular">
+                            <mask key="constraints">
+                                <include reference="MAN-DE-Q97"/>
+                                <exclude reference="gsB-Th-smL"/>
+                                <exclude reference="mAF-iE-mGD"/>
+                            </mask>
+                        </variation>
                     </view>
                     <navigationItem key="navigationItem" id="yoi-hr-8Pq"/>
                     <connections>

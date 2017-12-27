@@ -8,6 +8,8 @@ Version 0.9.1
 		TESTING NEEDED: Test the operation of this on the staging server.
 	* Show specific network lost error
 		https://github.com/crspybits/SharedImages/issues/53
+	* Reformat settings screen
+		https://github.com/crspybits/SharedImages/issues/48
 	
 Version 0.9.0 (12/26/17)
 	* Removed tap method for signin's-- no longer need Tappable protocol.
