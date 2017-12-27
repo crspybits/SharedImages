@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import SMCoreLib
 
-protocol LargeImageCellDelegate {
+protocol LargeImageCellDelegate : class {
     func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize)
 }
 
@@ -33,7 +33,7 @@ class ImageCollectionVC : UICollectionViewCell {
     private(set) weak var syncController:SyncController!
     weak var imageCache:LRUCache<Image>?
     
-    var delegate:LargeImageCellDelegate!
+    weak var delegate:LargeImageCellDelegate?
     var originalSize:CGSize!
     
     private var selectedImage:UIImageView!
@@ -119,7 +119,7 @@ extension ImageCollectionVC : UIScrollViewDelegate {
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        delegate.cellZoomed(cell: self, toZoomSize: imageView.frame.size, withOriginalSize: originalSize)
+        delegate?.cellZoomed(cell: self, toZoomSize: imageView.frame.size, withOriginalSize: originalSize)
         //Log.msg("imageView.frame.size: \(imageView.frame.size)")
         
         if !switchedToFullScaleImageForZooming {

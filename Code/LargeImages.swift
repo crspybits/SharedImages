@@ -14,7 +14,7 @@ import SMCoreLib
 class LargeImages : UIViewController {
     // Set these two when creating an instance of this class.
     var startItem: Int! = 0
-    var syncController:SyncController!
+    weak var syncController:SyncController?
     
     private var seekToIndexPath:IndexPath?
     let IMAGE_WIDTH_PADDING:CGFloat = 20.0
@@ -52,6 +52,17 @@ class LargeImages : UIViewController {
 
         let indexPath = IndexPath(item: startItem, section: 0)
         seekToIndexPath = indexPath
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // 12/27/17; This is overkill, but up until today: a) I had a memory leak where this LargeImages VC was being retained, and b) this was causing a crash when images were deleted. So, I'm going to make darn sure the path to that crash is no longer possible.
+        coreDataSource = nil
+    }
+    
+    deinit {
+        Log.msg("deinit")
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -128,6 +139,7 @@ extension LargeImages : CoreDataSourceDelegate {
     
         // 8/24/17; Looks like this is where the crash happens.
         collectionView.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
+        Log.msg("LargeImages: objectWasDeleted")
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasUpdated indexPathOfUpdatedObject: IndexPath!) {
@@ -172,7 +184,10 @@ extension LargeImages : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
-        cell.setProperties(image: self.coreDataSource.object(at: indexPath) as! Image, syncController: syncController, cache: imageCache)
+        
+        if let syncController = syncController {
+            cell.setProperties(image: self.coreDataSource.object(at: indexPath) as! Image, syncController: syncController, cache: imageCache)
+        }
         
         return cell
     }

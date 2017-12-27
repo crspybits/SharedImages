@@ -1,15 +1,20 @@
 SharedImages
 
 Version 0.9.1
-	* App rotation doesn't leave you on the same image
+	* Fixed: App rotation doesn't leave you on the same image
 		https://github.com/crspybits/SharedImages/issues/58
-	* On first creating an account, you don't get changed to Images tab
+	* Fixed: On first creating an account, you don't get changed to Images tab
 		https://github.com/crspybits/SharedImages/issues/54
 		TESTING NEEDED: Test the operation of this on the staging server.
 	* Show specific network lost error
 		https://github.com/crspybits/SharedImages/issues/53
-	* Reformat settings screen
+	* Reformat settings screen-- it looks better on iPad's now.
 		https://github.com/crspybits/SharedImages/issues/48
+	* Upload progress/download progress
+		There is now a progress indicator for uploading images, and for upload deleting images.
+		https://github.com/crspybits/SharedImages/issues/45
+	* Fixed a memory leak: The large images view controller was being retained.
+		This is what, indirectly, had been causing crashes when images were removed.
 	
 Version 0.9.0 (12/26/17)
 	* Removed tap method for signin's-- no longer need Tappable protocol.

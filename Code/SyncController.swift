@@ -27,10 +27,12 @@ class SyncController {
     private var progressIndicator: ProgressIndicator!
     private var numberDownloads: UInt!
     private var numberDownloadedSoFar: UInt!
+    private var numberUploads: UInt!
+    private var numberUploadedSoFar: UInt!
     
     init() {
         SyncServer.session.delegate = self
-        SyncServer.session.eventsDesired = [EventDesired.syncStarted, EventDesired.syncDone, EventDesired.willStartDownloads]
+        SyncServer.session.eventsDesired = [.syncStarted, .syncDone, .willStartDownloads, .willStartUploads, .singleFileUploadComplete, .singleUploadDeletionComplete]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -103,8 +105,18 @@ extension SyncController : SyncServerDelegate {
         // 12/3/17; We can get here from a call to `shouldDoDeletions`-- when the app is just recovering -- doing deletions on a refresh without having actually done any server interaction. i.e., the client interface has just cached some deletions.
         if numberDownloadedSoFar != nil {
             numberDownloadedSoFar! += count
-            progressIndicator?.updateProgress(withNumberDownloaded: numberDownloadedSoFar)
+            progressIndicator?.updateProgress(withNumberFilesProcessed: numberDownloadedSoFar)
             if numberDownloadedSoFar! >= numberDownloads {
+                progressIndicator?.dismiss()
+            }
+        }
+    }
+    
+    private func updateUploadProgress(count:UInt = 1) {
+        if numberUploadedSoFar != nil {
+            numberUploadedSoFar! += count
+            progressIndicator?.updateProgress(withNumberFilesProcessed: numberUploadedSoFar)
+            if numberUploadedSoFar! >= numberUploads {
                 progressIndicator?.dismiss()
             }
         }
@@ -135,7 +147,7 @@ extension SyncController : SyncServerDelegate {
         switch event {
         case .syncStarted:
             delegate.syncEvent(syncController: self, event: .syncStarted)
-        
+            
         case .willStartDownloads(numberFileDownloads: let numberFileDownloads, numberDownloadDeletions: let numberDownloadDeletions):
             numberDownloads = numberFileDownloads + numberDownloadDeletions
             numberDownloadedSoFar = 0
@@ -154,10 +166,28 @@ extension SyncController : SyncServerDelegate {
             })
             progressIndicator.show()
             
+        case .willStartUploads(numberFileUploads: let numberFileUploads, numberUploadDeletions: let numberUploadDeletions):
+            numberUploads = numberFileUploads + numberUploadDeletions
+            numberUploadedSoFar = 0
+            progressIndicator?.dismiss()
+            
+            progressIndicator = ProgressIndicator(imagesToUpload: numberFileUploads, imagesToUploadDelete: numberUploadDeletions, withStopHandler: {
+                SyncServer.session.stopSync()
+            })
+
+            progressIndicator.show()
+            
+        case .singleFileUploadComplete:
+            updateUploadProgress()
+            
+        case .singleUploadDeletionComplete:
+            updateUploadProgress()
+            
         case .syncDone:
             delegate.syncEvent(syncController: self, event: .syncDone)
         
         default:
+            Log.error("Unexpected event received: \(event)")
             break
         }
     }

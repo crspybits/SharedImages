@@ -13,16 +13,41 @@ import SMCoreLib
 
 class ProgressIndicator {
     private let label = UILabel()
-    private let alert:AlertController
-    private let totalImagesToDownload:UInt
-    
+    private var alert:AlertController!
+    private var totalImages:UInt!
+
     // So that the progress indicator shows up for at least a moment. Otherwise, for example-- with deleting files-- you can't tell what the app is doing.
     private var startTime:Double!
     let minDisplaySeconds = 2.0
     
+    init(imagesToUpload:UInt, imagesToUploadDelete:UInt, withStopHandler stop: @escaping ()->()) {
+        totalImages = imagesToUpload + imagesToUploadDelete
+        
+        var title = ""
+        if imagesToUpload > 0 && imagesToUploadDelete > 0 {
+            title = "Uploading & Upload Deleting Images"
+        }
+        else if imagesToUpload > 0 {
+            title = "Uploading Image"
+            if imagesToUpload > 1 {
+                title += "s"
+            }
+        }
+        else if imagesToUploadDelete > 0 {
+            title = "Upload Deleting Image"
+            if imagesToUploadDelete > 1 {
+                title += "s"
+            }
+        }
+        else {
+            assert(false)
+        }
+
+        setup(withTitle: title, withStopHandler: stop)
+    }
+    
     init(imagesToDownload: UInt, imagesToDelete:UInt, withStopHandler stop: @escaping ()->()) {
-        self.totalImagesToDownload = imagesToDownload + imagesToDelete
-        label.translatesAutoresizingMaskIntoConstraints = false
+        totalImages = imagesToDownload + imagesToDelete
         
         var title = ""
         if imagesToDownload > 0 && imagesToDelete > 0 {
@@ -44,6 +69,12 @@ class ProgressIndicator {
             assert(false)
         }
 
+        setup(withTitle: title, withStopHandler: stop)
+    }
+    
+    private func setup(withTitle title: String, withStopHandler stop: @escaping ()->()) {
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
         alert = AlertController(title: title, message: "Please wait...")
         alert.contentView.addSubview(label)
 
@@ -51,7 +82,7 @@ class ProgressIndicator {
         label.topAnchor.constraint(equalTo: alert.contentView.topAnchor).isActive = true
         label.bottomAnchor.constraint(equalTo: alert.contentView.bottomAnchor).isActive = true
         
-        updateProgress(withNumberDownloaded: 0)
+        updateProgress(withNumberFilesProcessed: 0)
 
         alert.add(AlertAction(title: "Stop", style: .destructive) { alert in
             stop()
@@ -79,8 +110,8 @@ class ProgressIndicator {
         }
     }
     
-    func updateProgress(withNumberDownloaded numberDownloaded:UInt) {
-        label.text = "\(numberDownloaded) of \(totalImagesToDownload) images..."
+    func updateProgress(withNumberFilesProcessed numberProcessed:UInt) {
+        label.text = "\(numberProcessed) of \(totalImages!) images..."
         label.sizeToFit()
     }
 }
