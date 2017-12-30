@@ -11,10 +11,19 @@ import SMCoreLib
 import SyncServer_Shared
 
 public protocol SharingInvitationDelegate : class {
-func sharingInvitationReceived(_ sharingInvitation:SharingInvitation)
+func sharingInvitationReceived(_ invite:SharingInvitation.Invitation)
 }
 
 public class SharingInvitation {
+    public struct Invitation {
+        public let sharingInvitationCode:String
+        
+        // It seems odd to have this coming in as a URL parameter, but it has no effect on the permissions granted. Rather, it's here for the UI-- to tell the invited person what kind of permissions they would get if they accept the invitation. (The alternative would be to have a dedicated backend call which would return the sharing permission given the invitation code).
+        public let sharingInvitationPermission:SharingPermission
+    }
+    
+    private var invitation:Invitation?
+    
     private static let queryItemAuthorizationCode = "code"
     private static let queryItemPermission = "permission"
 
@@ -22,21 +31,24 @@ public class SharingInvitation {
     
     public weak var delegate:SharingInvitationDelegate?
     
-    public var sharingInvitationCode:String?
-    
-    // It seems odd to have this coming in as a URL parameter, but it has no effect on the permissions granted. Rather, it's here for the UI-- to tell the invited person what kind of permissions they would get if they accept the invitation. (The alternative would be to have a dedicated backend call which would return the sharing permission given the invitation code).
-    public var sharingInvitationPermission:SharingPermission?
-
     // The upper/lower case sense of this is ignored.
     static let urlScheme = SMIdentifiers.session().APP_BUNDLE_IDENTIFIER() + ".invitation"
     
     private init() {
     }
     
+    // 12/29/17; This to deal with the case where the delegate method of this class wasn't set before the invitation was received. See https://github.com/crspybits/SharedImages/issues/42
+    // This will be nil if the invitation has already been processed by the delegate. If it returns non-nil, it returns non-nil only once for that invitation.
+    public func receive() -> Invitation? {
+        let result = invitation
+        invitation = nil
+        return result
+    }
+    
     // This URL/String is suitable for sending in an email to the person being invited.
     // Handles urls of the form: 
     //      <BundleId>.invitation://?code=<InvitationCode>&permission=<permission>
-    //      where <BundleId> is something like biz.SpasticMuffin.SharedNotes
+    //      where <BundleId> is something like biz.SpasticMuffin.SharedImages
     //
     public static func createSharingURL(invitationCode:String, permission:SharingPermission) -> String {
         let urlString = self.urlScheme + "://?\(queryItemAuthorizationCode)=" + invitationCode + "&\(queryItemPermission)=" + permission.rawValue
@@ -79,10 +91,15 @@ public class SharingInvitation {
 #endif
                     
                     if code != nil && permission != nil {
-                        sharingInvitationCode = code
-                        sharingInvitationPermission = permission
+                        let invite = Invitation(sharingInvitationCode: code!, sharingInvitationPermission: permission!)
                         returnResult = true
-                        self.delegate?.sharingInvitationReceived(self)
+                        
+                        if self.delegate == nil {
+                            invitation = invite
+                        }
+                        else {
+                            self.delegate!.sharingInvitationReceived(invite)
+                        }
                     }
                 }
             }
