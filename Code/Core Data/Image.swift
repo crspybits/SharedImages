@@ -110,6 +110,10 @@ public class Image: NSManagedObject {
         
         return images
     }
+    
+    func save() {
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+    }
 }
 
 extension Image : CacheDataSource {

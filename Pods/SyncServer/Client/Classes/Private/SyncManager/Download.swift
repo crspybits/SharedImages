@@ -21,7 +21,7 @@ class Download {
     
     enum OnlyCheckCompletion {
     case checkResult(downloadFiles:[FileInfo]?, downloadDeletions:[FileInfo]?, MasterVersionInt?)
-    case error(Error)
+    case error(SyncServerError)
     }
     
     // TODO: *0* while this check is occurring, we want to make sure we don't have a concurrent check operation.
@@ -45,7 +45,7 @@ class Download {
                     completionResult =
                         .checkResult(downloadFiles:downloads, downloadDeletions:deletions, masterVersion)
                 } catch (let error) {
-                    completionResult = .error(error)
+                    completionResult = .error(.coreDataError(error))
                 }
                 
                 completion?(completionResult)
@@ -56,7 +56,7 @@ class Download {
     enum CheckCompletion {
     case noDownloadsOrDeletionsAvailable
     case downloadsAvailable(numberOfDownloadFiles:Int32, numberOfDownloadDeletions:Int32)
-    case error(Error)
+    case error(SyncServerError)
     }
     
     // TODO: *0* while this check is occurring, we want to make sure we don't have a concurrent check operation.
@@ -113,7 +113,7 @@ class Download {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error(error)
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
                 } // End performAndWait
@@ -127,13 +127,13 @@ class Download {
     case started
     case noDownloadsOrDeletions
     case allDownloadsCompleted
-    case error(String)
+    case error(SyncServerError)
     }
     
     enum NextCompletion {
     case fileDownloaded(url:SMRelativeLocalURL, attr:SyncAttributes, dft: DownloadFileTracker)
     case masterVersionUpdate
-    case error(String)
+    case error(SyncServerError)
     }
     
     // Starts download of next file, if there is one. There should be no files downloading already. Only if .started is the NextResult will the completion handler be called. With a masterVersionUpdate response for NextCompletion, the MasterVersion Core Data object is updated by this method, and all the DownloadFileTracker objects have been reset.
@@ -157,9 +157,8 @@ class Download {
 
             let alreadyDownloading = dfts.filter {$0.status == .downloading}
             guard alreadyDownloading.count == 0 else {
-                let message = "Already downloading a file!"
-                Log.error(message)
-                nextResult = .error(message)
+                Log.error("Already downloading a file!")
+                nextResult = .error(.alreadyDownloadingAFile)
                 return
             }
             
@@ -177,7 +176,7 @@ class Download {
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
             } catch (let error) {
-                nextResult = .error("\(error)")
+                nextResult = .error(.coreDataError(error))
             }
             
             // Need this inside the `performAndWait` to bridge the gap without an NSManagedObject
@@ -204,9 +203,8 @@ class Download {
                     CoreData.sessionNamed(Constants.coreDataName).saveContext()
                 }
                 
-                let message = "Error: \(String(describing: error))"
-                Log.error(message)
-                completion?(.error(message))
+                Log.error("Error: \(String(describing: error))")
+                completion?(.error(error!))
                 return
             }
             
@@ -244,7 +242,7 @@ class Download {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        nextCompletionResult = .error("\(error)")
+                        nextCompletionResult = .error(.coreDataError(error))
                         return
                     }
                     

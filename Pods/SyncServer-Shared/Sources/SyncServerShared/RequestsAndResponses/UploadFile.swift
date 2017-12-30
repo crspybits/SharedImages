@@ -54,8 +54,6 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
         return self.nonNilKeys() + [UploadFileRequest.appMetaDataKey, UploadFileRequest.cloudFolderNameKey]
     }
     
-    
-    
     public required init?(json: JSON) {
         super.init()
         
@@ -107,9 +105,18 @@ public class UploadFileResponse : ResponseMessage {
         return .json
     }
     
-    // On a successful upload, this will be present in the response.
+    // On a successful upload, the following fields will be present in the response.
     public static let sizeKey = "sizeInBytes"
     public var size:Int64?
+    
+    // 12/27/17; These two were added to the response. See https://github.com/crspybits/SharedImages/issues/44
+    // This is the actual date/time of creation of the file on the server.
+    public static let creationDateKey = "creationDate"
+    public var creationDate: Date?
+ 
+    // This is the actual date/time of update of the file on the server.
+    public static let updateDateKey = "updateDate"
+    public var updateDate: Date?
     
     // If the master version for the user on the server has been incremented, this key will be present in the response-- with the new value of the master version. The upload was not attempted in this case.
     public static let masterVersionUpdateKey = "masterVersionUpdate"
@@ -117,7 +124,11 @@ public class UploadFileResponse : ResponseMessage {
     
     public required init?(json: JSON) {
         self.size = Decoder.decode(int64ForKey: UploadFileResponse.sizeKey)(json)
-        self.masterVersionUpdate = Decoder.decode(int64ForKey: UploadFileResponse.masterVersionUpdateKey)(json)        
+        self.masterVersionUpdate = Decoder.decode(int64ForKey: UploadFileResponse.masterVersionUpdateKey)(json)
+        
+        let dateFormatter = DateExtras.getDateFormatter(format: .DATETIME)
+        self.creationDate = Decoder.decode(dateForKey: UploadFileResponse.creationDateKey, dateFormatter: dateFormatter)(json)
+        self.updateDate = Decoder.decode(dateForKey: UploadFileResponse.updateDateKey, dateFormatter: dateFormatter)(json)
     }
     
     public convenience init?() {
@@ -126,9 +137,13 @@ public class UploadFileResponse : ResponseMessage {
     
     // MARK: - Serialization
     public func toJSON() -> JSON? {
+        let dateFormatter = DateExtras.getDateFormatter(format: .DATETIME)
+
         return jsonify([
             UploadFileResponse.sizeKey ~~> self.size,
-            UploadFileResponse.masterVersionUpdateKey ~~> self.masterVersionUpdate
+            UploadFileResponse.masterVersionUpdateKey ~~> self.masterVersionUpdate,
+            Encoder.encode(dateForKey: UploadFileResponse.creationDateKey, dateFormatter: dateFormatter)(self.creationDate),
+            Encoder.encode(dateForKey: UploadFileResponse.updateDateKey, dateFormatter: dateFormatter)(self.updateDate)
         ])
     }
 }

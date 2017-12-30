@@ -9,12 +9,16 @@
 import Foundation
 import SMCoreLib
 
-// This information is for testing purposes and for UI (e.g., for displaying download progress).
+// Most of this information is for testing purposes and for UI (e.g., for displaying download progress). Some of it, however, can be necessary for app operations.
 public enum SyncEvent {
     // This can repeat if there is a change to the files on the server (a master version update), and downloads restart.
     case willStartDownloads(numberFileDownloads:UInt, numberDownloadDeletions:UInt)
     
+    case willStartUploads(numberFileUploads:UInt, numberUploadDeletions:UInt)
+    
+    // The attributes report the actual creation and update dates of the file-- as established by the server.
     case singleFileUploadComplete(attr:SyncAttributes)
+    
     case singleUploadDeletionComplete(fileUUID:UUIDString)
     case fileUploadsCompleted(numberOfFiles:Int)
     case uploadDeletionsCompleted(numberOfFiles:Int)
@@ -34,36 +38,40 @@ public struct EventDesired: OptionSet {
     public init(rawValue:Int){ self.rawValue = rawValue}
 
     public static let willStartDownloads = EventDesired(rawValue: 1 << 0)
-    
-    public static let singleFileUploadComplete = EventDesired(rawValue: 1 << 1)
-    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 2)
-    public static let fileUploadsCompleted = EventDesired(rawValue: 1 << 3)
-    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 4)
-    
-    public static let syncStarted = EventDesired(rawValue: 1 << 5)
-    public static let syncDone = EventDesired(rawValue: 1 << 6)
-    
-    public static let syncStopping = EventDesired(rawValue: 1 << 7)
+    public static let willStartUploads = EventDesired(rawValue: 1 << 1)
 
-    public static let refreshingCredentials = EventDesired(rawValue: 1 << 8)
+    public static let singleFileUploadComplete = EventDesired(rawValue: 1 << 2)
+    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 3)
+    public static let fileUploadsCompleted = EventDesired(rawValue: 1 << 4)
+    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 5)
+    
+    public static let syncStarted = EventDesired(rawValue: 1 << 6)
+    public static let syncDone = EventDesired(rawValue: 1 << 7)
+    
+    public static let syncStopping = EventDesired(rawValue: 1 << 8)
+
+    public static let refreshingCredentials = EventDesired(rawValue: 1 << 9)
 
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .fileUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
         var eventIsDesired:EventDesired
         
         switch event {
-        case .willStartDownloads(numberDownloads: _):
+        case .willStartDownloads:
             eventIsDesired = .willStartDownloads
-
-        case .fileUploadsCompleted(_):
+            
+        case .willStartUploads:
+            eventIsDesired = .willStartUploads
+            
+        case .fileUploadsCompleted:
             eventIsDesired = .fileUploadsCompleted
             
-        case .uploadDeletionsCompleted(_):
+        case .uploadDeletionsCompleted:
             eventIsDesired = .uploadDeletionsCompleted
         
         case .syncStarted:
@@ -75,10 +83,10 @@ public struct EventDesired: OptionSet {
         case .syncStopping:
             eventIsDesired = .syncStopping
             
-        case .singleFileUploadComplete(_):
+        case .singleFileUploadComplete:
             eventIsDesired = .singleFileUploadComplete
             
-        case .singleUploadDeletionComplete(_):
+        case .singleUploadDeletionComplete:
             eventIsDesired = .singleUploadDeletionComplete
         
         case .refreshingCredentials:
@@ -91,6 +99,45 @@ public struct EventDesired: OptionSet {
             })
         }
     }
+}
+
+// Many of these only have internal meaning to the client. Some are documented because they can be useful to the code using the client.
+public enum SyncServerError: Error {
+    // The network connection was lost.
+    case noNetworkError
+    
+    case syncIsOperating
+    case alreadyDownloadingAFile
+    case alreadyUploadingAFile
+    case couldNotFindFileUUID(String)
+    case versionForFileWasNil(fileUUUID: String)
+    case noRefreshAvailable
+    case couldNotCreateResponse
+    case couldNotCreateRequest
+    case didNotGetDownloadURL
+    case couldNotMoveDownloadFile
+    case couldNotReadUploadFile
+    case couldNotCreateNewFileForDownload
+    case obtainedAppMetaDataButWasNotString
+    case noExpectedResultKey
+    case nilResponse
+    case couldNotObtainHeaderParameters
+    case resultURLObtainedWasNil
+    case errorConvertingServerResponse
+    case jsonSerializationError(Error)
+    case urlSessionError(Error)
+    case couldNotGetHTTPURLResponse
+    case non200StatusCode(Int)
+    case badCheckCreds
+    case unknownServerError
+    case coreDataError(Error)
+    case generic(String)
+    
+#if TEST_REFRESH_FAILURE
+    case testRefreshFailure
+#endif
+
+    case credentialsRefreshError
 }
 
 // These delegate methods are called on the main thread.
@@ -106,7 +153,7 @@ public protocol SyncServerDelegate : class {
     // This may be called sometime after the deletions have been received from the server. E.g., on a recovery step after the app launches and not after recent server interaction.
     func shouldDoDeletions(downloadDeletions:[SyncAttributes])
     
-    func syncServerErrorOccurred(error:Error)
+    func syncServerErrorOccurred(error:SyncServerError)
 
     // Reports events. Useful for testing and UI.
     func syncServerEventOccurred(event:SyncEvent)
@@ -136,6 +183,7 @@ public class SyncServer {
             SyncManager.session.desiredEvents = newValue
             ServerAPI.session.desiredEvents = newValue
             Download.session.desiredEvents = newValue
+            Upload.session.desiredEvents = newValue
         }
         
         get {
@@ -148,6 +196,7 @@ public class SyncServer {
             SyncManager.session.delegate = newValue
             ServerAPI.session.syncServerDelegate = newValue
             Download.session.delegate = newValue
+            Upload.session.delegate = delegate
         }
         
         get {
@@ -433,13 +482,60 @@ public class SyncServer {
         }
     }
     
+     // This is powerful method. It permanently removes all local/cached metadata known by the client interface. E.g., metadata about files that you have previously uploaded. It makes no server calls. This is similar to deleting and re-installing the app-- except that it does not delete the files referenced by the meta data. You must keep track of files and, if desired, delete them. It also doesn't sign out the user or require that the user is signed in.
+     // This method may only be called when the client is not doing any sync operations.
+    public func reset() throws {
+        var result:SyncServerError?
+        
+        Synchronized.block(self) {
+            if syncOperating {
+                result = .syncIsOperating
+            }
+            else {
+                do {
+                    try SyncServer.resetMetaData()
+                } catch (let error) {
+                    result = (error as! SyncServerError)
+                }
+            }
+        }
+        
+        if let result = result {
+            throw result
+        }
+    }
+    
+    // Separated out of the `reset` method above to use this one for testing.
+    internal static func resetMetaData() throws /* SyncServerError */ {
+        var result:SyncServerError?
+
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+            DownloadFileTracker.removeAll()
+            DirectoryEntry.removeAll()
+            UploadFileTracker.removeAll()
+            UploadQueue.removeAll()
+            UploadQueues.removeAll()
+            Singleton.removeAll()
+
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                result = .coreDataError(error)
+            }
+        }
+        
+        if let result = result {
+            throw result
+        }
+    }
+    
     public struct LocalConsistencyResults {
         public let clientMissingAndDeleted:Set<UUIDString>!
         public let clientMissingNotDeleted:Set<UUIDString>!
         public let directoryMissing:Set<UUIDString>!
     }
     
-    // Only operates if not currently synchronizing.
+    // Performs a similar operation to a file system consistency or integrity check. Only operates if not currently synchronizing. Suitable for running at app startup.
     public func localConsistencyCheck(clientFiles:[UUIDString]) throws -> LocalConsistencyResults? {
         var error: Error?
         var results:LocalConsistencyResults!
@@ -533,7 +629,7 @@ public class SyncServer {
 
             var doStart = false
             
-            Synchronized.block(self) {
+            Synchronized.block(self) { [unowned self] in
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     if !self.stoppingSync && (Upload.haveSyncQueue()  || self.delayedSync) {
                         self.delayedSync = false

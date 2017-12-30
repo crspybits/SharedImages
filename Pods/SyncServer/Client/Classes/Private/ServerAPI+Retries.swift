@@ -16,18 +16,12 @@ import Foundation
 import SMCoreLib
 import SyncServer_Shared
 
-#if TEST_REFRESH_FAILURE
-enum RequestWithRetriesError : Error {
-case testRefreshFailure
-}
-#endif
-
 private class RequestWithRetries {
     let maximumNumberRetries = 3
     
     let creds:GenericCredentials?
     let updateCreds:((_ creds:GenericCredentials?)->())
-    let checkForError:(_ statusCode:Int?, _ error:Error?) -> Error?
+    let checkForError:(_ statusCode:Int?, _ error:SyncServerError?) -> SyncServerError?
     let desiredEvents:EventDesired!
     weak var delegate:SyncServerDelegate?
     
@@ -36,12 +30,12 @@ private class RequestWithRetries {
     private var retryIfError:Bool
 
     var request:(()->())!
-    var completionHandler:((_ error:Error?)->())!
+    var completionHandler:((_ error:SyncServerError?)->())!
     
     // When we get a 401 response from server.
     var userUnauthorized:(()->())!
     
-    init(retryIfError:Bool = true, creds:GenericCredentials?, desiredEvents:EventDesired, delegate:SyncServerDelegate?, updateCreds:@escaping (_ creds:GenericCredentials?)->(), checkForError:@escaping (_ statusCode:Int?, _ error:Error?) -> Error?, userUnauthorized:@escaping ()->()) {
+    init(retryIfError:Bool = true, creds:GenericCredentials?, desiredEvents:EventDesired, delegate:SyncServerDelegate?, updateCreds:@escaping (_ creds:GenericCredentials?)->(), checkForError:@escaping (_ statusCode:Int?, _ error:SyncServerError?) -> SyncServerError?, userUnauthorized:@escaping ()->()) {
         self.creds = creds
         self.updateCreds = updateCreds
         self.checkForError = checkForError
@@ -56,7 +50,7 @@ private class RequestWithRetries {
     }
     
     // Make sure self.creds is non-nil before you call this!
-    private func refreshCredentials(completion: @escaping (Error?) ->()) {
+    private func refreshCredentials(completion: @escaping (SyncServerError?) ->()) {
         EventDesired.reportEvent(.refreshingCredentials, mask: self.desiredEvents, delegate: self.delegate)
         self.creds!.refreshCredentials { error in
             if error == nil {
@@ -64,7 +58,7 @@ private class RequestWithRetries {
             }
             
 #if TEST_REFRESH_FAILURE
-            completion(RequestWithRetriesError.testRefreshFailure)
+            completion(.testRefreshFailure)
 #else
             completion(error)
 #endif
@@ -86,7 +80,7 @@ private class RequestWithRetries {
         }
     }
     
-    private func completion(_ error:Error?) {
+    private func completion(_ error:SyncServerError?) {
         completionHandler(error)
         
         // Get rid of circular reference so `RequestWithRetries` instance can be deallocated.
@@ -94,7 +88,7 @@ private class RequestWithRetries {
         request = nil
     }
 
-    func retryCheck(statusCode:Int?, error:Error?) {
+    func retryCheck(statusCode:Int?, error:SyncServerError?) {
         numberTries += 1
         let errorCheck = checkForError(statusCode, error)
         
@@ -144,7 +138,7 @@ extension ServerAPI {
         delegate?.userWasUnauthorized(forServerAPI: self)
     }
     
-    func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval? = nil, retryIfError retry:Bool=true, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:Error?)->())?) {
+    func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval? = nil, retryIfError retry:Bool=true, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(retryIfError: retry, creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         
@@ -168,7 +162,7 @@ extension ServerAPI {
         rwr.start()
     }
     
-    func postUploadDataTo(_ serverURL: URL, dataToUpload:Data, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:Error?)->())?) {
+    func postUploadDataTo(_ serverURL: URL, dataToUpload:Data, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         
@@ -185,7 +179,7 @@ extension ServerAPI {
         rwr.start()
     }
     
-    func downloadFrom(_ serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ urlResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:Error?)->())?) {
+    func downloadFrom(_ serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ urlResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         

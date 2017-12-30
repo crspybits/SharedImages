@@ -11,6 +11,9 @@ import SMCoreLib
 import SyncServer_Shared
 
 class Upload {
+    var desiredEvents:EventDesired!
+    weak var delegate:SyncServerDelegate?
+    
     static let session = Upload()
     var cloudFolderName:String!
     var deviceUUID:String!
@@ -23,18 +26,18 @@ class Upload {
     case started
     case noUploads
     case allUploadsCompleted
-    case error(String)
+    case error(SyncServerError)
     }
     
     enum NextCompletion {
     case fileUploaded(SyncAttributes)
     case uploadDeletion(fileUUID:String)
     case masterVersionUpdate
-    case error(String)
+    case error(SyncServerError)
     }
     
     // Starts upload of next file, if there is one. There should be no files uploading already. Only if .started is the NextResult will the completion handler be called. With a masterVersionUpdate response for NextCompletion, the MasterVersion Core Data object is updated by this method, and all the UploadFileTracker objects have been reset.
-    func next(completion:((NextCompletion)->())?) -> NextResult {
+    func next(first: Bool = false, completion:((NextCompletion)->())?) -> NextResult {
         self.completion = completion
         
         var nextResult:NextResult!
@@ -42,6 +45,8 @@ class Upload {
         var nextToUpload:UploadFileTracker!
         var uploadQueue:UploadQueue!
         var deleteOnServer:Bool!
+        var numberFileUploads:Int!
+        var numberUploadDeletions:Int!
         
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             uploadQueue = Upload.getHeadSyncQueue()
@@ -50,12 +55,21 @@ class Upload {
                 return
             }
             
+            numberFileUploads =
+                uploadQueue.uploadFileTrackers.filter {
+                    $0.status == .notStarted && !$0.deleteOnServer
+                }.count
+            
+            numberUploadDeletions =
+                uploadQueue.uploadFileTrackers.filter {
+                    $0.status == .notStarted && $0.deleteOnServer
+                }.count
+            
             let alreadyUploading =
                 uploadQueue.uploadFileTrackers.filter {$0.status == .uploading}
             guard alreadyUploading.count == 0 else {
-                let message = "Already uploading a file!"
-                Log.error(message)
-                nextResult = .error(message)
+                Log.error("Already uploading a file!")
+                nextResult = .error(.alreadyUploadingAFile)
                 return
             }
 
@@ -73,12 +87,16 @@ class Upload {
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
             } catch (let error) {
-                nextResult = .error("\(error)")
+                nextResult = .error(.coreDataError(error))
             }
         }
         
         guard nextResult == nil else {
             return nextResult!
+        }
+        
+        if first {
+            EventDesired.reportEvent(.willStartUploads(numberFileUploads: UInt(numberFileUploads), numberUploadDeletions: UInt(numberUploadDeletions)), mask: desiredEvents, delegate: delegate)
         }
         
         if deleteOnServer! {
@@ -99,12 +117,12 @@ class Upload {
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             let entry = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID)
             if entry == nil {
-                nextResult = .error("Could not find fileUUID: \(nextToUpload.fileUUID)")
+                nextResult = .error(.couldNotFindFileUUID(nextToUpload.fileUUID))
                 return
             }
             
             if entry!.fileVersion == nil {
-                nextResult = .error("File version for fileUUID: \(nextToUpload.fileUUID) was nil!")
+                nextResult = .error(.versionForFileWasNil(fileUUUID: nextToUpload.fileUUID))
                 return
             }
             
@@ -127,7 +145,7 @@ class Upload {
                 
                 let message = "Error: \(String(describing: error))"
                 Log.error(message)
-                self.completion?(.error(message))
+                self.completion?(.error(error!))
                 return
             }
             
@@ -140,7 +158,7 @@ class Upload {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error("\(error)")
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
                     
@@ -163,7 +181,7 @@ class Upload {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error("\(error)")
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
                     
@@ -201,12 +219,12 @@ class Upload {
                 */
                 let message = "Error: \(String(describing: error))"
                 Log.error(message)
-                self.completion?(.error(message))
+                self.completion?(.error(error!))
                 return
             }
  
             switch uploadResult! {
-            case .success(sizeInBytes: _):
+            case .success(sizeInBytes: _, creationDate: let creationDate, updateDate: let updateDate):
                 var completionResult:NextCompletion?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     nextToUpload.status = .uploaded
@@ -214,11 +232,11 @@ class Upload {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error("\(error)")
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
 
-                    let attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:nextToUpload.mimeType!)
+                    let attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:nextToUpload.mimeType!, creationDate: creationDate, updateDate: updateDate)
                     completionResult = .fileUploaded(attr)
                 }
                 
@@ -238,7 +256,7 @@ class Upload {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error("\(error)")
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
                     
@@ -255,7 +273,7 @@ class Upload {
     enum DoneUploadsCompletion {
     case doneUploads(numberTransferred: Int64)
     case masterVersionUpdate
-    case error(String)
+    case error(SyncServerError)
     }
     
     func doneUploads(completion:((DoneUploadsCompletion)->())?) {
@@ -266,7 +284,7 @@ class Upload {
         
         ServerAPI.session.doneUploads(serverMasterVersion: masterVersion) { (result, error) in
             guard error == nil else {
-                completion?(.error("\(String(describing: error))"))
+                completion?(.error(error!))
                 return
             }
 
@@ -275,12 +293,12 @@ class Upload {
                 var completionResult:DoneUploadsCompletion?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     // Master version was incremented on the server as part of normal doneUploads operation. Update ours locally.
-                    Singleton.get().masterVersion = masterVersion + 1
+                    Singleton.get().masterVersion = masterVersion + MasterVersionInt(1)
                     
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error("\(error)")
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
                     
@@ -293,7 +311,7 @@ class Upload {
                 var completionResult:DoneUploadsCompletion?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     guard let uploadQueue = Upload.getHeadSyncQueue() else {
-                        completionResult = .error("Failed on getHeadSyncQueue")
+                        completionResult = .error(.generic("Failed on getHeadSyncQueue"))
                         return
                     }
                     
@@ -308,7 +326,7 @@ class Upload {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        completionResult = .error("\(error)")
+                        completionResult = .error(.coreDataError(error))
                         return
                     }
                                         

@@ -403,6 +403,17 @@ extension ImagesVC : SyncControllerDelegate {
         addLocalImage(newImageURL: url, mimeType: mimeType, uuid:uuid, title:title, creationDate: creationDate)
     }
     
+    func updateUploadedImageDate(uuid: String, creationDate: NSDate) {
+        // We provided the content for the image, but the server establishes its date of creation. So, update our local image date/time with the creation date from the server.
+        if let image = Image.fetchObjectWithUUID(uuid: uuid) {
+            image.creationDate = creationDate as NSDate
+            image.save()
+        }
+        else {
+            Log.error("Could not find image for UUID: \(uuid)")
+        }
+    }
+
     func removeLocalImages(syncController: SyncController, uuids: [String]) {
         removeLocalImages(uuids: uuids)
     }

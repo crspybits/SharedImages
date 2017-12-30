@@ -17,10 +17,9 @@ public struct SyncAttributes {
     public var fileUUID:String!
     public var mimeType:String!
     
-    // 11/18/17; Are these two used any more? I think we're not relying any more on the client's dates-- because (a) client's aren't generally reliable, and (b) we get odd date issues when a client queues a file for upload, but that upload is delayed, e.g., because of a lack of a network connection.
+    // 12/27/17; These only get used for responses from the server-- because it is the authority on dates.
     public var creationDate:Date?
     public var updateDate:Date?
-    
     
     public var appMetaData:String?
     

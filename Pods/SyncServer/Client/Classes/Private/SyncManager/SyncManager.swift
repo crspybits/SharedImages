@@ -38,7 +38,7 @@ class SyncManager {
     weak var testingDelegate:SyncServerTestingDelegate?
 #endif
 
-    private var callback:((Error?)->())?
+    private var callback:((SyncServerError?)->())?
     var desiredEvents:EventDesired = .defaults
 
     private init() {
@@ -60,7 +60,7 @@ class SyncManager {
     }
     
     // TODO: *1* If we get an app restart when we call this method, and an upload was previously in progress, and we now have download(s) available, we need to reset those uploads prior to doing the downloads.
-    func start(first: Bool = false, _ callback:((Error?)->())? = nil) {
+    func start(first: Bool = false, _ callback:((SyncServerError?)->())? = nil) {
         self.callback = callback
         
         // TODO: *1* This is probably the level at which we should ensure that multiple download operations are not taking place concurrently. E.g., some locking mechanism?
@@ -121,7 +121,7 @@ class SyncManager {
                 self.start(callback)
                 
             case .error(let error):
-                callback?(StartError.error(error))
+                callback?(error)
             }
         }
         
@@ -130,7 +130,7 @@ class SyncManager {
             checkForDownloads()
 
         case .error(let error):
-            callback?(StartError.error(error))
+            callback?(error)
             
         case .started:
             // Don't do anything. `next` completion will invoke callback.
@@ -185,11 +185,11 @@ class SyncManager {
             }
             
             guard errorResult == nil else {
-                callback?(errorResult)
+                callback?(.coreDataError(errorResult!))
                 return
             }
             
-            self.checkForPendingUploads()
+            self.checkForPendingUploads(first: true)
         }
     }
 
@@ -202,7 +202,7 @@ class SyncManager {
         Download.session.check() { checkCompletion in
             switch checkCompletion {
             case .noDownloadsOrDeletionsAvailable:
-                self.checkForPendingUploads()
+                self.checkForPendingUploads(first: true)
                 
             case .downloadsAvailable(numberOfDownloadFiles: let numberFileDownloads, numberOfDownloadDeletions: let numberDownloadDeletions):
             
@@ -220,12 +220,12 @@ class SyncManager {
         }
     }
     
-    private func checkForPendingUploads() {
+    private func checkForPendingUploads(first: Bool = false) {
         if self.needToStop() {
             return
         }
         
-        let nextResult = Upload.session.next { nextCompletion in
+        let nextResult = Upload.session.next(first: first) { nextCompletion in
             switch nextCompletion {
             case .fileUploaded(let attr):
                 EventDesired.reportEvent(.singleFileUploadComplete(attr: attr), mask: self.desiredEvents, delegate: self.delegate)
@@ -262,7 +262,7 @@ class SyncManager {
                 self.checkForDownloads()
                 
             case .error(let error):
-                self.callback?(StartError.error(error))
+                self.callback?(error)
             }
         }
         
@@ -278,7 +278,7 @@ class SyncManager {
             self.doneUploads()
             
         case .error(let error):
-            callback?(StartError.error(error))
+            callback?(error)
         }
     }
     
@@ -289,7 +289,7 @@ class SyncManager {
                 self.checkForDownloads()
                 
             case .error(let error):
-                self.callback?(StartError.error(error))
+                self.callback?(error)
                 
             // `numTransferred` may not be accurate in the case of retries/recovery.
             case .doneUploads(numberTransferred: _):
@@ -326,7 +326,7 @@ class SyncManager {
                     EventDesired.reportEvent(.uploadDeletionsCompleted(numberOfFiles: uploadDeletions.count), mask: self.desiredEvents, delegate: self.delegate)
                 }
                 
-                var errorResult:Error?
+                var errorResult:SyncServerError?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     if uploadDeletions.count > 0 {
                         // Each of the DirectoryEntry's for the uploads needs to now be marked as deleted.
@@ -345,7 +345,7 @@ class SyncManager {
                     do {
                         try CoreData.sessionNamed(Constants.coreDataName).context.save()
                     } catch (let error) {
-                        errorResult = error
+                        errorResult = .coreDataError(error)
                         return
                     }
                 }

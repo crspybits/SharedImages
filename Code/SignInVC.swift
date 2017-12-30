@@ -39,17 +39,8 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     var sharingBarButton:UIBarButtonItem!
     var signIn:SignIn!
     
-    private var _acceptSharingInvitation:Bool = false
-    var acceptSharingInvitation: Bool {
-        get {
-            let result = _acceptSharingInvitation
-            _acceptSharingInvitation = false
-            return result
-        }
-        set {
-            _acceptSharingInvitation = newValue
-        }
-    }
+    private var acceptSharingInvitation: Bool = false
+    private var invite:SharingInvitation.Invitation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,6 +73,12 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // 12/29/17; Because of https://github.com/crspybits/SharedImages/issues/42
+        if let invite = SharingInvitation.session.receive() {
+            self.invite = invite
+            sharingInvitationReceived(invite)
+        }
     }
     
     func setSharingButtonState() {
@@ -157,21 +154,22 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
 // TODO: *1* Need a delegate callback from the signin, to let us hide the user type button when the user is signed in.
 
 extension SignInVC : SharingInvitationDelegate {
-    func sharingInvitationReceived(_ sharingInvitation:SharingInvitation) {
+    func sharingInvitationReceived(_ invite:SharingInvitation.Invitation) {
 #if false
-        SMCoreLib.Alert.show(withTitle: "SharingInvitation", message: "code: \(String(describing: sharingInvitation.sharingInvitationCode))")
+        SMCoreLib.Alert.show(withTitle: "SharingInvitation", message: "code: \(invite.sharingInvitationCode)")
 #endif
 
         if !SignInManager.session.userIsSignedIn {
-            let userFriendlyText = sharingInvitation.sharingInvitationPermission!.userFriendlyText()
+            let userFriendlyText = invite.sharingInvitationPermission.userFriendlyText()
             let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: .actionSheet)
             Alert.styleForIPad(alert)
             alert.popoverPresentationController?.barButtonItem = self.sharingBarButton
 
             alert.addAction(UIAlertAction(title: "Not now", style: .cancel) {alert in
             })
-            alert.addAction(UIAlertAction(title: "Share", style: .default) {alert in
+            alert.addAction(UIAlertAction(title: "Share", style: .default) {[unowned self] alert in
                 self.acceptSharingInvitation = true
+                self.invite = invite
                 self.signIn.showSignIns(for: .sharingAccount)
             })
             self.present(alert, animated: true, completion: nil)
@@ -205,9 +203,10 @@ extension SignInVC : GenericSignInDelegate {
             })
             self.present(alert, animated: true, completion: nil)
         }
-        else if acceptSharingInvitation {
+        else if invite != nil && acceptSharingInvitation {
+            acceptSharingInvitation = false
             if signIn.signInTypesAllowed.contains(.sharingUser) {
-                result = .createSharingUser(invitationCode: SharingInvitation.session.sharingInvitationCode!)
+                result = .createSharingUser(invitationCode: invite!.sharingInvitationCode)
             }
         }
         else {
@@ -261,7 +260,8 @@ extension SignInVC : GenericSignInDelegate {
             successfulSignIn(switchToImagesTab: true)
             
         case .sharingUserCreated:
-            self.sharingPermission = SharingInvitation.session.sharingInvitationPermission!
+            self.sharingPermission = invite?.sharingInvitationPermission
+            invite = nil
             
             // 12/26/17; https://github.com/crspybits/SharedImages/issues/54
             successfulSignIn(switchToImagesTab: true)

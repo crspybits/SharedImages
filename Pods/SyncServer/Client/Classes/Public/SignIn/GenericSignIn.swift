@@ -9,6 +9,7 @@
 
 import Foundation
 import SyncServer_Shared
+import SMCoreLib
 
 public protocol GenericCredentials {
     // A unique identifier for the user. E.g., for Google this is their `sub`.
@@ -24,7 +25,7 @@ public protocol GenericCredentials {
 
     // If your credentials scheme enables a refresh, i.e., on the credentials expiring.
     // If your credentials scheme doesn't have a refresh capability, then immediately call the callback with a non-nil Error.
-    func refreshCredentials(completion: @escaping (Error?) ->())
+    func refreshCredentials(completion: @escaping (SyncServerError?) ->())
 }
 
 public enum UserActionNeeded {
@@ -106,3 +107,20 @@ public protocol GenericSignIn : class {
     func signUserOut()
 }
 
+extension GenericSignIn {
+    public func successCreatingOwningUser() {
+        SMCoreLib.Alert.show(withTitle: "Success!", message: "Created new owning user! You are now signed in too!") { [unowned self] in
+            // 12/27/17; I'm putting these delegate actions after the user taps OK so that we don't navigate away from the current view controller. That seems too fast in terms of UX, and can cause other problems.
+            self.delegate?.userActionOccurred(action: .owningUserCreated, signIn: self)
+            self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
+        }
+    }
+    
+    public func successCreatingSharingUser() {
+        SMCoreLib.Alert.show(withTitle: "Success!", message: "Created new sharing user! You are now signed in too!") { [unowned self] in
+            // 12/27/17; See above reasoning.
+            self.delegate?.userActionOccurred(action: .sharingUserCreated, signIn: self)
+            self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
+        }
+    }
+}

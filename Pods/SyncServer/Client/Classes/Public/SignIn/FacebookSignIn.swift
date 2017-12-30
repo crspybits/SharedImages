@@ -39,13 +39,9 @@ public class FacebookCredentials : GenericCredentials {
         result[ServerConstants.HTTPOAuth2AccessTokenKey] = accessToken.authenticationToken
         return result
     }
-
-    enum RefreshError : Error {
-    case noRefreshAvailable
-    }
     
-    public func refreshCredentials(completion: @escaping (Error?) ->()) {
-        completion(RefreshError.noRefreshAvailable)
+    public func refreshCredentials(completion: @escaping (SyncServerError?) ->()) {
+        completion(.noRefreshAvailable)
         // The AccessToken refresh method doesn't work if the access token has expired. So, I think it's not useful here.
     }
 }
@@ -155,7 +151,8 @@ public class FacebookSyncServerSignIn : GenericSignIn {
     
     fileprivate func completeSignInProcess(autoSignIn:Bool) {
         stickySignIn = true
-
+        // The Facebook signin button (`LoginButton`) automatically changes it's state to show "Sign out" when signed in. So, don't need to do that manually here.
+        
         guard let userAction = delegate?.shouldDoUserAction(signIn: self) else {
             // This occurs if we don't have a delegate (e.g., on a silent sign in). But, we need to set up creds-- because this is what gives us credentials for connecting to the SyncServer.
             SyncServerUser.session.creds = credentials
@@ -214,12 +211,10 @@ public class FacebookSyncServerSignIn : GenericSignIn {
             Log.msg("signUserOut: FacebookSignIn: tried to create an owning user!")
             
         case .createSharingUser(invitationCode: let invitationCode):
-            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode) { longLivedAccessToken, error in
+            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode) {[unowned self] longLivedAccessToken, error in
                 if error == nil {
                     Log.msg("Facebook long-lived access token: \(String(describing: longLivedAccessToken))")
-                    Alert.show(withTitle: "Success!", message: "Created new sharing user! You are now signed in too!")
-                    self.delegate?.userActionOccurred(action: .sharingUserCreated, signIn: self)
-                    self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
+                    self.successCreatingSharingUser()
                 }
                 else {
                     Log.error("Error: \(error!)")

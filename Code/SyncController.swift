@@ -18,6 +18,7 @@ enum SyncControllerEvent {
 
 protocol SyncControllerDelegate : class {
     func addLocalImage(syncController:SyncController, url:SMRelativeLocalURL, uuid:String, mimeType:String, title:String?, creationDate: NSDate?)
+    func updateUploadedImageDate(uuid: String, creationDate: NSDate)
     func completedAddingLocalImages()
     func removeLocalImages(syncController:SyncController, uuids:[String])
     func syncEvent(syncController:SyncController, event:SyncControllerEvent)
@@ -42,8 +43,8 @@ class SyncController {
     }
     
     func add(image:Image) {
-        // Make both the creation and update dates the same because we don't have multiple file versions yet.
-        var attr = SyncAttributes(fileUUID:image.uuid!, mimeType:image.mimeType!, creationDate: image.creationDate! as Date, updateDate: image.creationDate! as Date)
+        // 12/27/17; Not sending dates to the server-- it establishes the dates.
+        var attr = SyncAttributes(fileUUID:image.uuid!, mimeType:image.mimeType!)
         
         if image.title != nil {
             attr.appMetaData = "{\"\(ImageExtras.appMetaDataTitleKey)\": \"\(image.title!)\"}";
@@ -177,7 +178,8 @@ extension SyncController : SyncServerDelegate {
 
             progressIndicator.show()
             
-        case .singleFileUploadComplete:
+        case .singleFileUploadComplete(attr: let attr):
+            delegate.updateUploadedImageDate(uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
             updateUploadProgress()
             
         case .singleUploadDeletionComplete:

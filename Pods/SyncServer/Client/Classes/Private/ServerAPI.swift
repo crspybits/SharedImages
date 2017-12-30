@@ -53,13 +53,6 @@ class ServerAPI {
     fileprivate var authTokens:[String:String]?
     
     let httpUnauthorizedError = HTTPStatus.unauthorized.rawValue
-
-    enum ServerAPIError : Error {
-    case non200StatusCode(Int)
-    case badStatusCode(Int)
-    case badCheckCreds
-    case unknownError
-    }
     
     // If this is nil, you must use the ServerNetworking authenticationDelegate to provide credentials. Direct use of authenticationDelegate is for internal testing.
     public var creds:GenericCredentials? {
@@ -78,12 +71,12 @@ class ServerAPI {
         authTokens = creds?.httpRequestHeaders
     }
     
-    func checkForError(statusCode:Int?, error:Error?) -> Error? {
+    func checkForError(statusCode:Int?, error:SyncServerError?) -> SyncServerError? {
         if statusCode == HTTPStatus.ok.rawValue || statusCode == nil  {
             return error
         }
         else {
-            return ServerAPIError.non200StatusCode(statusCode!)
+            return .non200StatusCode(statusCode!)
         }
     }
     
@@ -98,19 +91,31 @@ class ServerAPI {
         return URL(string: baseURL + path)!
     }
     
-    func healthCheck(completion:((Error?)->(Void))?) {
+    func healthCheck(completion:((HealthCheckResponse?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.healthCheck
         let url = makeURL(forEndpoint: endpoint)
         
         sendRequestUsing(method: endpoint.method, toURL: url) { (response,  httpStatus, error) in
-            completion?(self.checkForError(statusCode: httpStatus, error: error))
+            let resultError = self.checkForError(statusCode: httpStatus, error: error)
+            
+            if resultError == nil {
+                if let response = response, let healthCheckResponse = HealthCheckResponse(json: response) {
+                    completion?(healthCheckResponse, nil)
+                }
+                else {
+                    completion?(nil, .couldNotCreateResponse)
+                }
+            }
+            else {
+                completion?(nil, resultError)
+            }
         }
     }
 
     // MARK: Authentication/user-sign in
     
     // Adds the user specified by the creds property (or authenticationDelegate in ServerNetworking if that is nil).
-    public func addUser(completion:((Error?)->(Void))?) {
+    public func addUser(completion:((SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.addUser
         let url = makeURL(forEndpoint: endpoint)
         
@@ -128,7 +133,7 @@ class ServerAPI {
     
     // Checks the creds of the user specified by the creds property (or authenticationDelegate in ServerNetworking if that is nil). Because this method uses an unauthorized (401) http status code to indicate that the user doesn't exist, it will not do retries in the case of an error.
     // One of checkCredsResult or error will be non-nil.
-    public func checkCreds(completion:((_ checkCredsResult:CheckCredsResult?, Error?)->(Void))?) {
+    public func checkCreds(completion:((_ checkCredsResult:CheckCredsResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.checkCreds
         let url = makeURL(forEndpoint: endpoint)
         
@@ -141,7 +146,7 @@ class ServerAPI {
             }
             else if httpStatus == HTTPStatus.ok.rawValue {
                 guard let checkCredsResponse = CheckCredsResponse(json: response!) else {
-                    completion?(nil, ServerAPIError.badCheckCreds)
+                    completion?(nil, .badCheckCreds)
                     return
                 }
                 
@@ -159,7 +164,7 @@ class ServerAPI {
                     completion?(nil, errorResult)
                 }
                 else {
-                    completion?(nil, ServerAPIError.unknownError)
+                    completion?(nil, .unknownServerError)
                 }
             }
             else {
@@ -168,7 +173,7 @@ class ServerAPI {
         }
     }
     
-    func removeUser(retryIfError:Bool=true, completion:((Error?)->(Void))?) {
+    func removeUser(retryIfError:Bool=true, completion:((SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.removeUser
         let url = makeURL(forEndpoint: endpoint)
         
@@ -179,13 +184,8 @@ class ServerAPI {
     }
     
     // MARK: Files
-    
-    enum FileIndexError : Error {
-    case fileIndexResponseConversionError
-    case couldNotCreateFileIndexRequest
-    }
         
-    func fileIndex(completion:((_ fileIndex: [FileInfo]?, _ masterVersion:MasterVersionInt?, Error?)->(Void))?) {
+    func fileIndex(completion:((_ fileIndex: [FileInfo]?, _ masterVersion:MasterVersionInt?, SyncServerError?)->(Void))?) {
     
         let endpoint = ServerEndpoints.fileIndex
         var params = [String : Any]()
@@ -197,7 +197,7 @@ class ServerAPI {
 #endif
         
         guard let fileIndexRequest = FileIndexRequest(json: params) else {
-            completion?(nil, nil, FileIndexError.couldNotCreateFileIndexRequest)
+            completion?(nil, nil, .couldNotCreateRequest)
             return
         }
 
@@ -212,7 +212,7 @@ class ServerAPI {
                     completion?(fileIndexResponse.fileIndex, fileIndexResponse.masterVersion, nil)
                 }
                 else {
-                    completion?(nil, nil, FileIndexError.fileIndexResponseConversionError)
+                    completion?(nil, nil, .couldNotCreateResponse)
                 }
             }
             else {
@@ -231,18 +231,12 @@ class ServerAPI {
         let fileVersion:FileVersionInt!
     }
     
-    enum UploadFileError : Error {
-    case couldNotCreateUploadFileRequest
-    case couldNotReadUploadFile
-    case noExpectedResultKey
-    }
-    
     enum UploadFileResult {
-    case success(sizeInBytes:Int64)
+    case success(sizeInBytes:Int64, creationDate: Date, updateDate: Date)
     case serverMasterVersionUpdate(Int64)
     }
     
-    func uploadFile(file:File, serverMasterVersion:MasterVersionInt, completion:((UploadFileResult?, Error?)->(Void))?) {
+    func uploadFile(file:File, serverMasterVersion:MasterVersionInt, completion:((UploadFileResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.uploadFile
 
         Log.special("file.fileUUID: \(file.fileUUID)")
@@ -257,40 +251,44 @@ class ServerAPI {
         ]
         
         guard let uploadRequest = UploadFileRequest(json: params) else {
-            completion?(nil, UploadFileError.couldNotCreateUploadFileRequest);
+            completion?(nil, .couldNotCreateRequest);
             return;
         }
         
         assert(endpoint.method == .post)
         
         guard let fileData = try? Data(contentsOf: file.localURL) else {
-            let message = UploadFileError.couldNotReadUploadFile
-            Log.error("\(message)")
-            completion?(nil, message);
+            Log.error("Could not read upload file.")
+            completion?(nil, .couldNotReadUploadFile);
             return
         }
         
         let parameters = uploadRequest.urlParameters()!
         let url = makeURL(forEndpoint: endpoint, parameters: parameters)
         
-        postUploadDataTo(url, dataToUpload: fileData) { (resultDict, httpStatus, error) in
-        
+        postUploadDataTo(url, dataToUpload: fileData) { (response, httpStatus, error) in
             let resultError = self.checkForError(statusCode: httpStatus, error: error)
 
             if resultError == nil {
-                if let size = resultDict?[UploadFileResponse.sizeKey] as? Int64 {
-                    completion?(UploadFileResult.success(sizeInBytes:size), nil)
+                guard let response = response,
+                    let uploadFileResponse = UploadFileResponse(json: response) else {
+                    completion?(nil, .couldNotCreateResponse)
+                    return
                 }
-                else if let versionUpdate = resultDict?[UploadFileResponse.masterVersionUpdateKey] as? Int64 {
+                
+                if let versionUpdate = uploadFileResponse.masterVersionUpdate {
                     let message = UploadFileResult.serverMasterVersionUpdate(versionUpdate)
                     Log.msg("\(message)")
                     completion?(message, nil)
+                    return
                 }
-                else {
-                    let message = UploadFileError.noExpectedResultKey
-                    Log.error("\(message)")
-                    completion?(nil, UploadFileError.noExpectedResultKey)
+                
+                guard let size = uploadFileResponse.size, let creationDate = uploadFileResponse.creationDate, let updateDate = uploadFileResponse.updateDate else {
+                    completion?(nil, .noExpectedResultKey)
+                    return
                 }
+                
+                completion?(UploadFileResult.success(sizeInBytes:size, creationDate: creationDate, updateDate: updateDate), nil)
             }
             else {
                 Log.error("\(resultError!)")
@@ -299,18 +297,13 @@ class ServerAPI {
         }
     }
     
-    enum DoneUploadsError : Error {
-    case noExpectedResultKey
-    case couldNotCreateDoneUploadsRequest
-    }
-    
     enum DoneUploadsResult {
     case success(numberUploadsTransferred:Int64)
     case serverMasterVersionUpdate(Int64)
     }
     
     // I'm providing a numberOfDeletions parameter here because the duration of these requests varies, if we're doing deletions, based on the number of items we're deleting.
-    func doneUploads(serverMasterVersion:MasterVersionInt!, numberOfDeletions:UInt = 0, completion:((DoneUploadsResult?, Error?)->(Void))?) {
+    func doneUploads(serverMasterVersion:MasterVersionInt!, numberOfDeletions:UInt = 0, completion:((DoneUploadsResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.doneUploads
         
         // See https://developer.apple.com/reference/foundation/nsurlsessionconfiguration/1408259-timeoutintervalforrequest
@@ -331,7 +324,7 @@ class ServerAPI {
 #endif
         
         guard let doneUploadsRequest = DoneUploadsRequest(json: params) else {
-            completion?(nil, DoneUploadsError.couldNotCreateDoneUploadsRequest)
+            completion?(nil, .couldNotCreateRequest)
             return
         }
 
@@ -349,7 +342,7 @@ class ServerAPI {
                 else if let masterVersionUpdate = response?[DoneUploadsResponse.masterVersionUpdateKey] as? Int64 {
                     completion?(DoneUploadsResult.serverMasterVersionUpdate(masterVersionUpdate), nil)
                 } else {
-                    completion?(nil, DoneUploadsError.noExpectedResultKey)
+                    completion?(nil, .noExpectedResultKey)
                 }
             }
             else {
@@ -369,16 +362,7 @@ class ServerAPI {
     case serverMasterVersionUpdate(Int64)
     }
     
-    enum DownloadFileError : Error {
-    case couldNotCreateDownloadFileRequest
-    case obtainedAppMetaDataButWasNotString
-    case noExpectedResultKey
-    case nilResponse
-    case couldNotObtainHeaderParameters
-    case resultURLObtainedWasNil
-    }
-    
-    func downloadFile(file: Filenaming, serverMasterVersion:MasterVersionInt!, completion:((DownloadFileResult?, Error?)->(Void))?) {
+    func downloadFile(file: Filenaming, serverMasterVersion:MasterVersionInt!, completion:((DownloadFileResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.downloadFile
         
         var params = [String : Any]()
@@ -387,7 +371,7 @@ class ServerAPI {
         params[DownloadFileRequest.fileVersionKey] = file.fileVersion
 
         guard let downloadFileRequest = DownloadFileRequest(json: params) else {
-            completion?(nil, DownloadFileError.couldNotCreateDownloadFileRequest)
+            completion?(nil, .couldNotCreateRequest)
             return
         }
 
@@ -397,7 +381,7 @@ class ServerAPI {
         downloadFrom(serverURL, method: endpoint.method) { (resultURL, response, statusCode, error) in
         
             guard response != nil else {
-                let resultError = error ?? DownloadFileError.nilResponse
+                let resultError = error ?? .nilResponse
                 completion?(nil, resultError)
                 return
             }
@@ -418,13 +402,13 @@ class ServerAPI {
                                 appMetaDataString = (appMetaData as! String)
                             }
                             else {
-                                completion?(nil, DownloadFileError.obtainedAppMetaDataButWasNotString)
+                                completion?(nil, .obtainedAppMetaDataButWasNotString)
                                 return
                             }
                         }
                         
                         guard resultURL != nil else {
-                            completion?(nil, DownloadFileError.resultURLObtainedWasNil)
+                            completion?(nil, .resultURLObtainedWasNil)
                             return
                         }
                         
@@ -434,11 +418,11 @@ class ServerAPI {
                     else if let masterVersionUpdate = jsonDict[DownloadFileResponse.masterVersionUpdateKey] as? Int64 {
                         completion?(DownloadFileResult.serverMasterVersionUpdate(masterVersionUpdate), nil)
                     } else {
-                        completion?(nil, DownloadFileError.noExpectedResultKey)
+                        completion?(nil, .noExpectedResultKey)
                     }
                 }
                 else {
-                    completion?(nil, DownloadFileError.couldNotObtainHeaderParameters)
+                    completion?(nil, .couldNotObtainHeaderParameters)
                 }
             }
             else {
@@ -468,13 +452,8 @@ class ServerAPI {
         
         return jsonDict
     }
-    
-    enum GetUploadsError : Error {
-    case getUploadsResponseConversionError
-    case couldNotCreateFileIndexRequest
-    }
         
-    func getUploads(completion:((_ fileIndex: [FileInfo]?, Error?)->(Void))?) {
+    func getUploads(completion:((_ fileIndex: [FileInfo]?, SyncServerError?)->(Void))?) {
     
         let endpoint = ServerEndpoints.getUploads
         
@@ -488,7 +467,7 @@ class ServerAPI {
                     completion?(getUploadsResponse.uploads, nil)
                 }
                 else {
-                    completion?(nil, GetUploadsError.getUploadsResponseConversionError)
+                    completion?(nil, .couldNotCreateResponse)
                 }
             }
             else {
@@ -521,7 +500,7 @@ class ServerAPI {
     }
     
     // TODO: *3* It would be *much* faster, at least in some testing situations, to batch together a group of deletions for upload-- instead of uploading them one by one.
-    func uploadDeletion(file: FileToDelete, serverMasterVersion:MasterVersionInt!, completion:((UploadDeletionResult?, Error?)->(Void))?) {
+    func uploadDeletion(file: FileToDelete, serverMasterVersion:MasterVersionInt!, completion:((UploadDeletionResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.uploadDeletion
                 
         var paramsForRequest:[String:Any] = [:]
@@ -553,7 +532,7 @@ class ServerAPI {
                     }
                 }
                 else {
-                    completion?(nil, UploadDeletionError.getUploadDeletionResponseConversionError)
+                    completion?(nil, .couldNotCreateResponse)
                 }
             }
             else {
@@ -599,7 +578,7 @@ class ServerAPI {
     }
     
     // Some accounts return an access token after sign-in (e.g., Facebook's long-lived access token).
-    func redeemSharingInvitation(sharingInvitationUUID:String, completion:((_ accessToken:String?, Error?)->(Void))?) {
+    func redeemSharingInvitation(sharingInvitationUUID:String, completion:((_ accessToken:String?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.redeemSharingInvitation
 
         var paramsForRequest:[String:Any] = [:]
@@ -618,7 +597,7 @@ class ServerAPI {
                     completion?(accessToken, nil)
                 }
                 else {
-                    completion?(nil, RedeemSharingInvitationError.responseConversionError)
+                    completion?(nil, .couldNotCreateResponse)
                 }
             }
             else {

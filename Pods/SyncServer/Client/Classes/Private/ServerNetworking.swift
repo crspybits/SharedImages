@@ -15,13 +15,6 @@ protocol ServerNetworkingAuthentication : class {
     func headerAuthentication(forServerNetworking: Any?) -> [String:String]?
 }
 
-enum DownloadFromError : Error {
-case couldNotGetHTTPURLResponse
-case didNotGetURL
-case couldNotMoveFile
-case couldNotCreateNewFile
-}
-
 class ServerNetworking : NSObject {
     static let session = ServerNetworking()
     
@@ -46,23 +39,18 @@ class ServerNetworking : NSObject {
     }
     
     func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval? = nil,
-        completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:Error?)->())?) {
+        completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         sendRequestTo(serverURL, method: method, timeoutIntervalForRequest:timeoutIntervalForRequest) { (serverResponse, statusCode, error) in
             completion?(serverResponse, statusCode, error)
         }
     }
     
-    enum PostUploadDataToError : Error {
-    case ErrorConvertingServerResponseToJsonDict
-    case CouldNotGetHTTPURLResponse
-    }
-    
     // Data is sent in the body via a POST request (not multipart).
-    func postUploadDataTo(_ serverURL: URL, dataToUpload:Data, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:Error?)->())?) {
+    func postUploadDataTo(_ serverURL: URL, dataToUpload:Data, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
 
         guard Network.session().connected() else {
-            completion?(nil, nil, ServerNetworkingError.noNetworkError)
+            completion?(nil, nil, .noNetworkError)
             return
         }
         
@@ -87,10 +75,10 @@ class ServerNetworking : NSObject {
         uploadTask.resume()
     }
     
-    public func downloadFrom(_ serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ serverResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:Error?)->())?) {
+    public func downloadFrom(_ serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ serverResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
 
         guard Network.session().connected() else {
-            completion?(nil, nil, nil, ServerNetworkingError.noNetworkError)
+            completion?(nil, nil, nil, .noNetworkError)
             return
         }
         
@@ -98,7 +86,7 @@ class ServerNetworking : NSObject {
         
             if error == nil {
                 guard url != nil else {
-                    completion?(nil, nil, urlResponse?.statusCode, DownloadFromError.didNotGetURL)
+                    completion?(nil, nil, urlResponse?.statusCode, .didNotGetDownloadURL)
                     return
                 }
             }
@@ -107,10 +95,10 @@ class ServerNetworking : NSObject {
         }
     }
     
-    private func sendRequestTo(_ serverURL: URL, method: ServerHTTPMethod, dataToUpload:Data? = nil, timeoutIntervalForRequest:TimeInterval? = nil, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:Error?)->())?) {
+    private func sendRequestTo(_ serverURL: URL, method: ServerHTTPMethod, dataToUpload:Data? = nil, timeoutIntervalForRequest:TimeInterval? = nil, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
     
         guard Network.session().connected() else {
-            completion?(nil, nil, ServerNetworkingError.noNetworkError)
+            completion?(nil, nil, .noNetworkError)
             return
         }
     
@@ -140,11 +128,11 @@ class ServerNetworking : NSObject {
         uploadTask.resume()
     }
     
-    private func processResponse(data:Data?, urlResponse:URLResponse?, error: Error?, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:Error?)->())?) {
+    private func processResponse(data:Data?, urlResponse:URLResponse?, error: Error?, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         if error == nil {
             // With an HTTP or HTTPS request, we get HTTPURLResponse back. See https://developer.apple.com/reference/foundation/urlsession/1407613-datatask
             guard let response = urlResponse as? HTTPURLResponse else {
-                completion?(nil, nil, PostUploadDataToError.CouldNotGetHTTPURLResponse)
+                completion?(nil, nil, .couldNotGetHTTPURLResponse)
                 return
             }
             
@@ -159,12 +147,12 @@ class ServerNetworking : NSObject {
                 try json = JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions(rawValue: UInt(0)))
             } catch (let error) {
                 Log.error("processResponse: Error in JSON conversion: \(error); statusCode= \(response.statusCode)")
-                completion?(nil, response.statusCode, error)
+                completion?(nil, response.statusCode, .jsonSerializationError(error))
                 return
             }
             
             guard let jsonDict = json as? [String: Any] else {
-                completion?(nil, response.statusCode, PostUploadDataToError.ErrorConvertingServerResponseToJsonDict)
+                completion?(nil, response.statusCode, .errorConvertingServerResponse)
                 return
             }
             
@@ -179,7 +167,7 @@ class ServerNetworking : NSObject {
             completion?(resultDict, response.statusCode, nil)
         }
         else {
-            completion?(nil, nil, error)
+            completion?(nil, nil, .urlSessionError(error!))
         }
     }
 }

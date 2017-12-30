@@ -98,15 +98,11 @@ public class DropboxCredentials : GenericCredentials {
         result[ServerConstants.HTTPAccountIdKey] = savedCreds.accountId
         return result
     }
-    
-    enum RefreshError : Error {
-    case noRefreshAvailable
-    }
 
     // Dropbox doesn't have a creds refresh.
-    public func refreshCredentials(completion: @escaping (Error?) ->()) {
+    public func refreshCredentials(completion: @escaping (SyncServerError?) ->()) {
         // Dropbox access tokens live until the user revokes them, so no need to refresh. See https://www.dropboxforum.com/t5/API-support/API-v2-access-token-validity/td-p/215123
-        completion(RefreshError.noRefreshAvailable)
+        completion(.noRefreshAvailable)
     }
 }
 
@@ -271,6 +267,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
     }
     
     fileprivate func completeSignInProcess(autoSignIn:Bool) {
+        signInOutButton?.buttonShowing = .signOut
         stickySignIn = true
 
         guard let userAction = delegate?.shouldDoUserAction(signIn: self) else {
@@ -332,10 +329,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
             
             SyncServerUser.session.addUser(creds: creds) {[unowned self] error in
                 if error == nil {
-                    SMCoreLib.Alert.show(withTitle: "Success!", message: "Created new owning user! You are now signed in too!")
-                    self.delegate?.userActionOccurred(action: .owningUserCreated, signIn: self)
-                    self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
-                    self.signInOutButton?.buttonShowing = .signOut
+                    self.successCreatingOwningUser()
                 }
                 else {
                     SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating owning user: \(error!)")
@@ -368,21 +362,38 @@ private class DropboxSignInButton : UIView, Tappable {
     var dropboxIconView:UIImageView!
     let label = UILabel()
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
+    // 12/27/17; I was having problems getting this to be called at the right time (it was just in `layoutSubviews` at the time), so I separated it out into its own function.
+    private func layout() {
         button.frame.size = frame.size
         
-        dropboxIconView.frameX = 5
-        dropboxIconView.centerVerticallyInSuperview()
-        
-        label.sizeToFit()
-        let remainingWidth = frameWidth - dropboxIconView.frameMaxX
-        label.centerX = dropboxIconView.frameMaxX + remainingWidth/2
-        label.centerVerticallyInSuperview()
+        if let dropboxIconView = dropboxIconView {
+            dropboxIconView.frameX = 5
+            dropboxIconView.centerVerticallyInSuperview()
+            
+            label.sizeToFit()
+            let remainingWidth = frameWidth - dropboxIconView.frameMaxX
+            label.centerX = dropboxIconView.frameMaxX + remainingWidth/2.0
+            label.centerVerticallyInSuperview()
+        }
     }
     
-    // Keeps only weak references to these parameters.
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layout()
+    }
+    
+    override var frame: CGRect {
+        set {
+            super.frame = newValue
+            layout()
+        }
+        
+        get {
+            return super.frame
+        }
+    }
+    
+    // Keeps only weak references to these parameters. You need to set the size of this button.
     init(vc: UIViewController, signIn: DropboxSyncServerSignIn) {
         super.init(frame: CGRect.zero)
         self.vc = vc
@@ -441,7 +452,7 @@ private class DropboxSignInButton : UIView, Tappable {
                 label.text = "Sign Out"
             }
 
-            layoutIfNeeded()
+            layout()
         }
     }
 }

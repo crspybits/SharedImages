@@ -14,10 +14,10 @@ import SyncServer_Shared
 
 protocol ServerNetworkingDownloadDelegate : class {
     // The file reference in the URL given in serverNetworkingDownloadCompleted  has already been transferred to a more permanent location.
-    func serverNetworkingDownloadCompleted(_ snd: ServerNetworkingDownload, url: SMRelativeLocalURL?, response: HTTPURLResponse?, statusCode:Int?, error: Error?)
+    func serverNetworkingDownloadCompleted(_ snd: ServerNetworkingDownload, url: SMRelativeLocalURL?, response: HTTPURLResponse?, statusCode:Int?, error: SyncServerError?)
 }
 
-typealias DownloadCompletion = (SMRelativeLocalURL?, HTTPURLResponse?, _ statusCode:Int?, Error?)->()
+typealias DownloadCompletion = (SMRelativeLocalURL?, HTTPURLResponse?, _ statusCode:Int?, SyncServerError?)->()
 
 private class CompletionHandler {
     var completion:DownloadCompletion!
@@ -83,11 +83,11 @@ extension ServerNetworkingDownload : URLSessionDelegate, URLSessionTaskDelegate,
         
         var newFileURL:SMRelativeLocalURL?
         newFileURL = FilesMisc.createTemporaryRelativeFile()
-        var returnError:Error?
+        var returnError:SyncServerError?
         
         // Transfer the temporary file to a more permanent location. Have to do it right now. https://developer.apple.com/reference/foundation/urlsessiondownloaddelegate/1411575-urlsession
         if newFileURL == nil {
-            returnError = DownloadFromError.couldNotCreateNewFile
+            returnError = .couldNotCreateNewFileForDownload
         }
         else {
             do {
@@ -95,14 +95,14 @@ extension ServerNetworkingDownload : URLSessionDelegate, URLSessionTaskDelegate,
             }
             catch (let error) {
                 Log.error("Could not move file: \(error)")
-                returnError = DownloadFromError.couldNotMoveFile
+                returnError = .couldNotMoveDownloadFile
             }
         }
         
         // With an HTTP or HTTPS request, we get HTTPURLResponse back. See https://developer.apple.com/reference/foundation/urlsession/1407613-datatask
         let response = downloadTask.response as? HTTPURLResponse
         if response == nil {
-            returnError = DownloadFromError.couldNotGetHTTPURLResponse
+            returnError = .couldNotGetHTTPURLResponse
         }
         
         if let handler = completionHandlers[downloadTask] {
@@ -135,10 +135,10 @@ extension ServerNetworkingDownload : URLSessionDelegate, URLSessionTaskDelegate,
             Log.error("didCompleteWithError: \(String(describing: error)); status: \(String(describing: response?.statusCode))")
 
             if handler == nil {
-                self.delegate?.serverNetworkingDownloadCompleted(self, url: nil, response: response, statusCode: response?.statusCode, error: error)
+                self.delegate?.serverNetworkingDownloadCompleted(self, url: nil, response: response, statusCode: response?.statusCode, error: .urlSessionError(error!))
             }
             else {
-                handler!.completion(nil, response, response?.statusCode, error)
+                handler!.completion(nil, response, response?.statusCode, .urlSessionError(error!))
             }
         }
     }
