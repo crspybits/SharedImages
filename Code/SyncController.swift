@@ -168,6 +168,8 @@ extension SyncController : SyncServerDelegate {
             progressIndicator.show()
             
         case .willStartUploads(numberFileUploads: let numberFileUploads, numberUploadDeletions: let numberUploadDeletions):
+        
+            Log.msg("willStartUploads: Starting ProgressIndicator")
             numberUploads = numberFileUploads + numberUploadDeletions
             numberUploadedSoFar = 0
             progressIndicator?.dismiss()
