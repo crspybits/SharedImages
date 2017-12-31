@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.10.0
+Version 0.10.0 (12/30/17)
 	* Fixed: App rotation doesn't leave you on the same image in the Large Images screen
 		https://github.com/crspybits/SharedImages/issues/58
 	* Fixed: On first creating an account, you don't get changed to Images tab
@@ -17,7 +17,7 @@ Version 0.10.0
 		Hopefully this is fixed now! :).
 	* Fixed-- New Image: Date doesn't get replaced with actual server date
 		https://github.com/crspybits/SharedImages/issues/44
-	* Fixed: Deep linking not working unless app launched
+	* Fixed: Deep linking (for accepting sharing invitations) not working unless app launched
 		https://github.com/crspybits/SharedImages/issues/42
 		
 Version 0.9.0 (12/26/17)
