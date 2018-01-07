@@ -12,7 +12,7 @@ import CoreData
 import SMCoreLib
 
 @objc(UploadFileTracker)
-public class UploadFileTracker: FileTracker, AllOperations {
+public class UploadFileTracker: FileTracker, AllOperations, LocalURLData {
     typealias COREDATAOBJECT = UploadFileTracker
 
     enum Status : String {
@@ -33,23 +33,11 @@ public class UploadFileTracker: FileTracker, AllOperations {
     
     var localURL:SMRelativeLocalURL? {
         get {
-            if localURLData == nil {
-                return nil
-            }
-            else {
-                let url = NSKeyedUnarchiver.unarchiveObject(with: localURLData! as Data) as? SMRelativeLocalURL
-                Assert.If(url == nil, thenPrintThisString: "UploadFileTracker: Yikes: No URL!")
-                return url
-            }
+            return getLocalURLData()
         }
         
         set {
-            if newValue == nil {
-                localURLData = nil
-            }
-            else {
-                localURLData = NSKeyedArchiver.archivedData(withRootObject: newValue!) as NSData
-            }
+            setLocalURLData(newValue: newValue)
         }
     }
     

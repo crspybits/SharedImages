@@ -25,17 +25,13 @@ class ServerNetworking : NSObject {
             return _authenticationDelegate
         }
         set {
-            ServerNetworkingDownload.session.authenticationDelegate = newValue
+            ServerNetworkingLoading.session.authenticationDelegate = newValue
             _authenticationDelegate = newValue
         }
     }
     
     func appLaunchSetup() {
         // TODO: *3* How can I have a networking spinner in the status bar? See https://github.com/crspybits/SyncServer-iOSClient/issues/7
-    }
-
-    enum ServerNetworkingError : Error {
-    case noNetworkError
     }
     
     func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval? = nil,
@@ -45,44 +41,27 @@ class ServerNetworking : NSObject {
             completion?(serverResponse, statusCode, error)
         }
     }
-    
-    // Data is sent in the body via a POST request (not multipart).
-    func postUploadDataTo(_ serverURL: URL, dataToUpload:Data, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
 
+    func upload(file:ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion: ((HTTPURLResponse?, _ statusCode:Int?, SyncServerError?)->())?) {
+    
         guard Network.session().connected() else {
             completion?(nil, nil, .noNetworkError)
             return
         }
         
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.httpAdditionalHeaders = self.authenticationDelegate?.headerAuthentication(forServerNetworking: self)
-        
-        // COULD DO: Use a delegate here to track upload progress.
-        let session = URLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
-        
-        // COULD DO: Data uploading task. We could use NSURLSessionUploadTask instead of NSURLSessionDataTask if we needed to support uploads in the background
-        
-        var request = URLRequest(url: serverURL)
-        request.httpMethod = "POST"
-        request.httpBody = dataToUpload
-        
-        Log.msg("postUploadDataTo: serverURL: \(serverURL)")
-        
-        let uploadTask:URLSessionUploadTask = session.uploadTask(with: request, from: dataToUpload) { (data, urlResponse, error) in            
-            self.processResponse(data: data, urlResponse: urlResponse, error: error, completion: completion)
+        ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) { (serverResponse, statusCode, error) in
+            completion?(serverResponse, statusCode, error)
         }
-        
-        uploadTask.resume()
     }
     
-    public func downloadFrom(_ serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ serverResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
+    public func download(file: ServerNetworkingLoadingFile, fromServerURL serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ serverResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
 
         guard Network.session().connected() else {
             completion?(nil, nil, nil, .noNetworkError)
             return
         }
         
-        ServerNetworkingDownload.session.downloadFrom(serverURL, method: method) { (url, urlResponse, status, error) in
+        ServerNetworkingLoading.session.download(file: file, fromServerURL: serverURL, method: method) { (url, urlResponse, status, error) in
         
             if error == nil {
                 guard url != nil else {
@@ -179,3 +158,11 @@ extension ServerNetworking : URLSessionDelegate {
     }
 #endif
 }
+
+/*
+extension ServerNetworking: ServerNetworkingLoadingDelegate {
+    func serverNetworkingDownloadCompleted(_ snl: ServerNetworkingLoading, url: SMRelativeLocalURL?, response: HTTPURLResponse?, statusCode:Int?, error: SyncServerError?) {
+
+    }
+}*/
+

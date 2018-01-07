@@ -72,4 +72,8 @@ extension AllOperations {
             assert(false)
         }
     }
+    
+    func save() {
+        CoreData.sessionNamed(Constants.coreDataName).saveContext()
+    }
 }

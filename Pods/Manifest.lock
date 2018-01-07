@@ -1,11 +1,11 @@
 PODS:
   - Alamofire (4.5.1)
-  - Bolts (1.8.4):
-    - Bolts/AppLinks (= 1.8.4)
-    - Bolts/Tasks (= 1.8.4)
-  - Bolts/AppLinks (1.8.4):
+  - Bolts (1.9.0):
+    - Bolts/AppLinks (= 1.9.0)
+    - Bolts/Tasks (= 1.9.0)
+  - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
-  - Bolts/Tasks (1.8.4)
+  - Bolts/Tasks (1.9.0)
   - Crashlytics (3.9.3):
     - Fabric (~> 1.7.2)
   - Fabric (1.7.2)
@@ -54,31 +54,31 @@ PODS:
     - HPTextViewTapGestureRecognizer (~> 0.1)
     - Reachability
     - SwiftyBeaver
-  - SwiftyBeaver (1.5.0)
+  - SwiftyBeaver (1.5.1)
   - SwiftyDropbox (4.3.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (9.0.0):
+  - SyncServer (10.0.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
-    - SyncServer-Shared (~> 3.3)
-    - SyncServer/Lite (= 9.0.0)
-  - SyncServer-Shared (3.3.1):
+    - SyncServer-Shared (~> 4.0)
+    - SyncServer/Lite (= 10.0.0)
+  - SyncServer-Shared (4.0.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (9.0.0):
+  - SyncServer/Dropbox (10.0.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
-    - SyncServer-Shared (~> 3.3)
-  - SyncServer/Facebook (9.0.0):
+    - SyncServer-Shared (~> 4.0)
+  - SyncServer/Facebook (10.0.0):
     - FacebookCore (~> 0.2)
     - FacebookLogin (~> 0.2)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
-    - SyncServer-Shared (~> 3.3)
-  - SyncServer/Lite (9.0.0):
+    - SyncServer-Shared (~> 4.0)
+  - SyncServer/Lite (10.0.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
-    - SyncServer-Shared (~> 3.3)
+    - SyncServer-Shared (~> 4.0)
 
 DEPENDENCIES:
   - Crashlytics
@@ -88,9 +88,9 @@ DEPENDENCIES:
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - rosterdev (from `https://github.com/RosterHQ/rosterdev.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (~> 9.0)
-  - SyncServer/Dropbox (~> 9.0)
-  - SyncServer/Facebook (~> 9.0)
+  - SyncServer (~> 10.0)
+  - SyncServer/Dropbox (~> 10.0)
+  - SyncServer/Facebook (~> 10.0)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
@@ -108,7 +108,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
-  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Crashlytics: dbb07d01876c171c5ccbdf7826410380189e452c
   Fabric: 9cd6a848efcf1b8b07497e0b6a2e7d336353ba15
   FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
@@ -128,11 +128,11 @@ SPEC CHECKSUMS:
   rosterdev: f615d97636d1e1449fa31e4ea3637cfccc1c98ff
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
   SMCoreLib: a2b5a175712594a01fab7010118dae2a06489bd0
-  SwiftyBeaver: 384235c59d9c67b4a5e1810cffa713babba34efd
+  SwiftyBeaver: 4f74563624b2c1e821c522c54142b5dd5ebb0f30
   SwiftyDropbox: f70ff647c8ef4195e1314c8a894652f3ba3da526
-  SyncServer: c350eab18724a3330770fa9898dc03ba90b14d72
-  SyncServer-Shared: faa4aaba10a2fcde966e4e61321807289593ca71
+  SyncServer: 94772c1de44df6c8c3db7f98dfa9bf43ec9bb654
+  SyncServer-Shared: 2437ad75f19a1953f7e003ec9630df4d97399623
 
-PODFILE CHECKSUM: 03e65c8e8d27181804fea1ccd3c3375f3931f725
+PODFILE CHECKSUM: 7b62ffcc652632db6c7b27172ef3afa9f32d7ab7
 
 COCOAPODS: 1.3.1

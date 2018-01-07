@@ -422,7 +422,7 @@ private class DropboxSignInButton : UIView, Tappable {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func tap() {
+    @objc func tap() {
         switch buttonShowing {
         case .signIn:
             signIn.managerDelegate?.signInStateChanged(to: .signInStarted, for: signIn)

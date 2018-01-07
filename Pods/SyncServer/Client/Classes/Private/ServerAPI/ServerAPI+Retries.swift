@@ -162,13 +162,13 @@ extension ServerAPI {
         rwr.start()
     }
     
-    func postUploadDataTo(_ serverURL: URL, dataToUpload:Data, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
+    func upload(file: ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion:((_ urlResponse: HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         
         // I get rid of the circular references in the completion handler. These references are being used to retain the rwr object.
         rwr.request = {
-            ServerNetworking.session.postUploadDataTo(serverURL, dataToUpload: dataToUpload) { (serverResponse, statusCode, error) in
+            ServerNetworking.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) { (serverResponse, statusCode, error) in
                 
                 rwr.completionHandler = { error in
                     completion?(serverResponse, statusCode, error)
@@ -179,13 +179,13 @@ extension ServerAPI {
         rwr.start()
     }
     
-    func downloadFrom(_ serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ urlResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
+    func download(file: ServerNetworkingLoadingFile, fromServerURL serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ urlResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         
         // I get rid of the circular references in the completion handler. These references are being used to retain the rwr object.
         rwr.request = {
-            ServerNetworking.session.downloadFrom(serverURL, method: method) { (localURL, urlResponse, statusCode, error) in
+            ServerNetworking.session.download(file: file, fromServerURL: serverURL, method: method) { (localURL, urlResponse, statusCode, error) in
                 
                 rwr.completionHandler = { error in
                     completion?(localURL, urlResponse, statusCode, error)

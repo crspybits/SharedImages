@@ -1,5 +1,11 @@
 SharedImages
 
+Version 0.11.0
+	* Fixed crash issue-- when returning to large images screen.
+		Introduced in the last release when fixing another crash issue.
+	* Updated to SyncServer iOS Client 10.0.0-- which, amongst other things,
+		improves background uploading/downloading.
+		
 Version 0.10.0 (12/30/17)
 	* Fixed: App rotation doesn't leave you on the same image in the Large Images screen
 		https://github.com/crspybits/SharedImages/issues/58

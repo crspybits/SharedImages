@@ -110,6 +110,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SharingInvitation.session.application(app, open: url, options: options)
     }
     
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        SyncServer.session.application(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
+    }
+    
     func application(_ application: UIApplication,
               didRegister notificationSettings: UIUserNotificationSettings) {
         AppBadge.iOS9BadgeAuthorization(didRegister: notificationSettings)

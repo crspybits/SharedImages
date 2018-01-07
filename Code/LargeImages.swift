@@ -35,7 +35,6 @@ class LargeImages : UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
 
-        coreDataSource = CoreDataSource(delegate: self)
         edgesForExtendedLayout = []
     }
     
@@ -48,6 +47,9 @@ class LargeImages : UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        // 12/31/17; Just had a crash here. On `coreDataSource.fetchData()`. This was arising because of the nil assignment I put in `viewWillDisappear`. I'm putting the assignment to `coreDataSource` here (moved from viewDidLoad) to deal with this.
+        coreDataSource = CoreDataSource(delegate: self)
         coreDataSource.fetchData()
 
         let indexPath = IndexPath(item: startItem, section: 0)

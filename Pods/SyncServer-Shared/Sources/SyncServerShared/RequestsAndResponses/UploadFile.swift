@@ -102,7 +102,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
 
 public class UploadFileResponse : ResponseMessage {
     public var responseType: ResponseType {
-        return .json
+        return .header
     }
     
     // On a successful upload, the following fields will be present in the response.

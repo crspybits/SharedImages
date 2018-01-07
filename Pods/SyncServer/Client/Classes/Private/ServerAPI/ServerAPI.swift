@@ -257,41 +257,43 @@ class ServerAPI {
         
         assert(endpoint.method == .post)
         
-        guard let fileData = try? Data(contentsOf: file.localURL) else {
-            Log.error("Could not read upload file.")
-            completion?(nil, .couldNotReadUploadFile);
-            return
-        }
-        
         let parameters = uploadRequest.urlParameters()!
         let url = makeURL(forEndpoint: endpoint, parameters: parameters)
-        
-        postUploadDataTo(url, dataToUpload: fileData) { (response, httpStatus, error) in
+        let networkingFile = ServerNetworkingLoadingFile(fileUUID: file.fileUUID, fileVersion: file.fileVersion)
+
+        upload(file: networkingFile, fromLocalURL: file.localURL, toServerURL: url, method: endpoint.method) { (response, httpStatus, error) in
             let resultError = self.checkForError(statusCode: httpStatus, error: error)
 
             if resultError == nil {
-                guard let response = response,
-                    let uploadFileResponse = UploadFileResponse(json: response) else {
-                    completion?(nil, .couldNotCreateResponse)
-                    return
+                Log.msg("response!.allHeaderFields: \(response!.allHeaderFields)")
+                if let parms = response!.allHeaderFields[ServerConstants.httpResponseMessageParams] as? String,
+                    let jsonDict = self.toJSONDictionary(jsonString: parms) {
+                    Log.msg("jsonDict: \(jsonDict)")
+                    
+                    guard let uploadFileResponse = UploadFileResponse(json: jsonDict) else {
+                        completion?(nil, .couldNotCreateResponse)
+                        return
+                    }
+                    
+                    if let versionUpdate = uploadFileResponse.masterVersionUpdate {
+                        let message = UploadFileResult.serverMasterVersionUpdate(versionUpdate)
+                        Log.msg("\(message)")
+                        completion?(message, nil)
+                        return
+                    }
+                    
+                    guard let size = uploadFileResponse.size, let creationDate = uploadFileResponse.creationDate, let updateDate = uploadFileResponse.updateDate else {
+                        completion?(nil, .noExpectedResultKey)
+                        return
+                    }
+                    
+                    completion?(UploadFileResult.success(sizeInBytes:size, creationDate: creationDate, updateDate: updateDate), nil)
                 }
-                
-                if let versionUpdate = uploadFileResponse.masterVersionUpdate {
-                    let message = UploadFileResult.serverMasterVersionUpdate(versionUpdate)
-                    Log.msg("\(message)")
-                    completion?(message, nil)
-                    return
+                else {
+                    completion?(nil, .couldNotObtainHeaderParameters)
                 }
-                
-                guard let size = uploadFileResponse.size, let creationDate = uploadFileResponse.creationDate, let updateDate = uploadFileResponse.updateDate else {
-                    completion?(nil, .noExpectedResultKey)
-                    return
-                }
-                
-                completion?(UploadFileResult.success(sizeInBytes:size, creationDate: creationDate, updateDate: updateDate), nil)
             }
             else {
-                Log.error("\(resultError!)")
                 completion?(nil, resultError)
             }
         }
@@ -377,8 +379,9 @@ class ServerAPI {
 
         let parameters = downloadFileRequest.urlParameters()!
         let serverURL = makeURL(forEndpoint: endpoint, parameters: parameters)
-
-        downloadFrom(serverURL, method: endpoint.method) { (resultURL, response, statusCode, error) in
+        let file = ServerNetworkingLoadingFile(fileUUID: file.fileUUID, fileVersion: file.fileVersion)
+        
+        download(file: file, fromServerURL: serverURL, method: endpoint.method) { (resultURL, response, statusCode, error) in
         
             guard response != nil else {
                 let resultError = error ?? .nilResponse

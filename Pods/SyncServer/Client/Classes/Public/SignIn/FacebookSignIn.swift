@@ -264,7 +264,7 @@ private class FacebookSignInButton : UIControl, Tappable {
         }
     }
     
-    func tap() {
+    @objc func tap() {
         if signIn.userIsSignedIn {
             signIn.signUserOut()
             Log.msg("signUserOut: FacebookSignIn: explicit request to signout")
