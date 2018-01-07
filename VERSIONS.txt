@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.11.0
+Version 0.11.0 (1/7/18)
 	* Fixed crash issue-- when returning to large images screen.
 		Introduced in the last release when fixing another crash issue.
 	* Updated to SyncServer iOS Client 10.0.0-- which, amongst other things,

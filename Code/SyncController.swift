@@ -9,6 +9,7 @@
 import Foundation
 import SyncServer
 import SMCoreLib
+import rosterdev
 
 enum SyncControllerEvent {
     case syncStarted
@@ -142,6 +143,15 @@ extension SyncController : SyncServerDelegate {
         delegate.syncEvent(syncController: self, event: .syncError)
     }
 
+#if DEBUG
+    private func delayedCrash() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+            let x:Int! = nil
+            print("\(x!)")
+        }
+    }
+#endif
+
     func syncServerEventOccurred(event:SyncEvent) {
         Log.msg("Server event occurred: \(event)")
         
@@ -150,6 +160,13 @@ extension SyncController : SyncServerDelegate {
             delegate.syncEvent(syncController: self, event: .syncStarted)
             
         case .willStartDownloads(numberFileDownloads: let numberFileDownloads, numberDownloadDeletions: let numberDownloadDeletions):
+        
+            RosterDevInjectTest.if(TestCases.session.testCrashNextDownload) {[unowned self] in
+#if DEBUG
+                self.delayedCrash()
+#endif
+            }
+            
             numberDownloads = numberFileDownloads + numberDownloadDeletions
             numberDownloadedSoFar = 0
             
@@ -168,6 +185,12 @@ extension SyncController : SyncServerDelegate {
             progressIndicator.show()
             
         case .willStartUploads(numberFileUploads: let numberFileUploads, numberUploadDeletions: let numberUploadDeletions):
+        
+            RosterDevInjectTest.if(TestCases.session.testCrashNextUpload) {[unowned self] in
+#if DEBUG
+                self.delayedCrash()
+#endif
+            }
         
             Log.msg("willStartUploads: Starting ProgressIndicator")
             numberUploads = numberFileUploads + numberUploadDeletions

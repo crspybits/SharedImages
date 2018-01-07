@@ -28,6 +28,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 #else
         Log.minLevel = .error
 #endif
+
+#if DEBUG
+        TestCases.setup()
+#endif
     
         let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
         
