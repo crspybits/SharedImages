@@ -236,12 +236,13 @@ class ServerAPI {
     case serverMasterVersionUpdate(Int64)
     }
     
-    func uploadFile(file:File, serverMasterVersion:MasterVersionInt, completion:((UploadFileResult?, SyncServerError?)->(Void))?) {
+    // Set undelete = true in order to do an upload undeletion. The server file must already have been deleted. The meaning is to upload a new file version for a file that has already been deleted on the server. The use case is for conflict resolution-- when a download deletion and a file upload are taking place at the same time, and the client want's its upload to take priority over the download deletion.
+    func uploadFile(file:File, serverMasterVersion:MasterVersionInt, undelete:Bool = false, completion:((UploadFileResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.uploadFile
 
         Log.special("file.fileUUID: \(file.fileUUID)")
 
-        let params:[String : Any] = [
+        var params:[String : Any] = [
             UploadFileRequest.fileUUIDKey: file.fileUUID,
             UploadFileRequest.mimeTypeKey: file.mimeType,
             UploadFileRequest.cloudFolderNameKey: file.cloudFolderName,
@@ -249,6 +250,10 @@ class ServerAPI {
             UploadFileRequest.fileVersionKey: file.fileVersion,
             UploadFileRequest.masterVersionKey: serverMasterVersion
         ]
+        
+        if undelete {
+            params[UploadFileRequest.undeleteServerFileKey] = 1
+        }
         
         guard let uploadRequest = UploadFileRequest(json: params) else {
             completion?(nil, .couldNotCreateRequest);

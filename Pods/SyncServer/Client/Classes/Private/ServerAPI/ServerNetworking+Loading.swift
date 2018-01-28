@@ -194,6 +194,7 @@ class ServerNetworkingLoading : NSObject {
     func download(file:ServerNetworkingLoadingFile, fromServerURL serverURL: URL, method: ServerHTTPMethod, completion:@escaping DownloadCompletion) {
     
         // Before we go any further-- check to see if we have cached results.
+        // There is a race condition here: What if we have a cached object, but the upload hasn't finished yet?? Need to fix this. See https://github.com/crspybits/SharedImages/issues/72
         if let (response, url) = lookupAndRemoveCache(file: file, download: true) {
             let statusCode = response.statusCode
             DebugWriter.session.log("Using cached download result")
@@ -215,6 +216,7 @@ class ServerNetworkingLoading : NSObject {
     func upload(file:ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion:@escaping UploadCompletion) {
     
         // Before we go any further-- check to see if we have cached results.
+        // There is a race condition here: What if we have a cached object, but the upload hasn't finished yet?? Need to fix this. See https://github.com/crspybits/SharedImages/issues/72
         if let (response, _) = lookupAndRemoveCache(file: file, download: false) {
             let statusCode = response.statusCode
             DebugWriter.session.log("Using cached upload result")

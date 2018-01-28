@@ -17,9 +17,9 @@ PODS:
     - FacebookCore (~> 0.3)
     - FBSDKCoreKit (~> 4.27)
     - FBSDKLoginKit (~> 4.27)
-  - FBSDKCoreKit (4.29.0):
+  - FBSDKCoreKit (4.30.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.29.0):
+  - FBSDKLoginKit (4.30.0):
     - FBSDKCoreKit
   - Gloss (1.2.4)
   - GoogleSignIn (4.1.1):
@@ -43,7 +43,7 @@ PODS:
   - GTMSessionFetcher/Full (1.1.12):
     - GTMSessionFetcher/Core (= 1.1.12)
   - HPTextViewTapGestureRecognizer (0.1)
-  - lottie-ios (2.1.5)
+  - lottie-ios (2.5.0)
   - LottiesBottom (0.4.0):
     - lottie-ios (~> 2.1)
   - ODRefreshControl (1.2)
@@ -57,25 +57,25 @@ PODS:
   - SwiftyBeaver (1.5.1)
   - SwiftyDropbox (4.3.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (10.0.0):
+  - SyncServer (11.0.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 4.0)
-    - SyncServer/Lite (= 10.0.0)
-  - SyncServer-Shared (4.0.0):
+    - SyncServer/Lite (= 11.0.0)
+  - SyncServer-Shared (4.1.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (10.0.0):
+  - SyncServer/Dropbox (11.0.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
     - SyncServer-Shared (~> 4.0)
-  - SyncServer/Facebook (10.0.0):
+  - SyncServer/Facebook (11.0.0):
     - FacebookCore (~> 0.2)
     - FacebookLogin (~> 0.2)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 4.0)
-  - SyncServer/Lite (10.0.0):
+  - SyncServer/Lite (11.0.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 4.0)
@@ -88,9 +88,9 @@ DEPENDENCIES:
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - rosterdev (from `https://github.com/RosterHQ/rosterdev.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (~> 10.0)
-  - SyncServer/Dropbox (~> 10.0)
-  - SyncServer/Facebook (~> 10.0)
+  - SyncServer (~> 11.0)
+  - SyncServer/Dropbox (~> 11.0)
+  - SyncServer/Facebook (~> 11.0)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
@@ -113,15 +113,15 @@ SPEC CHECKSUMS:
   Fabric: 9cd6a848efcf1b8b07497e0b6a2e7d336353ba15
   FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
   FacebookLogin: 0af839ea858faef99550d16596b87b4a8e8906e6
-  FBSDKCoreKit: 6f139173dc63a1deaff4430a55f2fe5bb222d2af
-  FBSDKLoginKit: 56a057ca6822535ea0faa25f57a7c41edb697fd4
+  FBSDKCoreKit: 7c4bba2877781a131ab5d54c0a78c405d4307b62
+  FBSDKLoginKit: fe7a7e82373dc5daad92e1623219e86224ab1fb1
   Gloss: 4e036074610fdb993abcb958ebcd7332588e2333
   GoogleSignIn: 3fdaa34a2ba04dbd7a25d7db39aecb0da98d5bdc
   GoogleToolboxForMac: 2501e2ad72a52eb3dfe7bd9aee7dad11b858bd20
   GTMOAuth2: c77fe325e4acd453837e72d91e3b5f13116857b2
   GTMSessionFetcher: ebaa1f79a5366922c1735f1566901f50beba23b7
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
-  lottie-ios: 836cdbba92f62f3c6a00e37a4ce485321fe317cf
+  lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   LottiesBottom: 576ecb1cd2dfd6fc0eba2d56595d77c045e10533
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
@@ -130,9 +130,9 @@ SPEC CHECKSUMS:
   SMCoreLib: a2b5a175712594a01fab7010118dae2a06489bd0
   SwiftyBeaver: 4f74563624b2c1e821c522c54142b5dd5ebb0f30
   SwiftyDropbox: f70ff647c8ef4195e1314c8a894652f3ba3da526
-  SyncServer: 94772c1de44df6c8c3db7f98dfa9bf43ec9bb654
-  SyncServer-Shared: 2437ad75f19a1953f7e003ec9630df4d97399623
+  SyncServer: 90b4de88fee64af82d0ff2ae96e8ddbad407ce50
+  SyncServer-Shared: aa69d8a275616073675f7d9467badd2cd6693f2e
 
-PODFILE CHECKSUM: 7b62ffcc652632db6c7b27172ef3afa9f32d7ab7
+PODFILE CHECKSUM: b53c8e5bf443bc60ff134e023e4a933ee60efb36
 
 COCOAPODS: 1.3.1

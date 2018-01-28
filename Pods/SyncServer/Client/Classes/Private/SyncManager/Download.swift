@@ -41,7 +41,7 @@ class Download {
             CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                 do {
                     let (downloads, deletions) =
-                        try Directory.session.checkFileIndex(fileIndex: fileIndex!)
+                        try Directory.session.checkFileIndex(serverFileIndex: fileIndex!)
                     completionResult =
                         .checkResult(downloadFiles:downloads, downloadDeletions:deletions, masterVersion)
                 } catch (let error) {
@@ -82,12 +82,8 @@ class Download {
                         var numberFileDownloads:Int32 = 0
                         var numberDownloadDeletions:Int32 = 0
                         
+                        
                         for file in allFiles {
-                            if file.fileVersion != 0 {
-                                // TODO: *5* We're considering this an error currently because we're not yet supporting multiple file versions.
-                                assert(false, "Not Yet Implemented: Multiple File Versions")
-                            }
-                            
                             let dft = DownloadFileTracker.newObject() as! DownloadFileTracker
                             dft.fileUUID = file.fileUUID
                             dft.fileVersion = file.fileVersion

@@ -76,7 +76,13 @@ class SyncController {
 }
 
 extension SyncController : SyncServerDelegate {
-    func singleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
+    func syncServerMustResolveFileDownloadConflict(downloadedFile: SMRelativeLocalURL, downloadedFileAttributes: SyncAttributes, uploadConflict: SyncServerConflict<FileDownloadResolution>) {
+    }
+    
+    func syncServerMustResolveDownloadDeletionConflicts(conflicts:[DownloadDeletionConflict]) {
+    }
+    
+    func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
         // The files we get back from the SyncServer are in a temporary location.
         let newImageURL = FileExtras().newURLForImage()
         do {
@@ -124,7 +130,7 @@ extension SyncController : SyncServerDelegate {
         }
     }
 
-    func shouldDoDeletions(downloadDeletions:[SyncAttributes]) {
+    func syncServerShouldDoDeletions(downloadDeletions:[SyncAttributes]) {
         let uuids = downloadDeletions.map({$0.fileUUID!})
         delegate.removeLocalImages(syncController: self, uuids: uuids)
         updateDownloadProgress(count: UInt(uuids.count))

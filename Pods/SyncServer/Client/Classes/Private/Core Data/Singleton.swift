@@ -21,6 +21,18 @@ public class Singleton: NSManagedObject, CoreDataSingleton, AllOperations {
     public class func newObject() -> NSManagedObject {
         let singleton = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! Singleton
         singleton.masterVersion = 0
+        singleton.nextFileTrackerAge = 0
         return singleton
+    }
+    
+    // Also increments the age afterwards.
+    public func getNextFileTrackerAge() -> Int64 {
+        var result:Int64!
+        Synchronized.block(self) {
+            result = nextFileTrackerAge
+            nextFileTrackerAge += 1
+        }
+        
+        return result
     }
 }

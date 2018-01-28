@@ -2,7 +2,7 @@
 //  DownloadFileTracker+CoreDataProperties.swift
 //  SyncServer
 //
-//  Created by Christopher G Prince on 9/19/17.
+//  Created by Christopher G Prince on 1/21/18.
 //
 //
 

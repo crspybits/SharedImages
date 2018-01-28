@@ -4,8 +4,6 @@
 //
 //  Created by Christopher Prince on 2/28/17.
 //
-//  This file was automatically generated and should not be edited.
-//
 
 import Foundation
 import CoreData
@@ -48,6 +46,8 @@ public class UploadFileTracker: FileTracker, AllOperations, LocalURLData {
     public class func newObject() -> NSManagedObject {
         let uft = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! UploadFileTracker
         uft.status = .notStarted
+        uft.addAge()
+        uft.uploadUndeletion = false
         return uft
     }
 }

@@ -196,13 +196,45 @@ class Upload {
     }
     
     private func uploadFile(nextToUpload:UploadFileTracker, uploadQueue:UploadQueue,masterVersion:MasterVersionInt) -> NextResult {
-    
+        
         var file:ServerAPI.File!
+        var nextResult:NextResult?
+        var directoryEntry:DirectoryEntry?
+        var undelete = false
+        
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            // 1/11/18; Determing the version to upload immediately before the upload. See https://github.com/crspybits/SyncServerII/issues/12
+            
+            directoryEntry = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID)
+            guard directoryEntry != nil else {
+                nextResult = .error(.couldNotFindFileUUID(nextToUpload.fileUUID))
+                return
+            }
+            
+            if directoryEntry!.fileVersion == nil {
+                nextToUpload.fileVersion = 0
+            }
+            else {
+                nextToUpload.fileVersion = directoryEntry!.fileVersion! + 1
+            }
+            
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                nextResult = .error(.coreDataError(error))
+                return
+            }
+            
             file = ServerAPI.File(localURL: nextToUpload.localURL! as URL!, fileUUID: nextToUpload.fileUUID, mimeType: nextToUpload.mimeType, cloudFolderName: self.cloudFolderName, deviceUUID:self.deviceUUID, appMetaData: nextToUpload.appMetaData, fileVersion: nextToUpload.fileVersion)
+            
+            undelete = nextToUpload.uploadUndeletion
         }
         
-        ServerAPI.session.uploadFile(file: file, serverMasterVersion: masterVersion) { (uploadResult, error) in
+        guard nextResult == nil else {
+            return nextResult!
+        }
+
+        ServerAPI.session.uploadFile(file: file, serverMasterVersion: masterVersion, undelete: undelete) { (uploadResult, error) in
         
             guard error == nil else {
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
@@ -229,12 +261,7 @@ class Upload {
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     nextToUpload.status = .uploaded
                     
-                    do {
-                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
-                    } catch (let error) {
-                        completionResult = .error(.coreDataError(error))
-                        return
-                    }
+                    // 1/27/18; See [2] below.
 
                     let attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:nextToUpload.mimeType!, creationDate: creationDate, updateDate: updateDate)
                     completionResult = .fileUploaded(attr)
@@ -338,3 +365,19 @@ class Upload {
         }
     }
 }
+
+/* 1/27/18; [2]. For some reason, up until now, I'd been assigning the directory entry from the uft file version right here (at [2] above in the code):
+
+    directoryEntry!.fileVersion = nextToUpload.fileVersion
+
+    HOWEVER, the upload isn't actually done until the DoneUploads
+    succeeds *after* the upload. I'm focused on this right now because I just got an error because of this. The situation went like this:
+    
+    1) A file upload occurred (device 1)
+    2) Two successive DoneUploads occurred (device 2, and then device 1, for the same user data)
+    3) The second DoneUploads (trying to complete the file upload in 1)) fails because of the master version update from the Device 2 DoneUploads
+    4) Device 1 retries its file upload, which makes the attempt with file version 1 because the directory entry had been assigned version 0 already.
+    5) That file upload failed with a server error "File is new, but file version being uploaded (Optional(1)) is not 0".
+
+    We'd been doing that fileVersion update in [1] in SyncManager.swift previously, so should be safe in just removing the assignment here.
+*/

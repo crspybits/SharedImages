@@ -9,127 +9,6 @@
 import Foundation
 import SMCoreLib
 
-// Most of this information is for testing purposes and for UI (e.g., for displaying download progress). Some of it, however, can be necessary for app operations.
-public enum SyncEvent {
-    // This can repeat if there is a change to the files on the server (a master version update), and downloads restart.
-    case willStartDownloads(numberFileDownloads:UInt, numberDownloadDeletions:UInt)
-    
-    case willStartUploads(numberFileUploads:UInt, numberUploadDeletions:UInt)
-    
-    // The attributes report the actual creation and update dates of the file-- as established by the server.
-    case singleFileUploadComplete(attr:SyncAttributes)
-    
-    case singleUploadDeletionComplete(fileUUID:UUIDString)
-    case fileUploadsCompleted(numberOfFiles:Int)
-    case uploadDeletionsCompleted(numberOfFiles:Int)
-    
-    case syncStarted
-    
-    // Occurs after call to stopSync, when the synchronization is just about to stop. syncDone will be the next event (if desired).
-    case syncStopping
-    
-    case syncDone
-    
-    case refreshingCredentials
-}
-
-public struct EventDesired: OptionSet {
-    public let rawValue: Int
-    public init(rawValue:Int){ self.rawValue = rawValue}
-
-    public static let willStartDownloads = EventDesired(rawValue: 1 << 0)
-    public static let willStartUploads = EventDesired(rawValue: 1 << 1)
-
-    public static let singleFileUploadComplete = EventDesired(rawValue: 1 << 2)
-    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 3)
-    public static let fileUploadsCompleted = EventDesired(rawValue: 1 << 4)
-    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 5)
-    
-    public static let syncStarted = EventDesired(rawValue: 1 << 6)
-    public static let syncDone = EventDesired(rawValue: 1 << 7)
-    
-    public static let syncStopping = EventDesired(rawValue: 1 << 8)
-
-    public static let refreshingCredentials = EventDesired(rawValue: 1 << 9)
-
-    public static let defaults:EventDesired =
-        [.singleFileUploadComplete, .singleUploadDeletionComplete, .fileUploadsCompleted,
-         .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads])
-    
-    static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
-    
-        var eventIsDesired:EventDesired
-        
-        switch event {
-        case .willStartDownloads:
-            eventIsDesired = .willStartDownloads
-            
-        case .willStartUploads:
-            eventIsDesired = .willStartUploads
-            
-        case .fileUploadsCompleted:
-            eventIsDesired = .fileUploadsCompleted
-            
-        case .uploadDeletionsCompleted:
-            eventIsDesired = .uploadDeletionsCompleted
-        
-        case .syncStarted:
-            eventIsDesired = .syncStarted
-            
-        case .syncDone:
-            eventIsDesired = .syncDone
-            
-        case .syncStopping:
-            eventIsDesired = .syncStopping
-            
-        case .singleFileUploadComplete:
-            eventIsDesired = .singleFileUploadComplete
-            
-        case .singleUploadDeletionComplete:
-            eventIsDesired = .singleUploadDeletionComplete
-        
-        case .refreshingCredentials:
-            eventIsDesired = .refreshingCredentials
-        }
-        
-        if mask.contains(eventIsDesired) {
-            Thread.runSync(onMainThread: {
-                delegate?.syncServerEventOccurred(event: event)
-            })
-        }
-    }
-}
-
-// These delegate methods are called on the main thread.
-
-public protocol SyncServerDelegate : class {
-    /* Called at the end of a single download, on non-error conditions.
-    The client owns the file referenced by the url after this call completes. This file is temporary in the sense that it will not be backed up to iCloud, could be removed when the device or app is restarted, and should be moved to a more permanent location.
-    Client should replace their existing data with that from the given file.
-    */
-    func singleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes)
-
-    // Called when deletions have been received from the server. I.e., these files have been deleted on the server. This is received/called in an atomic manner: This reflects a snapshot state of file deletions on the server. Clients should delete the files referenced by the SMSyncAttributes's (i.e., the UUID's).
-    // This may be called sometime after the deletions have been received from the server. E.g., on a recovery step after the app launches and not after recent server interaction.
-    func shouldDoDeletions(downloadDeletions:[SyncAttributes])
-    
-    func syncServerErrorOccurred(error:SyncServerError)
-
-    // Reports events. Useful for testing and UI.
-    func syncServerEventOccurred(event:SyncEvent)
-}
-
-#if DEBUG
-public protocol SyncServerTestingDelegate : class {
-    // You *must* call `next` before returning.
-    func syncServerSingleFileUploadCompleted(next: @escaping ()->())
-    
-     // You *must* call `next` before returning. If this delegate is given in testing, then `SyncServerDelegate` is not used for the corresponding method (without `next`).
-     func singleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes, next: @escaping ()->())
-}
-#endif
-
 public class SyncServer {
     public static let session = SyncServer()
     private var syncOperating = false
@@ -206,6 +85,7 @@ public class SyncServer {
     // This operation survives app launches, as long as the the call itself completes. 
     // If there is a file with the same uuid, which has been enqueued for upload but not yet `sync`'ed, it will be replaced by the given file. 
     // This operation does not access the server, and thus runs quickly and synchronously.
+    // When uploading a file for the 2nd or more time ("multi-version upload") the 2nd and following updates must have the same mimeType as the first version of the file.
     // Warning: If you indicate that the mime type is "text/plain", and you are using Google Drive and the text contains unusual characters, you may run into problems-- e.g., downloading the files may fail.
     public func uploadImmutable(localFile:SMRelativeLocalURL, withAttributes attr: SyncAttributes) throws {
         try upload(fileURL: localFile, withAttributes: attr)
@@ -223,11 +103,6 @@ public class SyncServer {
                 entry!.mimeType = attr.mimeType
             }
             else {
-                if entry!.fileVersion != nil {
-                    // Right now, we're not allowing uploads of multiple version files, so this is not allowed.
-                    assert(false)
-                }
-                
                 if attr.mimeType != entry!.mimeType {
                     errorToThrow = SyncServerError.mimeTypeOfFileChanged
                     return
@@ -245,14 +120,8 @@ public class SyncServer {
             newUft.fileUUID = attr.fileUUID
             newUft.mimeType = attr.mimeType
             
-            // TODO: *1* I think this mechanism for setting the file version of the UploadFileTracker is not correct. Analogous to the deletion case, where we wait until the last moment prior to the upload deletion, I think we have to wait until the last moment of file upload to figure out the file version of the upload. The issue comes in with a series of upload/sync/upload/sync's, where we won't get all of the file version's correct.
-            if entry!.fileVersion == nil {
-                newUft.fileVersion = 0
-            }
-            else {
-                newUft.fileVersion = entry!.fileVersion! + 1
-            }
-            
+            // The file version to upload will be determined immediately before the upload so not assigning the fileVersion property of `newUft` yet. See https://github.com/crspybits/SyncServerII/issues/12
+
             Synchronized.block(self) {
                 // Has this file UUID been added to `pendingSync` already? i.e., Has the client called `uploadImmutable`, then a little later called `uploadImmutable` again, with the same uuid, all without calling `sync`-- so, we don't have a new file version because new file versions only occur once the upload hits the server.
                 do {

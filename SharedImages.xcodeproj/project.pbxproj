@@ -28,6 +28,8 @@
 		83A2E6AC1F76F84500A2E303 /* D.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A81F76F83300A2E303 /* D.json */; };
 		83A2E6AD1F76F84500A2E303 /* N.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A91F76F83300A2E303 /* N.json */; };
 		83A2E6AE1F76F84500A2E303 /* R.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6AA1F76F83300A2E303 /* R.json */; };
+		83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34070201D58C500DAD865 /* FixedObjects.swift */; };
+		83C34073201D5B5600DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34072201D5B5600DAD865 /* FixedObjects.swift */; };
 		83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D1FE331EAB074A00DD468F /* LargeImages.swift */; };
 		83D49C981F49468200409B0F /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D49C971F49468200409B0F /* SettingsVC.swift */; };
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
@@ -83,6 +85,8 @@
 		83A2E6A81F76F83300A2E303 /* D.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = D.json; sourceTree = "<group>"; };
 		83A2E6A91F76F83300A2E303 /* N.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = N.json; sourceTree = "<group>"; };
 		83A2E6AA1F76F83300A2E303 /* R.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = R.json; sourceTree = "<group>"; };
+		83C34070201D58C500DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
+		83C34072201D5B5600DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83D49C971F49468200409B0F /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
@@ -155,6 +159,7 @@
 		830B1DF71EFCC03E0022FCC7 /* SharedImagesTests */ = {
 			isa = PBXGroup;
 			children = (
+				83C34072201D5B5600DAD865 /* FixedObjects.swift */,
 				837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */,
 				830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */,
 				830B1DFA1EFCC03E0022FCC7 /* Info.plist */,
@@ -235,6 +240,14 @@
 			path = Resources/LottieAnimations;
 			sourceTree = "<group>";
 		};
+		83C3406F201D57D400DAD865 /* DIscussion Threads */ = {
+			isa = PBXGroup;
+			children = (
+				83C34070201D58C500DAD865 /* FixedObjects.swift */,
+			);
+			path = "DIscussion Threads";
+			sourceTree = "<group>";
+		};
 		83D49C961F49466600409B0F /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -291,6 +304,7 @@
 				8324EE361E7649E8000656AF /* Misc UI */,
 				8324EE2C1E74ABD4000656AF /* SignIn */,
 				8324EE311E763DBE000656AF /* Images */,
+				83C3406F201D57D400DAD865 /* DIscussion Threads */,
 				83D49C961F49466600409B0F /* Settings */,
 				83F882511E73B156008F644A /* Core Data */,
 				831EEC4A2002D76B001821B9 /* Developer */,
@@ -637,6 +651,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */,
+				83C34073201D5B5600DAD865 /* FixedObjects.swift in Sources */,
 				830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -652,6 +667,7 @@
 				83F8824E1E712004008F644A /* ImagesVC.swift in Sources */,
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83F8824D1E712004008F644A /* AppDelegate.swift in Sources */,
+				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
 				8324EE301E75EC62000656AF /* SignInVC.swift in Sources */,
 				83F882561E73B2DC008F644A /* Image.swift in Sources */,
@@ -860,8 +876,8 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "87d3c9ce-6339-4b7c-b4ed-b6b3e7828d0e";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "f9fa8dce-07a9-44d0-b736-93cc0c7eb3ea";
+				PROVISIONING_PROFILE_SPECIFIER = "Shared Images Ad Hoc";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -883,8 +899,8 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "87d3c9ce-6339-4b7c-b4ed-b6b3e7828d0e";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "f9fa8dce-07a9-44d0-b736-93cc0c7eb3ea";
+				PROVISIONING_PROFILE_SPECIFIER = "Shared Images Ad Hoc";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;

@@ -37,6 +37,7 @@ class DownloadFileTracker: FileTracker, AllOperations {
     class func newObject() -> NSManagedObject {
         let dft = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! DownloadFileTracker
         dft.status = .notStarted
+        dft.addAge()
         return dft
     }
 }

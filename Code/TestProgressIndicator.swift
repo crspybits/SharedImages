@@ -32,7 +32,7 @@ class TestProgressIndicator: XCTestCase {
         
         func update(_ number: Int) {
             TimedCallback.withDuration(1) {
-                progressIndicator.updateProgress(withNumberDownloaded: UInt(number))
+                progressIndicator.updateProgress(withNumberFilesProcessed: UInt(number))
                 if number < 30 {
                     update(number+1)
                 }
@@ -65,7 +65,7 @@ class TestProgressIndicator: XCTestCase {
         func update(_ number: Int) {
             TimedCallback.withDuration(1) {
                 let indicator = progressIndicator2 ?? progressIndicator1
-                indicator.updateProgress(withNumberDownloaded: UInt(number))
+                indicator.updateProgress(withNumberFilesProcessed: UInt(number))
                 if number < 30 {
                     update(number+1)
                 }

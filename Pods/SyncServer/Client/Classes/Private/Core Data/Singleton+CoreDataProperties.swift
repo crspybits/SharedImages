@@ -1,8 +1,8 @@
 //
 //  Singleton+CoreDataProperties.swift
-//  Pods
+//  SyncServer
 //
-//  Created by Christopher Prince on 3/2/17.
+//  Created by Christopher G Prince on 1/17/18.
 //
 //
 
@@ -13,10 +13,11 @@ import CoreData
 extension Singleton {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<Singleton> {
-        return NSFetchRequest<Singleton>(entityName: "Singleton");
+        return NSFetchRequest<Singleton>(entityName: "Singleton")
     }
 
     @NSManaged public var masterVersion: Int64
+    @NSManaged public var nextFileTrackerAge: Int64
     @NSManaged public var pendingSync: UploadQueue?
 
 }
