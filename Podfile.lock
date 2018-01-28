@@ -1,5 +1,6 @@
 PODS:
   - Alamofire (4.5.1)
+  - BadgeSwift (5.0.1)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -81,6 +82,7 @@ PODS:
     - SyncServer-Shared (~> 4.0)
 
 DEPENDENCIES:
+  - BadgeSwift (~> 5.0)
   - Crashlytics
   - Fabric
   - GoogleSignIn (~> 4.1)
@@ -108,6 +110,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
+  BadgeSwift: 3defa56f504bfb46f2300122c4a565ec9e405c1e
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Crashlytics: dbb07d01876c171c5ccbdf7826410380189e452c
   Fabric: 9cd6a848efcf1b8b07497e0b6a2e7d336353ba15
@@ -133,6 +136,6 @@ SPEC CHECKSUMS:
   SyncServer: 90b4de88fee64af82d0ff2ae96e8ddbad407ce50
   SyncServer-Shared: aa69d8a275616073675f7d9467badd2cd6693f2e
 
-PODFILE CHECKSUM: b53c8e5bf443bc60ff134e023e4a933ee60efb36
+PODFILE CHECKSUM: 7a3089235ebdfefa03528e873435bdd048d46718
 
 COCOAPODS: 1.3.1

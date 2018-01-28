@@ -11,6 +11,7 @@ import SMCoreLib
 import SyncServer
 import ODRefreshControl
 import LottiesBottom
+import BadgeSwift
 
 class ImagesVC: UIViewController {
     let reuseIdentifier = "ImageIcon"
@@ -319,6 +320,12 @@ extension ImagesVC : UICollectionViewDataSource {
         cell.setProperties(image: imageObj, syncController: syncController, cache: imageCache)
         
         showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+        
+        if indexPath.row == 0 {
+            let badge = BadgeSwift()
+            badge.text = "2"
+            cell.contentView.addSubview(badge)
+        }
 
         return cell
     }

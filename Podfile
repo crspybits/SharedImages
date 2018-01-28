@@ -32,6 +32,9 @@ target 'SharedImages' do
     # developer dashbaord
     pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
     
+    # for badges for updates to discussion threads
+    pod 'BadgeSwift', '~> 5.0'
+    
 	target 'SharedImagesTests' do
     	inherit! :search_paths
   	end

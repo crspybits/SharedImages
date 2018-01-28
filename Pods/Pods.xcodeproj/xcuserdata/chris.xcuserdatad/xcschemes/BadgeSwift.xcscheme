@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '62F7935FB25E1E38535D36039D9A5D8C'
-               BlueprintName = 'SMCoreLib'
+               BlueprintIdentifier = '2BB3C7A0D901BA50C22490631DD34A01'
+               BlueprintName = 'BadgeSwift'
                ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'SMCoreLib.framework'>
+               BuildableName = 'BadgeSwift.framework'>
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
