@@ -17,6 +17,8 @@ case newerAtBottom
 class ImageExtras {
     static var currentSortingOrder = SMPersistItemString(name:"ImageExtras.currentSortingOrder", initialStringValue:SortingOrder.newerAtBottom.rawValue,  persistType: .userDefaults)
     
+    static let discussionsDirectoryPath = "Discussions"
+
     static let iconDirectory = "SmallImages"
     static let iconDirectoryURL = FileStorage.url(ofItem: iconDirectory)
     static let largeImageDirectoryURL = FileStorage.url(ofItem: FileExtras.defaultDirectoryPath)
@@ -35,7 +37,14 @@ class ImageExtras {
     }
 
     static let appMetaDataTitleKey = "title"
+    static let appMetaDataDiscussionUUIDKey = "discussionUUID"
+    static let appMetaDataFileTypeKey = "fileType"
     
+    enum FileType : String {
+        case image
+        case discussion
+    }
+
     static func imageFileName(url:URL) -> String {
         return url.lastPathComponent
     }
@@ -67,8 +76,21 @@ class ImageExtras {
             Log.msg("Deleting image with uuid: \(uuid)")
             
             // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
-            CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+            do {
+                try image.remove()
+            }
+            catch (let error) {
+                Log.error("Error removing image: \(error)")
+            }
+            
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         }
+    }
+    
+    static func newJSONFile() -> SMRelativeLocalURL {
+        let directoryURL = FileStorage.url(ofItem: ImageExtras.discussionsDirectoryPath)
+        FileStorage.createDirectoryIfNeeded(directoryURL)
+        let newFileName = FileStorage.createTempFileName(inDirectory: directoryURL?.path, withPrefix: "FileObjects", andExtension: "json")
+        return SMRelativeLocalURL(withRelativePath: ImageExtras.discussionsDirectoryPath + "/" + newFileName!, toBaseURLType: .documentsDirectory)!
     }
 }

@@ -90,15 +90,17 @@ DEPENDENCIES:
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - rosterdev (from `https://github.com/RosterHQ/rosterdev.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (~> 11.0)
-  - SyncServer/Dropbox (~> 11.0)
-  - SyncServer/Facebook (~> 11.0)
+  - SyncServer (from `../SyncServer-iOSClient`)
+  - SyncServer/Dropbox (from `../SyncServer-iOSClient`)
+  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
   rosterdev:
     :git: https://github.com/RosterHQ/rosterdev.git
+  SyncServer:
+    :path: ../SyncServer-iOSClient
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -133,9 +135,9 @@ SPEC CHECKSUMS:
   SMCoreLib: a2b5a175712594a01fab7010118dae2a06489bd0
   SwiftyBeaver: 4f74563624b2c1e821c522c54142b5dd5ebb0f30
   SwiftyDropbox: f70ff647c8ef4195e1314c8a894652f3ba3da526
-  SyncServer: 90b4de88fee64af82d0ff2ae96e8ddbad407ce50
+  SyncServer: 3afa6467c0a994c811150e63c502ab2ed1e6d391
   SyncServer-Shared: aa69d8a275616073675f7d9467badd2cd6693f2e
 
-PODFILE CHECKSUM: 7a3089235ebdfefa03528e873435bdd048d46718
+PODFILE CHECKSUM: 83caadb219ba4b90488432d9167c94ddc6368ebb
 
 COCOAPODS: 1.3.1

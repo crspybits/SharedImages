@@ -17,11 +17,30 @@ enum SyncControllerEvent {
     case syncError
 }
 
+struct ImageData {
+    let file: FileData
+    let title:String?
+    let creationDate: NSDate?
+    let discussionUUID:String?
+}
+
+struct FileData {
+    let url: SMRelativeLocalURL
+    let mimeType:String
+    
+    // This will be non-nil when we have an assigned UUID being downloaded from the server.
+    let uuid:String?
+}
+
 protocol SyncControllerDelegate : class {
-    func addLocalImage(syncController:SyncController, url:SMRelativeLocalURL, uuid:String, mimeType:String, title:String?, creationDate: NSDate?)
+    func addLocalImage(syncController:SyncController, imageData: ImageData)
+    func addLocalDiscussion(syncController:SyncController, discussionData: FileData)
     func updateUploadedImageDate(uuid: String, creationDate: NSDate)
     func completedAddingLocalImages()
+    
+    // Including removing any discussion thread.
     func removeLocalImages(syncController:SyncController, uuids:[String])
+    
     func syncEvent(syncController:SyncController, event:SyncControllerEvent)
 }
 
@@ -34,7 +53,8 @@ class SyncController {
     
     init() {
         SyncServer.session.delegate = self
-        SyncServer.session.eventsDesired = [.syncStarted, .syncDone, .willStartDownloads, .willStartUploads, .singleFileUploadComplete, .singleUploadDeletionComplete]
+        SyncServer.session.eventsDesired = [.syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
+                .singleFileUploadComplete, .singleUploadDeletionComplete]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -43,28 +63,66 @@ class SyncController {
         SyncServer.session.sync()
     }
     
-    func add(image:Image) {
-        // 12/27/17; Not sending dates to the server-- it establishes the dates.
-        var attr = SyncAttributes(fileUUID:image.uuid!, mimeType:image.mimeType!)
-        
-        if image.title != nil {
-            attr.appMetaData = "{\"\(ImageExtras.appMetaDataTitleKey)\": \"\(image.title!)\"}";
+    private func dictToJSONString(_ dict: [String: Any]) -> String? {
+        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: JSONSerialization.WritingOptions(rawValue: 0)) else {
+            return nil
         }
+        
+        guard let jsonString = String(data: data, encoding: String.Encoding.utf8) else {
+            return nil
+        }
+        
+        return jsonString
+    }
     
+    private func jsonStringToDict(_ jsonString: String) -> [String: Any]? {
+        if let jsonData = jsonString.data(using: String.Encoding.utf8, allowLossyConversion: false) {
+        
+            if let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
+                return json
+            }
+        }
+        
+        return nil
+    }
+    
+    func add(image:Image, discussion: Discussion) {
+        // 12/27/17; Not sending dates to the server-- it establishes the dates.
+        var imageAttr = SyncAttributes(fileUUID:image.uuid!, mimeType:image.mimeType!)
+        
+        var imageAppMetaData = [String: Any]()
+        imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
+        imageAppMetaData[ImageExtras.appMetaDataDiscussionUUIDKey] = discussion.uuid
+        imageAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.image.rawValue
+
+        imageAttr.appMetaData = dictToJSONString(imageAppMetaData)
+        assert(imageAttr.appMetaData != nil)
+        
+        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussion.mimeType!)
+        var discussionAppMetaData = [String: Any]()
+        discussionAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.discussion.rawValue
+        discussionAttr.appMetaData = dictToJSONString(discussionAppMetaData)
+        assert(discussionAttr.appMetaData != nil)
+        
         do {
-            try SyncServer.session.uploadImmutable(localFile: image.url!, withAttributes: attr)
+            try SyncServer.session.uploadImmutable(localFile: image.url!, withAttributes: imageAttr)
+            try SyncServer.session.uploadImmutable(localFile: discussion.url!, withAttributes: discussionAttr)
+
             SyncServer.session.sync()
         } catch (let error) {
             Log.error("An error occurred: \(error)")
         }
     }
     
-    func remove(images:[Image]) -> Bool {
-        let uuids = images.map({$0.uuid!})
+    // Also removes associated discussions, on the server.
+    func remove(images:[Image]) -> Bool {        
+        let imageUuids = images.map({$0.uuid!})
+        let imagesWithDiscussions = images.filter({$0.discussion != nil && $0.discussion!.uuid != nil})
+        let discussionUuids = imagesWithDiscussions.map({$0.discussion!.uuid!})
         
         // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
         do {
-            try SyncServer.session.delete(filesWithUUIDs: uuids)
+            try SyncServer.session.delete(filesWithUUIDs: imageUuids + discussionUuids)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
             return false
@@ -77,12 +135,72 @@ class SyncController {
 
 extension SyncController : SyncServerDelegate {
     func syncServerMustResolveFileDownloadConflict(downloadedFile: SMRelativeLocalURL, downloadedFileAttributes: SyncAttributes, uploadConflict: SyncServerConflict<FileDownloadResolution>) {
-    }
     
-    func syncServerMustResolveDownloadDeletionConflicts(conflicts:[DownloadDeletionConflict]) {
+        let errorResolution: FileDownloadResolution = .acceptFileDownload
+        
+        switch uploadConflict.conflictType! {
+        case .fileUpload:
+            // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
+            
+            guard let discussion = Discussion.fetchObjectWithUUID(uuid: downloadedFileAttributes.fileUUID),
+                let discussionURL = discussion.url as URL?,
+                let localDiscussion = FixedObjects(withFile: discussionURL),
+                let serverDiscussion = FixedObjects(withFile: downloadedFile as URL) else {
+                Log.error("Error! Yark! We had a conflict but had problems. Oh. My.")
+                uploadConflict.resolveConflict(resolution: errorResolution)
+                return
+            }
+            
+            let (mergedDiscussion, unreadCount) = localDiscussion.merge(with: serverDiscussion)
+            let attr = SyncAttributes(fileUUID: downloadedFileAttributes.fileUUID, mimeType: downloadedFileAttributes.mimeType)
+            
+            let mergeURL = ImageExtras.newJSONFile()
+            do {
+                try mergedDiscussion.save(toFile: mergeURL as URL)
+                
+                discussion.url = mergeURL
+                discussion.unreadCount = Int32(unreadCount)
+                CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+
+                try SyncServer.session.uploadImmutable(localFile: mergeURL, withAttributes: attr)
+                
+            } catch (let error) {
+                Log.error("Problems writing merged discussion or uploading: \(error)")
+                uploadConflict.resolveConflict(resolution: errorResolution)
+                return
+            }
+            
+            SyncServer.session.sync()
+            
+            uploadConflict.resolveConflict(resolution: .rejectFileDownload(.removeAll))
+        
+        // For now, we're going to prioritize the server operation. We've queued up a local deletion-- seems no loss if we accept the new download. We can always try the deletion again.
+        case .uploadDeletion, .bothFileUploadAndDeletion:
+            uploadConflict.resolveConflict(resolution: .acceptFileDownload)
+        }
     }
     
     func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
+        if let appMetaData = attr.appMetaData,
+            let jsonDict = jsonStringToDict(appMetaData),
+            let fileTypeString = jsonDict[ImageExtras.appMetaDataFileTypeKey] as? String,
+            let fileType = ImageExtras.FileType(rawValue: fileTypeString) {
+            
+            switch fileType {
+            case .discussion:
+                discussionDownloadComplete(url: url, attr: attr)
+                
+            case .image:
+                imageDownloadComplete(url: url, attr: attr)
+            }
+            
+            return
+        }
+        
+        imageDownloadComplete(url: url, attr: attr)
+    }
+    
+    private func imageDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
         // The files we get back from the SyncServer are in a temporary location.
         let newImageURL = FileExtras().newURLForImage()
         do {
@@ -92,20 +210,38 @@ extension SyncController : SyncServerDelegate {
         }
     
         var title:String?
-    
+        var discussionUUID:String?
+        
         Log.msg("attr.appMetaData: \(String(describing: attr.appMetaData))")
     
         // If present, the appMetaData will be a JSON string
-        if let jsonData = attr.appMetaData?.data(using: String.Encoding.utf8, allowLossyConversion: false) {
-        
-            if let appMetaDataJSON = try? JSONSerialization.jsonObject(with: jsonData, options: []) as! [String: AnyObject] {
-                title = appMetaDataJSON[ImageExtras.appMetaDataTitleKey] as? String
-            }
+        if let appMetaData = attr.appMetaData,
+            let jsonDict = jsonStringToDict(appMetaData) {
+            title = jsonDict[ImageExtras.appMetaDataTitleKey] as? String
+            discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
         }
 
-        delegate.addLocalImage(syncController: self, url: newImageURL, uuid: attr.fileUUID, mimeType: attr.mimeType, title:title, creationDate:attr.creationDate as NSDate?)
+        let imageFileData = FileData(url: newImageURL, mimeType: attr.mimeType, uuid: attr.fileUUID)
+        let imageData = ImageData(file: imageFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID)
+        
+        delegate.addLocalImage(syncController: self, imageData: imageData)
         
         delegate.completedAddingLocalImages()
+        updateDownloadProgress()
+    }
+    
+    private func discussionDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
+        // The files we get back from the SyncServer are in a temporary location.
+        let newJSONFileURL = ImageExtras.newJSONFile()
+        do {
+            try FileManager.default.moveItem(at: url as URL, to: newJSONFileURL as URL)
+        } catch (let error) {
+            Log.error("An error occurred moving a file: \(error)")
+        }
+
+        let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, uuid: attr.fileUUID)
+        delegate.addLocalDiscussion(syncController: self, discussionData: discussionFileData)
+        
         updateDownloadProgress()
     }
     
@@ -127,6 +263,14 @@ extension SyncController : SyncServerDelegate {
             if numberUploadedSoFar! >= numberUploads {
                 progressIndicator?.dismiss()
             }
+        }
+    }
+    
+    // Initially, I wanted to resolve this conflict with `.rejectDownloadDeletion(.keepFileUpload)`. However, this has technical problems. See https://github.com/crspybits/SharedImages/issues/77
+    // For now, so that I can complete an initial implementation of discussion threads, I'm going to just use .acceptDownloadDeletion, and have the server take priority on download deletions.
+    func syncServerMustResolveDownloadDeletionConflicts(conflicts:[DownloadDeletionConflict]) {
+        conflicts.forEach() { (downloadDeletion: SyncAttributes, uploadConflict: SyncServerConflict<DownloadDeletionResolution>) in
+            uploadConflict.resolveConflict(resolution: .acceptDownloadDeletion)
         }
     }
 

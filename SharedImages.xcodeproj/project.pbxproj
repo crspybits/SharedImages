@@ -30,6 +30,9 @@
 		83A2E6AE1F76F84500A2E303 /* R.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6AA1F76F83300A2E303 /* R.json */; };
 		83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34070201D58C500DAD865 /* FixedObjects.swift */; };
 		83C34073201D5B5600DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34072201D5B5600DAD865 /* FixedObjects.swift */; };
+		83C34078201D939100DAD865 /* AppMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34077201D939100DAD865 /* AppMetaData.swift */; };
+		83C34081201E42C400DAD865 /* Discussion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* Discussion.swift */; };
+		83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */; };
 		83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D1FE331EAB074A00DD468F /* LargeImages.swift */; };
 		83D49C981F49468200409B0F /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D49C971F49468200409B0F /* SettingsVC.swift */; };
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
@@ -87,6 +90,10 @@
 		83A2E6AA1F76F83300A2E303 /* R.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = R.json; sourceTree = "<group>"; };
 		83C34070201D58C500DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
 		83C34072201D5B5600DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
+		83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages3.xcdatamodel; sourceTree = "<group>"; };
+		83C34077201D939100DAD865 /* AppMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetaData.swift; sourceTree = "<group>"; };
+		83C3407E201E42C400DAD865 /* Discussion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Discussion.swift; path = "Core Data/Discussion.swift"; sourceTree = "<group>"; };
+		83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discussion+CoreDataProperties.swift"; path = "Core Data/Discussion+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83D49C971F49468200409B0F /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
@@ -159,6 +166,7 @@
 		830B1DF71EFCC03E0022FCC7 /* SharedImagesTests */ = {
 			isa = PBXGroup;
 			children = (
+				83C34077201D939100DAD865 /* AppMetaData.swift */,
 				83C34072201D5B5600DAD865 /* FixedObjects.swift */,
 				837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */,
 				830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */,
@@ -316,6 +324,8 @@
 		83F882511E73B156008F644A /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
+				83C3407E201E42C400DAD865 /* Discussion.swift */,
+				83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */,
 				83F882541E73B2DC008F644A /* Image.swift */,
 				83F882551E73B2DC008F644A /* Image+CoreDataProperties.swift */,
 				83F882521E73B172008F644A /* CoreDataExtras.swift */,
@@ -654,6 +664,7 @@
 			files = (
 				837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */,
 				83C34073201D5B5600DAD865 /* FixedObjects.swift in Sources */,
+				83C34078201D939100DAD865 /* AppMetaData.swift in Sources */,
 				830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -664,6 +675,7 @@
 			files = (
 				8310F5151F11D8FA00735EDB /* GoogleSignIn.swift in Sources */,
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
+				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
 				837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */,
 				83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */,
 				83F8824E1E712004008F644A /* ImagesVC.swift in Sources */,
@@ -682,6 +694,7 @@
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,
+				83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
 				835A3E471FB954AF009DB032 /* Environment.swift in Sources */,
@@ -945,10 +958,11 @@
 		83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */,
 				83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */,
 				83F882441E711FC6008F644A /* SharedImages.xcdatamodel */,
 			);
-			currentVersion = 83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */;
+			currentVersion = 83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */;
 			name = SharedImages.xcdatamodeld;
 			path = Resources/SharedImages.xcdatamodeld;
 			sourceTree = "<group>";

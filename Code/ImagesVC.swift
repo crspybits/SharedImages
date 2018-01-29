@@ -139,7 +139,13 @@ class ImagesVC: UIViewController {
         // 12/2/17, 12/25/17; This is tricky. See https://github.com/crspybits/SharedImages/issues/61 and https://stackoverflow.com/questions/47614583/delete-multiple-core-data-objects-issue-with-nsfetchedresultscontroller
         // I'm dealing with this below. See the reference to this SO issue below.
         for image in images {
-            CoreData.sessionNamed(CoreDataExtras.sessionName).remove(image)
+            // This also removes any associated discussion.
+            do {
+                try image.remove()
+            }
+            catch (let error) {
+                Log.error("Could not remove image: \(error)")
+            }
         }
         
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
@@ -258,33 +264,91 @@ class ImagesVC: UIViewController {
     }
     
     @discardableResult
-    func addLocalImage(newImageURL: SMRelativeLocalURL, mimeType:String, uuid:String? = nil, title:String? = nil, creationDate: NSDate? = nil) -> Image {
+    func addLocalImage(newImageData: ImageData) -> Image {
         var newImage:Image!
         
-        if uuid == nil {
-            newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: creationDate) as! Image
+        if newImageData.file.uuid == nil {
+            // We're creating a new image at the user's request.
+            newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as! Image
         }
         else {
-            newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: creationDate) as! Image
-            newImage.uuid = uuid
+            newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as! Image
+            newImage.uuid = newImageData.file.uuid
         }
+
+        newImage.url = newImageData.file.url
+        newImage.mimeType = newImageData.file.mimeType
+        newImage.title = newImageData.title
+        newImage.discussionUUID = newImageData.discussionUUID
         
-        newImage.url = newImageURL
-        newImage.mimeType = mimeType
-        newImage.title = title
-        
-        let imageFileName = newImageURL.lastPathComponent
+        let imageFileName = newImageData.file.url.lastPathComponent
         let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
         newImage.originalHeight = Float(size.height)
         newImage.originalWidth = Float(size.width)
+        
+        // Lookup the Discussion and connect it if we have it.
+        if let discussionUUID = newImageData.discussionUUID,
+            let discussion = Discussion.fetchObjectWithUUID(uuid: discussionUUID) {
+            newImage.discussion = discussion
+        }
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         
         return newImage
     }
     
+    @discardableResult
+    func addLocalDiscussion(newDiscussionData: FileData) -> Discussion {
+        var newDiscussion: Discussion!
+        
+        if newDiscussionData.uuid == nil {
+            newDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: true) as! Discussion)
+        }
+        else {
+            newDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
+            newDiscussion.uuid = newDiscussionData.uuid
+            
+            // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
+            if let fixedObjects = FixedObjects(withFile: newDiscussionData.url as URL) {
+                newDiscussion.unreadCount = Int32(fixedObjects.count)
+            }
+            else {
+                Log.error("Could not load discussion!")
+            }
+        }
+        
+        newDiscussion.mimeType = newDiscussionData.mimeType
+        newDiscussion.url = newDiscussionData.url
+        
+        // Look up and connect the Image if we have one.
+        if let image = Image.fetchObjectWithDiscussionUUID(discussionUUID: newDiscussion.uuid!) {
+            newDiscussion.image = image
+        }
+
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        
+        return newDiscussion
+    }
+    
     func removeLocalImages(uuids:[String]) {
+        // TODO: Need to remove associated discussion(s) too.
         ImageExtras.removeLocalImages(uuids:uuids)
+    }
+    
+    private func createEmptyDiscussion() -> FileData? {
+        let newDiscussionFileURL = ImageExtras.newJSONFile()
+        let fixedObjects = FixedObjects()
+    
+        do {
+            try fixedObjects.save(toFile: newDiscussionFileURL as URL)
+        }
+        catch (let error) {
+            Log.error("Error saving new discussion thread to file: \(error)")
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating discussion thread.")
+            return nil
+        }
+        
+        return FileData(url: newDiscussionFileURL, mimeType: "text/plain", uuid: nil)
     }
 }
 
@@ -321,9 +385,12 @@ extension ImagesVC : UICollectionViewDataSource {
         
         showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
         
-        if indexPath.row == 0 {
+        if let discussion = imageObj.discussion, discussion.unreadCount > 0 {
             let badge = BadgeSwift()
-            badge.text = "2"
+            badge.textColor = .white
+            badge.text = "\(discussion.unreadCount)"
+            badge.frame.origin = CGPoint(x: 3, y: 3)
+            badge.sizeToFit()
             cell.contentView.addSubview(badge)
         }
 
@@ -346,13 +413,22 @@ extension ImagesVC : SMAcquireImageDelegate {
             Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
         }
         
+        guard let discussionFileData = createEmptyDiscussion() else {
+            return
+        }
+        
+        let newDiscussion = addLocalDiscussion(newDiscussionData: discussionFileData)
+        
+        let imageFileData = FileData(url: newImageURL, mimeType: mimeType, uuid: nil)
+        let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussion.uuid!)
+        
         // We're making an image that the user of the app added-- we'll generate a new UUID.
-        let newImage = addLocalImage(newImageURL:newImageURL, mimeType:mimeType, title:userName)
+        let newImage = addLocalImage(newImageData: imageData)
         
         scrollIfNeeded(animated:true)
         
         // Sync this new image with the server.
-        syncController.add(image: newImage)
+        syncController.add(image: newImage, discussion: newDiscussion)
     }
 }
 
@@ -405,9 +481,13 @@ extension ImagesVC : CoreDataSourceDelegate {
 }
 
 extension ImagesVC : SyncControllerDelegate {
-    func addLocalImage(syncController:SyncController, url:SMRelativeLocalURL, uuid:String, mimeType:String, title:String?, creationDate: NSDate?) {
+    func addLocalImage(syncController:SyncController, imageData: ImageData) {
         // We're making an image for which there is already a UUID on the server.
-        addLocalImage(newImageURL: url, mimeType: mimeType, uuid:uuid, title:title, creationDate: creationDate)
+        addLocalImage(newImageData: imageData)
+    }
+    
+    func addLocalDiscussion(syncController:SyncController, discussionData: FileData) {
+        addLocalDiscussion(newDiscussionData: discussionData)
     }
     
     func updateUploadedImageDate(uuid: String, creationDate: NSDate) {

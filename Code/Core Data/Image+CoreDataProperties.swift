@@ -2,8 +2,9 @@
 //  Image+CoreDataProperties.swift
 //  SharedImages
 //
-//  Created by Christopher Prince on 6/6/17.
-//  Copyright © 2017 Spastic Muffin, LLC. All rights reserved.
+//  Created by Christopher G Prince on 1/28/18.
+//  Copyright © 2018 Spastic Muffin, LLC. All rights reserved.
+//
 //
 
 import Foundation
@@ -23,5 +24,7 @@ extension Image {
     @NSManaged public var title: String?
     @NSManaged public var urlInternal: NSData?
     @NSManaged public var uuid: String?
+    @NSManaged public var discussionUUID: String?
+    @NSManaged public var discussion: Discussion?
 
 }

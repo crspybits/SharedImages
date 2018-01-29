@@ -26,8 +26,12 @@ struct FixedObjects: Sequence, Equatable {
     typealias ConvertableToJSON = Any
     typealias FixedObject = [String: ConvertableToJSON]
     private var contents = [Element]()
-    private var ids = Set<String>()
+    fileprivate var ids = Set<String>()
     static let idKey = "id"
+    
+    var count: Int {
+        return contents.count
+    }
     
     // Create empty sequence.
     public init() {
@@ -76,6 +80,27 @@ struct FixedObjects: Sequence, Equatable {
         contents += [newFixedObject]
     }
     
+    // Duplicates are ignored-- they are assumed to be identical.
+    // The `new` count is with respect to self: The number of new objects added in the merge from the other.
+    func merge(with otherFixedObjects: FixedObjects) -> (FixedObjects, new: Int) {
+        var mergedResult = FixedObjects()
+        
+        for fixedObject in self {
+            try! mergedResult.add(newFixedObject: fixedObject)
+        }
+        
+        var new = 0
+        for otherFixedObject in otherFixedObjects {
+            let id = otherFixedObject[FixedObjects.idKey] as! String
+            if !ids.contains(id) {
+                try! mergedResult.add(newFixedObject: otherFixedObject)
+                new += 1
+            }
+        }
+        
+        return (mergedResult, new)
+    }
+    
     // Saves current sequence of fixed objects, in JSON format, to the file.
     func save(toFile localURL: URL) throws {
         let data = try getData()
@@ -112,5 +137,11 @@ struct FixedObjects: Sequence, Equatable {
             return false
         }
     }
+}
+
+// Weaker equivalency: Just checks to make sure objects have each have the same ids. Doesn't check other contents of the objects in each.
+infix operator ~~
+func ~~(lhs: FixedObjects, rhs: FixedObjects) -> Bool {
+    return lhs.ids == rhs.ids
 }
 
