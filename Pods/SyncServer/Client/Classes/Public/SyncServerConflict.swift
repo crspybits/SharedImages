@@ -31,6 +31,7 @@ public enum FileDownloadResolution {
         // If you are going to use `rejectFileDownload`, this the typical upload resolution.
         public static let keepAll:UploadResolution = [keepFileUploads, keepUploadDeletions]
         
+        // Remove any conflicting local file uploads and/or upload deletions.
         public static let removeAll = UploadResolution(rawValue: 0)
         
         // Not having this option means to remove your conflicting file uploads

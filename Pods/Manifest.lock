@@ -58,25 +58,25 @@ PODS:
   - SwiftyBeaver (1.5.1)
   - SwiftyDropbox (4.3.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (11.0.0):
+  - SyncServer (11.0.1):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 4.0)
-    - SyncServer/Lite (= 11.0.0)
+    - SyncServer/Lite (= 11.0.1)
   - SyncServer-Shared (4.1.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (11.0.0):
+  - SyncServer/Dropbox (11.0.1):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
     - SyncServer-Shared (~> 4.0)
-  - SyncServer/Facebook (11.0.0):
+  - SyncServer/Facebook (11.0.1):
     - FacebookCore (~> 0.2)
     - FacebookLogin (~> 0.2)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 4.0)
-  - SyncServer/Lite (11.0.0):
+  - SyncServer/Lite (11.0.1):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 4.0)
@@ -90,17 +90,15 @@ DEPENDENCIES:
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - rosterdev (from `https://github.com/RosterHQ/rosterdev.git`)
   - SDCAlertView (~> 7.1)
-  - SyncServer (from `../SyncServer-iOSClient`)
-  - SyncServer/Dropbox (from `../SyncServer-iOSClient`)
-  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
+  - SyncServer (~> 11.0)
+  - SyncServer/Dropbox (~> 11.0)
+  - SyncServer/Facebook (~> 11.0)
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
   rosterdev:
     :git: https://github.com/RosterHQ/rosterdev.git
-  SyncServer:
-    :path: ../SyncServer-iOSClient
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -135,9 +133,9 @@ SPEC CHECKSUMS:
   SMCoreLib: a2b5a175712594a01fab7010118dae2a06489bd0
   SwiftyBeaver: 4f74563624b2c1e821c522c54142b5dd5ebb0f30
   SwiftyDropbox: f70ff647c8ef4195e1314c8a894652f3ba3da526
-  SyncServer: 3afa6467c0a994c811150e63c502ab2ed1e6d391
+  SyncServer: 5d1efa31e8fbdda9d1101f93712ba97315ea2496
   SyncServer-Shared: aa69d8a275616073675f7d9467badd2cd6693f2e
 
-PODFILE CHECKSUM: 83caadb219ba4b90488432d9167c94ddc6368ebb
+PODFILE CHECKSUM: 54b91ea6b082c6dacdc8600e283b278d94308275
 
 COCOAPODS: 1.3.1
