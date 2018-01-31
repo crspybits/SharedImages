@@ -154,16 +154,18 @@ extension SyncController : SyncServerDelegate {
             let (mergedDiscussion, unreadCount) = localDiscussion.merge(with: serverDiscussion)
             let attr = SyncAttributes(fileUUID: downloadedFileAttributes.fileUUID, mimeType: downloadedFileAttributes.mimeType)
             
+            // I'm going to use a new file, just in case we have an error writing.
             let mergeURL = ImageExtras.newJSONFile()
+            
             do {
                 try mergedDiscussion.save(toFile: mergeURL as URL)
+                try FileManager.default.removeItem(at: discussionURL)
                 
                 discussion.url = mergeURL
                 discussion.unreadCount = Int32(unreadCount)
                 CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
 
                 try SyncServer.session.uploadImmutable(localFile: mergeURL, withAttributes: attr)
-                
             } catch (let error) {
                 Log.error("Problems writing merged discussion or uploading: \(error)")
                 uploadConflict.resolveConflict(resolution: errorResolution)
@@ -183,8 +185,14 @@ extension SyncController : SyncServerDelegate {
     func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
         if let appMetaData = attr.appMetaData,
             let jsonDict = jsonStringToDict(appMetaData),
-            let fileTypeString = jsonDict[ImageExtras.appMetaDataFileTypeKey] as? String,
-            let fileType = ImageExtras.FileType(rawValue: fileTypeString) {
+            let fileTypeString = jsonDict[ImageExtras.appMetaDataFileTypeKey] as? String {
+            
+            // If we get to this point, we *do* have a file type.
+            
+            guard let fileType = ImageExtras.FileType(rawValue: fileTypeString) else {
+                Log.error("Unknown file type: \(fileTypeString)")
+                return
+            }
             
             switch fileType {
             case .discussion:

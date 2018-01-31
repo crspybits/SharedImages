@@ -331,7 +331,6 @@ class ImagesVC: UIViewController {
     }
     
     func removeLocalImages(uuids:[String]) {
-        // TODO: Need to remove associated discussion(s) too.
         ImageExtras.removeLocalImages(uuids:uuids)
     }
     
@@ -427,7 +426,7 @@ extension ImagesVC : SMAcquireImageDelegate {
         
         scrollIfNeeded(animated:true)
         
-        // Sync this new image with the server.
+        // Sync this new image & discussion with the server.
         syncController.add(image: newImage, discussion: newDiscussion)
     }
 }

@@ -65,7 +65,8 @@ class ImageExtras {
 
         return CGSize(width: originalSize.width * aspectRatio, height: originalSize.height * aspectRatio)
     }
-
+    
+    // Also removes associated discussions.
     static func removeLocalImages(uuids:[String]) {        
         for uuid in uuids {
             guard let image = Image.fetchObjectWithUUID(uuid: uuid) else {
