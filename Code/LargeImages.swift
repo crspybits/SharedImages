@@ -187,11 +187,24 @@ extension LargeImages : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
         
-        if let syncController = syncController {
-            cell.setProperties(image: self.coreDataSource.object(at: indexPath) as! Image, syncController: syncController, cache: imageCache)
+        if let syncController = syncController,
+            let image = self.coreDataSource.object(at: indexPath) as? Image {
+            cell.setProperties(image: image, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
+                self.showDiscussionIfPresent(image: image)
+            })
         }
         
         return cell
+    }
+    
+    func showDiscussionIfPresent(image: Image) {
+        guard let discussion = image.discussion,
+            let url = discussion.url else {
+            return
+        }
+        
+        let discussionModal = DiscussionVC()
+        discussionModal.show(fromParentVC: self, fixedObjectsURL: url as URL)
     }
 }
 

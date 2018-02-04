@@ -40,6 +40,9 @@ public class ServerConstants {
 
     // Used for some Account types (e.g., Facebook)
     public static let httpResponseOAuth2AccessTokenKey = "syncserver-access-token"
+    
+    // The value of this key is a "X.Y.Z" version string.
+    public static let httpResponseCurrentServerVersion = "syncserver-version"
 
     public enum AuthTokenType : String {
         case GoogleToken

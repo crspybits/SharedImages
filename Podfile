@@ -7,17 +7,20 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 11.0'
-	pod 'SyncServer/Facebook', '~> 11.0'
-	pod 'SyncServer/Dropbox', '~> 11.0'
+# 	pod 'SyncServer', '~> 11.0'
+# 	pod 'SyncServer/Facebook', '~> 11.0'
+# 	pod 'SyncServer/Dropbox', '~> 11.0'
 	
-# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
 	
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 	
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
+
+	# For a discussion thread on images
+	pod 'MessageKit', '~> 0.13'
 
 	# Using my fork because of changes I made
 	pod 'ODRefreshControl', :git => 'https://github.com/crspybits/ODRefreshControl.git'

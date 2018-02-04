@@ -11,7 +11,6 @@ import SMCoreLib
 import SyncServer
 import ODRefreshControl
 import LottiesBottom
-import BadgeSwift
 
 class ImagesVC: UIViewController {
     let reuseIdentifier = "ImageIcon"
@@ -383,15 +382,6 @@ extension ImagesVC : UICollectionViewDataSource {
         cell.setProperties(image: imageObj, syncController: syncController, cache: imageCache)
         
         showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
-        
-        if let discussion = imageObj.discussion, discussion.unreadCount > 0 {
-            let badge = BadgeSwift()
-            badge.textColor = .white
-            badge.text = "\(discussion.unreadCount)"
-            badge.frame.origin = CGPoint(x: 3, y: 3)
-            badge.sizeToFit()
-            cell.contentView.addSubview(badge)
-        }
 
         return cell
     }

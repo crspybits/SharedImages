@@ -33,6 +33,12 @@ struct FixedObjects: Sequence, Equatable {
         return contents.count
     }
     
+    subscript(index: Int) -> FixedObject {
+        get {
+            return contents[index]
+        }
+    }
+    
     // Create empty sequence.
     public init() {
     }

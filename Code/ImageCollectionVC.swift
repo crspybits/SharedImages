@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SMCoreLib
+import BadgeSwift
 
 protocol LargeImageCellDelegate : class {
     func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize)
@@ -35,6 +36,9 @@ class ImageCollectionVC : UICollectionViewCell {
     
     weak var delegate:LargeImageCellDelegate?
     var originalSize:CGSize!
+    let badge = BadgeSwift()
+    var tapGesture: UITapGestureRecognizer?
+    var imageTapBehavior:(()->())?
     
     private var selectedImage:UIImageView!
     var userSelected:Bool = false {
@@ -70,9 +74,10 @@ class ImageCollectionVC : UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         switchedToFullScaleImageForZooming = false
+        badge.removeFromSuperview()
     }
     
-    func setProperties(image:Image, syncController:SyncController, cache: LRUCache<Image>) {
+    func setProperties(image:Image, syncController:SyncController, cache: LRUCache<Image>, imageTapBehavior:(()->())? = nil) {
         self.image = image
 
         self.syncController = syncController
@@ -82,6 +87,34 @@ class ImageCollectionVC : UICollectionViewCell {
         scrollView?.zoomScale = 1.0
         scrollView?.maximumZoomScale = 6.0
         scrollView?.delegate = self
+        
+        self.imageTapBehavior = imageTapBehavior
+
+        if let discussion = image.discussion {
+            title.textColor = UIColor(red: 0.0/255.0, green: 191.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+            
+            if let _ = imageTapBehavior, tapGesture == nil {
+                tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureAction))
+                
+                // Putting this on the scrollView and not the imageView because the tap is not recognized if I put it on the imageView.
+                scrollView?.addGestureRecognizer(tapGesture!)
+            }
+
+            if discussion.unreadCount > 0 {
+                badge.textColor = .white
+                badge.text = "\(discussion.unreadCount)"
+                badge.frame.origin = CGPoint(x: 3, y: 3)
+                badge.sizeToFit()
+                contentView.addSubview(badge)
+            }
+        }
+        else {
+            title.textColor = UIColor.black
+        }
+    }
+    
+    @objc private func tapGestureAction() {
+        imageTapBehavior?()
     }
     
     // I had problems knowing when the cell was sized correctly so that I could call `ImageStorage.getImage`. `layoutSubviews` seems to not be the right place. And neither is `setProperties` (which gets called by cellForItemAt). When the UICollectionView is first displayed, I get small sizes (less than 1/2 of correct sizes) at least on iPad. Odd.

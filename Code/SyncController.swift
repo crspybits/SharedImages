@@ -294,11 +294,18 @@ extension SyncController : SyncServerDelegate {
         switch error {
         case .noNetworkError:
             SMCoreLib.Alert.show(withTitle: "The network connection was lost!", message: "Please try again later.")
+            
+        case .badServerVersion(let actualServerVersion):
+            let version = actualServerVersion == nil ? "nil" : actualServerVersion!.rawValue
+            SMCoreLib.Alert.show(withTitle: "Bad server version", message: "actualServerVersion: \(version)")
+            
         default:
             break
         }
         
-        delegate.syncEvent(syncController: self, event: .syncError)
+        if let delegate = delegate {
+            delegate.syncEvent(syncController: self, event: .syncError)
+        }
     }
 
 #if DEBUG
