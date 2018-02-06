@@ -198,13 +198,15 @@ extension LargeImages : UICollectionViewDataSource {
     }
     
     func showDiscussionIfPresent(image: Image) {
-        guard let discussion = image.discussion,
-            let url = discussion.url else {
+        guard let discussion = image.discussion else {
             return
         }
         
         let discussionModal = DiscussionVC()
-        discussionModal.show(fromParentVC: self, fixedObjectsURL: url as URL)
+        discussionModal.show(fromParentVC: self, discussion:discussion, delegate: self) { [unowned self] in
+            // To clear the unread count.
+            self.collectionView.reloadData()
+        }
     }
 }
 
@@ -252,5 +254,11 @@ extension LargeImages : LargeImageCellDelegate {
                 }
             }
         }
+    }
+}
+
+extension LargeImages : DiscussionVCDelegate {
+        func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
+        syncController?.update(discussion: changedDiscussion)
     }
 }

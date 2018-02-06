@@ -9,6 +9,11 @@
 import UIKit
 import MessageKit
 import SMCoreLib
+import SyncServer
+
+protocol DiscussionVCDelegate {
+    func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion)
+}
 
 class DiscussionVC: MessagesViewController {
     private var fixedObjectsURL: URL!
@@ -16,6 +21,10 @@ class DiscussionVC: MessagesViewController {
     private var changeFrameTd:ChangeFrameTransitioningDelegate!
     var parentVC: UIViewController!
     private var closeHandler:(()->())?
+    private var senderUserDisplayName:String!
+    private var senderUserId:String!
+    private var delegate:DiscussionVCDelegate!
+    private var discussion: Discussion!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,14 +39,28 @@ class DiscussionVC: MessagesViewController {
         maintainPositionOnKeyboardFrameChanged = true // default false
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        view.frame.size = size
+    }
+    
     // `closeHandler` gets called when the ModalVC gets closed.
     // Returns false iff the show failed.
     @discardableResult
-    func show(fromParentVC parentVC: UIViewController, fixedObjectsURL: URL, usingNavigationController: Bool = true, closeHandler:(()->())? = nil) -> Bool {
+    func show(fromParentVC parentVC: UIViewController, discussion: Discussion, delegate:DiscussionVCDelegate, usingNavigationController: Bool = true, closeHandler:(()->())? = nil) -> Bool {
+    
         self.parentVC = parentVC
         self.closeHandler = closeHandler
+        self.delegate = delegate
+        self.discussion = discussion
         
-        self.fixedObjectsURL = fixedObjectsURL
+        guard let url = discussion.url else {
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Problem loading messages", message: "The discussion had no URL!")
+            return false
+        }
+        
+        self.fixedObjectsURL = url as URL
         fixedObjects = FixedObjects(withFile: fixedObjectsURL)
         
         // Make sure that the file format containing the messages hasn't changed.
@@ -48,6 +71,20 @@ class DiscussionVC: MessagesViewController {
                 return false
             }
         }
+        
+        guard let username = SyncServerUser.session.creds?.username else {
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Alert!", message: "No user name for messages!")
+            return false
+        }
+        
+        senderUserDisplayName = username
+        
+        guard let userId = SyncServerUser.session.syncServerUserId else {
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Alert!", message: "No user id for messages!")
+            return false
+        }
+        
+        senderUserId = userId
         
         var vcToPresent: UIViewController = self
         
@@ -62,7 +99,12 @@ class DiscussionVC: MessagesViewController {
         vcToPresent.modalPresentationStyle = .custom
         vcToPresent.transitioningDelegate = changeFrameTd
         vcToPresent.modalTransitionStyle = .coverVertical
+        
         parentVC.present(vcToPresent, animated: true, completion: nil)
+        
+        discussion.unreadCount = 0
+        discussion.save()
+        
         return true
     }
     
@@ -77,6 +119,17 @@ class DiscussionVC: MessagesViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         closeHandler?()
+    }
+    
+    func getInitialsFromSenderDisplayName(sender: Sender) -> String {
+        var initials = ""
+        let usernameComponents = sender.displayName.components(separatedBy: " ")
+        for namePart in usernameComponents {
+            let initial = String(namePart[namePart.startIndex])
+            initials += initial
+        }
+        
+        return initials
     }
 }
 
@@ -107,8 +160,8 @@ extension DiscussionVC: MessagesDisplayDelegate {
     }
 
     func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
-        // TODO: Get the initials.
-        let avatar = Avatar(initials: "S")
+        let initials = getInitialsFromSenderDisplayName(sender: message.sender)
+        let avatar = Avatar(initials: initials)
         avatarView.set(avatar: avatar)
     }
 }
@@ -155,9 +208,8 @@ extension DiscussionVC: MessagesLayoutDelegate {
 }
 
 extension DiscussionVC: MessagesDataSource {
-    func currentSender() -> Sender {
-        // TODO: How do we get a unique id here? How do we get a name here?
-        return Sender(id: "654321", displayName: "Steven")
+    func currentSender() -> Sender {        
+        return Sender(id: senderUserId, displayName: senderUserDisplayName)
     }
 
     func numberOfMessages(in messagesCollectionView: MessagesCollectionView) -> Int {
@@ -214,6 +266,8 @@ extension DiscussionVC: MessageInputBarDelegate {
                 }
                 
                 messagesCollectionView.insertSections([fixedObjects.count - 1])
+                
+                delegate.discussionVC(self, changedDiscussion: discussion)
             }
         }
         

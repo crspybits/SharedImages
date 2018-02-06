@@ -43,6 +43,9 @@ class ImagesVC: UIViewController {
     
     private var deletedImages:[IndexPath]?
     
+    // Does the app have discussions yet?
+    private static let discussions = SMPersistItemBool(name: "ImagesVC.discussions", initialBoolValue: false, persistType: .userDefaults)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
@@ -218,6 +221,9 @@ class ImagesVC: UIViewController {
         // If we navigated to the large images and are just coming back now, don't bother with the scrolling.
         if navigatedToLargeImages {
             navigatedToLargeImages = false
+            
+            // To clear unread count(s).
+            collectionView.reloadData()
         }
         else {
             scrollIfNeeded(animated: true)
@@ -522,6 +528,12 @@ extension ImagesVC : SyncControllerDelegate {
             
             self.bottomAnimation.reset()
             
+            // So that we don't get a whole bunch of unread counts the first time we download the data.
+            if !ImagesVC.discussions.boolValue {
+                ImagesVC.discussions.boolValue = true
+                resetUnreadCounts()
+            }
+            
         case .syncError:
             self.spinner.stop(withBackgroundColor: .red)
         }
@@ -531,6 +543,16 @@ extension ImagesVC : SyncControllerDelegate {
     
     func completedAddingLocalImages() {
         scrollIfNeeded(animated: true)
+    }
+    
+    private func resetUnreadCounts() {
+        let discussions = Discussion.fetchAll()
+        discussions.forEach { discussion in
+            discussion.unreadCount = 0
+        }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        collectionView.reloadData()
     }
 }
 

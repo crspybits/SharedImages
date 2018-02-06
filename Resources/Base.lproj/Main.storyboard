@@ -323,10 +323,10 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p1e-vt-Zhp">
-                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="394"/>
+                                                    <rect key="frame" x="0.0" y="20" width="375" height="374"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ehS-fV-uhh">
-                                                            <rect key="frame" x="0.0" y="0.0" width="375" height="427"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="375" height="407"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                         </imageView>
                                                     </subviews>
@@ -355,7 +355,7 @@
                                             <constraint firstAttribute="bottom" secondItem="v3d-KG-LOK" secondAttribute="bottom" constant="30" id="3c5-Qm-ayu"/>
                                             <constraint firstAttribute="trailing" secondItem="v3d-KG-LOK" secondAttribute="trailing" id="NQR-Od-zPE"/>
                                             <constraint firstItem="v3d-KG-LOK" firstAttribute="top" secondItem="p1e-vt-Zhp" secondAttribute="bottom" constant="1" id="TLq-Vc-f3g"/>
-                                            <constraint firstItem="p1e-vt-Zhp" firstAttribute="top" secondItem="jFk-xt-pcJ" secondAttribute="top" id="b5l-TK-ovf"/>
+                                            <constraint firstItem="p1e-vt-Zhp" firstAttribute="top" secondItem="jFk-xt-pcJ" secondAttribute="top" constant="20" id="b5l-TK-ovf"/>
                                             <constraint firstItem="v3d-KG-LOK" firstAttribute="leading" secondItem="jFk-xt-pcJ" secondAttribute="leading" id="dHF-oi-vjB"/>
                                             <constraint firstAttribute="trailing" secondItem="p1e-vt-Zhp" secondAttribute="trailing" id="hUP-4i-uI3"/>
                                             <constraint firstItem="p1e-vt-Zhp" firstAttribute="leading" secondItem="jFk-xt-pcJ" secondAttribute="leading" id="tPE-Fl-e0Q"/>

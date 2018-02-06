@@ -8,6 +8,9 @@ Version 0.12.0
 		- Presenting this UI in a modal
 		- Requiring minimum server version so I don't corrupt the existing production server
 		- Using badges on image in UI to indicate unread discussion messages.
+		- Utilizing syncServerUserId, user display name, and user initials in MessageKit
+		- Updated terminology in upload/download progress indicator
+		- Added a close icon
 		
 Version 0.11.0 (1/7/18)
 	* Fixed crash issue-- when returning to large images screen.

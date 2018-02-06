@@ -114,6 +114,17 @@ class SyncController {
         }
     }
     
+    func update(discussion: Discussion) {
+        let discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussion.mimeType!)
+        
+        do {
+            try SyncServer.session.uploadImmutable(localFile: discussion.url!, withAttributes: discussionAttr)
+            SyncServer.session.sync()
+        } catch (let error) {
+            Log.error("An error occurred: \(error)")
+        }
+    }
+    
     // Also removes associated discussions, on the server.
     func remove(images:[Image]) -> Bool {        
         let imageUuids = images.map({$0.uuid!})
@@ -182,14 +193,28 @@ extension SyncController : SyncServerDelegate {
         }
     }
     
-    func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
-        if let appMetaData = attr.appMetaData,
+    func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, ImageExtras.FileType?) {
+    
+        if let appMetaData = appMetaData,
             let jsonDict = jsonStringToDict(appMetaData),
             let fileTypeString = jsonDict[ImageExtras.appMetaDataFileTypeKey] as? String {
             
-            // If we get to this point, we *do* have a file type.
+            if let fileType = ImageExtras.FileType(rawValue: fileTypeString) {
+                return (fileTypeString, fileType)
+            }
             
-            guard let fileType = ImageExtras.FileType(rawValue: fileTypeString) else {
+            return (fileTypeString, nil)
+        }
+        
+        return (nil, nil)
+    }
+    
+    func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
+    
+        let (fileTypeString, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
+        
+        if let fileTypeString = fileTypeString {
+            guard let fileType = fileType else {
                 Log.error("Unknown file type: \(fileTypeString)")
                 return
             }
@@ -344,7 +369,7 @@ extension SyncController : SyncServerDelegate {
             // })
             // TESTING
             
-            progressIndicator = ProgressIndicator(imagesToDownload: numberFileDownloads, imagesToDelete: numberDownloadDeletions, withStopHandler: {
+            progressIndicator = ProgressIndicator(filesToDownload: numberFileDownloads, filesToDelete: numberDownloadDeletions, withStopHandler: {
                 SyncServer.session.stopSync()
             })
             progressIndicator.show()
@@ -362,14 +387,20 @@ extension SyncController : SyncServerDelegate {
             numberUploadedSoFar = 0
             progressIndicator?.dismiss()
             
-            progressIndicator = ProgressIndicator(imagesToUpload: numberFileUploads, imagesToUploadDelete: numberUploadDeletions, withStopHandler: {
+            progressIndicator = ProgressIndicator(filesToUpload: numberFileUploads, filesToUploadDelete: numberUploadDeletions, withStopHandler: {
                 SyncServer.session.stopSync()
             })
 
             progressIndicator.show()
             
         case .singleFileUploadComplete(attr: let attr):
-            delegate.updateUploadedImageDate(uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
+            let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
+            if fileType == nil || fileType == .image {
+                // Include the nil case because files without types are images-- i.e., they were created before we started typing files in the meta data.
+                Log.msg("fileType: \(String(describing: fileType))")
+                delegate.updateUploadedImageDate(uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
+            }
+            
             updateUploadProgress()
             
         case .singleUploadDeletionComplete:

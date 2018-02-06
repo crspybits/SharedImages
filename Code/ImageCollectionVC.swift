@@ -103,9 +103,10 @@ class ImageCollectionVC : UICollectionViewCell {
             if discussion.unreadCount > 0 {
                 badge.textColor = .white
                 badge.text = "\(discussion.unreadCount)"
-                badge.frame.origin = CGPoint(x: 3, y: 3)
+                let padding:CGFloat = 3
+                badge.frame.origin = CGPoint(x: padding, y: padding)
                 badge.sizeToFit()
-                contentView.addSubview(badge)
+                imageView.addSubview(badge)
             }
         }
         else {

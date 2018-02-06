@@ -21,6 +21,7 @@ So, in terms of SyncServer and conflicts, resolving a conflict between a file do
 */
 
 import Foundation
+import SMCoreLib
 
 struct FixedObjects: Sequence, Equatable {
     typealias ConvertableToJSON = Any
@@ -49,6 +50,8 @@ struct FixedObjects: Sequence, Equatable {
         
         do {
             let data = try Data(contentsOf: localURL)
+            let jsonString = String(data: data, encoding: .utf8)
+            Log.msg("json: \(String(describing: jsonString))")
             jsonObject = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: 0))
         } catch {
             return nil

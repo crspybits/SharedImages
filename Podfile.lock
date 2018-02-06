@@ -62,25 +62,25 @@ PODS:
   - SyncServer (11.0.1):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
-    - SyncServer-Shared (~> 4.0)
+    - SyncServer-Shared (~> 4.3)
     - SyncServer/Lite (= 11.0.1)
-  - SyncServer-Shared (4.2.0):
+  - SyncServer-Shared (4.3.0):
     - Gloss (~> 1.2)
   - SyncServer/Dropbox (11.0.1):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
-    - SyncServer-Shared (~> 4.0)
+    - SyncServer-Shared (~> 4.3)
   - SyncServer/Facebook (11.0.1):
     - FacebookCore (~> 0.2)
     - FacebookLogin (~> 0.2)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
-    - SyncServer-Shared (~> 4.0)
+    - SyncServer-Shared (~> 4.3)
   - SyncServer/Lite (11.0.1):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
-    - SyncServer-Shared (~> 4.0)
+    - SyncServer-Shared (~> 4.3)
 
 DEPENDENCIES:
   - BadgeSwift (~> 5.0)
@@ -138,8 +138,8 @@ SPEC CHECKSUMS:
   SMCoreLib: a2b5a175712594a01fab7010118dae2a06489bd0
   SwiftyBeaver: 4f74563624b2c1e821c522c54142b5dd5ebb0f30
   SwiftyDropbox: f70ff647c8ef4195e1314c8a894652f3ba3da526
-  SyncServer: 9b2f722433735d9af6f48b703779b54b7e74dc00
-  SyncServer-Shared: 9f44484412971b358d948363842866122589db05
+  SyncServer: d5fe70f16b180ae4c1c380dd51ae11e77d8eded5
+  SyncServer-Shared: 94b2e89b798ca9246beb4b2cb6c2ea5912f1c1bb
 
 PODFILE CHECKSUM: b1358d12416b239c998ba006f2f863c7b7f50750
 
