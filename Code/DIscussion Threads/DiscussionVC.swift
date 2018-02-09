@@ -18,7 +18,6 @@ protocol DiscussionVCDelegate {
 class DiscussionVC: MessagesViewController {
     private var fixedObjectsURL: URL!
     private var fixedObjects:FixedObjects!
-    private var changeFrameTd:ChangeFrameTransitioningDelegate!
     var parentVC: UIViewController!
     private var closeHandler:(()->())?
     private var senderUserDisplayName:String!
@@ -37,12 +36,6 @@ class DiscussionVC: MessagesViewController {
         messageInputBar.sendButton.tintColor = UIColor(red: 69/255, green: 193/255, blue: 89/255, alpha: 1)
         scrollsToBottomOnKeybordBeginsEditing = true // default false
         maintainPositionOnKeyboardFrameChanged = true // default false
-    }
-    
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        
-        view.frame.size = size
     }
     
     // `closeHandler` gets called when the ModalVC gets closed.
@@ -86,21 +79,16 @@ class DiscussionVC: MessagesViewController {
         
         senderUserId = userId
         
-        var vcToPresent: UIViewController = self
+        let barButton = UIBarButtonItem(image: #imageLiteral(resourceName: "close"), style: .plain, target: self, action: #selector(close))
+        navigationItem.rightBarButtonItem = barButton
+        let nav = UINavigationController(rootViewController: self)
         
-        if usingNavigationController {
-            let barButton = UIBarButtonItem(image: #imageLiteral(resourceName: "close"), style: .plain, target: self, action: #selector(close))
-            
-            navigationItem.rightBarButtonItem = barButton
-            vcToPresent = UINavigationController(rootViewController: self)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            nav.modalTransitionStyle = .coverVertical
+            nav.modalPresentationStyle = .formSheet
         }
         
-        changeFrameTd = ChangeFrameTransitioningDelegate(frame: view.frame)
-        vcToPresent.modalPresentationStyle = .custom
-        vcToPresent.transitioningDelegate = changeFrameTd
-        vcToPresent.modalTransitionStyle = .coverVertical
-        
-        parentVC.present(vcToPresent, animated: true, completion: nil)
+        parentVC.present(nav, animated: true, completion: nil)
         
         discussion.unreadCount = 0
         discussion.save()
@@ -109,7 +97,7 @@ class DiscussionVC: MessagesViewController {
     }
     
     @objc func close() {
-        changeFrameTd.close()
+        dismiss(animated: true, completion: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
