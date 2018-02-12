@@ -100,17 +100,59 @@ public struct EventDesired: OptionSet {
     }
 }
 
+public struct ServerVersion {
+    public let rawValue: String
+    let major:Int
+    let minor:Int
+    let patch:Int
+    
+    // Format: X.Y.Z, where X, Y, and Z are integers.
+    public init?(rawValue: String) {
+        self.rawValue = rawValue
+        
+        let components = rawValue.components(separatedBy: ".")
+        guard components.count == 3 else {
+            return nil
+        }
+        
+        guard let c1 = Int(components[0]),
+            let c2 = Int(components[1]),
+            let c3 = Int(components[2]) else {
+            return nil
+        }
+        
+        major = c1
+        minor = c2
+        patch = c3
+    }
+
+    // e.g., ServerVersion(rawValue: "1.2.3") < ServerVersion(rawValue: "2.0.0")
+    public static func <(lhs: ServerVersion, rhs: ServerVersion) -> Bool {
+        if lhs.major < rhs.major {
+            return true
+        }
+        else if lhs.major == rhs.major && lhs.minor < rhs.minor {
+            return true
+        } else if lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch < rhs.patch {
+            return true
+        }
+        
+        return false
+    }
+}
+
 // Except as noted, these delegate methods are called on the main thread.
 
 public protocol SyncServerDelegate : class {
     // The client has to decide how to resolve the file-download conflicts. The resolveConflict method of the SyncServerConflict must be called. The statements below apply for the SMRelativeLocalURL's.
     // Not called on the main thread. You must call the conflict resolution callbacks on the same thread as this was called on.
+    // The `syncServerSingleFileDownloadComplete` will be called after, if you allow the download to continue. i.e., if you use acceptFileDownload of FileDownloadResolution.
     func syncServerMustResolveFileDownloadConflict(downloadedFile: SMRelativeLocalURL, downloadedFileAttributes: SyncAttributes, uploadConflict: SyncServerConflict<FileDownloadResolution>)
     
     /* Called at the end of a single download, on non-error conditions.
-    The client owns the file referenced by the url after this call completes. This file is temporary in the sense that it will not be backed up to iCloud, could be removed when the device or app is restarted, and should be moved to a more permanent location.
+    The client owns the file referenced by the url after this call completes. This file is temporary in the sense that it will not be backed up to iCloud, could be removed when the device or app is restarted, and should be copied and/or moved to a more permanent location.
     Client should replace their existing data with that from the given file.
-    This method doesn't get called for a particular download if (a) there is a conflict and (b) the client resolves that conflict by using `keepConflictingClientOperations`.
+    This method doesn't get called for a particular download if (a) there is a conflict and (b) the client resolves that conflict by using .rejectFileDownload
     */
     func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes)
 
@@ -120,6 +162,7 @@ public protocol SyncServerDelegate : class {
     typealias DownloadDeletionConflict = (downloadDeletion: SyncAttributes, uploadConflict: SyncServerConflict<DownloadDeletionResolution>)
     
     // The number of elements in this array reflects the number of conflicts in the download deletions. E.g., if there is only a single download deletion, there can be at most one conflict.
+    // `syncServerShouldDoDeletions` will be called after this if you allow the deletion(s) to continue.
     func syncServerMustResolveDownloadDeletionConflicts(conflicts:[DownloadDeletionConflict])
     
     // Called when deletions have been received from the server. I.e., these files have been deleted on the server. This is received/called in an atomic manner: This reflects a snapshot state of file deletions on the server. Clients should delete the files referenced by the SyncAttributes's (i.e., the UUID's).

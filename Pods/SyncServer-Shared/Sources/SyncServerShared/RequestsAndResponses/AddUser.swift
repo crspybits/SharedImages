@@ -31,11 +31,16 @@ public class AddUserRequest : NSObject, RequestMessage {
 }
 
 public class AddUserResponse : ResponseMessage {
+    // Present only as means to help clients uniquely identify users. This is *never* passed back to the server. This id is unique across all users and is not specific to any sign-in type (e.g., Google).
+    public static let userIdKey = "userId"
+    public var userId:UserId!
+    
     public var responseType: ResponseType {
         return .json
     }
     
     public required init?(json: JSON) {
+        userId = Decoder.decode(int64ForKey: AddUserResponse.userIdKey)(json)
     }
     
     public convenience init?() {
@@ -45,6 +50,7 @@ public class AddUserResponse : ResponseMessage {
     // MARK: - Serialization
     public func toJSON() -> JSON? {
         return jsonify([
+            AddUserResponse.userIdKey ~~> userId
         ])
     }
 }

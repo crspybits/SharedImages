@@ -187,11 +187,26 @@ extension LargeImages : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
         
-        if let syncController = syncController {
-            cell.setProperties(image: self.coreDataSource.object(at: indexPath) as! Image, syncController: syncController, cache: imageCache)
+        if let syncController = syncController,
+            let image = self.coreDataSource.object(at: indexPath) as? Image {
+            cell.setProperties(image: image, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
+                self.showDiscussionIfPresent(image: image)
+            })
         }
         
         return cell
+    }
+    
+    func showDiscussionIfPresent(image: Image) {
+        guard let discussion = image.discussion else {
+            return
+        }
+        
+        let discussionModal = DiscussionVC()
+        discussionModal.show(fromParentVC: self, discussion:discussion, delegate: self) { [unowned self] in
+            // To clear the unread count.
+            self.collectionView.reloadData()
+        }
     }
 }
 
@@ -238,6 +253,26 @@ extension LargeImages : LargeImageCellDelegate {
                     invalidateLayout(withAnimation: true)
                 }
             }
+        }
+    }
+}
+
+extension LargeImages : DiscussionVCDelegate {
+    func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
+        syncController?.update(discussion: changedDiscussion)
+    }
+    
+    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion) {
+        collectionView.reloadData()
+    }
+    
+    func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?) {
+        syncController?.sync() {
+            // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
+            discussion.unreadCount = 0
+            discussion.save()
+            
+            refreshWithCompletion?()
         }
     }
 }

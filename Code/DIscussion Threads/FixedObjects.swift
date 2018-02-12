@@ -21,13 +21,24 @@ So, in terms of SyncServer and conflicts, resolving a conflict between a file do
 */
 
 import Foundation
+import SMCoreLib
 
 struct FixedObjects: Sequence, Equatable {
     typealias ConvertableToJSON = Any
     typealias FixedObject = [String: ConvertableToJSON]
     private var contents = [Element]()
-    private var ids = Set<String>()
+    fileprivate var ids = Set<String>()
     static let idKey = "id"
+    
+    var count: Int {
+        return contents.count
+    }
+    
+    subscript(index: Int) -> FixedObject {
+        get {
+            return contents[index]
+        }
+    }
     
     // Create empty sequence.
     public init() {
@@ -39,6 +50,8 @@ struct FixedObjects: Sequence, Equatable {
         
         do {
             let data = try Data(contentsOf: localURL)
+            let jsonString = String(data: data, encoding: .utf8)
+            Log.msg("json: \(String(describing: jsonString))")
             jsonObject = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: 0))
         } catch {
             return nil
@@ -74,6 +87,27 @@ struct FixedObjects: Sequence, Equatable {
         
         ids.insert(newId)
         contents += [newFixedObject]
+    }
+    
+    // Duplicates are ignored-- they are assumed to be identical.
+    // The `new` count is with respect to self: The number of new objects added in the merge from the other.
+    func merge(with otherFixedObjects: FixedObjects) -> (FixedObjects, new: Int) {
+        var mergedResult = FixedObjects()
+        
+        for fixedObject in self {
+            try! mergedResult.add(newFixedObject: fixedObject)
+        }
+        
+        var new = 0
+        for otherFixedObject in otherFixedObjects {
+            let id = otherFixedObject[FixedObjects.idKey] as! String
+            if !ids.contains(id) {
+                try! mergedResult.add(newFixedObject: otherFixedObject)
+                new += 1
+            }
+        }
+        
+        return (mergedResult, new)
     }
     
     // Saves current sequence of fixed objects, in JSON format, to the file.
@@ -112,5 +146,11 @@ struct FixedObjects: Sequence, Equatable {
             return false
         }
     }
+}
+
+// Weaker equivalency: Just checks to make sure objects have each have the same ids. Doesn't check other contents of the objects in each.
+infix operator ~~
+func ~~(lhs: FixedObjects, rhs: FixedObjects) -> Bool {
+    return lhs.ids == rhs.ids
 }
 

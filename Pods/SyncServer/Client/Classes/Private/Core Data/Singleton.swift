@@ -24,15 +24,4 @@ public class Singleton: NSManagedObject, CoreDataSingleton, AllOperations {
         singleton.nextFileTrackerAge = 0
         return singleton
     }
-    
-    // Also increments the age afterwards.
-    public func getNextFileTrackerAge() -> Int64 {
-        var result:Int64!
-        Synchronized.block(self) {
-            result = nextFileTrackerAge
-            nextFileTrackerAge += 1
-        }
-        
-        return result
-    }
 }

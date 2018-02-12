@@ -263,7 +263,21 @@ class Upload {
                     
                     // 1/27/18; See [2] below.
 
-                    let attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:nextToUpload.mimeType!, creationDate: creationDate, updateDate: updateDate)
+                    var attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:nextToUpload.mimeType!, creationDate: creationDate, updateDate: updateDate)
+                    
+                    // `nextToUpload.appMetaData` may be nil because the client isn't making a change to the appMetaData.
+                    var appMetaData:String?
+                    if let amd = nextToUpload.appMetaData {
+                        appMetaData = amd
+                    }
+                    else {
+                        // See if the directory entry has any appMetaData
+                        if let dirEnt = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID), let amd = dirEnt.appMetaData {
+                            appMetaData = amd
+                        }
+                    }
+                    
+                    attr.appMetaData = appMetaData
                     completionResult = .fileUploaded(attr)
                 }
                 

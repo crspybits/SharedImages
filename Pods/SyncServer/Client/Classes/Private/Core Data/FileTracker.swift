@@ -36,7 +36,12 @@ public class FileTracker: NSManagedObject, Filenaming, FileUUID {
     }
     
     // Only call this when creating an object.
+    // 1/28/18; I used to have this in the Singleton itself, but ran into a really odd infinite loop.
     public func addAge() {
-        age = Singleton.get().getNextFileTrackerAge()
+        let singleton = Singleton.get()
+        Synchronized.block(singleton) {
+            age = singleton.nextFileTrackerAge
+            singleton.nextFileTrackerAge += 1
+        }
     }
 }

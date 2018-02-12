@@ -12,7 +12,12 @@ public enum SyncServerError: Error {
     // The network connection was lost.
     case noNetworkError
     
+    // The minimum server version you gave in `appLaunchSetup` was not met. Immediately this is raised as an error, the SyncServer client stops operating.
+    case badServerVersion(actualServerVersion: ServerVersion?)
+    
     case mimeTypeOfFileChanged
+    case noMimeType
+    case downloadedFileVersionNotGreaterThanCurrent
     case fileAlreadyDeleted
     case fileQueuedForDeletion
     case deletingUnknownFile
@@ -26,7 +31,8 @@ public enum SyncServerError: Error {
     case couldNotCreateRequest
     case didNotGetDownloadURL
     case couldNotMoveDownloadFile
-    case couldNotCreateNewFileForDownload
+    case couldNotCreateNewFile
+    case couldNotRemoveFileTracker
     case obtainedAppMetaDataButWasNotString
     case noExpectedResultKey
     case nilResponse
@@ -38,8 +44,10 @@ public enum SyncServerError: Error {
     case couldNotGetHTTPURLResponse
     case non200StatusCode(Int)
     case badCheckCreds
+    case badAddUser
     case unknownServerError
     case coreDataError(Error)
+    case fileManagerError(Error)
     case generic(String)
     
 #if TEST_REFRESH_FAILURE

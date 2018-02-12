@@ -23,6 +23,19 @@ public class SyncServerUser {
         }
     }
     
+    // Persisting this in the keychain for security-- I'd rather this identifier wasn't known to more folks than need it.
+    static let syncServerUserId = SMPersistItemString(name: "SyncServerUser.syncServerUserId", initialStringValue: "", persistType: .keyChain)
+    
+    // A unique identifier for the user on the SyncServer system. If creds are set this will be set.
+    public var syncServerUserId:String? {
+        if SyncServerUser.syncServerUserId.stringValue == "" {
+            return nil
+        }
+        else {
+            return SyncServerUser.syncServerUserId.stringValue
+        }
+    }
+    
     public static let session = SyncServerUser()
     
     func appLaunchSetup() {
@@ -67,7 +80,7 @@ public class SyncServerUser {
         
         Log.msg("SignInCreds: \(creds)")
         
-        ServerAPI.session.checkCreds { (checkCredsResult, error) in
+        ServerAPI.session.checkCreds {[unowned self] (checkCredsResult, error) in
             var checkForUserResult:CheckForExistingUserResult?
             var errorResult:Error? = error
             
@@ -87,11 +100,13 @@ public class SyncServerUser {
                 
                 checkForUserResult = .noUser
                 
-            case .some(.owningUser):
+            case .some(.owningUser(let syncServerUserId)):
                 checkForUserResult = .owningUser
+                SyncServerUser.syncServerUserId.stringValue = "\(syncServerUserId)"
                 
-            case .some(.sharingUser(let permission, let accessToken)):
+            case .some(.sharingUser(let syncServerUserId, let permission, let accessToken)):
                 checkForUserResult = .sharingUser(sharingPermission: permission, accessToken:accessToken)
+                SyncServerUser.syncServerUserId.stringValue = "\(syncServerUserId)"
             }
             
             if case .some(.noUser) = checkForUserResult {
@@ -116,7 +131,7 @@ public class SyncServerUser {
 
         self.creds = creds
         
-        ServerAPI.session.addUser { error in
+        ServerAPI.session.addUser { syncServerUserId, error in
             if error != nil {
                 self.creds = nil
                 Log.error("Error: \(String(describing: error))")
@@ -124,6 +139,11 @@ public class SyncServerUser {
                     self.showAlert(with: "Failed adding user \(creds.uiDisplayName).", and: "Error was: \(error!).")
                 })
             }
+            
+            if let syncServerUserId = syncServerUserId  {
+                SyncServerUser.syncServerUserId.stringValue = "\(syncServerUserId)"
+            }
+            
             Thread.runSync(onMainThread: {
                 completion(error)
             })
@@ -151,7 +171,7 @@ public class SyncServerUser {
     }
 }
 
-extension SyncServerUser : ServerAPIDelegate {
+extension SyncServerUser : ServerAPIDelegate {    
     func deviceUUID(forServerAPI: ServerAPI) -> Foundation.UUID {
         return Foundation.UUID(uuidString: SyncServerUser.mobileDeviceUUID.stringValue)!
     }
@@ -159,8 +179,7 @@ extension SyncServerUser : ServerAPIDelegate {
     // 1/3/18 somewhat before 9am MST; Bushrod just got this after installing v0.10.0 of SharedImages, "I just upgraded sharedimages. When i launched it, it said it was having trouble authenticating me and that I should log out and back in. I didn’t do that, changed to the login tab, back to the images tab, and it downloaded new images so I guess the sticky login worked despite the complaining."
     func userWasUnauthorized(forServerAPI: ServerAPI) {
         Thread.runSync(onMainThread: {
-            self.showAlert(with: "The server is having problems authenticating you. Please sign out and sign back in.")
-            // May want to explicitly force a user sign-out here. Shall see.
+            self.showAlert(with: "The server is having problems authenticating you. You may need to sign out and sign back in.")
         })
     }
 

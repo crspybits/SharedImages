@@ -10,23 +10,25 @@ import Foundation
 import SMCoreLib
 import SyncServer_Shared
 
-protocol ServerNetworkingAuthentication : class {
+protocol ServerNetworkingDelegate : class {
     // Key/value pairs to be added to the outgoing HTTP header for authentication
-    func headerAuthentication(forServerNetworking: Any?) -> [String:String]?
+    func serverNetworkingHeaderAuthentication(forServerNetworking: Any?) -> [String:String]?
 }
 
 class ServerNetworking : NSObject {
     static let session = ServerNetworking()
-    
-    private weak var _authenticationDelegate:ServerNetworkingAuthentication?
+    var minimumServerVersion:ServerVersion?
+    weak var syncServerDelegate:SyncServerDelegate?
 
-    var authenticationDelegate:ServerNetworkingAuthentication? {
+    private weak var _delegate:ServerNetworkingDelegate?
+
+    var delegate:ServerNetworkingDelegate? {
         get {
-            return _authenticationDelegate
+            return _delegate
         }
         set {
-            ServerNetworkingLoading.session.authenticationDelegate = newValue
-            _authenticationDelegate = newValue
+            ServerNetworkingLoading.session.delegate = newValue
+            _delegate = newValue
         }
     }
     
@@ -49,9 +51,39 @@ class ServerNetworking : NSObject {
             return
         }
         
-        ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) { (serverResponse, statusCode, error) in
+        ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) {[unowned self] (serverResponse, statusCode, error) in
+        
+            if let headers = serverResponse?.allHeaderFields {
+                if !self.serverVersionIsOK(headerFields: headers) {
+                    return
+                }
+            }
+            
             completion?(serverResponse, statusCode, error)
         }
+    }
+    
+    private func serverVersionIsOK(headerFields: [AnyHashable: Any]) -> Bool {
+        var serverVersion: ServerVersion?
+        if let version = headerFields[ServerConstants.httpResponseCurrentServerVersion] as? String {
+            serverVersion = ServerVersion(rawValue: version)
+        }
+        
+        if minimumServerVersion == nil {
+            // Client doesn't care which version of the server they are using.
+            return true
+        }
+        else if serverVersion == nil || serverVersion! < minimumServerVersion! {
+            // Either: a) Client *does* care, but server isn't versioned, or
+            // b) the actual server version is less than what the client needs.
+            Thread.runSync(onMainThread: {
+                self.syncServerDelegate?.syncServerErrorOccurred(error:
+                    .badServerVersion(actualServerVersion: serverVersion))
+            })
+            return false
+        }
+        
+        return true
     }
     
     public func download(file: ServerNetworkingLoadingFile, fromServerURL serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ serverResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
@@ -62,15 +94,26 @@ class ServerNetworking : NSObject {
         }
         
         ServerNetworkingLoading.session.download(file: file, fromServerURL: serverURL, method: method) { (url, urlResponse, status, error) in
-        
-            if error == nil {
-                guard url != nil else {
-                    completion?(nil, nil, urlResponse?.statusCode, .didNotGetDownloadURL)
-                    return
+
+            func finish() {
+                if error == nil {
+                    guard url != nil else {
+                        completion?(nil, nil, urlResponse?.statusCode, .didNotGetDownloadURL)
+                        return
+                    }
                 }
+
+                completion?(url, urlResponse, urlResponse?.statusCode, error)
             }
 
-            completion?(url, urlResponse, urlResponse?.statusCode, error)
+            if let headers = urlResponse?.allHeaderFields {
+                if self.serverVersionIsOK(headerFields: headers) {
+                    finish()
+                }
+            }
+            else {
+                finish()
+            }
         }
     }
     
@@ -86,7 +129,8 @@ class ServerNetworking : NSObject {
             sessionConfiguration.timeoutIntervalForRequest = timeoutIntervalForRequest!
         }
         
-        sessionConfiguration.httpAdditionalHeaders = self.authenticationDelegate?.headerAuthentication(forServerNetworking: self)
+        sessionConfiguration.httpAdditionalHeaders = self.delegate?.serverNetworkingHeaderAuthentication(
+                forServerNetworking: self)
         Log.msg("httpAdditionalHeaders: \(String(describing: sessionConfiguration.httpAdditionalHeaders))")
         
         // If needed, use a delegate here to track upload progress.
@@ -121,29 +165,31 @@ class ServerNetworking : NSObject {
                 return
             }
             
-            var json:Any?
-            do {
-                try json = JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions(rawValue: UInt(0)))
-            } catch (let error) {
-                Log.error("processResponse: Error in JSON conversion: \(error); statusCode= \(response.statusCode)")
-                completion?(nil, response.statusCode, .jsonSerializationError(error))
-                return
+            if serverVersionIsOK(headerFields: response.allHeaderFields) {
+                var json:Any?
+                do {
+                    try json = JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions(rawValue: UInt(0)))
+                } catch (let error) {
+                    Log.error("processResponse: Error in JSON conversion: \(error); statusCode= \(response.statusCode)")
+                    completion?(nil, response.statusCode, .jsonSerializationError(error))
+                    return
+                }
+                
+                guard let jsonDict = json as? [String: Any] else {
+                    completion?(nil, response.statusCode, .errorConvertingServerResponse)
+                    return
+                }
+                
+                var resultDict = jsonDict
+                
+                // Some responses (from endpoints doing sharing operations) have ServerConstants.httpResponseOAuth2AccessTokenKey in their header. Pass it up using the same key.
+                if let accessTokenResponse = response.allHeaderFields[ServerConstants.httpResponseOAuth2AccessTokenKey] {
+                    resultDict[ServerConstants.httpResponseOAuth2AccessTokenKey] = accessTokenResponse
+                }
+                
+                Log.msg("No errors on upload: jsonDict: \(jsonDict)")
+                completion?(resultDict, response.statusCode, nil)
             }
-            
-            guard let jsonDict = json as? [String: Any] else {
-                completion?(nil, response.statusCode, .errorConvertingServerResponse)
-                return
-            }
-            
-            var resultDict = jsonDict
-            
-            // Some responses (from endpoints doing sharing operations) have ServerConstants.httpResponseOAuth2AccessTokenKey in their header. Pass it up using the same key.
-            if let accessTokenResponse = response.allHeaderFields[ServerConstants.httpResponseOAuth2AccessTokenKey] {
-                resultDict[ServerConstants.httpResponseOAuth2AccessTokenKey] = accessTokenResponse
-            }
-            
-            Log.msg("No errors on upload: jsonDict: \(jsonDict)")
-            completion?(resultDict, response.statusCode, nil)
         }
         else {
             completion?(nil, nil, .urlSessionError(error!))
@@ -158,11 +204,4 @@ extension ServerNetworking : URLSessionDelegate {
     }
 #endif
 }
-
-/*
-extension ServerNetworking: ServerNetworkingLoadingDelegate {
-    func serverNetworkingDownloadCompleted(_ snl: ServerNetworkingLoading, url: SMRelativeLocalURL?, response: HTTPURLResponse?, statusCode:Int?, error: SyncServerError?) {
-
-    }
-}*/
 

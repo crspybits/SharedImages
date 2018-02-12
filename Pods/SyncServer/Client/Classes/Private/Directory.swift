@@ -14,6 +14,7 @@ import SyncServer_Shared
 
 class Directory {
     static var session = Directory()
+    weak var delegate:SyncServerDelegate!
     
     private init() {
     }
@@ -97,11 +98,16 @@ class Directory {
     
     // Does not do `CoreData.sessionNamed(Constants.coreDataName).performAndWait`
     func updateAfterDownloadingFiles(downloads:[DownloadFileTracker]) {
-        _ = downloads.map { dft in
+        downloads.forEach { dft in
             if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: dft.fileUUID) {
                 // This will really only ever happen in testing: A situation where the DirectoryEntry has been created for the file uuid, but we don't have a fileVersion assigned. e.g., The file gets uploaded (not using the sync system), then uploaded by the sync system, and then we get the download that was created not using the sync system.
 #if !DEBUG
-                assert(entry.fileVersion! < dft.fileVersion)
+                if entry.fileVersion! < dft.fileVersion {
+                    Thread.runSync(onMainThread: {[unowned self] in
+                        self.delegate.syncServerErrorOccurred(error:
+                            .downloadedFileVersionNotGreaterThanCurrent)
+                    })
+                }
 #endif
                 entry.fileVersion = dft.fileVersion
                 
@@ -109,11 +115,24 @@ class Directory {
                 if entry.deletedOnServer {
                     entry.deletedOnServer = false
                 }
+                
+                if entry.mimeType != dft.mimeType {
+                    Thread.runSync(onMainThread: {[unowned self] in
+                        self.delegate.syncServerErrorOccurred(error: .mimeTypeOfFileChanged)
+                    })
+                }
+                
+                // Only assign the appMetaData if it's non-nil-- otherwise, the value isn't intended to be changed by the previously uploading client.
+                if let appMetaData = dft.appMetaData {
+                    entry.appMetaData = appMetaData
+                }
             }
             else {
                 let newEntry = DirectoryEntry.newObject() as! DirectoryEntry
                 newEntry.fileUUID = dft.fileUUID
                 newEntry.fileVersion = dft.fileVersion
+                newEntry.mimeType = dft.mimeType
+                newEntry.appMetaData = dft.appMetaData
             }
         }
     }

@@ -14,28 +14,28 @@ import SMCoreLib
 class ProgressIndicator {
     private let label = UILabel()
     private var alert:AlertController!
-    private var totalImages:UInt!
+    private var totalFiles:UInt!
 
     // So that the progress indicator shows up for at least a moment. Otherwise, for example-- with deleting files-- you can't tell what the app is doing.
     private var startTime:Double!
     let minDisplaySeconds = 2.0
     
-    init(imagesToUpload:UInt, imagesToUploadDelete:UInt, withStopHandler stop: @escaping ()->()) {
-        totalImages = imagesToUpload + imagesToUploadDelete
+    init(filesToUpload:UInt, filesToUploadDelete:UInt, withStopHandler stop: @escaping ()->()) {
+        totalFiles = filesToUpload + filesToUploadDelete
         
         var title = ""
-        if imagesToUpload > 0 && imagesToUploadDelete > 0 {
-            title = "Uploading & Upload Deleting Images"
+        if filesToUpload > 0 && filesToUploadDelete > 0 {
+            title = "Uploading & Upload Deleting Images (and Discussions)"
         }
-        else if imagesToUpload > 0 {
-            title = "Uploading Image"
-            if imagesToUpload > 1 {
+        else if filesToUpload > 0 {
+            title = "Uploading Image/Discussion"
+            if filesToUpload > 1 {
                 title += "s"
             }
         }
-        else if imagesToUploadDelete > 0 {
-            title = "Upload Deleting Image"
-            if imagesToUploadDelete > 1 {
+        else if filesToUploadDelete > 0 {
+            title = "Upload Deleting Image/Discussion"
+            if filesToUploadDelete > 1 {
                 title += "s"
             }
         }
@@ -46,22 +46,22 @@ class ProgressIndicator {
         setup(withTitle: title, withStopHandler: stop)
     }
     
-    init(imagesToDownload: UInt, imagesToDelete:UInt, withStopHandler stop: @escaping ()->()) {
-        totalImages = imagesToDownload + imagesToDelete
+    init(filesToDownload: UInt, filesToDelete:UInt, withStopHandler stop: @escaping ()->()) {
+        totalFiles = filesToDownload + filesToDelete
         
         var title = ""
-        if imagesToDownload > 0 && imagesToDelete > 0 {
-            title = "Downloading & Deleting Images"
+        if filesToDownload > 0 && filesToDelete > 0 {
+            title = "Downloading & Deleting Images/Discussions"
         }
-        else if imagesToDownload > 0 {
-            title = "Downloading Image"
-            if imagesToDownload > 1 {
+        else if filesToDownload > 0 {
+            title = "Downloading Image/Discussion"
+            if filesToDownload > 1 {
                 title += "s"
             }
         }
-        else if imagesToDelete > 0 {
-            title = "Deleting Image"
-            if imagesToDelete > 1 {
+        else if filesToDelete > 0 {
+            title = "Deleting Image/Discussion"
+            if filesToDelete > 1 {
                 title += "s"
             }
         }
@@ -111,7 +111,7 @@ class ProgressIndicator {
     }
     
     func updateProgress(withNumberFilesProcessed numberProcessed:UInt) {
-        label.text = "\(numberProcessed) of \(totalImages!) images..."
+        label.text = "\(numberProcessed) of \(totalFiles!) images/discussions..."
         label.sizeToFit()
     }
 }

@@ -35,7 +35,11 @@ public class CheckCredsRequest : NSObject, RequestMessage {
 public class CheckCredsResponse : ResponseMessage {
     // This will be present iff the user is a sharing user. i.e., for an owning user it will be nil.
     public static let sharingPermissionKey = "sharingPermission"
-    public var sharingPermission:SharingPermission!
+    public var sharingPermission:SharingPermission?
+    
+    // Present only as means to help clients uniquely identify users. This is *never* passed back to the server. This id is unique across all users and is not specific to any sign-in type (e.g., Google).
+    public static let userIdKey = "userId"
+    public var userId:UserId!
     
     public var responseType: ResponseType {
         return .json
@@ -43,6 +47,7 @@ public class CheckCredsResponse : ResponseMessage {
     
     public required init?(json: JSON) {
         self.sharingPermission = Decoder.decodeSharingPermission(key: CheckCredsResponse.sharingPermissionKey, json: json)
+        userId = Decoder.decode(int64ForKey: CheckCredsResponse.userIdKey)(json)
     }
     
     public convenience init?() {
@@ -52,7 +57,8 @@ public class CheckCredsResponse : ResponseMessage {
     // MARK: - Serialization
     public func toJSON() -> JSON? {
         return jsonify([
-            Encoder.encodeSharingPermission(key: CheckCredsResponse.sharingPermissionKey, value: self.sharingPermission)
+            Encoder.encodeSharingPermission(key: CheckCredsResponse.sharingPermissionKey, value: self.sharingPermission),
+            CheckCredsResponse.userIdKey ~~> userId,
         ])
     }
 }

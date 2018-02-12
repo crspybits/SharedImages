@@ -22,15 +22,6 @@ class FixedObjectsTests: XCTestCase {
         super.tearDown()
     }
     
-    let documentsDirectoryPath = "JSON"
-    
-    func newJSONFile() -> URL {
-        let directoryURL = FileStorage.url(ofItem: documentsDirectoryPath)
-        FileStorage.createDirectoryIfNeeded(directoryURL)
-        let newFileName = FileStorage.createTempFileName(inDirectory: directoryURL?.path, withPrefix: "FileObjects", andExtension: "json")
-        return SMRelativeLocalURL(withRelativePath: documentsDirectoryPath + "/" + newFileName!, toBaseURLType: .documentsDirectory)! as URL
-    }
-    
     func testAddNewFixedObjectWorks() {
         var fixedObjects = FixedObjects()
         
@@ -73,17 +64,17 @@ class FixedObjectsTests: XCTestCase {
     func saveToFileWithJustId() -> (FixedObjects, URL)? {
         var fixedObjects = FixedObjects()
 
-        let url = newJSONFile()
+        let url = ImageExtras.newJSONFile()
         print("url: \(url)")
         do {
             try fixedObjects.add(newFixedObject: [FixedObjects.idKey: "1"])
-            try fixedObjects.save(toFile: url)
+            try fixedObjects.save(toFile: url as URL)
         } catch {
             XCTFail()
             return nil
         }
         
-        return (fixedObjects, url)
+        return (fixedObjects, url as URL)
     }
     
     func testSaveToFileWithJustIdWorks() {
@@ -94,7 +85,7 @@ class FixedObjectsTests: XCTestCase {
     func saveToFileWithIdAndOherContents() -> (FixedObjects, URL)? {
         var fixedObjects = FixedObjects()
 
-        let url = newJSONFile()
+        let url = ImageExtras.newJSONFile()
         print("url: \(url)")
         do {
             try fixedObjects.add(newFixedObject: [
@@ -102,13 +93,13 @@ class FixedObjectsTests: XCTestCase {
                 "Foobar": 1,
                 "snafu": ["Nested": "object"]
             ])
-            try fixedObjects.save(toFile: url)
+            try fixedObjects.save(toFile: url as URL)
         } catch {
             XCTFail()
             return nil
         }
         
-        return (fixedObjects, url)
+        return (fixedObjects, url as URL)
     }
     
     func testSaveToFileWithIdAndOherContentsWorks() {
@@ -122,7 +113,7 @@ class FixedObjectsTests: XCTestCase {
         let quote1 = "\""
         let quote2 = "'"
         
-        let url = newJSONFile()
+        let url = ImageExtras.newJSONFile()
         print("url: \(url)")
         do {
             try fixedObjects.add(newFixedObject: [
@@ -130,13 +121,13 @@ class FixedObjectsTests: XCTestCase {
                 "test1": quote1,
                 "test2": quote2
             ])
-            try fixedObjects.save(toFile: url)
+            try fixedObjects.save(toFile: url as URL)
         } catch {
             XCTFail()
             return nil
         }
         
-        return (fixedObjects, url)
+        return (fixedObjects, url as URL)
     }
     
     func testSaveToFileWithQuoteInContentsWorks() {
@@ -229,5 +220,165 @@ class FixedObjectsTests: XCTestCase {
             
             XCTAssert(data.fixedObject == fromFile)
         }
+    }
+    
+    func testEquivalanceWithNonEqualSameSizeWorks() {
+        var fixedObjects1 = FixedObjects()
+        do {
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects2 = FixedObjects()
+        do {
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "2"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        XCTAssert(!(fixedObjects1 ~~ fixedObjects2))
+    }
+    
+    func testEquivalanceWithNonEqualsDiffSizeWorks() {
+        var fixedObjects1 = FixedObjects()
+        do {
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects2 = FixedObjects()
+        do {
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "2"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        XCTAssert(!(fixedObjects1 ~~ fixedObjects2))
+    }
+    
+    func testMergeWithSameWorks() {
+        var fixedObjects = FixedObjects()
+        do {
+            try fixedObjects.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        let (result, unread) = fixedObjects.merge(with: fixedObjects)
+        XCTAssert(unread  == 0)
+        XCTAssert(fixedObjects ~~ result)
+        XCTAssert(result.count == 1)
+    }
+    
+    func testMergeNeitherHaveObjectsWorks() {
+        let fixedObjects1 = FixedObjects()
+        let fixedObjects2 = FixedObjects()
+        
+        let (result, unread) = fixedObjects1.merge(with: fixedObjects2)
+        XCTAssert(unread  == 0)
+        XCTAssert(fixedObjects1 ~~ result)
+        XCTAssert(result.count == 0)
+    }
+
+    func testMergeOnlyHaveSameObjectWorks() {
+        var fixedObjects1 = FixedObjects()
+        do {
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects2 = FixedObjects()
+        do {
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        let (result, unread) = fixedObjects1.merge(with: fixedObjects2)
+        XCTAssert(unread  == 0)
+        XCTAssert(fixedObjects1 ~~ result)
+        XCTAssert(result.count == 1)
+    }
+
+    func testMergeHaveSomeSameObjectsWorks() {
+        var standard = FixedObjects()
+        do {
+            try standard.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try standard.add(newFixedObject: [FixedObjects.idKey: "2"])
+            try standard.add(newFixedObject: [FixedObjects.idKey: "3"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects1 = FixedObjects()
+        do {
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "2"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects2 = FixedObjects()
+        do {
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "3"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        let (result, unread) = fixedObjects1.merge(with: fixedObjects2)
+        XCTAssert(unread == 1)
+        XCTAssert(result ~~ standard)
+        XCTAssert(result.count == 3)
+    }
+    
+    func testMergeHaveNoSameObjectsWorks() {
+        var standard = FixedObjects()
+        do {
+            try standard.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try standard.add(newFixedObject: [FixedObjects.idKey: "2"])
+            try standard.add(newFixedObject: [FixedObjects.idKey: "3"])
+            try standard.add(newFixedObject: [FixedObjects.idKey: "4"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects1 = FixedObjects()
+        do {
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try fixedObjects1.add(newFixedObject: [FixedObjects.idKey: "2"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        var fixedObjects2 = FixedObjects()
+        do {
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "3"])
+            try fixedObjects2.add(newFixedObject: [FixedObjects.idKey: "4"])
+        } catch {
+            XCTFail()
+            return
+        }
+        
+        let (result, unread) = fixedObjects1.merge(with: fixedObjects2)
+        XCTAssert(unread == 2, "unread: \(unread)")
+        XCTAssert(result ~~ standard)
+        XCTAssert(result.count == 4)
     }
 }

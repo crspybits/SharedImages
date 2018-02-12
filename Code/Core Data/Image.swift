@@ -14,7 +14,8 @@ import SMCoreLib
 public class Image: NSManagedObject {
     static let CREATION_DATE_KEY = "creationDate"
     static let UUID_KEY = "uuid"
-    
+    static let DISCUSSION_UUID_KEY = "discussionUUID"
+
     var originalSize:CGSize {
         var originalImageSize = CGSize()
 
@@ -35,17 +36,10 @@ public class Image: NSManagedObject {
     
     var url:SMRelativeLocalURL? {
         get {
-            if urlInternal == nil {
-                return nil
-            }
-            else {
-                let url = NSKeyedUnarchiver.unarchiveObject(with: urlInternal! as Data) as? SMRelativeLocalURL
-                Assert.If(url == nil, thenPrintThisString: "Image: Yikes: No URL!")
-                return url
-            }
+            return CoreData.getSMRelativeLocalURL(fromCoreDataProperty: urlInternal as Data?)
         }
         
-        set {
+        set {            
             if newValue == nil {
                 urlInternal = nil
             }
@@ -54,12 +48,11 @@ public class Image: NSManagedObject {
             }
         }
     }
-    
+
     class func entityName() -> String {
         return "Image"
     }
 
-    // Only may throw when makeUUIDAndUpload is true.
     class func newObjectAndMakeUUID(makeUUID: Bool, creationDate:NSDate? = nil) -> NSManagedObject {
         let image = CoreData.sessionNamed(CoreDataExtras.sessionName).newObject(withEntityName: self.entityName()) as! Image
         
@@ -98,6 +91,11 @@ public class Image: NSManagedObject {
         return managedObject as? Image
     }
     
+    class func fetchObjectWithDiscussionUUID(discussionUUID:String) -> Image? {
+        let managedObject = CoreData.fetchObjectWithUUID(discussionUUID, usingUUIDKey: DISCUSSION_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
+        return managedObject as? Image
+    }
+    
     static func fetchAll() -> [Image] {
         var images:[Image]!
 
@@ -113,6 +111,18 @@ public class Image: NSManagedObject {
     
     func save() {
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+    }
+    
+    func remove() throws {
+        if let discussion = discussion {
+            try discussion.remove()
+        }
+        
+        if let url = url {
+            try FileManager.default.removeItem(at: url as URL)
+        }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
     }
 }
 

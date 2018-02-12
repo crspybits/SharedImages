@@ -24,13 +24,15 @@ public enum DownloadDeletionResolution {
 public enum FileDownloadResolution {
     // File downloads can conflict with file upload(s) and/or an upload deletion. See the conflictType of the specific `SyncServerConflict`.
     
+    // This is used in `rejectFileDownload` below.
     public struct UploadResolution : OptionSet {
         public let rawValue: Int
         public init(rawValue:Int){ self.rawValue = rawValue}
         
-        // If you are going to use `rejectFileDownload`, this the typical upload resolution.
+        // If you are going to use `rejectFileDownload` (see below), this the typical upload resolution.
         public static let keepAll:UploadResolution = [keepFileUploads, keepUploadDeletions]
         
+        // Remove any conflicting local file uploads and/or upload deletions.
         public static let removeAll = UploadResolution(rawValue: 0)
         
         // Not having this option means to remove your conflicting file uploads

@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '89DD6F745BC1AC853BA9E12E5C2686E4'
+               BlueprintIdentifier = 'E822B1B8C646417A0E1C7C27280B07CB'
                BlueprintName = 'SwiftyDropbox'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'SwiftyDropbox.framework'>

@@ -48,17 +48,17 @@ class ConflictManager {
                 
                     switch resolution {
                     case .acceptFileDownload:
-                        removeManagedObjects(conflictingFileUploads)
-                        removeManagedObjects(conflictingUploadDeletions)
+                        removeManagedObjects(conflictingFileUploads, delegate: delegate)
+                        removeManagedObjects(conflictingUploadDeletions, delegate: delegate)
                         completion(nil)
                         
                     case .rejectFileDownload(let uploadResolution):
                         if uploadResolution.removeFileUploads {
-                            removeManagedObjects(conflictingFileUploads)
+                            removeManagedObjects(conflictingFileUploads, delegate: delegate)
                         }
                         
                         if uploadResolution.removeUploadDeletions {
-                            removeManagedObjects(conflictingUploadDeletions)
+                            removeManagedObjects(conflictingUploadDeletions, delegate: delegate)
                         }
                         
                         completion(attr)
@@ -96,7 +96,14 @@ class ConflictManager {
             let pendingDeletionsToRemove = fileUUIDIntersection(pendingUploadDeletions, downloadDeletionAttrs)
             pendingDeletionsToRemove.forEach() { (uft, attr) in
                 let fileUUID = uft.fileUUID
-                CoreData.sessionNamed(Constants.coreDataName).remove(uft)
+                
+                do {
+                    try uft.remove()
+                } catch {
+                    delegate.syncServerErrorOccurred(error:
+                        .couldNotRemoveFileTracker)
+                }
+                
                 let index = remainingDownloadDeletionAttrs.index(where: {$0.fileUUID == fileUUID})!
                 remainingDownloadDeletionAttrs.remove(at: index)
                 havePendingUploadDeletions += [attr]
@@ -120,7 +127,7 @@ class ConflictManager {
                     
                         switch resolution {
                         case .acceptDownloadDeletion:
-                            removeConflictingUpload(pendingFileUploads: pendingFileUploads, fileUUID: attr.fileUUID)
+                            removeConflictingUpload(pendingFileUploads: pendingFileUploads, fileUUID: attr.fileUUID, delegate: delegate)
                             
                         case .rejectDownloadDeletion(let uploadResolution):
                             // We're going to disregard the download deletion.
@@ -132,7 +139,7 @@ class ConflictManager {
                                 markUftAsUploadUndeletion(pendingFileUploads: pendingFileUploads, fileUUID: attr.fileUUID)
                                 
                             case .removeFileUpload:
-                                removeConflictingUpload(pendingFileUploads: pendingFileUploads, fileUUID: attr.fileUUID)
+                                removeConflictingUpload(pendingFileUploads: pendingFileUploads, fileUUID: attr.fileUUID, delegate: delegate)
                             }
                         }
                         
@@ -171,22 +178,37 @@ class ConflictManager {
     }
     
     // Remove any pending file upload's with this UUID.
-    private static func removeConflictingUpload(pendingFileUploads: [UploadFileTracker], fileUUID:String) {
+    private static func removeConflictingUpload(pendingFileUploads: [UploadFileTracker], fileUUID:String, delegate: SyncServerDelegate) {
         // [1] Having deadlock issue here. Resolving it by documenting that delegate is *not* called on main thread for the two conflict delegate methods. Not the best solution.
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             let toDelete = pendingFileUploads.filter({$0.fileUUID == fileUUID})
             toDelete.forEach { uft in
-                CoreData.sessionNamed(Constants.coreDataName).remove(uft)
+                do {
+                    try uft.remove()
+                } catch {
+                    delegate.syncServerErrorOccurred(error:
+                        .couldNotRemoveFileTracker)
+                }
             }
 
             CoreData.sessionNamed(Constants.coreDataName).saveContext()
         }
     }
     
-    private static func removeManagedObjects(_ managedObjects:[NSManagedObject]) {
+    private static func removeManagedObjects(_ managedObjects:[NSManagedObject], delegate: SyncServerDelegate) {
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             managedObjects.forEach { managedObject in
-                CoreData.sessionNamed(Constants.coreDataName).remove(managedObject)
+                if let uft = managedObject as? UploadFileTracker {
+                    do {
+                        try uft.remove()
+                    } catch {
+                        delegate.syncServerErrorOccurred(error:
+                            .couldNotRemoveFileTracker)
+                    }
+                }
+                else {
+                    CoreData.sessionNamed(Constants.coreDataName).remove(managedObject)
+                }
             }
             CoreData.sessionNamed(Constants.coreDataName).saveContext()
         }
