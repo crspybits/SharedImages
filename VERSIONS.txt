@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.12.0
+Version 0.12.0 (2/12/18)
 	* Adding discussion thread feature.
 		https://github.com/crspybits/SharedImages/issues/75
 		As part of this:
