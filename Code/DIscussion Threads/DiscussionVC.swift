@@ -12,10 +12,14 @@ import SMCoreLib
 import SyncServer
 
 protocol DiscussionVCDelegate {
+    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion)
     func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion)
+    func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?)
 }
 
 class DiscussionVC: MessagesViewController {
+    let maxMessageLength = 1024
+
     private var fixedObjectsURL: URL!
     private var fixedObjects:FixedObjects!
     var parentVC: UIViewController!
@@ -24,6 +28,7 @@ class DiscussionVC: MessagesViewController {
     private var senderUserId:String!
     private var delegate:DiscussionVCDelegate!
     private var discussion: Discussion!
+    private var viewsLayedOut = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +43,33 @@ class DiscussionVC: MessagesViewController {
         maintainPositionOnKeyboardFrameChanged = true // default false
     }
     
+    @discardableResult
+    private func loadDiscussion() -> Bool {
+        guard let url = discussion.url else {
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Problem loading messages", message: "The discussion had no URL!")
+            return false
+        }
+        
+        self.fixedObjectsURL = url as URL
+        fixedObjects = FixedObjects(withFile: fixedObjectsURL)
+        
+        guard fixedObjects != nil else {
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Problem loading messages", message: "Could not load from file!")
+            return false
+        }
+        
+        // Make sure that the file format containing the messages hasn't changed.
+        for fixedObject in fixedObjects {
+            guard let dict = fixedObject as? [String: String],
+                let _ = DiscussionMessage.fromDictionary(dict) else {
+                SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Problem loading messages", message: "Has there been a format change?")
+                return false
+            }
+        }
+        
+        return true
+    }
+    
     // `closeHandler` gets called when the ModalVC gets closed.
     // Returns false iff the show failed.
     @discardableResult
@@ -48,21 +80,8 @@ class DiscussionVC: MessagesViewController {
         self.delegate = delegate
         self.discussion = discussion
         
-        guard let url = discussion.url else {
-            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Problem loading messages", message: "The discussion had no URL!")
+        guard loadDiscussion() else {
             return false
-        }
-        
-        self.fixedObjectsURL = url as URL
-        fixedObjects = FixedObjects(withFile: fixedObjectsURL)
-        
-        // Make sure that the file format containing the messages hasn't changed.
-        for fixedObject in fixedObjects {
-            guard let dict = fixedObject as? [String: String],
-                let _ = DiscussionMessage.fromDictionary(dict) else {
-                SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Problem loading messages", message: "Has there been a format change?")
-                return false
-            }
         }
         
         guard let username = SyncServerUser.session.creds?.username else {
@@ -79,8 +98,12 @@ class DiscussionVC: MessagesViewController {
         
         senderUserId = userId
         
-        let barButton = UIBarButtonItem(image: #imageLiteral(resourceName: "close"), style: .plain, target: self, action: #selector(close))
-        navigationItem.rightBarButtonItem = barButton
+        let closeBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "close"), style: .plain, target: self, action: #selector(close))
+        navigationItem.rightBarButtonItem = closeBarButton
+        
+        let refreshBarButton = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh))
+        navigationItem.leftBarButtonItem = refreshBarButton
+        
         let nav = UINavigationController(rootViewController: self)
         
         if UIDevice.current.userInterfaceIdiom == .pad {
@@ -93,15 +116,31 @@ class DiscussionVC: MessagesViewController {
         discussion.unreadCount = 0
         discussion.save()
         
+        // This is for iPad-- When you tap on the large image, it should reset the unread count then. Because otherwise, you can be looking at the discussion thread for that image, with the unread count badge present, and it looks odd.
+        delegate.discussionVC(self, resetUnreadCount: discussion)
+        
         return true
     }
     
-    @objc func close() {
+    @objc private func close() {
         dismiss(animated: true, completion: nil)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    @objc private func refresh() {
+        delegate.discussionVC(self, discussion: discussion, refreshWithCompletion: {[unowned self] in
+            self.loadDiscussion()
+            self.messagesCollectionView.reloadData()
+        })
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        // I can't get this to work in `viewWillAppear`. If it goes in `viewDidAppear`, I get the scrolling *after* the view appears, which doesn't look so good. Don't want it called more than once either.
+        if !viewsLayedOut {
+            viewsLayedOut = true
+            messagesCollectionView.scrollToBottom()
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -261,5 +300,25 @@ extension DiscussionVC: MessageInputBarDelegate {
         
         inputBar.inputTextView.text = String()
         messagesCollectionView.scrollToBottom()
+    }
+    
+    func messageInputBar(_ inputBar: MessageInputBar, textViewTextDidChangeTo text: String) {
+        if text.count > maxMessageLength {
+            inputBar.inputTextView.text = text.substring(toIndex: maxMessageLength)
+        }
+    }
+}
+
+extension String {
+    subscript (r: Range<Int>) -> String {
+        let range = Range(uncheckedBounds: (lower: max(0, min(count, r.lowerBound)),
+                                        upper: min(count, max(0, r.upperBound))))
+        let start = index(startIndex, offsetBy: range.lowerBound)
+        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+        return String(self[start ..< end])
+    }
+    
+    func substring(toIndex: Int) -> String {
+        return self[0 ..< max(0, toIndex)]
     }
 }

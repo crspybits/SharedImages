@@ -302,37 +302,63 @@ class ImagesVC: UIViewController {
         return newImage
     }
     
+    // Three cases: 1) new discussion added locally (uuid of the FileData will be nil), 2) update to existing local discussion, and 3) new discussion from server.
     @discardableResult
-    func addLocalDiscussion(newDiscussionData: FileData) -> Discussion {
-        var newDiscussion: Discussion!
+    func addToLocalDiscussion(discussionData: FileData) -> Discussion {
+        var localDiscussion: Discussion!
         
-        if newDiscussionData.uuid == nil {
-            newDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: true) as! Discussion)
+        if discussionData.uuid == nil {
+            // 1) New discussion, added locally.
+            localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: true) as! Discussion)
+        }
+        else if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(uuid: discussionData.uuid!) {
+            // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
+            
+            localDiscussion = existingLocalDiscussion
+            
+            // Since we didn't have a conflict, `newFixedObjects` will be a superset of the existing objects.
+            if let newFixedObjects = FixedObjects(withFile: discussionData.url as URL),
+                let existingDiscussionURL = existingLocalDiscussion.url,
+                let oldFixedObjects = FixedObjects(withFile: existingDiscussionURL as URL) {
+                
+                // We still want to know how many new messages there are.
+                let (_, newCount) = oldFixedObjects.merge(with: newFixedObjects)
+                // Use `+=1` here because there may already be unread messages.
+                existingLocalDiscussion.unreadCount += Int32(newCount)
+                
+                // Remove the existing discussion file
+                do {
+                    try FileManager.default.removeItem(at: existingDiscussionURL as URL)
+                } catch (let error) {
+                    Log.error("Error removing old discussion file: \(error)")
+                }
+            }
         }
         else {
-            newDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
-            newDiscussion.uuid = newDiscussionData.uuid
+            // 3) New discussion downloaded from server.
+            localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
+            localDiscussion.uuid = discussionData.uuid
             
             // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
-            if let fixedObjects = FixedObjects(withFile: newDiscussionData.url as URL) {
-                newDiscussion.unreadCount = Int32(fixedObjects.count)
+            if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
+                localDiscussion.unreadCount = Int32(fixedObjects.count)
             }
             else {
                 Log.error("Could not load discussion!")
             }
         }
         
-        newDiscussion.mimeType = newDiscussionData.mimeType
-        newDiscussion.url = newDiscussionData.url
+        localDiscussion.mimeType = discussionData.mimeType
+        localDiscussion.url = discussionData.url
         
         // Look up and connect the Image if we have one.
-        if let image = Image.fetchObjectWithDiscussionUUID(discussionUUID: newDiscussion.uuid!) {
-            newDiscussion.image = image
+        if let image = Image.fetchObjectWithDiscussionUUID(discussionUUID: localDiscussion.uuid!) {
+            localDiscussion.image = image
         }
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         
-        return newDiscussion
+        return localDiscussion
     }
     
     func removeLocalImages(uuids:[String]) {
@@ -408,11 +434,11 @@ extension ImagesVC : SMAcquireImageDelegate {
             Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
         }
         
-        guard let discussionFileData = createEmptyDiscussion() else {
+        guard let newDiscussionFileData = createEmptyDiscussion() else {
             return
         }
         
-        let newDiscussion = addLocalDiscussion(newDiscussionData: discussionFileData)
+        let newDiscussion = addToLocalDiscussion(discussionData: newDiscussionFileData)
         
         let imageFileData = FileData(url: newImageURL, mimeType: mimeType, uuid: nil)
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussion.uuid!)
@@ -481,8 +507,8 @@ extension ImagesVC : SyncControllerDelegate {
         addLocalImage(newImageData: imageData)
     }
     
-    func addLocalDiscussion(syncController:SyncController, discussionData: FileData) {
-        addLocalDiscussion(newDiscussionData: discussionData)
+    func addToLocalDiscussion(syncController:SyncController, discussionData: FileData) {
+        addToLocalDiscussion(discussionData: discussionData)
     }
     
     func updateUploadedImageDate(uuid: String, creationDate: NSDate) {
@@ -533,6 +559,9 @@ extension ImagesVC : SyncControllerDelegate {
                 ImagesVC.discussions.boolValue = true
                 resetUnreadCounts()
             }
+            
+            // To refresh the badge unread counts, if we have new messages.
+            collectionView.reloadData()
             
         case .syncError:
             self.spinner.stop(withBackgroundColor: .red)

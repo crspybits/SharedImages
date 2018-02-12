@@ -91,7 +91,8 @@ class ImageCollectionVC : UICollectionViewCell {
         self.imageTapBehavior = imageTapBehavior
 
         if let discussion = image.discussion {
-            title.textColor = UIColor(red: 0.0/255.0, green: 191.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+            // Color from http://www.tayloredmktg.com/rgb/
+            title.textColor = UIColor(red: 30.0/255.0, green: 144.0/255.0, blue: 255.0/255.0, alpha: 1.0)
             
             if let _ = imageTapBehavior, tapGesture == nil {
                 tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureAction))

@@ -258,7 +258,21 @@ extension LargeImages : LargeImageCellDelegate {
 }
 
 extension LargeImages : DiscussionVCDelegate {
-        func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
+    func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
         syncController?.update(discussion: changedDiscussion)
+    }
+    
+    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion) {
+        collectionView.reloadData()
+    }
+    
+    func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?) {
+        syncController?.sync() {
+            // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
+            discussion.unreadCount = 0
+            discussion.save()
+            
+            refreshWithCompletion?()
+        }
     }
 }

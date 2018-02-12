@@ -33,8 +33,12 @@ struct FileData {
 }
 
 protocol SyncControllerDelegate : class {
+    // Adding a new image-- since images are immutable, this always results from downloading a new image.
     func addLocalImage(syncController:SyncController, imageData: ImageData)
-    func addLocalDiscussion(syncController:SyncController, discussionData: FileData)
+    
+    // This will either be for a new discussion (corresponding to a new image) or it will be additional data for an existing discussion (with an existing image).
+    func addToLocalDiscussion(syncController:SyncController, discussionData: FileData)
+    
     func updateUploadedImageDate(uuid: String, creationDate: NSDate)
     func completedAddingLocalImages()
     
@@ -50,6 +54,7 @@ class SyncController {
     private var numberDownloadedSoFar: UInt!
     private var numberUploads: UInt!
     private var numberUploadedSoFar: UInt!
+    private var syncDone:(()->())?
     
     init() {
         SyncServer.session.delegate = self
@@ -59,7 +64,8 @@ class SyncController {
     
     weak var delegate:SyncControllerDelegate!
     
-    func sync() {
+    func sync(completion: (()->())? = nil) {
+        syncDone = completion
         SyncServer.session.sync()
     }
     
@@ -86,6 +92,7 @@ class SyncController {
         return nil
     }
     
+    // Add new image and discussion
     func add(image:Image, discussion: Discussion) {
         // 12/27/17; Not sending dates to the server-- it establishes the dates.
         var imageAttr = SyncAttributes(fileUUID:image.uuid!, mimeType:image.mimeType!)
@@ -106,7 +113,9 @@ class SyncController {
         
         do {
             try SyncServer.session.uploadImmutable(localFile: image.url!, withAttributes: imageAttr)
-            try SyncServer.session.uploadImmutable(localFile: discussion.url!, withAttributes: discussionAttr)
+            
+            // Using uploadCopy for discussions in case the discussion gets updated locally before we complete this sync operation. i.e., discussions are mutable.
+            try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
 
             SyncServer.session.sync()
         } catch (let error) {
@@ -118,7 +127,8 @@ class SyncController {
         let discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussion.mimeType!)
         
         do {
-            try SyncServer.session.uploadImmutable(localFile: discussion.url!, withAttributes: discussionAttr)
+            // Like before, since discussions are mutable, use uploadCopy.
+            try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
             SyncServer.session.sync()
         } catch (let error) {
             Log.error("An error occurred: \(error)")
@@ -176,7 +186,8 @@ extension SyncController : SyncServerDelegate {
                 discussion.unreadCount = Int32(unreadCount)
                 CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
 
-                try SyncServer.session.uploadImmutable(localFile: mergeURL, withAttributes: attr)
+                // As before, discussion are mutable-- upload a copy.
+                try SyncServer.session.uploadCopy(localFile: mergeURL, withAttributes: attr)
             } catch (let error) {
                 Log.error("Problems writing merged discussion or uploading: \(error)")
                 uploadConflict.resolveConflict(resolution: errorResolution)
@@ -234,7 +245,7 @@ extension SyncController : SyncServerDelegate {
     }
     
     private func imageDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
-        // The files we get back from the SyncServer are in a temporary location.
+        // The files we get back from the SyncServer are in a temporary location. We own them though, so can move them.
         let newImageURL = FileExtras().newURLForImage()
         do {
             try FileManager.default.moveItem(at: url as URL, to: newImageURL as URL)
@@ -264,16 +275,16 @@ extension SyncController : SyncServerDelegate {
     }
     
     private func discussionDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
-        // The files we get back from the SyncServer are in a temporary location.
+        // The files we get back from the SyncServer are in a temporary location. We own them though so can move it.
         let newJSONFileURL = ImageExtras.newJSONFile()
         do {
             try FileManager.default.moveItem(at: url as URL, to: newJSONFileURL as URL)
         } catch (let error) {
             Log.error("An error occurred moving a file: \(error)")
         }
-
+        
         let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, uuid: attr.fileUUID)
-        delegate.addLocalDiscussion(syncController: self, discussionData: discussionFileData)
+        delegate.addToLocalDiscussion(syncController: self, discussionData: discussionFileData)
         
         updateDownloadProgress()
     }
@@ -408,6 +419,8 @@ extension SyncController : SyncServerDelegate {
             
         case .syncDone:
             delegate.syncEvent(syncController: self, event: .syncDone)
+            syncDone?()
+            syncDone = nil
         
         default:
             Log.error("Unexpected event received: \(event)")
