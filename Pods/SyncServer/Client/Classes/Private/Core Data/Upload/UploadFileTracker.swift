@@ -50,4 +50,12 @@ public class UploadFileTracker: FileTracker, AllOperations, LocalURLData {
         uft.uploadUndeletion = false
         return uft
     }
+    
+    func remove() throws {
+        if uploadCopy, let url = localURL {
+            try FileManager.default.removeItem(at: url as URL)
+        }
+        
+        CoreData.sessionNamed(Constants.coreDataName).remove(self)
+    }
 }

@@ -11,8 +11,8 @@ import Foundation
 import SyncServer_Shared
 import SMCoreLib
 
-public protocol GenericCredentials {
-    // A unique identifier for the user. E.g., for Google this is their `sub`.
+public protocol GenericCredentials {    
+    // A unique identifier for the user for the specific account type. E.g., for Google this is their `sub`.
     var userId:String {get}
 
     // This is sent to the server as a human-readable means to identify the user.

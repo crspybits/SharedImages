@@ -32,7 +32,7 @@ struct ServerNetworkingLoadingFile {
 class ServerNetworkingLoading : NSObject {
     static private(set) var session = ServerNetworkingLoading()
     
-    weak var authenticationDelegate:ServerNetworkingAuthentication?
+    weak var delegate:ServerNetworkingDelegate?
     
     private var session:URLSession!
     fileprivate var completionHandlers = [URLSessionTask:CompletionHandler]()
@@ -79,7 +79,8 @@ class ServerNetworkingLoading : NSObject {
         var request = URLRequest(url: serverURL)
         request.httpMethod = method.rawValue.uppercased()
         
-        request.allHTTPHeaderFields = authenticationDelegate?.headerAuthentication(forServerNetworking: self)
+        request.allHTTPHeaderFields = delegate?.serverNetworkingHeaderAuthentication(
+                forServerNetworking: self)
         
         Log.msg("downloadFrom: serverURL: \(serverURL)")
         
@@ -101,7 +102,8 @@ class ServerNetworkingLoading : NSObject {
         var request = URLRequest(url: serverURL)
         request.httpMethod = method.rawValue.uppercased()
         
-        request.allHTTPHeaderFields = authenticationDelegate?.headerAuthentication(forServerNetworking: self)
+        request.allHTTPHeaderFields = delegate?.serverNetworkingHeaderAuthentication(
+                forServerNetworking: self)
         
         Log.msg("uploadTo: serverURL: \(serverURL); localURL: \(nonRelativeUploadURL)")
         
@@ -273,7 +275,7 @@ extension ServerNetworkingLoading : URLSessionDelegate, URLSessionTaskDelegate, 
 
         // Transfer the temporary file to a more permanent location. Have to do it right now. https://developer.apple.com/reference/foundation/urlsessiondownloaddelegate/1411575-urlsession
         if movedDownloadedFile == nil {
-            returnError = .couldNotCreateNewFileForDownload
+            returnError = .couldNotCreateNewFile
         }
         else {
             do {

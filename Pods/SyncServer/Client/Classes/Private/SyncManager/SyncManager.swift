@@ -349,10 +349,10 @@ class SyncManager {
                 if fileUploads.count > 0 {
                     EventDesired.reportEvent(.fileUploadsCompleted(numberOfFiles: fileUploads.count), mask: self.desiredEvents, delegate: self.delegate)
                 }
-                
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+    
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() { [unowned self] in
                     if fileUploads.count > 0 {
-                        // Each of the DirectoryEntry's for the uploads needs to now be given its version, as uploaded.
+                        // Each of the DirectoryEntry's for the uploads needs to now be given its version, as uploaded. And appMetaData needs to be updated in directory if it has been updated on this upload.
                         fileUploads.forEach { uft in
                             guard let uploadedEntry = DirectoryEntry.fetchObjectWithUUID(uuid: uft.fileUUID) else {
                                 assert(false)
@@ -361,7 +361,17 @@ class SyncManager {
                             
                             // 1/27/18; [1]. It's safe to update the local directory entry with the new file version-- we've done the file upload *and* we've done the DoneUploads too.
                             uploadedEntry.fileVersion = uft.fileVersion
-                            CoreData.sessionNamed(Constants.coreDataName).remove(uft)
+                            
+                            if let amd = uft.appMetaData {
+                                uploadedEntry.appMetaData = amd
+                            }
+                            
+                            do {
+                                try uft.remove()
+                            } catch {
+                                self.delegate?.syncServerErrorOccurred(error:
+                                    .couldNotRemoveFileTracker)
+                            }
                         }
                     }
                     
@@ -373,7 +383,7 @@ class SyncManager {
                 }
                 
                 var errorResult:SyncServerError?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {[unowned self] in
                     if uploadDeletions.count > 0 {
                         // Each of the DirectoryEntry's for the uploads needs to now be marked as deleted.
                         uploadDeletions.forEach { uft in
@@ -383,7 +393,11 @@ class SyncManager {
                             }
 
                             uploadedEntry.deletedOnServer = true
-                            CoreData.sessionNamed(Constants.coreDataName).remove(uft)
+                            do {
+                                try uft.remove()
+                            } catch {
+                                errorResult = .couldNotRemoveFileTracker
+                            }
                         }
                     }
                     

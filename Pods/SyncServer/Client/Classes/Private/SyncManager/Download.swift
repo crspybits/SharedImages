@@ -89,6 +89,7 @@ class Download {
                             dft.fileVersion = file.fileVersion
                             dft.mimeType = file.mimeType
                             dft.deletedOnServer = file.deleted!
+                            dft.appMetaData = file.appMetaData
                             
                             if file.deleted! {
                                 numberDownloadDeletions += 1

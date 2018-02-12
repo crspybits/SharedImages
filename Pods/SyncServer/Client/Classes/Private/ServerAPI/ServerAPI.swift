@@ -26,7 +26,10 @@ class ServerAPI {
     // These need to be set by user of this class.
     var baseURL:String!
     weak var delegate:ServerAPIDelegate!
+    
+    // Used in ServerAPI extension(s).
     weak var syncServerDelegate:SyncServerDelegate?
+    
     var desiredEvents:EventDesired = .defaults
 
 #if DEBUG
@@ -64,7 +67,7 @@ class ServerAPI {
     public static let session = ServerAPI()
     
     fileprivate init() {
-        ServerNetworking.session.authenticationDelegate = self
+        ServerNetworking.session.delegate = self
     }
     
     func updateCreds(_ creds:GenericCredentials?) {
@@ -115,20 +118,38 @@ class ServerAPI {
     // MARK: Authentication/user-sign in
     
     // Adds the user specified by the creds property (or authenticationDelegate in ServerNetworking if that is nil).
-    public func addUser(completion:((SyncServerError?)->(Void))?) {
+    public func addUser(completion:((UserId?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.addUser
         let url = makeURL(forEndpoint: endpoint)
         
         sendRequestUsing(method: endpoint.method,
             toURL: url) { (response,  httpStatus, error) in
-            completion?(self.checkForError(statusCode: httpStatus, error: error))
+           
+            guard let response = response else {
+                completion?(nil, .nilResponse)
+                return
+            }
+            
+            let error = self.checkForError(statusCode: httpStatus, error: error)
+
+            guard error == nil else {
+                completion?(nil, error)
+                return
+            }
+            
+            guard let checkCredsResponse = AddUserResponse(json: response) else {
+                completion?(nil, .badAddUser)
+                return
+            }
+            
+            completion?(checkCredsResponse.userId, nil)
         }
     }
     
     enum CheckCredsResult {
     case noUser
-    case owningUser
-    case sharingUser(sharingPermission:SharingPermission, accessToken:String?)
+    case owningUser(UserId)
+    case sharingUser(UserId, sharingPermission:SharingPermission, accessToken:String?)
     }
     
     // Checks the creds of the user specified by the creds property (or authenticationDelegate in ServerNetworking if that is nil). Because this method uses an unauthorized (401) http status code to indicate that the user doesn't exist, it will not do retries in the case of an error.
@@ -151,11 +172,11 @@ class ServerAPI {
                 }
                 
                 if checkCredsResponse.sharingPermission == nil {
-                    result = .owningUser
+                    result = .owningUser(checkCredsResponse.userId)
                 }
                 else {
                     let accessToken = response?[ServerConstants.httpResponseOAuth2AccessTokenKey] as? String
-                    result = .sharingUser(sharingPermission: checkCredsResponse.sharingPermission, accessToken: accessToken)
+                    result = .sharingUser(checkCredsResponse.userId, sharingPermission: checkCredsResponse.sharingPermission!, accessToken: accessToken)
                 }
             }
             
@@ -615,8 +636,8 @@ class ServerAPI {
     }
 }
 
-extension ServerAPI : ServerNetworkingAuthentication {
-    func headerAuthentication(forServerNetworking: Any?) -> [String:String]? {
+extension ServerAPI : ServerNetworkingDelegate {    
+    func serverNetworkingHeaderAuthentication(forServerNetworking: Any?) -> [String:String]? {
         var result = [String:String]()
         if self.authTokens != nil {
             for (key, value) in self.authTokens! {
