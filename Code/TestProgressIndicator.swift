@@ -24,7 +24,7 @@ class TestProgressIndicator: XCTestCase {
     
     func testShowOnce() {
         let exp = expectation(description: "Test")
-        let progressIndicator = ProgressIndicator(imagesToDownload: 100, imagesToDelete: 0) {
+        let progressIndicator = ProgressIndicator(filesToDownload: 100, filesToDelete: 0) {
             Log.msg("Pressed the Stop Button!")
             exp.fulfill()
         }
@@ -50,10 +50,10 @@ class TestProgressIndicator: XCTestCase {
     func testShowTwice() {
         let exp = expectation(description: "Test")
         var progressIndicator2:ProgressIndicator?
-        var progressIndicator1 = ProgressIndicator(imagesToDownload: 100, imagesToDelete: 0) {
+        var progressIndicator1 = ProgressIndicator(filesToDownload: 100, filesToDelete: 0) {
             Log.msg("Pressed the Stop Button!")
             
-            progressIndicator2 = ProgressIndicator(imagesToDownload: 200, imagesToDelete: 0) {
+            progressIndicator2 = ProgressIndicator(filesToDownload: 200, filesToDelete: 0) {
                 exp.fulfill()
             }
             

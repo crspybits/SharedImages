@@ -10,7 +10,7 @@
 Provides upport for a special type of file to reduce conflicts with SyncServer:
 
 - JSON format
-- Top level structure is an array of JSON dict objects
+- Top level structure is a dictionary where the main element is an array of JSON dict objects
 - Each of these objects has a unique id
 - Once added, these objects *never* change
 - Once added, these objects cannot be removed
@@ -26,17 +26,44 @@ import SMCoreLib
 struct FixedObjects: Sequence, Equatable {
     typealias ConvertableToJSON = Any
     typealias FixedObject = [String: ConvertableToJSON]
-    private var contents = [Element]()
+    typealias MainDictionary = [String: ConvertableToJSON]
+    
+    // It is an error for you to directly use this key to access the main dictionary.
+    let elementsKey = "elements"
+    
+    private var mainDictionary = MainDictionary()
+    private var elements = [Element]()
+    
     fileprivate var ids = Set<String>()
     static let idKey = "id"
     
     var count: Int {
-        return contents.count
+        return elements.count
     }
     
     subscript(index: Int) -> FixedObject {
         get {
-            return contents[index]
+            return elements[index]
+        }
+    }
+    
+    // Access the top-level (main) dictionary.
+    subscript(index: String) -> ConvertableToJSON? {
+        get {
+            if index == elementsKey {
+                Log.error("Cannot use key: \(elementsKey)")
+                return nil
+            }
+            else {
+                return mainDictionary[index]
+            }
+        }
+        
+        set(newValue) {
+            if index != elementsKey {
+                Log.error("Cannot use key: \(elementsKey)")
+                mainDictionary[index] = newValue
+            }
         }
     }
     
@@ -57,17 +84,20 @@ struct FixedObjects: Sequence, Equatable {
             return nil
         }
         
-        guard let contents = jsonObject as? [FixedObject] else {
+        guard let mainDictionary = jsonObject as? MainDictionary,
+            let elements = mainDictionary[elementsKey] as? [FixedObject] else {
             return nil
         }
         
         do {
-            for fixedObject in contents {
+            for fixedObject in elements {
                 try add(newFixedObject: fixedObject)
             }
         } catch {
             return nil
         }
+        
+        self.mainDictionary = mainDictionary
     }
     
     enum Errors : Error {
@@ -86,11 +116,11 @@ struct FixedObjects: Sequence, Equatable {
         }
         
         ids.insert(newId)
-        contents += [newFixedObject]
+        elements += [newFixedObject]
     }
     
-    // Duplicates are ignored-- they are assumed to be identical.
-    // The `new` count is with respect to self: The number of new objects added in the merge from the other.
+    // Duplicate FixedObjects are ignored-- they are assumed to be identical. Other keys/values in the main dictionaries are simply assigned into the main dictionary of the result, other first and then self (so self takes priority).
+    // The `new` count is with respect to the FixedObjects in self: The number of new objects added in the merge from the other.
     func merge(with otherFixedObjects: FixedObjects) -> (FixedObjects, new: Int) {
         var mergedResult = FixedObjects()
         
@@ -107,6 +137,14 @@ struct FixedObjects: Sequence, Equatable {
             }
         }
         
+        for (mainDictKey, mainDictValue) in otherFixedObjects.mainDictionary {
+            mergedResult.mainDictionary[mainDictKey] = mainDictValue
+        }
+        
+        for (mainDictKey, mainDictValue) in self.mainDictionary {
+            mergedResult.mainDictionary[mainDictKey] = mainDictValue
+        }
+        
         return (mergedResult, new)
     }
     
@@ -117,7 +155,9 @@ struct FixedObjects: Sequence, Equatable {
     }
     
     private func getData() throws -> Data {
-        return try JSONSerialization.data(withJSONObject: contents, options: JSONSerialization.WritingOptions(rawValue: 0))
+        var mainDictionary = self.mainDictionary
+        mainDictionary[elementsKey] = elements
+        return try JSONSerialization.data(withJSONObject: mainDictionary, options: JSONSerialization.WritingOptions(rawValue: 0))
     }
     
     // Adapted from https://digitalleaves.com/blog/2017/03/sequence-hacking-in-swift-iii-building-custom-sequences-for-fun-and-profit/
@@ -126,8 +166,8 @@ struct FixedObjects: Sequence, Equatable {
         return AnyIterator {
             var result: FixedObject?
             
-            if index < self.contents.count {
-                result = self.contents[index]
+            if index < self.elements.count {
+                result = self.elements[index]
                 index += 1
             }
             
@@ -135,7 +175,7 @@ struct FixedObjects: Sequence, Equatable {
         }
     }
     
-    // Equality includes ordering of calls to `add`, i.e., ordering of the FixedObjects in the sequence.
+    // Equality includes ordering of calls to `add`, i.e., ordering of the FixedObjects in the sequence. And contents of the main dictionary.
     static func ==(lhs: FixedObjects, rhs: FixedObjects) -> Bool {
         do {
             let data1 = try lhs.getData()
@@ -148,7 +188,7 @@ struct FixedObjects: Sequence, Equatable {
     }
 }
 
-// Weaker equivalency: Just checks to make sure objects have each have the same ids. Doesn't check other contents of the objects in each.
+// Weaker equivalency: Just checks to make sure objects have each have the same ids. Doesn't check other contents of the objects in each. Doesn't include other key/values in main dictionary.
 infix operator ~~
 func ~~(lhs: FixedObjects, rhs: FixedObjects) -> Bool {
     return lhs.ids == rhs.ids

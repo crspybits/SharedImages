@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2732DEE9F55439017415A76A /* Pods_SharedImages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B908205C67FEB8F896E15398 /* Pods_SharedImages.framework */; };
 		2987D796FBECCBAD42606057 /* Pods_SharedImagesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */; };
-		8305C0472026D4040064A339 /* ChangeFrameTransitioningDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8305C0452026D4040064A339 /* ChangeFrameTransitioningDelegate.m */; };
 		830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */; };
 		830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */; };
 		8310F5151F11D8FA00735EDB /* GoogleSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8310F5131F11D8FA00735EDB /* GoogleSignIn.swift */; };
@@ -70,8 +69,6 @@
 
 /* Begin PBXFileReference section */
 		3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SharedImagesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8305C0442026D4030064A339 /* ChangeFrameTransitioningDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeFrameTransitioningDelegate.h; sourceTree = "<group>"; };
-		8305C0452026D4040064A339 /* ChangeFrameTransitioningDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeFrameTransitioningDelegate.m; sourceTree = "<group>"; };
 		830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
 		830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedImagesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedImagesTests.swift; sourceTree = "<group>"; };
@@ -269,8 +266,6 @@
 				83C34070201D58C500DAD865 /* FixedObjects.swift */,
 				838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */,
 				831A759D20279C76004F330A /* DiscussionMessage.swift */,
-				8305C0442026D4030064A339 /* ChangeFrameTransitioningDelegate.h */,
-				8305C0452026D4040064A339 /* ChangeFrameTransitioningDelegate.m */,
 			);
 			path = "DIscussion Threads";
 			sourceTree = "<group>";
@@ -426,7 +421,7 @@
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = BH68R29JBE;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 1;
@@ -700,7 +695,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8305C0472026D4040064A339 /* ChangeFrameTransitioningDelegate.m in Sources */,
 				8310F5151F11D8FA00735EDB /* GoogleSignIn.swift in Sources */,
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
 				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
@@ -912,8 +906,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BH68R29JBE;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -921,8 +915,8 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "87d3c9ce-6339-4b7c-b4ed-b6b3e7828d0e";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -935,8 +929,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BH68R29JBE;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -944,8 +938,8 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "87d3c9ce-6339-4b7c-b4ed-b6b3e7828d0e";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;

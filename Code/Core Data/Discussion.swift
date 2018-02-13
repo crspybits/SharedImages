@@ -35,7 +35,8 @@ public class Discussion: NSManagedObject {
     }
 
     class func newObjectAndMakeUUID(makeUUID: Bool) -> NSManagedObject {
-        let discussion = CoreData.sessionNamed(CoreDataExtras.sessionName).newObject(withEntityName: self.entityName()) as! Discussion
+        let discussion = CoreData.sessionNamed(CoreDataExtras.sessionName).newObject(withEntityName:
+                self.entityName()) as! Discussion
         
         if makeUUID {
             discussion.uuid = UUID.make()

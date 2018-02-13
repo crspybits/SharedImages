@@ -13,6 +13,9 @@ import ODRefreshControl
 import LottiesBottom
 
 class ImagesVC: UIViewController {
+    // Key in discussion JSON file.
+    private let imageUUIDKey = "imageUUID"
+    
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
     var addImageBarButton:UIBarButtonItem!
@@ -302,49 +305,58 @@ class ImagesVC: UIViewController {
         return newImage
     }
     
-    // Three cases: 1) new discussion added locally (uuid of the FileData will be nil), 2) update to existing local discussion, and 3) new discussion from server.
+    enum AddToDiscussion {
+        case newLocalDiscussion
+        case fromServer
+    }
+    
+    // Three cases: 1) new discussion added locally (uuid of the FileData will be nil), 2) update to existing local discussion (with data from server), and 3) new discussion from server.
     @discardableResult
-    func addToLocalDiscussion(discussionData: FileData) -> Discussion {
+    func addToLocalDiscussion(discussionData: FileData, type: AddToDiscussion) -> Discussion {
         var localDiscussion: Discussion!
         
-        if discussionData.uuid == nil {
-            // 1) New discussion, added locally.
-            localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: true) as! Discussion)
-        }
-        else if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(uuid: discussionData.uuid!) {
-            // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
-            
-            localDiscussion = existingLocalDiscussion
-            
-            // Since we didn't have a conflict, `newFixedObjects` will be a superset of the existing objects.
-            if let newFixedObjects = FixedObjects(withFile: discussionData.url as URL),
-                let existingDiscussionURL = existingLocalDiscussion.url,
-                let oldFixedObjects = FixedObjects(withFile: existingDiscussionURL as URL) {
-                
-                // We still want to know how many new messages there are.
-                let (_, newCount) = oldFixedObjects.merge(with: newFixedObjects)
-                // Use `+=1` here because there may already be unread messages.
-                existingLocalDiscussion.unreadCount += Int32(newCount)
-                
-                // Remove the existing discussion file
-                do {
-                    try FileManager.default.removeItem(at: existingDiscussionURL as URL)
-                } catch (let error) {
-                    Log.error("Error removing old discussion file: \(error)")
-                }
-            }
-        }
-        else {
-            // 3) New discussion downloaded from server.
+        switch type {
+        case .newLocalDiscussion:
+            // 1)
             localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
             localDiscussion.uuid = discussionData.uuid
             
-            // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
-            if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
-                localDiscussion.unreadCount = Int32(fixedObjects.count)
+        case .fromServer:
+            if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(uuid: discussionData.uuid!) {
+                // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
+                
+                localDiscussion = existingLocalDiscussion
+                
+                // Since we didn't have a conflict, `newFixedObjects` will be a superset of the existing objects.
+                if let newFixedObjects = FixedObjects(withFile: discussionData.url as URL),
+                    let existingDiscussionURL = existingLocalDiscussion.url,
+                    let oldFixedObjects = FixedObjects(withFile: existingDiscussionURL as URL) {
+                    
+                    // We still want to know how many new messages there are.
+                    let (_, newCount) = oldFixedObjects.merge(with: newFixedObjects)
+                    // Use `+=1` here because there may already be unread messages.
+                    existingLocalDiscussion.unreadCount += Int32(newCount)
+                    
+                    // Remove the existing discussion file
+                    do {
+                        try FileManager.default.removeItem(at: existingDiscussionURL as URL)
+                    } catch (let error) {
+                        Log.error("Error removing old discussion file: \(error)")
+                    }
+                }
             }
             else {
-                Log.error("Could not load discussion!")
+                // 3) New discussion downloaded from server.
+                localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
+                localDiscussion.uuid = discussionData.uuid
+                
+                // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
+                if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
+                    localDiscussion.unreadCount = Int32(fixedObjects.count)
+                }
+                else {
+                    Log.error("Could not load discussion!")
+                }
             }
         }
         
@@ -365,9 +377,12 @@ class ImagesVC: UIViewController {
         ImageExtras.removeLocalImages(uuids:uuids)
     }
     
-    private func createEmptyDiscussion() -> FileData? {
+    private func createEmptyDiscussion(image:Image, discussionUUID: String) -> FileData? {
         let newDiscussionFileURL = ImageExtras.newJSONFile()
-        let fixedObjects = FixedObjects()
+        var fixedObjects = FixedObjects()
+        
+        // This is so that we have the possibility of reconstructing the image/discussions if we lose the server data. This will explicitly connect the discussion to the image.
+        fixedObjects[imageUUIDKey] = image.uuid
     
         do {
             try fixedObjects.save(toFile: newDiscussionFileURL as URL)
@@ -378,7 +393,7 @@ class ImagesVC: UIViewController {
             return nil
         }
         
-        return FileData(url: newDiscussionFileURL, mimeType: "text/plain", uuid: nil)
+        return FileData(url: newDiscussionFileURL, mimeType: "text/plain", uuid: discussionUUID)
     }
 }
 
@@ -434,18 +449,20 @@ extension ImagesVC : SMAcquireImageDelegate {
             Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
         }
         
-        guard let newDiscussionFileData = createEmptyDiscussion() else {
-            return
-        }
-        
-        let newDiscussion = addToLocalDiscussion(discussionData: newDiscussionFileData)
+        let newDiscussionUUID = UUID.make()!
         
         let imageFileData = FileData(url: newImageURL, mimeType: mimeType, uuid: nil)
-        let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussion.uuid!)
+        let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = addLocalImage(newImageData: imageData)
         
+        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID) else {
+            return
+        }
+        
+        let newDiscussion = addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion)
+
         scrollIfNeeded(animated:true)
         
         // Sync this new image & discussion with the server.
@@ -508,7 +525,7 @@ extension ImagesVC : SyncControllerDelegate {
     }
     
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData) {
-        addToLocalDiscussion(discussionData: discussionData)
+        addToLocalDiscussion(discussionData: discussionData, type: .fromServer)
     }
     
     func updateUploadedImageDate(uuid: String, creationDate: NSDate) {
