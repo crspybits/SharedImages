@@ -11,6 +11,7 @@ Version 0.12.0 (2/12/18)
 		- Utilizing syncServerUserId, user display name, and user initials in MessageKit
 		- Updated terminology in upload/download progress indicator
 		- Added a close icon
+		- JSON discussion files also include image uuid's so that given only user data, discussions might be reconnected to their images.
 		
 Version 0.11.0 (1/7/18)
 	* Fixed crash issue-- when returning to large images screen.
