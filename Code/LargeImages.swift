@@ -13,14 +13,35 @@ import SMCoreLib
 
 class LargeImages : UIViewController {
     // Set these two when creating an instance of this class.
-    var startItem: Int! = 0
+    var startItem: Int = 0
     weak var syncController:SyncController?
     
     private var seekToIndexPath:IndexPath?
     let IMAGE_WIDTH_PADDING:CGFloat = 20.0
 
     @IBOutlet weak var collectionView: UICollectionView!
-    var coreDataSource:CoreDataSource!
+    
+    private var _coreDataSource:CoreDataSource!
+    private var coreDataSource:CoreDataSource! {
+        get {
+            if _coreDataSource == nil {
+                // 12/31/17; Just had a crash here. On `coreDataSource.fetchData()`. This was arising because of the nil assignment I put in `viewWillDisappear`. I'm putting the assignment to `coreDataSource` here (moved from viewDidLoad) to deal with this.
+                // 2/13/18; Trying to fix: https://github.com/crspybits/SharedImages/issues/80
+                _coreDataSource = CoreDataSource(delegate: self)
+                _coreDataSource.fetchData()
+
+                let indexPath = IndexPath(item: startItem, section: 0)
+                seekToIndexPath = indexPath
+            }
+            
+            return _coreDataSource
+        }
+        
+        set {
+            _coreDataSource = newValue
+        }
+    }
+    
     let reuseIdentifier = "largeImage"
     
     typealias FirstTimeZoomed = Bool
@@ -43,17 +64,6 @@ class LargeImages : UIViewController {
         ImageExtras.resetToSmallerImageCache() {
             collectionView.reloadData()
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // 12/31/17; Just had a crash here. On `coreDataSource.fetchData()`. This was arising because of the nil assignment I put in `viewWillDisappear`. I'm putting the assignment to `coreDataSource` here (moved from viewDidLoad) to deal with this.
-        coreDataSource = CoreDataSource(delegate: self)
-        coreDataSource.fetchData()
-
-        let indexPath = IndexPath(item: startItem, section: 0)
-        seekToIndexPath = indexPath
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -218,7 +228,11 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
         let maxWidth = max(collectionView.frame.height, collectionView.frame.width)
         let boundingCellSize = CGSize(width: maxWidth, height: collectionView.frame.height)
         
+        /* 2/13/18; Looks like this line caused a crash: https://github.com/crspybits/SharedImages/issues/80
+        I assume this must have occurred with an unwrapping of `coreDataSource` when it was nil. I'm trying to fix this by using a getter which always sets the coreDataSource if nil.
+        */
         let image = self.coreDataSource.object(at: indexPath) as! Image
+        
         var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
         
         if let firstTimeZoomed = zoomedCells[indexPath], firstTimeZoomed {

@@ -37,6 +37,9 @@ class DiscussionVC: MessagesViewController {
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
+        
+        // 2/13/18; See https://github.com/crspybits/SharedImages/issues/81 and see https://github.com/MessageKit/MessageKit/issues/518
+        messageInputBar.sendButton.titleLabel?.font = UIFont.systemFont(ofSize: 22.0)
 
         messageInputBar.sendButton.tintColor = UIColor(red: 69/255, green: 193/255, blue: 89/255, alpha: 1)
         scrollsToBottomOnKeybordBeginsEditing = true // default false
