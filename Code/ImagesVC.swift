@@ -46,9 +46,6 @@ class ImagesVC: UIViewController {
     
     private var deletedImages:[IndexPath]?
     
-    // Does the app have discussions yet?
-    private static let discussions = SMPersistItemBool(name: "ImagesVC.discussions", initialBoolValue: false, persistType: .userDefaults)
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
@@ -571,11 +568,7 @@ extension ImagesVC : SyncControllerDelegate {
             
             self.bottomAnimation.reset()
             
-            // So that we don't get a whole bunch of unread counts the first time we download the data.
-            if !ImagesVC.discussions.boolValue {
-                ImagesVC.discussions.boolValue = true
-                resetUnreadCounts()
-            }
+            // 2/13/18; I had been resetting the unread counts on first use of the app, but I don't think that's appropriate. See https://github.com/crspybits/SharedImages/issues/83
             
             // To refresh the badge unread counts, if we have new messages.
             collectionView.reloadData()
@@ -589,16 +582,6 @@ extension ImagesVC : SyncControllerDelegate {
     
     func completedAddingLocalImages() {
         scrollIfNeeded(animated: true)
-    }
-    
-    private func resetUnreadCounts() {
-        let discussions = Discussion.fetchAll()
-        discussions.forEach { discussion in
-            discussion.unreadCount = 0
-        }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        collectionView.reloadData()
     }
 }
 
