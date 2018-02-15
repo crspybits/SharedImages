@@ -96,7 +96,12 @@ class ProgressIndicator {
         alert.present()
     }
     
-    func dismiss() {
+    func dismiss(force:Bool = false) {
+        if force {
+            alert.dismiss(animated: false, completion: nil)
+            return
+        }
+        
         // Make sure that we display the progress indicator for the minimum time.
         let endTime = CACurrentMediaTime()
         let diff = endTime - startTime

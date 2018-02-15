@@ -293,6 +293,7 @@ extension SyncController : SyncServerDelegate {
         // 12/3/17; We can get here from a call to `shouldDoDeletions`-- when the app is just recovering -- doing deletions on a refresh without having actually done any server interaction. i.e., the client interface has just cached some deletions.
         if numberDownloadedSoFar != nil {
             numberDownloadedSoFar! += count
+            Log.msg("numberDownloadedSoFar: \(numberDownloadedSoFar)")
             progressIndicator?.updateProgress(withNumberFilesProcessed: numberDownloadedSoFar)
             if numberDownloadedSoFar! >= numberDownloads {
                 progressIndicator?.dismiss()
@@ -356,6 +357,8 @@ extension SyncController : SyncServerDelegate {
     func syncServerEventOccurred(event:SyncEvent) {
         Log.msg("Server event occurred: \(event)")
         
+        let progressIndicatorDelay:DispatchTimeInterval = .milliseconds(500)
+        
         switch event {
         case .syncStarted:
             delegate.syncEvent(syncController: self, event: .syncStarted)
@@ -368,11 +371,14 @@ extension SyncController : SyncServerDelegate {
 #endif
             }
             
+            Log.msg("willStartDownloads: Starting ProgressIndicator")
+
             numberDownloads = numberFileDownloads + numberDownloadDeletions
             numberDownloadedSoFar = 0
             
             // In case there's already one. Seems unlikely, but willStartDownloads can be repeated if we get a master version update.
-            progressIndicator?.dismiss()
+            // 2/13/18; And while it seems unlikely, I've found a case where it occurs: https://github.com/crspybits/SharedImages/issues/82
+            progressIndicator?.dismiss(force: true)
             
             // TESTING
             // TimedCallback.withDuration(30, andCallback: {
@@ -380,11 +386,14 @@ extension SyncController : SyncServerDelegate {
             // })
             // TESTING
             
-            progressIndicator = ProgressIndicator(filesToDownload: numberFileDownloads, filesToDelete: numberDownloadDeletions, withStopHandler: {
-                SyncServer.session.stopSync()
-            })
-            progressIndicator.show()
-            
+            // 2/13/18; I'm having problems getting this to actually display the progress indicator in the case of https://github.com/crspybits/SharedImages/issues/82 It turns out it needs an appreciable delay (1ms doesn't work, but 500ms does).
+            DispatchQueue.main.asyncAfter(deadline: .now() + progressIndicatorDelay) {[unowned self] in
+                self.progressIndicator = ProgressIndicator(filesToDownload: numberFileDownloads, filesToDelete: numberDownloadDeletions, withStopHandler: {
+                    SyncServer.session.stopSync()
+                })
+                self.progressIndicator.show()
+            }
+
         case .willStartUploads(numberFileUploads: let numberFileUploads, numberUploadDeletions: let numberUploadDeletions):
         
             RosterDevInjectTest.if(TestCases.session.testCrashNextUpload) {[unowned self] in
@@ -396,13 +405,15 @@ extension SyncController : SyncServerDelegate {
             Log.msg("willStartUploads: Starting ProgressIndicator")
             numberUploads = numberFileUploads + numberUploadDeletions
             numberUploadedSoFar = 0
-            progressIndicator?.dismiss()
+            progressIndicator?.dismiss(force: true)
             
-            progressIndicator = ProgressIndicator(filesToUpload: numberFileUploads, filesToUploadDelete: numberUploadDeletions, withStopHandler: {
-                SyncServer.session.stopSync()
-            })
+            DispatchQueue.main.asyncAfter(deadline: .now() + progressIndicatorDelay) {[unowned self] in
+                self.progressIndicator = ProgressIndicator(filesToUpload: numberFileUploads, filesToUploadDelete: numberUploadDeletions, withStopHandler: {
+                    SyncServer.session.stopSync()
+                })
 
-            progressIndicator.show()
+                self.progressIndicator.show()
+            }
             
         case .singleFileUploadComplete(attr: let attr):
             let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
