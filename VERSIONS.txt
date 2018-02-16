@@ -1,11 +1,13 @@
 SharedImages
 
-Version 0.12.1
+Version 0.12.1 (2/15/18)
 	* Fixed: S..d button on iPhone X: Rod
 		https://github.com/crspybits/SharedImages/issues/81
 	* Attempted fix: Dany: Back crashed the app after comment uploaded.
 		https://github.com/crspybits/SharedImages/issues/80
-	
+	* Fixed: The discussion progress indicator now seems to go away too quickly
+		https://github.com/crspybits/SharedImages/issues/82
+		
 Version 0.12.0 (2/12/18)
 	* Adding discussion thread feature.
 		https://github.com/crspybits/SharedImages/issues/75
