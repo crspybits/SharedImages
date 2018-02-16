@@ -213,6 +213,7 @@ class ImagesVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         coreDataSource.fetchData()
+        Progress.session.navController = self.navigationController
     }
     
     override func viewDidAppear(_ animated: Bool) {

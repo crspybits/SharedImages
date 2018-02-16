@@ -49,7 +49,7 @@ protocol SyncControllerDelegate : class {
 }
 
 class SyncController {
-    private var progressIndicator: ProgressIndicator!
+//    private var progressIndicator: ProgressIndicator!
     private var numberDownloads: UInt!
     private var numberDownloadedSoFar: UInt!
     private var numberUploads: UInt!
@@ -271,7 +271,8 @@ extension SyncController : SyncServerDelegate {
         delegate.addLocalImage(syncController: self, imageData: imageData)
         
         delegate.completedAddingLocalImages()
-        updateDownloadProgress()
+//        updateDownloadProgress()
+        Progress.session.next()
     }
     
     private func discussionDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
@@ -286,30 +287,31 @@ extension SyncController : SyncServerDelegate {
         let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, uuid: attr.fileUUID)
         delegate.addToLocalDiscussion(syncController: self, discussionData: discussionFileData)
         
-        updateDownloadProgress()
+        Progress.session.next()
+//        updateDownloadProgress()
     }
     
-    private func updateDownloadProgress(count:UInt = 1) {
-        // 12/3/17; We can get here from a call to `shouldDoDeletions`-- when the app is just recovering -- doing deletions on a refresh without having actually done any server interaction. i.e., the client interface has just cached some deletions.
-        if numberDownloadedSoFar != nil {
-            numberDownloadedSoFar! += count
-            Log.msg("numberDownloadedSoFar: \(numberDownloadedSoFar)")
-            progressIndicator?.updateProgress(withNumberFilesProcessed: numberDownloadedSoFar)
-            if numberDownloadedSoFar! >= numberDownloads {
-                progressIndicator?.dismiss()
-            }
-        }
-    }
+//    private func updateDownloadProgress(count:UInt = 1) {
+//        // 12/3/17; We can get here from a call to `shouldDoDeletions`-- when the app is just recovering -- doing deletions on a refresh without having actually done any server interaction. i.e., the client interface has just cached some deletions.
+//        if numberDownloadedSoFar != nil {
+//            numberDownloadedSoFar! += count
+//            Log.msg("numberDownloadedSoFar: \(numberDownloadedSoFar)")
+//            progressIndicator?.updateProgress(withNumberFilesProcessed: numberDownloadedSoFar)
+//            if numberDownloadedSoFar! >= numberDownloads {
+//                progressIndicator?.dismiss()
+//            }
+//        }
+//    }
     
-    private func updateUploadProgress(count:UInt = 1) {
-        if numberUploadedSoFar != nil {
-            numberUploadedSoFar! += count
-            progressIndicator?.updateProgress(withNumberFilesProcessed: numberUploadedSoFar)
-            if numberUploadedSoFar! >= numberUploads {
-                progressIndicator?.dismiss()
-            }
-        }
-    }
+//    private func updateUploadProgress(count:UInt = 1) {
+//        if numberUploadedSoFar != nil {
+//            numberUploadedSoFar! += count
+//            progressIndicator?.updateProgress(withNumberFilesProcessed: numberUploadedSoFar)
+//            if numberUploadedSoFar! >= numberUploads {
+//                progressIndicator?.dismiss()
+//            }
+//        }
+//    }
     
     // Initially, I wanted to resolve this conflict with `.rejectDownloadDeletion(.keepFileUpload)`. However, this has technical problems. See https://github.com/crspybits/SharedImages/issues/77
     // For now, so that I can complete an initial implementation of discussion threads, I'm going to just use .acceptDownloadDeletion, and have the server take priority on download deletions.
@@ -322,7 +324,8 @@ extension SyncController : SyncServerDelegate {
     func syncServerShouldDoDeletions(downloadDeletions:[SyncAttributes]) {
         let uuids = downloadDeletions.map({$0.fileUUID!})
         delegate.removeLocalImages(syncController: self, uuids: uuids)
-        updateDownloadProgress(count: UInt(uuids.count))
+        Progress.session.next(count: uuids.count)
+//        updateDownloadProgress(count: UInt(uuids.count))
     }
     
     func syncServerErrorOccurred(error:SyncServerError) {
@@ -357,7 +360,7 @@ extension SyncController : SyncServerDelegate {
     func syncServerEventOccurred(event:SyncEvent) {
         Log.msg("Server event occurred: \(event)")
         
-        let progressIndicatorDelay:DispatchTimeInterval = .milliseconds(500)
+//        let progressIndicatorDelay:DispatchTimeInterval = .milliseconds(500)
         
         switch event {
         case .syncStarted:
@@ -371,14 +374,15 @@ extension SyncController : SyncServerDelegate {
 #endif
             }
             
-            Log.msg("willStartDownloads: Starting ProgressIndicator")
+//            Log.msg("willStartDownloads: Starting ProgressIndicator")
 
             numberDownloads = numberFileDownloads + numberDownloadDeletions
+            Progress.session.start(withTotalNumber: Int(numberDownloads))
             numberDownloadedSoFar = 0
             
             // In case there's already one. Seems unlikely, but willStartDownloads can be repeated if we get a master version update.
             // 2/13/18; And while it seems unlikely, I've found a case where it occurs: https://github.com/crspybits/SharedImages/issues/82
-            progressIndicator?.dismiss(force: true)
+//            progressIndicator?.dismiss(force: true)
             
             // TESTING
             // TimedCallback.withDuration(30, andCallback: {
@@ -387,12 +391,12 @@ extension SyncController : SyncServerDelegate {
             // TESTING
             
             // 2/13/18; I'm having problems getting this to actually display the progress indicator in the case of https://github.com/crspybits/SharedImages/issues/82 It turns out it needs an appreciable delay (1ms doesn't work, but 500ms does).
-            DispatchQueue.main.asyncAfter(deadline: .now() + progressIndicatorDelay) {[unowned self] in
-                self.progressIndicator = ProgressIndicator(filesToDownload: numberFileDownloads, filesToDelete: numberDownloadDeletions, withStopHandler: {
-                    SyncServer.session.stopSync()
-                })
-                self.progressIndicator.show()
-            }
+//            DispatchQueue.main.asyncAfter(deadline: .now() + progressIndicatorDelay) {[unowned self] in
+//                self.progressIndicator = ProgressIndicator(filesToDownload: numberFileDownloads, filesToDelete: numberDownloadDeletions, withStopHandler: {
+//                    SyncServer.session.stopSync()
+//                })
+//                self.progressIndicator.show()
+//            }
 
         case .willStartUploads(numberFileUploads: let numberFileUploads, numberUploadDeletions: let numberUploadDeletions):
         
@@ -402,18 +406,20 @@ extension SyncController : SyncServerDelegate {
 #endif
             }
         
-            Log.msg("willStartUploads: Starting ProgressIndicator")
+//            Log.msg("willStartUploads: Starting ProgressIndicator")
             numberUploads = numberFileUploads + numberUploadDeletions
-            numberUploadedSoFar = 0
-            progressIndicator?.dismiss(force: true)
+            Progress.session.start(withTotalNumber: Int(numberUploads))
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + progressIndicatorDelay) {[unowned self] in
-                self.progressIndicator = ProgressIndicator(filesToUpload: numberFileUploads, filesToUploadDelete: numberUploadDeletions, withStopHandler: {
-                    SyncServer.session.stopSync()
-                })
-
-                self.progressIndicator.show()
-            }
+            numberUploadedSoFar = 0
+//            progressIndicator?.dismiss(force: true)
+            
+//            DispatchQueue.main.asyncAfter(deadline: .now() + progressIndicatorDelay) {[unowned self] in
+//                self.progressIndicator = ProgressIndicator(filesToUpload: numberFileUploads, filesToUploadDelete: numberUploadDeletions, withStopHandler: {
+//                    SyncServer.session.stopSync()
+//                })
+//
+//                self.progressIndicator.show()
+//            }
             
         case .singleFileUploadComplete(attr: let attr):
             let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
@@ -423,15 +429,18 @@ extension SyncController : SyncServerDelegate {
                 delegate.updateUploadedImageDate(uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
             }
             
-            updateUploadProgress()
+            Progress.session.next()
+//            updateUploadProgress()
             
         case .singleUploadDeletionComplete:
-            updateUploadProgress()
+            Progress.session.next()
+//            updateUploadProgress()
             
         case .syncDone:
             delegate.syncEvent(syncController: self, event: .syncDone)
             syncDone?()
             syncDone = nil
+            Progress.session.finish()
         
         default:
             Log.error("Unexpected event received: \(event)")

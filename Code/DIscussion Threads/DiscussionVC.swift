@@ -146,6 +146,11 @@ class DiscussionVC: MessagesViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        Progress.session.navController = self.navigationController
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         closeHandler?()
