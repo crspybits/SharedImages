@@ -18,11 +18,16 @@
 		8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */; };
 		8324EE301E75EC62000656AF /* SignInVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE2F1E75EC62000656AF /* SignInVC.swift */; };
 		8324EE331E764907000656AF /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE321E764907000656AF /* SyncController.swift */; };
-		8324EE351E7649E3000656AF /* TabControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE341E7649E3000656AF /* TabControllerDelegate.swift */; };
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
-		8324EE541E77873F000656AF /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE531E77873F000656AF /* SyncSpinner.swift */; };
-		8347BA651EF109F9002763F6 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8347BA641EF109F9002763F6 /* Alert.swift */; };
-		834A7E682036787C00969B18 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E672036787C00969B18 /* Progress.swift */; };
+		834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6E2037858800969B18 /* TabControllerDelegate.swift */; };
+		834A7E792037858800969B18 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6F2037858800969B18 /* Alert.swift */; };
+		834A7E7A2037858800969B18 /* XibBasics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E702037858800969B18 /* XibBasics.swift */; };
+		834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E712037858800969B18 /* SyncSpinner.swift */; };
+		834A7E7C2037858800969B18 /* AppBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E722037858800969B18 /* AppBadge.swift */; };
+		834A7E7D2037858800969B18 /* Progress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E742037858800969B18 /* Progress.swift */; };
+		834A7E7E2037858800969B18 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E752037858800969B18 /* ProgressView.swift */; };
+		834A7E7F2037858800969B18 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 834A7E762037858800969B18 /* ProgressView.xib */; };
+		834A7E802037858800969B18 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E772037858800969B18 /* Types.swift */; };
 		835A3E471FB954AF009DB032 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A3E461FB954AF009DB032 /* Environment.swift */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
@@ -41,7 +46,6 @@
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
 		83E13B2520318366005A0A18 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E13B2420318366005A0A18 /* GameKit.framework */; };
 		83E13B272031836A005A0A18 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E13B262031836A005A0A18 /* StoreKit.framework */; };
-		83F58ACB1EE3BA140081C3D1 /* AppBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F58ACA1EE3BA140081C3D1 /* AppBadge.swift */; };
 		83F882451E711FC6008F644A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823D1E711FC6008F644A /* Assets.xcassets */; };
 		83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */; };
 		83F882471E711FC6008F644A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F882401E711FC6008F644A /* Main.storyboard */; };
@@ -81,13 +85,18 @@
 		8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupSignIn.swift; sourceTree = "<group>"; };
 		8324EE2F1E75EC62000656AF /* SignInVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInVC.swift; sourceTree = "<group>"; };
 		8324EE321E764907000656AF /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
-		8324EE341E7649E3000656AF /* TabControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabControllerDelegate.swift; sourceTree = "<group>"; };
 		8324EE431E7781AD000656AF /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BridgingHeader.h; path = Code/BridgingHeader.h; sourceTree = "<group>"; };
 		8324EE461E778623000656AF /* CALayer+MBAnimationPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MBAnimationPersistence.h"; sourceTree = "<group>"; };
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
-		8324EE531E77873F000656AF /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
-		8347BA641EF109F9002763F6 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
-		834A7E672036787C00969B18 /* Progress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
+		834A7E6E2037858800969B18 /* TabControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabControllerDelegate.swift; sourceTree = "<group>"; };
+		834A7E6F2037858800969B18 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		834A7E702037858800969B18 /* XibBasics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XibBasics.swift; sourceTree = "<group>"; };
+		834A7E712037858800969B18 /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
+		834A7E722037858800969B18 /* AppBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppBadge.swift; sourceTree = "<group>"; };
+		834A7E742037858800969B18 /* Progress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Progress.swift; sourceTree = "<group>"; };
+		834A7E752037858800969B18 /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		834A7E762037858800969B18 /* ProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgressView.xib; sourceTree = "<group>"; };
+		834A7E772037858800969B18 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		835A3E461FB954AF009DB032 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
@@ -109,7 +118,6 @@
 		83E13B2420318366005A0A18 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		83E13B262031836A005A0A18 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		83E4F9A31EFA194A006BE0F0 /* SharedImages.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SharedImages.entitlements; sourceTree = "<group>"; };
-		83F58ACA1EE3BA140081C3D1 /* AppBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppBadge.swift; sourceTree = "<group>"; };
 		83F8821F1E711600008F644A /* SharedImages.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedImages.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83F8823D1E711FC6008F644A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		83F8823F1E711FC6008F644A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Resources/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -222,17 +230,6 @@
 			name = Images;
 			sourceTree = "<group>";
 		};
-		8324EE361E7649E8000656AF /* Misc UI */ = {
-			isa = PBXGroup;
-			children = (
-				8324EE531E77873F000656AF /* SyncSpinner.swift */,
-				8324EE341E7649E3000656AF /* TabControllerDelegate.swift */,
-				83F58ACA1EE3BA140081C3D1 /* AppBadge.swift */,
-				8347BA641EF109F9002763F6 /* Alert.swift */,
-			);
-			name = "Misc UI";
-			sourceTree = "<group>";
-		};
 		8324EE441E778623000656AF /* SDKs */ = {
 			isa = PBXGroup;
 			children = (
@@ -250,10 +247,26 @@
 			path = "CALayer+MBAnimationPersistence";
 			sourceTree = "<group>";
 		};
-		834A7E662036786200969B18 /* Progress Indicator */ = {
+		834A7E6D2037858800969B18 /* Misc UI */ = {
 			isa = PBXGroup;
 			children = (
-				834A7E672036787C00969B18 /* Progress.swift */,
+				834A7E6E2037858800969B18 /* TabControllerDelegate.swift */,
+				834A7E6F2037858800969B18 /* Alert.swift */,
+				834A7E702037858800969B18 /* XibBasics.swift */,
+				834A7E712037858800969B18 /* SyncSpinner.swift */,
+				834A7E722037858800969B18 /* AppBadge.swift */,
+				834A7E732037858800969B18 /* Progress Indicator */,
+				834A7E772037858800969B18 /* Types.swift */,
+			);
+			path = "Misc UI";
+			sourceTree = "<group>";
+		};
+		834A7E732037858800969B18 /* Progress Indicator */ = {
+			isa = PBXGroup;
+			children = (
+				834A7E742037858800969B18 /* Progress.swift */,
+				834A7E752037858800969B18 /* ProgressView.swift */,
+				834A7E762037858800969B18 /* ProgressView.xib */,
 			);
 			path = "Progress Indicator";
 			sourceTree = "<group>";
@@ -333,8 +346,7 @@
 				835A3E461FB954AF009DB032 /* Environment.swift */,
 				8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */,
 				83F882601E749C18008F644A /* Consts.swift */,
-				834A7E662036786200969B18 /* Progress Indicator */,
-				8324EE361E7649E8000656AF /* Misc UI */,
+				834A7E6D2037858800969B18 /* Misc UI */,
 				8324EE2C1E74ABD4000656AF /* SignIn */,
 				8324EE311E763DBE000656AF /* Images */,
 				83C3406F201D57D400DAD865 /* DIscussion Threads */,
@@ -485,6 +497,7 @@
 				83A2E6AE1F76F84500A2E303 /* R.json in Resources */,
 				83A2E6AD1F76F84500A2E303 /* N.json in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
+				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
 			);
@@ -644,7 +657,6 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
 				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
-				"${BUILT_PRODUCTS_DIR}/M13ProgressSuite/M13ProgressSuite.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/ODRefreshControl/ODRefreshControl.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
@@ -672,7 +684,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/M13ProgressSuite.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ODRefreshControl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
@@ -711,35 +722,38 @@
 				8310F5151F11D8FA00735EDB /* GoogleSignIn.swift in Sources */,
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
 				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
+				834A7E802037858800969B18 /* Types.swift in Sources */,
 				837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */,
 				83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */,
 				83F8824E1E712004008F644A /* ImagesVC.swift in Sources */,
+				834A7E7D2037858800969B18 /* Progress.swift in Sources */,
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83F8824D1E712004008F644A /* AppDelegate.swift in Sources */,
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
 				8324EE301E75EC62000656AF /* SignInVC.swift in Sources */,
 				83F882561E73B2DC008F644A /* Image.swift in Sources */,
-				8324EE351E7649E3000656AF /* TabControllerDelegate.swift in Sources */,
 				831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */,
-				8324EE541E77873F000656AF /* SyncSpinner.swift in Sources */,
 				831EEC4E2002D76B001821B9 /* TestCases.swift in Sources */,
 				83D49C981F49468200409B0F /* SettingsVC.swift in Sources */,
 				83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */,
+				834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */,
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,
 				83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
+				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
+				834A7E792037858800969B18 /* Alert.swift in Sources */,
 				835A3E471FB954AF009DB032 /* Environment.swift in Sources */,
 				83FAF3A21F4554B90009111B /* TrashActivity.swift in Sources */,
+				834A7E7A2037858800969B18 /* XibBasics.swift in Sources */,
 				838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */,
-				83F58ACB1EE3BA140081C3D1 /* AppBadge.swift in Sources */,
+				834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */,
+				834A7E7C2037858800969B18 /* AppBadge.swift in Sources */,
 				831A759E20279C76004F330A /* DiscussionMessage.swift in Sources */,
 				8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */,
-				834A7E682036787C00969B18 /* Progress.swift in Sources */,
-				8347BA651EF109F9002763F6 /* Alert.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -74,7 +74,7 @@ class SyncSpinner : UIView {
         self.animating = true
         self.isHidden = false
         let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
-        rotationAnimation.toValue = M_PI * 2.0
+        rotationAnimation.toValue = Double.pi * 2.0
         rotationAnimation.duration = 1
         rotationAnimation.isCumulative = true
         rotationAnimation.repeatCount = Float.infinity

@@ -28,10 +28,6 @@ class ImagesVC: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    // Spinner for controlling/indicating sync with SyncServer. This spinner is displayed for as long as the synchronization operation with the SyncServer takes. It's not visible or available afterwards, unless an error occurs.
-    var spinner:SyncSpinner!
-    var timeThatSpinnerStarts:CFTimeInterval!
-    
     fileprivate var navigatedToLargeImages = false
     
     fileprivate var imageCache:LRUCache<Image>! {
@@ -88,19 +84,10 @@ class ImagesVC: UIViewController {
         titleLabel.addGestureRecognizer(lp)
         titleLabel.isUserInteractionEnabled = true
         
-        // Spinner that shows when syncing
-        let spinnerSize:CGFloat = 25
-        spinner = SyncSpinner(frame: CGRect(x: 0, y: 0, width: spinnerSize, height: spinnerSize))
-        let spinnerButton = UIButton()
-        spinnerButton.backgroundColor = UIColor.clear
-        spinnerButton.frame = CGRect(x: 0, y: 0, width: spinnerSize, height: spinnerSize)
-        spinnerButton.addSubview(spinner)
-        let spinnerBarButtonItem = UIBarButtonItem(customView: spinnerButton)
-        
         // For sharing images via email, text messages, and for deleting images.
         actionButton = UIBarButtonItem(image: #imageLiteral(resourceName: "Action"), style: .plain, target: self, action: #selector(actionButtonAction))
         
-        navigationItem.setLeftBarButtonItems([actionButton, spinnerBarButtonItem], animated: false)
+        navigationItem.setLeftBarButtonItems([actionButton], animated: false)
         
         let size = CGSize(width: 200, height: 100)
         let animationLetters = ["C", "R", "D", "N"]
@@ -213,7 +200,7 @@ class ImagesVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         coreDataSource.fetchData()
-        Progress.session.navController = self.navigationController
+        Progress.session.viewController = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -232,6 +219,17 @@ class ImagesVC: UIViewController {
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
         setAddButtonState()
+        
+        // TESTING
+//        let progress = ProgressView.create()!
+//        progress.setup()
+//        //progress.showOn(navController: self.navigationController!, withAnimation: true)
+//        progress.showOn(viewController: self, withAnimation: true)
+        //{
+            //progress.hide(keepReducedSize: true, withAnimation: true) {
+                //progress.test(p: 0.1)
+            //}
+        //}
     }
 
     func setAddButtonState() {
@@ -544,28 +542,13 @@ extension ImagesVC : SyncControllerDelegate {
     func syncEvent(syncController:SyncController, event:SyncControllerEvent) {
         switch event {
         case .syncStarted:
-            if !self.spinner.animating {
-                timeThatSpinnerStarts = CFAbsoluteTimeGetCurrent()
-                self.spinner.start()
-            }
+            break
             
         case .syncDone:
             // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
             AppBadge.setBadge(number: 0)
             
-            // If we don't let the spinner show for a minimum amount of time, it looks odd.
-            let minimumDuration:CFTimeInterval = 2
-            let difference:CFTimeInterval = CFAbsoluteTimeGetCurrent() - timeThatSpinnerStarts
-            if difference > minimumDuration {
-                self.spinner.stop()
-            }
-            else {
-                let waitingTime = minimumDuration - difference
-                
-                TimedCallback.withDuration(Float(waitingTime)) {
-                    self.spinner.stop()
-                }
-            }
+            Progress.session.finish()
             
             self.bottomAnimation.reset()
             
@@ -575,10 +558,8 @@ extension ImagesVC : SyncControllerDelegate {
             collectionView.reloadData()
             
         case .syncError:
-            self.spinner.stop(withBackgroundColor: .red)
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Synchronization error")
         }
-        
-        self.spinner.setNeedsLayout()
     }
     
     func completedAddingLocalImages() {

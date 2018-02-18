@@ -132,7 +132,7 @@ class LargeImages : UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Progress.session.navController = self.navigationController
+        Progress.session.viewController = self
     }
 }
 

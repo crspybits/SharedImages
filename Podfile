@@ -19,9 +19,6 @@ target 'SharedImages' do
 	
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
 
-	# For progress indicator for uploading and downloading
-	pod 'M13ProgressSuite', '~> 1.2'
-
 	# For a discussion thread on images
 	pod 'MessageKit', '~> 0.13'
 
