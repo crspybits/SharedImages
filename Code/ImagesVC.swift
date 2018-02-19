@@ -219,17 +219,6 @@ class ImagesVC: UIViewController {
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
         setAddButtonState()
-        
-        // TESTING
-//        let progress = ProgressView.create()!
-//        progress.setup()
-//        //progress.showOn(navController: self.navigationController!, withAnimation: true)
-//        progress.showOn(viewController: self, withAnimation: true)
-        //{
-            //progress.hide(keepReducedSize: true, withAnimation: true) {
-                //progress.test(p: 0.1)
-            //}
-        //}
     }
 
     func setAddButtonState() {
