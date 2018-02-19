@@ -15,6 +15,7 @@ protocol DiscussionVCDelegate {
     func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion)
     func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion)
     func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?)
+    func discussionVCWillClose(_ vc: DiscussionVC)
 }
 
 class DiscussionVC: MessagesViewController {
@@ -132,6 +133,11 @@ class DiscussionVC: MessagesViewController {
     }
     
     @objc private func close() {
+        // Otherwise, on iPad, the progress indicator, if it's active, doesn't "transfer back" to the view controller using the discussion thread.
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            delegate.discussionVCWillClose(self)
+        }
+        
         dismiss(animated: true, completion: nil)
     }
     

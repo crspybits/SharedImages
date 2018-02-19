@@ -277,6 +277,10 @@ extension LargeImages : LargeImageCellDelegate {
 }
 
 extension LargeImages : DiscussionVCDelegate {
+    func discussionVCWillClose(_ vc: DiscussionVC) {
+        Progress.session.viewController = self
+    }
+    
     func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
         syncController?.update(discussion: changedDiscussion)
     }
