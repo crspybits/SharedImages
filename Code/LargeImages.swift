@@ -80,12 +80,16 @@ class LargeImages : UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        // Because the order of indexPathsForVisibleItems doesn't appear sorted-- otherwise, with repeated device rotation, we get to much image motion. Looks odd.
+        // Because the order of indexPathsForVisibleItems doesn't appear sorted-- otherwise, with repeated device rotation, we get too much image motion. Looks odd.
         let visibleItems = collectionView.indexPathsForVisibleItems as [IndexPath]
         let sortedArray = visibleItems.sorted {$0 < $1}
         
-        seekToIndexPath = sortedArray[0]
+        // When the discussion thread screen is open, and the device is rotated, we can get a crash without this test.
+        guard sortedArray.count > 0 else {
+            return
+        }
         
+        seekToIndexPath = sortedArray[0]
         // I get some odd effects if I retain zooming across the rotation-- cells show up as being empty.
         zoomedCells.removeAll()
         
@@ -120,14 +124,22 @@ class LargeImages : UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // 12/26/17; Adding the DispatchQueue call to cure: https://github.com/crspybits/SharedImages/issues/58
-        DispatchQueue.main.async {[unowned self] in
-            // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
-            if self.seekToIndexPath != nil {
-                self.collectionView.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
-                self.seekToIndexPath = nil
+        // Without the `isVisible` test, when user is on a discussion thread, and device rotates, can come back to large images, may not end up back on the same large image as when you started.
+        if isVisible() {
+            // 12/26/17; Adding the DispatchQueue call to cure: https://github.com/crspybits/SharedImages/issues/58
+            DispatchQueue.main.async {[unowned self] in
+                // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
+                if self.seekToIndexPath != nil {
+                    self.collectionView.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
+                    self.seekToIndexPath = nil
+                }
             }
         }
+    }
+    
+    // See https://stackoverflow.com/questions/2777438/how-to-tell-if-uiviewcontrollers-view-is-visible
+    private func isVisible() -> Bool {
+        return isViewLoaded && self.view.window != nil && parent != nil
     }
     
     override func viewWillAppear(_ animated: Bool) {

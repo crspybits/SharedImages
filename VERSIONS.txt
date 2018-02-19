@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.13.1
+	* Bug fix: Crash when you were viewing a discussion thread and you rotate the device multiple times.
+	
 Version 0.13.0 (2/18/18)
 	* Improved progress indicator.
 		https://github.com/crspybits/SharedImages/issues/86
