@@ -22,11 +22,11 @@ class Progress {
     // Set this to establish the view controller on which the progress indicator is displayed. You can change this to a different view controller if the user changes screens.
     weak var viewController: UIViewController! {
         didSet {
-            if let viewController = viewController {
+            if let viewController = viewController, totalNumber > 0 {
                 progressView.showOn(viewController: viewController, withAnimation: false)
             }
             else {
-                progressView.hide(keepReducedSize: false, withAnimation: false)
+                progressView.hide(.dismiss, withAnimation: false)
             }
         }
     }
@@ -76,7 +76,7 @@ class Progress {
         setProgress() {[unowned self] in
             if self.numberCounted >= self.totalNumber {
                 self.progressView.setProgress(1.0, withAnimation: true) {
-                    self.progressView.hide(keepReducedSize: false, withAnimation: true)
+                    self.progressView.hide(.dismiss, withAnimation: true)
                 }
                 
                 self.numberCounted = 0
@@ -91,16 +91,11 @@ class Progress {
             return
         }
         
-
-        
         totalStarts -= 1
         if totalStarts <= 0 {
             if let _ = viewController  {
-            
-
-            
                 progressView.setProgress(1.0, withAnimation: true) {[unowned self] in
-                    self.progressView.hide(keepReducedSize: false, withAnimation: true)
+                    self.progressView.hide(.dismiss, withAnimation: true)
                 }
             }
             

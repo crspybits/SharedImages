@@ -94,6 +94,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.setMinimumBackgroundFetchInterval(minimumBackgroundFetchIntervalOneHour)
 
         Fabric.with([Crashlytics.self])
+        
+        Progress.session.stop = {
+            SyncServer.session.stopSync()
+        }
 
         return true
     }

@@ -44,6 +44,9 @@ class DiscussionVC: MessagesViewController {
         messageInputBar.sendButton.tintColor = UIColor(red: 69/255, green: 193/255, blue: 89/255, alpha: 1)
         scrollsToBottomOnKeybordBeginsEditing = true // default false
         maintainPositionOnKeyboardFrameChanged = true // default false
+        
+        // So the view controller starts immediately below the nav bar
+        edgesForExtendedLayout = []
     }
     
     @discardableResult
@@ -109,6 +112,9 @@ class DiscussionVC: MessagesViewController {
         
         let nav = UINavigationController(rootViewController: self)
         
+        // Otherwise, with edgesForExtendedLayout set to [], we'd get a gray nav bar
+        nav.navigationBar.isTranslucent = false
+        
         if UIDevice.current.userInterfaceIdiom == .pad {
             nav.modalTransitionStyle = .coverVertical
             nav.modalPresentationStyle = .formSheet
@@ -149,6 +155,10 @@ class DiscussionVC: MessagesViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Progress.session.viewController = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     override func viewDidDisappear(_ animated: Bool) {

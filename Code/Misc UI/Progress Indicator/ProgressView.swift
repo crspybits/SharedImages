@@ -23,6 +23,13 @@ class ProgressView : UIView, XibBasics {
     private var progressViewIsHidden:Bool?
     private var spinner:SyncSpinner!
     private var timeThatSpinnerStarts:CFTimeInterval!
+    private var progress:Float = 0
+    
+    enum DisplayHeight {
+        case reduced
+        case full
+    }
+    private var displayHeight:DisplayHeight?
     
     private var displayButtons: Bool = true {
         didSet {
@@ -56,10 +63,11 @@ class ProgressView : UIView, XibBasics {
     @objc private func swipeAction() {
         if let progressViewIsHidden = progressViewIsHidden {
             if progressViewIsHidden {
+                displayHeight = .full
                 show(withAnimation: true)
             }
             else {
-                hide(keepReducedSize: true, withAnimation: true)
+                hide(.reducedHeight, withAnimation: true)
             }
         }
     }
@@ -80,7 +88,8 @@ class ProgressView : UIView, XibBasics {
     func showOn(viewController: UIViewController, withAnimation: Bool, completion:(()->())? = nil) {
         frameWidth = viewController.view.frameWidth
         viewController.view.addSubview(self)
-
+        progressIndicatorWidth.constant = CGFloat(progress)
+        
         if withAnimation {
             frameHeight = 0
         }
@@ -89,6 +98,10 @@ class ProgressView : UIView, XibBasics {
     }
     
     private func stopSpinnerWithMinimimumDisplayTime(completion:(()->())? = nil) {
+        guard let timeThatSpinnerStarts = timeThatSpinnerStarts else {
+            return
+        }
+        
         // If we don't let the spinner show for a minimum amount of time, it looks odd.
         let minimumDuration:CFTimeInterval = 2
         let difference:CFTimeInterval = CFAbsoluteTimeGetCurrent() - timeThatSpinnerStarts
@@ -108,7 +121,11 @@ class ProgressView : UIView, XibBasics {
     
     private func show(withAnimation: Bool, completion:(()->())? = nil) {
         progressViewIsHidden = false
-
+        
+        if progress > 0 {
+            progressIndicatorWidth.constant = frameWidth * CGFloat(progress)
+        }
+        
         if withAnimation {
             UIView.animate(withDuration: 0.3, animations: {
                 self.displayButtons = true
@@ -118,7 +135,16 @@ class ProgressView : UIView, XibBasics {
             })
         }
         else {
-            displayButtons = true
+            switch displayHeight {
+            case .none, .some(.full):
+                frameHeight = originalHeight
+                displayHeight = .full
+                displayButtons = true
+                
+            case .some(.reduced):
+                frameHeight = reducedHeight
+            }
+            
             completion?()
         }
         
@@ -126,23 +152,43 @@ class ProgressView : UIView, XibBasics {
             timeThatSpinnerStarts = CFAbsoluteTimeGetCurrent()
         }
         
-        // Start each time to deal with issue where when we switch back to a view controller after being on another we don't get spinner spinning.
-        self.spinner.start()
+        switch displayHeight {
+        case .none, .some(.full):
+            // Start each time to deal with issue where when we switch back to a view controller after being on another we don't get spinner spinning.
+            self.spinner.start()
+            
+        case .some(.reduced):
+            break
+        }
     }
 
-    func hide(keepReducedSize reducedSize: Bool, withAnimation: Bool, completion: (()->())? = nil) {
+    enum HideType {
+        case dismiss
+        case reducedHeight
+    }
+    
+    func hide(_ hideType: HideType, withAnimation: Bool, completion: (()->())? = nil) {
         progressViewIsHidden = true
 
         func hide() {
             displayButtons = false
-            frameHeight = reducedSize ? reducedHeight : 0
-            if !reducedSize {
+            
+            switch hideType {
+            case .reducedHeight:
+                frameHeight = reducedHeight
+                displayHeight = .reduced
+                
+            case .dismiss:
+                frameHeight = 0
                 removeFromSuperview()
+                progress = 0
+                displayHeight = nil
             }
         }
         
         if withAnimation {
-            if reducedSize {
+            switch hideType {
+            case .reducedHeight:
                 spinner.stop()
                 
                 UIView.animate(withDuration: 0.3, animations: {
@@ -150,8 +196,8 @@ class ProgressView : UIView, XibBasics {
                 }, completion: { _ in
                     completion?()
                 })
-            }
-            else {
+                
+            case .dismiss:
                 stopSpinnerWithMinimimumDisplayTime() {
                     UIView.animate(withDuration: 0.3, animations: {
                         hide()
@@ -179,7 +225,9 @@ class ProgressView : UIView, XibBasics {
             return
         }
         
+        self.progress = progress
         progressIndicatorWidth.constant = frameWidth * CGFloat(progress)
+        
         if withAnimation {
             UIView.animate(withDuration: 0.3, animations: {
                 self.layoutIfNeeded()
@@ -187,6 +235,15 @@ class ProgressView : UIView, XibBasics {
                 completion?()
             })
         }
+    }
+    
+    @IBAction func stopAction(_ sender: Any) {
+        hide(.dismiss, withAnimation: true)
+        stopAction?()
+    }
+    
+    @IBAction func hideAction(_ sender: Any) {
+        hide(.reducedHeight, withAnimation: true)
     }
     
     func test(p: Float) {
@@ -199,17 +256,8 @@ class ProgressView : UIView, XibBasics {
         }
         else {
             setProgress(1.0, withAnimation: true) {[unowned self] in
-                self.hide(keepReducedSize: false, withAnimation: true)
+                self.hide(.dismiss, withAnimation: true)
             }
         }
-    }
-    
-    @IBAction func stopAction(_ sender: Any) {
-        hide(keepReducedSize: false, withAnimation: true)
-        stopAction?()
-    }
-    
-    @IBAction func hideAction(_ sender: Any) {
-        hide(keepReducedSize: true, withAnimation: true)
     }
 }
