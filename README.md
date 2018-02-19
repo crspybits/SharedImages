@@ -4,15 +4,15 @@
 
 ### Privately shared images
 
-    Users can store their images in their own cloud storage, and safely share those images with others
+Users can store their images in their own cloud storage, and safely share those images with others
 
 ### Private discussion threads per image
 
-    Conversations about the images are also stored in user cloud storage. And the same (sharing and owning) users that can access the images can access the discussion threads.
+Conversations about the images are also stored in user cloud storage. And the same (sharing and owning) users that can access the images can access the discussion threads.
     
 ### Google Drive and Dropbox for cloud storage
 
-    These are for owning users.
+These are for owning users.
 
 ### Sharing users: Facebook and Google
 
