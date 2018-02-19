@@ -1,5 +1,9 @@
 SharedImages
 
+Version 0.13.0 (2/18/18)
+	* Improved progress indicator.
+		https://github.com/crspybits/SharedImages/issues/86
+
 Version 0.12.1 (2/15/18)
 	* Fixed: S..d button on iPhone X: Rod
 		https://github.com/crspybits/SharedImages/issues/81
