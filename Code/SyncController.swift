@@ -10,6 +10,7 @@ import Foundation
 import SyncServer
 import SMCoreLib
 import rosterdev
+import SyncServer_Shared
 
 enum SyncControllerEvent {
     case syncStarted
@@ -26,7 +27,7 @@ struct ImageData {
 
 struct FileData {
     let url: SMRelativeLocalURL
-    let mimeType:String
+    let mimeType:MimeType
     
     // This will be non-nil when we have an assigned UUID being downloaded from the server.
     let uuid:String?
@@ -89,8 +90,18 @@ class SyncController {
     
     // Add new image and discussion
     func add(image:Image, discussion: Discussion) {
+        guard let imageMimeTypeEnum = MimeType(rawValue: image.mimeType!) else {
+            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown image mime type: \(image.mimeType!)")
+            return
+        }
+        
+        guard let discussionMimeTypeEnum = MimeType(rawValue: discussion.mimeType!) else {
+            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown discussion mime type: \(discussion.mimeType!)")
+            return
+        }
+        
         // 12/27/17; Not sending dates to the server-- it establishes the dates.
-        var imageAttr = SyncAttributes(fileUUID:image.uuid!, mimeType:image.mimeType!)
+        var imageAttr = SyncAttributes(fileUUID:image.uuid!, mimeType:imageMimeTypeEnum)
         
         var imageAppMetaData = [String: Any]()
         imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
@@ -100,7 +111,7 @@ class SyncController {
         imageAttr.appMetaData = dictToJSONString(imageAppMetaData)
         assert(imageAttr.appMetaData != nil)
         
-        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussion.mimeType!)
+        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussionMimeTypeEnum)
         var discussionAppMetaData = [String: Any]()
         discussionAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.discussion.rawValue
         discussionAttr.appMetaData = dictToJSONString(discussionAppMetaData)
@@ -119,7 +130,12 @@ class SyncController {
     }
     
     func update(discussion: Discussion) {
-        let discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussion.mimeType!)
+        guard let discussionMimeTypeEnum = MimeType(rawValue: discussion.mimeType!) else {
+            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown discussion mime type: \(discussion.mimeType!)")
+            return
+        }
+        
+        let discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, mimeType:discussionMimeTypeEnum)
         
         do {
             // Like before, since discussions are mutable, use uploadCopy.

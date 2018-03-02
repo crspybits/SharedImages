@@ -11,6 +11,7 @@ import SMCoreLib
 import SyncServer
 import ODRefreshControl
 import LottiesBottom
+import SyncServer_Shared
 
 class ImagesVC: UIViewController {
     // Key in discussion JSON file.
@@ -270,7 +271,7 @@ class ImagesVC: UIViewController {
         }
 
         newImage.url = newImageData.file.url
-        newImage.mimeType = newImageData.file.mimeType
+        newImage.mimeType = newImageData.file.mimeType.rawValue
         newImage.title = newImageData.title
         newImage.discussionUUID = newImageData.discussionUUID
         
@@ -345,7 +346,7 @@ class ImagesVC: UIViewController {
             }
         }
         
-        localDiscussion.mimeType = discussionData.mimeType
+        localDiscussion.mimeType = discussionData.mimeType.rawValue
         localDiscussion.url = discussionData.url
         
         // Look up and connect the Image if we have one.
@@ -378,7 +379,7 @@ class ImagesVC: UIViewController {
             return nil
         }
         
-        return FileData(url: newDiscussionFileURL, mimeType: "text/plain", uuid: discussionUUID)
+        return FileData(url: newDiscussionFileURL, mimeType: .text, uuid: discussionUUID)
     }
 }
 
@@ -436,7 +437,12 @@ extension ImagesVC : SMAcquireImageDelegate {
         
         let newDiscussionUUID = UUID.make()!
         
-        let imageFileData = FileData(url: newImageURL, mimeType: mimeType, uuid: nil)
+        guard let mimeTypeEnum = MimeType(rawValue: mimeType) else {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Unknown mime type: \(mimeType)")
+            return
+        }
+        
+        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, uuid: nil)
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
