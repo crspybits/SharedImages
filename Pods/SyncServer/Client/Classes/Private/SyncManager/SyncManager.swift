@@ -8,6 +8,7 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer_Shared
 
 class SyncManager {
     static let session = SyncManager()
@@ -166,7 +167,9 @@ class SyncManager {
             downloadDeletionDfts = dfts.filter {$0.deletedOnServer == true}
 
             downloadDeletionDfts.forEach { dft in
-                let attr = SyncAttributes(fileUUID: dft.fileUUID, mimeType: dft.mimeType!, creationDate: dft.creationDate! as Date, updateDate: dft.updateDate! as Date)
+                let mimeType = MimeType(rawValue: dft.mimeType!)!
+
+                let attr = SyncAttributes(fileUUID: dft.fileUUID, mimeType: mimeType, creationDate: dft.creationDate! as Date, updateDate: dft.updateDate! as Date)
                 deletions += [attr]
             }
             

@@ -17,6 +17,7 @@ public enum SyncServerError: Error {
     
     case mimeTypeOfFileChanged
     case noMimeType
+    case badMimeType
     case downloadedFileVersionNotGreaterThanCurrent
     case fileAlreadyDeleted
     case fileQueuedForDeletion

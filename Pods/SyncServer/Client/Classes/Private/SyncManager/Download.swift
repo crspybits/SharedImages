@@ -35,6 +35,16 @@ class Download {
                 completion?(.error(error!))
                 return
             }
+            
+            // Make sure the mime types we get back from the server are known to the client.
+            for file in fileIndex! {
+                guard let fileMimeTypeString = file.mimeType,
+                    let _ = MimeType(rawValue: fileMimeTypeString) else {
+                        Log.error("Unknown mime type from server: \(String(describing: file.mimeType))")
+                    completion?(.error(.badMimeType))
+                    return
+                }
+            }
 
             var completionResult:OnlyCheckCompletion!
             
@@ -81,7 +91,6 @@ class Download {
                         let allFiles = (fileDownloads ?? []) + (downloadDeletions ?? [])
                         var numberFileDownloads:Int32 = 0
                         var numberDownloadDeletions:Int32 = 0
-                        
                         
                         for file in allFiles {
                             let dft = DownloadFileTracker.newObject() as! DownloadFileTracker
@@ -214,8 +223,8 @@ class Download {
                     CoreData.sessionNamed(Constants.coreDataName).saveContext()
                     
                     // TODO: Not using downloadedFile.fileSizeBytes. Why?
-                    
-                    var attr = SyncAttributes(fileUUID: nextToDownload.fileUUID, mimeType: nextToDownload.mimeType!, creationDate: nextToDownload.creationDate! as Date, updateDate: nextToDownload.updateDate! as Date)
+                    let mimeType = MimeType(rawValue: nextToDownload.mimeType!)!
+                    var attr = SyncAttributes(fileUUID: nextToDownload.fileUUID, mimeType: mimeType, creationDate: nextToDownload.creationDate! as Date, updateDate: nextToDownload.updateDate! as Date)
                     attr.appMetaData = downloadedFile.appMetaData
                     attr.creationDate = nextToDownload.creationDate as Date?
                     attr.updateDate = nextToDownload.updateDate as Date?

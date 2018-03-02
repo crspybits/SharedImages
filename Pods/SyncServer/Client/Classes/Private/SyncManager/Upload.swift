@@ -15,7 +15,6 @@ class Upload {
     weak var delegate:SyncServerDelegate?
     
     static let session = Upload()
-    var cloudFolderName:String!
     var deviceUUID:String!
     private var completion:((NextCompletion)->())?
     
@@ -225,7 +224,8 @@ class Upload {
                 return
             }
             
-            file = ServerAPI.File(localURL: nextToUpload.localURL! as URL!, fileUUID: nextToUpload.fileUUID, mimeType: nextToUpload.mimeType, cloudFolderName: self.cloudFolderName, deviceUUID:self.deviceUUID, appMetaData: nextToUpload.appMetaData, fileVersion: nextToUpload.fileVersion)
+            let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
+            file = ServerAPI.File(localURL: nextToUpload.localURL! as URL!, fileUUID: nextToUpload.fileUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: nextToUpload.appMetaData, fileVersion: nextToUpload.fileVersion)
             
             undelete = nextToUpload.uploadUndeletion
         }
@@ -260,10 +260,10 @@ class Upload {
                 var completionResult:NextCompletion?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     nextToUpload.status = .uploaded
-                    
-                    // 1/27/18; See [2] below.
+                    let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
 
-                    var attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:nextToUpload.mimeType!, creationDate: creationDate, updateDate: updateDate)
+                    // 1/27/18; See [2] below.
+                    var attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, mimeType:mimeType, creationDate: creationDate, updateDate: updateDate)
                     
                     // `nextToUpload.appMetaData` may be nil because the client isn't making a change to the appMetaData.
                     var appMetaData:String?

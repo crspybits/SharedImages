@@ -36,9 +36,12 @@ public class SyncServerUser {
         }
     }
     
+    private var cloudFolderName:String?
+    
     public static let session = SyncServerUser()
     
-    func appLaunchSetup() {
+    func appLaunchSetup(cloudFolderName:String?) {
+        self.cloudFolderName = cloudFolderName
     }
 
     // A distinct UUID for this user mobile device.
@@ -131,7 +134,7 @@ public class SyncServerUser {
 
         self.creds = creds
         
-        ServerAPI.session.addUser { syncServerUserId, error in
+        ServerAPI.session.addUser(cloudFolderName: cloudFolderName) { syncServerUserId, error in
             if error != nil {
                 self.creds = nil
                 Log.error("Error: \(String(describing: error))")

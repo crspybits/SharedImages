@@ -27,10 +27,6 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public static let mimeTypeKey = "mimeType"
     public var mimeType:String!
     
-    // A root-level folder in the cloud file service. This is only used by some of the cloud file servces. E.g., Google Drive. It's not used by Dropbox.
-    public static let cloudFolderNameKey = "cloudFolderName"
-    public var cloudFolderName:String?
-    
     // If a file is already on the server, and you are uploading a new version, simply setting the appMetaData to nil will not reset the appMetaData on the server. It will just ignore the nil field and leave the appMetaData as it was on the last version of the file. To reset the appMetaData, explicitly set it to the empty string "".
     public static let appMetaDataKey = "appMetaData"
     public var appMetaData:String!
@@ -57,7 +53,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     }
     
     public func allKeys() -> [String] {
-        return self.nonNilKeys() + [UploadFileRequest.appMetaDataKey, UploadFileRequest.cloudFolderNameKey, UploadFileRequest.undeleteServerFileKey]
+        return self.nonNilKeys() + [UploadFileRequest.appMetaDataKey, UploadFileRequest.undeleteServerFileKey]
     }
     
     public required init?(json: JSON) {
@@ -65,7 +61,6 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
         
         self.fileUUID = UploadFileRequest.fileUUIDKey <~~ json
         self.mimeType = UploadFileRequest.mimeTypeKey <~~ json
-        self.cloudFolderName = UploadFileRequest.cloudFolderNameKey <~~ json
         self.fileVersion = Decoder.decode(int32ForKey: UploadFileRequest.fileVersionKey)(json)
         self.masterVersion = Decoder.decode(int64ForKey: UploadFileRequest.masterVersionKey)(json)
         self.appMetaData = UploadFileRequest.appMetaDataKey <~~ json
@@ -100,7 +95,6 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
         return jsonify([
             UploadFileRequest.fileUUIDKey ~~> self.fileUUID,
             UploadFileRequest.mimeTypeKey ~~> self.mimeType,
-            UploadFileRequest.cloudFolderNameKey ~~> self.cloudFolderName,
             UploadFileRequest.fileVersionKey ~~> self.fileVersion,
             UploadFileRequest.masterVersionKey ~~> self.masterVersion,
             UploadFileRequest.appMetaDataKey ~~> self.appMetaData,

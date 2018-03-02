@@ -2,6 +2,7 @@ SharedImages
 
 Version 0.13.1
 	* Bug fix: Crash when you were viewing a discussion thread and you rotate the device multiple times.
+	* Update for client library version 13.0.0
 	
 Version 0.13.0 (2/18/18)
 	* Improved progress indicator.

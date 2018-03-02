@@ -28,9 +28,6 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
     public static let updateDateKey = "updateDate"
     public var updateDate: Date?
     
-    public static let cloudFolderNameKey = "cloudFolderName"
-    public var cloudFolderName: String?
-    
     public static let mimeTypeKey = "mimeType"
     public var mimeType: String?
     
@@ -47,7 +44,7 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
     public var fileSizeBytes: Int64!
     
     public var description: String {
-        return "fileUUID: \(fileUUID); deviceUUID: \(String(describing: deviceUUID)); creationDate: \(String(describing: creationDate)); updateDate: \(String(describing: updateDate)); mimeTypeKey: \(String(describing: mimeType)); appMetaData: \(String(describing: appMetaData)); deleted: \(deleted); fileVersion: \(fileVersion); fileSizeBytes: \(fileSizeBytes); cloudFolderName: \(String(describing: cloudFolderName))"
+        return "fileUUID: \(fileUUID); deviceUUID: \(String(describing: deviceUUID)); creationDate: \(String(describing: creationDate)); updateDate: \(String(describing: updateDate)); mimeTypeKey: \(String(describing: mimeType)); appMetaData: \(String(describing: appMetaData)); deleted: \(deleted); fileVersion: \(fileVersion); fileSizeBytes: \(fileSizeBytes)"
     }
     
     required public init?(json: JSON) {
@@ -59,8 +56,6 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
         
         self.fileVersion = Decoder.decode(int32ForKey: FileInfo.fileVersionKey)(json)
         self.fileSizeBytes = Decoder.decode(int64ForKey: FileInfo.fileSizeBytesKey)(json)
-        
-        self.cloudFolderName = FileInfo.cloudFolderNameKey <~~ json
         
         let dateFormatter = DateExtras.getDateFormatter(format: .DATETIME)
         self.creationDate = Decoder.decode(dateForKey: FileInfo.creationDateKey, dateFormatter: dateFormatter)(json)
@@ -82,7 +77,6 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
             FileInfo.deletedKey ~~> self.deleted,
             FileInfo.fileVersionKey ~~> self.fileVersion,
             FileInfo.fileSizeBytesKey ~~> self.fileSizeBytes,
-            FileInfo.cloudFolderNameKey ~~> self.cloudFolderName,
             Encoder.encode(dateForKey: FileInfo.creationDateKey, dateFormatter: dateFormatter)(self.creationDate),
             Encoder.encode(dateForKey: FileInfo.updateDateKey, dateFormatter: dateFormatter)(self.updateDate)
         ])

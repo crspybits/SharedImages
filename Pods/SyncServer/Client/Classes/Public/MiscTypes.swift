@@ -8,6 +8,7 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer_Shared
 
 public typealias AppMetaData = [String:AnyObject]
 public typealias UUIDString = String
@@ -19,7 +20,7 @@ public protocol FileUUID {
 // Attributes for a file being synced.
 public struct SyncAttributes : FileUUID {
     public var fileUUID:UUIDString!
-    public var mimeType:String!
+    public var mimeType:MimeType!
     
     // 12/27/17; These only get used for responses from the server-- because it is the authority on dates.
     public var creationDate:Date?
@@ -27,7 +28,7 @@ public struct SyncAttributes : FileUUID {
     
     public var appMetaData:String?
     
-    public init(fileUUID:UUIDString, mimeType:String, creationDate: Date? = nil, updateDate: Date? = nil) {
+    public init(fileUUID:UUIDString, mimeType:MimeType, creationDate: Date? = nil, updateDate: Date? = nil) {
         self.fileUUID = fileUUID
         self.mimeType = mimeType
         self.creationDate = creationDate

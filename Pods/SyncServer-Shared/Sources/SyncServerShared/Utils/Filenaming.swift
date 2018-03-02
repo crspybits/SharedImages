@@ -8,6 +8,27 @@
 
 import Foundation
 
+public enum MimeType: String {
+    case text = "text/plain"
+    case jpeg = "image/jpeg"
+}
+
+public struct Extension {
+    public static func forMimeType(mimeType:String) -> String {
+        let defaultExt = "dat"
+        guard let mimeTypeEnum = MimeType(rawValue: mimeType) else {
+            return defaultExt
+        }
+        
+        switch mimeTypeEnum {
+        case .text:
+            return "txt"
+        case .jpeg:
+            return "jpg"
+        }
+    }
+}
+
 // In some situations on the client, I need this
 #if !SERVER
 public struct FilenamingObject : Filenaming {
@@ -27,17 +48,17 @@ public protocol Filenaming {
     var fileVersion:Int32! {get}
 
 #if SERVER
-    func cloudFileName(deviceUUID:String) -> String
+    func cloudFileName(deviceUUID:String, mimeType:String) -> String
 #endif
 }
 
 #if SERVER
 public extension Filenaming {
-    
     /* We are not going to use just the file UUID to name the file in the cloud service. This is because we are not going to hold a lock across multiple file uploads, and we need to make sure that we don't have a conflict when two or more devices attempt to concurrently upload the same file. The file name structure we're going to use is given by this method.
     */
-    public func cloudFileName(deviceUUID:String) -> String {
-        return "\(fileUUID!).\(deviceUUID).\(fileVersion!)"
+    public func cloudFileName(deviceUUID:String, mimeType:String) -> String {
+        let ext = Extension.forMimeType(mimeType: mimeType)
+        return "\(fileUUID!).\(deviceUUID).\(fileVersion!).\(ext)"
     }
 }
 #endif

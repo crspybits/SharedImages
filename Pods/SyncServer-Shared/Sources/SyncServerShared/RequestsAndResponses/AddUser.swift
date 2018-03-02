@@ -14,6 +14,11 @@ import Kitura
 #endif
 
 public class AddUserRequest : NSObject, RequestMessage {
+    // A root-level folder in the cloud file service. This is only used by some of the cloud file servces. E.g., Google Drive. It's not used by Dropbox.
+    public static let cloudFolderNameKey = "cloudFolderName"
+    public var cloudFolderName:String?
+    public static let maxCloudFolderNameLength = 256
+    
 #if SERVER
     public required convenience init?(request: RouterRequest) {
         self.init(json: request.queryParameters)
@@ -22,11 +27,18 @@ public class AddUserRequest : NSObject, RequestMessage {
     
     public required init?(json: JSON) {
         super.init()
+        
+        self.cloudFolderName = AddUserRequest.cloudFolderNameKey <~~ json
     }
     
     public func toJSON() -> JSON? {
         return jsonify([
+            AddUserRequest.cloudFolderNameKey ~~> self.cloudFolderName
         ])
+    }
+    
+    public func allKeys() -> [String] {
+        return [AddUserRequest.cloudFolderNameKey]
     }
 }
 

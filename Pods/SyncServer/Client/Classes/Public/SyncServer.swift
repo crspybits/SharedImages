@@ -8,6 +8,7 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer_Shared
 
 public class SyncServer {
     public static let session = SyncServer()
@@ -46,9 +47,9 @@ public class SyncServer {
         }
     }
     
-    // Leave the minimumServerVersion as nil if your app doesn't have a specific server version requirement.
-    public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String, minimumServerVersion:ServerVersion? = nil) {
-        Log.msg("cloudFolderName: \(cloudFolderName)")
+    // Leave the minimumServerVersion as nil if your app doesn't have a specific server version requirement. `cloudFolderName` is optional because it's only needed for some of the cloud storage services (e.g., Google Drive).
+    public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil) {
+        Log.msg("cloudFolderName: \(String(describing: cloudFolderName))")
         Log.msg("serverURL: \(serverURL.absoluteString)")
         
         // This seems a little hacky, but can't find a better way to get the bundle of the framework containing our model. I.e., "this" framework. Just using a Core Data object contained in this framework to track it down.
@@ -66,7 +67,6 @@ public class SyncServer {
         
         CoreData.registerSession(coreDataSession, forName: Constants.coreDataName)
         
-        Upload.session.cloudFolderName = cloudFolderName
         Network.session().appStartup()
         ServerAPI.session.baseURL = serverURL.absoluteString
         
@@ -79,7 +79,7 @@ public class SyncServer {
         ServerNetworkingLoading.session.appLaunchSetup()
         
         // SyncServerUser sets up the delegate for the ServerAPI. Need to set it up early in the launch sequence.
-        SyncServerUser.session.appLaunchSetup()
+        SyncServerUser.session.appLaunchSetup(cloudFolderName: cloudFolderName)
     }
     
     // For dealing with background uploading/downloading.
@@ -112,10 +112,16 @@ public class SyncServer {
             if nil == entry {
                 entry = (DirectoryEntry.newObject() as! DirectoryEntry)
                 entry!.fileUUID = attr.fileUUID
-                entry!.mimeType = attr.mimeType
+                entry!.mimeType = attr.mimeType.rawValue
             }
             else {
-                if attr.mimeType != entry!.mimeType {
+                guard let entryMimeTypeString = entry!.mimeType,
+                    let entryMimeType = MimeType(rawValue: entryMimeTypeString) else {
+                    errorToThrow = SyncServerError.noMimeType
+                    return
+                }
+                
+                if attr.mimeType != entryMimeType {
                     errorToThrow = SyncServerError.mimeTypeOfFileChanged
                     return
                 }
@@ -129,7 +135,7 @@ public class SyncServer {
             let newUft = UploadFileTracker.newObject() as! UploadFileTracker
             newUft.appMetaData = attr.appMetaData
             newUft.fileUUID = attr.fileUUID
-            newUft.mimeType = attr.mimeType
+            newUft.mimeType = attr.mimeType.rawValue
             newUft.uploadCopy = copy
             
             if copy {
