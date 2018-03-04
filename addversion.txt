@@ -1,5 +1,5 @@
 
-RELEASE_TAG="0.12.0"
+RELEASE_TAG="0.13.1"
 git add -A
 git commit -m "version $RELEASE_TAG"
 git tag -a "$RELEASE_TAG" -m "version $RELEASE_TAG"
