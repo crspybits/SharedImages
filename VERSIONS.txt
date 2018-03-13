@@ -1,5 +1,8 @@
 SharedImages
 
+Version (NEXT)
+	* Using `rosterdev` from Cocoapods.org; update pods
+
 Version 0.13.1 (3/3/18)
 	* Bug fix: Crash when you were viewing a discussion thread and you rotate the device multiple times.
 	* Update for client library version 13.0.0

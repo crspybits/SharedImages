@@ -67,7 +67,7 @@ class DebugDashboardData {
 }
 ```
 
-To use this class, use `DebugDashboardData.session.sections()` to the `rowContents` parameter.
+To use this class, use `DebugDashboardData.session.sections()` for the `rowContents` parameter of `RosterDevVC.show`.
 
 If you are doing test injection, you will need:
 
@@ -87,6 +87,39 @@ in your AppDelegate. [See the example here](Example/rosterdev/AppDelegate.swift)
 #endif
         return true
     }
+```
+
+Where `TestCases` looks something like:
+
+```
+import Foundation
+import rosterdev
+
+class TestCases {
+    private init() {
+    }
+    
+    static let session = TestCases()
+    
+    static func setup() {
+        _ = session
+    }
+    
+    // Make these text names fairly short. They are presented in a UI.
+    
+    let testFail1 = RosterDevInjectTest.define(testCaseName: "Endpoint1Failure")
+    let testFail2 = RosterDevInjectTest.define(testCaseName: "Endpoint2Failure")
+    ...
+}
+```
+
+You will also need, of course, to inject some actual tests in your code. For example, this would look something like:
+
+```
+RosterDevInjectTest.if(TestCases.session.testFail1) {
+    // This will only get executed if the DEBUG flag is set AND testFail1 is turned on from the developer dashboard.
+    // So, do whatever test injection you need to do here.
+}
 ```
 
 ## Author

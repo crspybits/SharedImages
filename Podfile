@@ -34,7 +34,8 @@ target 'SharedImages' do
     # pod 'LottiesBottom', :path => '../LottiesBottom/'
     
     # developer dashbaord
-    pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
+    # pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
+    pod 'rosterdev', '~> 0.1'
     
     # for badges for updates to discussion threads
     pod 'BadgeSwift', '~> 5.0'
