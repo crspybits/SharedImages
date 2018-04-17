@@ -5,6 +5,8 @@
 //  Created by Christopher Prince on 2/28/17.
 //
 
+// For tracking both file uploads and appMetaData uploads (usually termed `content`).
+
 import Foundation
 import CoreData
 import SMCoreLib

@@ -11,13 +11,15 @@ import SMCoreLib
 // Most of this information is for testing purposes and for UI (e.g., for displaying download progress). Some of it, however, can be necessary for app operations.
 public enum SyncEvent {
     // This can repeat if there is a change to the files on the server (a master version update), and downloads restart.
-    case willStartDownloads(numberFileDownloads:UInt, numberDownloadDeletions:UInt)
+    case willStartDownloads(numberContentDownloads:UInt, numberDownloadDeletions:UInt)
     
-    case willStartUploads(numberFileUploads:UInt, numberUploadDeletions:UInt)
+    case willStartUploads(numberContentUploads:UInt, numberUploadDeletions:UInt)
     
     // The attributes report the actual creation and update dates of the file-- as established by the server.
     case singleFileUploadComplete(attr:SyncAttributes)
     
+    case singleAppMetaDataUploadComplete(fileUUID: String)
+
     case singleUploadDeletionComplete(fileUUID:UUIDString)
     case fileUploadsCompleted(numberOfFiles:Int)
     case uploadDeletionsCompleted(numberOfFiles:Int)
@@ -40,21 +42,22 @@ public struct EventDesired: OptionSet {
     public static let willStartUploads = EventDesired(rawValue: 1 << 1)
 
     public static let singleFileUploadComplete = EventDesired(rawValue: 1 << 2)
-    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 3)
-    public static let fileUploadsCompleted = EventDesired(rawValue: 1 << 4)
-    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 5)
+    public static let singleAppMetaDataUploadComplete = EventDesired(rawValue: 1 << 3)
+    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 4)
+    public static let fileUploadsCompleted = EventDesired(rawValue: 1 << 5)
+    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 6)
     
-    public static let syncStarted = EventDesired(rawValue: 1 << 6)
-    public static let syncDone = EventDesired(rawValue: 1 << 7)
+    public static let syncStarted = EventDesired(rawValue: 1 << 7)
+    public static let syncDone = EventDesired(rawValue: 1 << 8)
     
-    public static let syncStopping = EventDesired(rawValue: 1 << 8)
+    public static let syncStopping = EventDesired(rawValue: 1 << 9)
 
-    public static let refreshingCredentials = EventDesired(rawValue: 1 << 9)
+    public static let refreshingCredentials = EventDesired(rawValue: 1 << 10)
 
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .fileUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -84,6 +87,9 @@ public struct EventDesired: OptionSet {
             
         case .singleFileUploadComplete:
             eventIsDesired = .singleFileUploadComplete
+            
+        case .singleAppMetaDataUploadComplete:
+            eventIsDesired = .singleAppMetaDataUploadComplete
             
         case .singleUploadDeletionComplete:
             eventIsDesired = .singleUploadDeletionComplete
@@ -144,10 +150,11 @@ public struct ServerVersion {
 // Except as noted, these delegate methods are called on the main thread.
 
 public protocol SyncServerDelegate : class {
-    // The client has to decide how to resolve the file-download conflicts. The resolveConflict method of the SyncServerConflict must be called. The statements below apply for the SMRelativeLocalURL's.
+    // The client has to decide how to resolve the content-download conflicts. The resolveConflict method of the SyncServerConflict must be called. The statements below apply for the SMRelativeLocalURL's.
     // Not called on the main thread. You must call the conflict resolution callbacks on the same thread as this was called on.
-    // The `syncServerSingleFileDownloadComplete` will be called after, if you allow the download to continue. i.e., if you use acceptFileDownload of FileDownloadResolution.
-    func syncServerMustResolveFileDownloadConflict(downloadedFile: SMRelativeLocalURL, downloadedFileAttributes: SyncAttributes, uploadConflict: SyncServerConflict<FileDownloadResolution>)
+    // The `syncServerSingleFileDownloadComplete` will be called after, if you allow the download to continue. i.e., if you use acceptContentDownload of ContentDownloadResolution.
+    // downloadedFile is nil only when this is an appMetaData download conflict.
+    func syncServerMustResolveContentDownloadConflict(downloadedFile: SMRelativeLocalURL?, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>)
     
     /* Called at the end of a single download, on non-error conditions.
     The client owns the file referenced by the url after this call completes. This file is temporary in the sense that it will not be backed up to iCloud, could be removed when the device or app is restarted, and should be copied and/or moved to a more permanent location.
@@ -155,6 +162,9 @@ public protocol SyncServerDelegate : class {
     This method doesn't get called for a particular download if (a) there is a conflict and (b) the client resolves that conflict by using .rejectFileDownload
     */
     func syncServerSingleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes)
+    
+    // If the app meta data on the server was updated without a corresponding file content change.
+    func syncServerAppMetaDataDownloadComplete(attr: SyncAttributes)
 
     // The client has to decide how to resolve the download-deletion conflicts. The resolveConflict method of each SyncServerConflict must be called.
     // Conflicts will not include UploadDeletion.

@@ -27,11 +27,11 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public static let mimeTypeKey = "mimeType"
     public var mimeType:String!
     
-    // If a file is already on the server, and you are uploading a new version, simply setting the appMetaData to nil will not reset the appMetaData on the server. It will just ignore the nil field and leave the appMetaData as it was on the last version of the file. To reset the appMetaData, explicitly set it to the empty string "".
-    public static let appMetaDataKey = "appMetaData"
-    public var appMetaData:String!
+    // If a file is already on the server, and you are uploading a new version, simply setting the appMetaData contents to nil will not reset the appMetaData on the server. It will just ignore the nil field and leave the appMetaData as it was on the last version of the file. To reset the appMetaData, explicitly set its contents to the empty string "".
+    // Set this to nil if you are not updating the app meta data.
+    public var appMetaData:AppMetaData?
     
-    // The file version must be 0 (for a new file) or N+1 where N is the current version of the file on the server.
+    // Must be 0 (for a new file) or N+1 where N is the current version of the file on the server.
     public static let fileVersionKey = "fileVersion"
     public var fileVersion:FileVersionInt!
 
@@ -53,7 +53,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     }
     
     public func allKeys() -> [String] {
-        return self.nonNilKeys() + [UploadFileRequest.appMetaDataKey, UploadFileRequest.undeleteServerFileKey]
+        return self.nonNilKeys() + [UploadFileRequest.undeleteServerFileKey, AppMetaData.contentsKey, AppMetaData.versionKey]
     }
     
     public required init?(json: JSON) {
@@ -63,7 +63,9 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
         self.mimeType = UploadFileRequest.mimeTypeKey <~~ json
         self.fileVersion = Decoder.decode(int32ForKey: UploadFileRequest.fileVersionKey)(json)
         self.masterVersion = Decoder.decode(int64ForKey: UploadFileRequest.masterVersionKey)(json)
-        self.appMetaData = UploadFileRequest.appMetaDataKey <~~ json
+        
+        // Nested structures aren't working so well with `request.queryParameters`.
+        self.appMetaData = AppMetaData(json: json)
         
         self.undeleteServerFile = Decoder.decode(int32ForKey:  UploadFileRequest.undeleteServerFileKey)(json)
         
@@ -92,14 +94,19 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
 #endif
     
     public func toJSON() -> JSON? {
-        return jsonify([
+        var result = [
             UploadFileRequest.fileUUIDKey ~~> self.fileUUID,
             UploadFileRequest.mimeTypeKey ~~> self.mimeType,
             UploadFileRequest.fileVersionKey ~~> self.fileVersion,
             UploadFileRequest.masterVersionKey ~~> self.masterVersion,
-            UploadFileRequest.appMetaDataKey ~~> self.appMetaData,
             UploadFileRequest.undeleteServerFileKey ~~> self.undeleteServerFile
-        ])
+        ]
+        
+        if let appMetaData = self.appMetaData?.toJSON() {
+            result += [appMetaData]
+        }
+        
+        return jsonify(result)
     }
 }
 

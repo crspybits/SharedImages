@@ -64,8 +64,8 @@ public struct ServerEndpoint {
     
     // Don't put a trailing "/" on the pathName.
     public init(_ pathName:String, method:ServerHTTPMethod, authenticationLevel:AuthenticationLevel = .secondary, needsLock:Bool = false, minSharingPermission: SharingPermission = .read) {
-        
-        assert(pathName.count > 0 && pathName.characters.last != "/")
+
+        assert(pathName.count > 0 && pathName.last != "/")
         
         self.pathName = pathName
         self.method = method
@@ -112,6 +112,9 @@ public class ServerEndpoints {
     
     public static let uploadFile = ServerEndpoint("UploadFile", method: .post, minSharingPermission: .write)
     
+    // Useful if only the app meta data has changed, so you don't have to re-upload the entire file.
+    public static let uploadAppMetaData = ServerEndpoint("UploadAppMetaData", method: .post, minSharingPermission: .write)
+    
     // Any time we're doing an operation constrained to the current masterVersion, holding the lock seems like a good idea.
     public static let uploadDeletion = ServerEndpoint("UploadDeletion", method: .delete, needsLock:true, minSharingPermission: .write)
 
@@ -123,8 +126,9 @@ public class ServerEndpoints {
     public static let doneUploads = ServerEndpoint("DoneUploads", method: .post, minSharingPermission: .write)
 
     public static let downloadFile = ServerEndpoint("DownloadFile", method: .get)
-
-    // TODO: *3* Need a new endpoint that enables clients to flush (i.e., delete) files in the Uploads table which are in the `uploaded` state. If this fails on deleting from cloud storage, then this should not probably cause a failure of the endpoint-- because we may be using as a cleanup and we want it to be robust.
+    
+    // Useful if only the app meta data has changed, so you don't have to re-download the entire file.
+    public static let downloadAppMetaData = ServerEndpoint("DownloadAppMetaData", method: .get)
     
     // MARK: Sharing
     

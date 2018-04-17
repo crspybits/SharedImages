@@ -20,7 +20,7 @@ class Download {
     }
     
     enum OnlyCheckCompletion {
-    case checkResult(downloadFiles:[FileInfo]?, downloadDeletions:[FileInfo]?, MasterVersionInt?)
+    case checkResult(downloadSet: Directory.DownloadSet, MasterVersionInt?)
     case error(SyncServerError)
     }
     
@@ -50,10 +50,10 @@ class Download {
             
             CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                 do {
-                    let (downloads, deletions) =
+                    let downloadSet =
                         try Directory.session.checkFileIndex(serverFileIndex: fileIndex!)
                     completionResult =
-                        .checkResult(downloadFiles:downloads, downloadDeletions:deletions, masterVersion)
+                        .checkResult(downloadSet: downloadSet, masterVersion)
                 } catch (let error) {
                     completionResult = .error(.coreDataError(error))
                 }
@@ -65,7 +65,7 @@ class Download {
     
     enum CheckCompletion {
     case noDownloadsOrDeletionsAvailable
-    case downloadsAvailable(numberOfDownloadFiles:Int32, numberOfDownloadDeletions:Int32)
+    case downloadsAvailable(numberOfContentDownloads:Int, numberOfDownloadDeletions:Int)
     case error(SyncServerError)
     }
     
@@ -77,35 +77,34 @@ class Download {
             case .error(let error):
                 completion?(.error(error))
             
-            case .checkResult(downloadFiles: let fileDownloads, downloadDeletions: let downloadDeletions, let masterVersion):
-                
+            case .checkResult(downloadSet: let downloadSet, let masterVersion):
                 var completionResult:CheckCompletion!
 
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     Singleton.get().masterVersion = masterVersion!
                     
-                    if fileDownloads == nil && downloadDeletions == nil {
-                        completionResult = .noDownloadsOrDeletionsAvailable
-                    }
-                    else {
-                        let allFiles = (fileDownloads ?? []) + (downloadDeletions ?? [])
-                        var numberFileDownloads:Int32 = 0
-                        var numberDownloadDeletions:Int32 = 0
-                        
-                        for file in allFiles {
+                    if downloadSet.allFiles().count > 0 {
+                        for file in downloadSet.allFiles() {
                             let dft = DownloadFileTracker.newObject() as! DownloadFileTracker
                             dft.fileUUID = file.fileUUID
                             dft.fileVersion = file.fileVersion
                             dft.mimeType = file.mimeType
-                            dft.deletedOnServer = file.deleted!
-                            dft.appMetaData = file.appMetaData
                             
-                            if file.deleted! {
-                                numberDownloadDeletions += 1
+                            if downloadSet.downloadFiles.contains(file) {
+                                dft.operation = .file
+                            }
+                            else if downloadSet.downloadDeletions.contains(file) {
+                                dft.operation = .deletion
+                            }
+                            else if downloadSet.downloadAppMetaData.contains(file) {
+                                dft.operation = .appMetaData
                             }
                             else {
-                                numberFileDownloads += 1
+                                completionResult = .error(.generic("Internal Error"))
+                                return
                             }
+                            
+                            dft.appMetaDataVersion = file.appMetaDataVersion
                             
                             if file.creationDate != nil {
                                 dft.creationDate = file.creationDate! as NSDate
@@ -113,7 +112,12 @@ class Download {
                             }
                         }
                         
-                        completionResult = .downloadsAvailable(numberOfDownloadFiles:numberFileDownloads, numberOfDownloadDeletions:numberDownloadDeletions)
+                        completionResult = .downloadsAvailable(
+                            numberOfContentDownloads:downloadSet.downloadFiles.count + downloadSet.downloadAppMetaData.count,
+                            numberOfDownloadDeletions:downloadSet.downloadDeletions.count)
+                    }
+                    else {
+                        completionResult = .noDownloadsOrDeletionsAvailable
                     }
                     
                     do {
@@ -138,19 +142,21 @@ class Download {
     
     enum NextCompletion {
     case fileDownloaded(url:SMRelativeLocalURL, attr:SyncAttributes, dft: DownloadFileTracker)
+    case appMetaDataDownloaded(attr:SyncAttributes, dft: DownloadFileTracker)
     case masterVersionUpdate
     case error(SyncServerError)
     }
     
-    // Starts download of next file, if there is one. There should be no files downloading already. Only if .started is the NextResult will the completion handler be called. With a masterVersionUpdate response for NextCompletion, the MasterVersion Core Data object is updated by this method, and all the DownloadFileTracker objects have been reset.
+    // Starts download of next file or appMetaData, if there is one. There should be no files/appMetaData downloading already. Only if .started is the NextResult will the completion handler be called. With a masterVersionUpdate response for NextCompletion, the MasterVersion Core Data object is updated by this method, and all the DownloadFileTracker objects have been reset.
     func next(first: Bool = false, completion:((NextCompletion)->())?) -> NextResult {
         var masterVersion:MasterVersionInt!
         var nextResult:NextResult?
-        var downloadFile:FilenamingObject!
+        var downloadFile:FilenamingWithAppMetaDataVersion!
         var nextToDownload:DownloadFileTracker!
-        var numberFileDownloads = 0
+        var numberContentDownloads = 0
         var numberDownloadDeletions = 0
-
+        var operation:FileTracker.Operation!
+        
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             let dfts = DownloadFileTracker.fetchAll()
             guard dfts.count != 0 else {
@@ -158,8 +164,8 @@ class Download {
                 return
             }
             
-            numberDownloadDeletions = (dfts.filter {$0.deletedOnServer}).count
-            numberFileDownloads = dfts.count - numberDownloadDeletions
+            numberDownloadDeletions = (dfts.filter {$0.operation.isDeletion}).count
+            numberContentDownloads = dfts.count - numberDownloadDeletions
 
             let alreadyDownloading = dfts.filter {$0.status == .downloading}
             guard alreadyDownloading.count == 0 else {
@@ -168,7 +174,7 @@ class Download {
                 return
             }
             
-            let notStarted = dfts.filter {$0.status == .notStarted && !$0.deletedOnServer}
+            let notStarted = dfts.filter {$0.status == .notStarted && $0.operation.isContents}
             guard notStarted.count != 0 else {
                 nextResult = .allDownloadsCompleted
                 return
@@ -186,7 +192,8 @@ class Download {
             }
             
             // Need this inside the `performAndWait` to bridge the gap without an NSManagedObject
-            downloadFile = FilenamingObject(fileUUID: nextToDownload.fileUUID, fileVersion: nextToDownload.fileVersion)
+            downloadFile = FilenamingWithAppMetaDataVersion(fileUUID: nextToDownload.fileUUID, fileVersion: nextToDownload.fileVersion, appMetaDataVersion: nextToDownload.appMetaDataVersion)
+            operation = nextToDownload.operation
         }
         
         guard nextResult == nil else {
@@ -194,23 +201,31 @@ class Download {
         }
         
         if first {
-            EventDesired.reportEvent( .willStartDownloads(numberFileDownloads: UInt(numberFileDownloads), numberDownloadDeletions: UInt(numberDownloadDeletions)), mask: desiredEvents, delegate: delegate)
+            EventDesired.reportEvent( .willStartDownloads(numberContentDownloads: UInt(numberContentDownloads), numberDownloadDeletions: UInt(numberDownloadDeletions)), mask: desiredEvents, delegate: delegate)
         }
         
-        ServerAPI.session.downloadFile(file: downloadFile, serverMasterVersion: masterVersion) { (result, error)  in
+        switch operation! {
+        case .file:
+            doDownloadFile(masterVersion: masterVersion, downloadFile: downloadFile, nextToDownload: nextToDownload, completion:completion)
+        
+        case .appMetaData:
+            doAppMetaDataDownload(masterVersion: masterVersion, downloadFile: downloadFile, nextToDownload: nextToDownload, completion:completion)
+            
+        case .deletion:
+            assert(false, "Bad puppy!")
+        }
+        
+        return .started
+    }
+    
+    private func doDownloadFile(masterVersion: MasterVersionInt, downloadFile: FilenamingWithAppMetaDataVersion, nextToDownload: DownloadFileTracker, completion:((NextCompletion)->())?) {
+    
+        ServerAPI.session.downloadFile(fileNamingObject: downloadFile, serverMasterVersion: masterVersion) {[weak self] (result, error)  in
         
             // Don't hold the performAndWait while we do completion-- easy to get a deadlock!
 
             guard error == nil else {
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    nextToDownload.status = .notStarted
-                    
-                    // Not going to check for exceptions on saveContext; we already have an error.
-                    CoreData.sessionNamed(Constants.coreDataName).saveContext()
-                }
-                
-                Log.error("Error: \(String(describing: error))")
-                completion?(.error(error!))
+                self?.doError(nextToDownload: nextToDownload, error: .otherError(error!), completion: completion)
                 return
             }
             
@@ -218,14 +233,19 @@ class Download {
             case .success(let downloadedFile):
                 var nextCompletionResult:NextCompletion!
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    // 3/23/18; Because we're not getting appMetaData in the FileIndex any more.
+                    nextToDownload.appMetaData = downloadedFile.appMetaData?.contents
+                    nextToDownload.appMetaDataVersion = downloadedFile.appMetaData?.version
+                
                     // 9/16/17; Not really crucial since we'll be deleting this DownloadFileTracker quickly. But, useful for testing.
                     nextToDownload.status = .downloaded
+                    
                     CoreData.sessionNamed(Constants.coreDataName).saveContext()
                     
                     // TODO: Not using downloadedFile.fileSizeBytes. Why?
                     let mimeType = MimeType(rawValue: nextToDownload.mimeType!)!
                     var attr = SyncAttributes(fileUUID: nextToDownload.fileUUID, mimeType: mimeType, creationDate: nextToDownload.creationDate! as Date, updateDate: nextToDownload.updateDate! as Date)
-                    attr.appMetaData = downloadedFile.appMetaData
+                    attr.appMetaData = downloadedFile.appMetaData?.contents
                     attr.creationDate = nextToDownload.creationDate as Date?
                     attr.updateDate = nextToDownload.updateDate as Date?
                     
@@ -237,28 +257,78 @@ class Download {
                 completion?(nextCompletionResult)
                 
             case .serverMasterVersionUpdate(let masterVersionUpdate):
-                // 9/18/17; We're doing downloads in an eventually consistent manner. See http://www.spasticmuffin.biz/blog/2017/09/15/making-downloads-more-flexible-in-the-syncserver/
-                // The following will remove any outstanding DownloadFileTrackers. If we've already downloaded a file-- those dft's will have been removed already. This is part of our eventually consistent operation. It is possible that some of the already downloaded files may need to be deleted (or updated, when we get to multiple file versions).
-                
-                var nextCompletionResult:NextCompletion!
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    DownloadFileTracker.removeAll()
-                    Singleton.get().masterVersion = masterVersionUpdate
-                    
-                    do {
-                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
-                    } catch (let error) {
-                        nextCompletionResult = .error(.coreDataError(error))
-                        return
-                    }
-                    
-                    nextCompletionResult = .masterVersionUpdate
-                }
-                
-                completion?(nextCompletionResult)
+                self?.doMasterVersionUpdate(masterVersionUpdate: masterVersionUpdate, completion:completion)
             }
         }
+    }
+    
+    private func doAppMetaDataDownload(masterVersion: MasterVersionInt, downloadFile: FilenamingWithAppMetaDataVersion, nextToDownload: DownloadFileTracker, completion:((NextCompletion)->())?) {
+    
+        assert(downloadFile.appMetaDataVersion != nil)
+
+        ServerAPI.session.downloadAppMetaData(appMetaDataVersion: downloadFile.appMetaDataVersion!, fileUUID: downloadFile.fileUUID, serverMasterVersion: masterVersion) {[weak self] result in
+
+            switch result {
+            case .success(.appMetaData(let appMetaData)):
+                var nextCompletionResult:NextCompletion!
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    nextToDownload.appMetaData = appMetaData
+                    nextToDownload.status = .downloaded
+                    CoreData.sessionNamed(Constants.coreDataName).saveContext()
+                    
+                    let mimeType = MimeType(rawValue: nextToDownload.mimeType!)!
+                    var attr = SyncAttributes(fileUUID: nextToDownload.fileUUID, mimeType: mimeType, creationDate: nextToDownload.creationDate! as Date, updateDate: nextToDownload.updateDate! as Date)
+                    attr.appMetaData = appMetaData
+                    attr.creationDate = nextToDownload.creationDate as Date?
+                    attr.updateDate = nextToDownload.updateDate as Date?
+                    
+                    // Not removing nextToDownload yet because I haven't called the client completion callback yet-- will do the deletion after that.
+                    
+                    nextCompletionResult = .appMetaDataDownloaded(attr:attr, dft: nextToDownload)
+                }
         
-        return .started
+                completion?(nextCompletionResult)
+                
+            case .success(.serverMasterVersionUpdate(let masterVersionUpdate)):
+                self?.doMasterVersionUpdate(masterVersionUpdate: masterVersionUpdate, completion:completion)
+                
+            case .error(let error):
+                self?.doError(nextToDownload: nextToDownload, error: .otherError(error), completion: completion)
+            }
+        }
+    }
+    
+    private func doError(nextToDownload: DownloadFileTracker, error:SyncServerError, completion:((NextCompletion)->())?) {
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            nextToDownload.status = .notStarted
+            
+            // Not going to check for exceptions on saveContext; we already have an error.
+            CoreData.sessionNamed(Constants.coreDataName).saveContext()
+        }
+
+        Log.error("Error: \(String(describing: error))")
+        completion?(.error(error))
+    }
+    
+    private func doMasterVersionUpdate(masterVersionUpdate: MasterVersionInt, completion:((NextCompletion)->())?) {
+        // 9/18/17; We're doing downloads in an eventually consistent manner. See http://www.spasticmuffin.biz/blog/2017/09/15/making-downloads-more-flexible-in-the-syncserver/
+        // The following will remove any outstanding DownloadFileTrackers. If we've already downloaded a file-- those dft's will have been removed already. This is part of our eventually consistent operation. It is possible that some of the already downloaded files may need to be deleted (or updated, when we get to multiple file versions).
+        
+        var nextCompletionResult:NextCompletion!
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            DownloadFileTracker.removeAll()
+            Singleton.get().masterVersion = masterVersionUpdate
+            
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                nextCompletionResult = .error(.coreDataError(error))
+                return
+            }
+            
+            nextCompletionResult = .masterVersionUpdate
+        }
+
+        completion?(nextCompletionResult)
     }
 }

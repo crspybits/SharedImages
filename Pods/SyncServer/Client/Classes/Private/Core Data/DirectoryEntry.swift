@@ -28,6 +28,29 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         }
     }
     
+    public var appMetaDataVersion: AppMetaDataVersionInt? {
+        get {
+            return appMetaDataVersionInternal?.int32Value
+        }
+        
+        set {
+            appMetaDataVersionInternal = newValue == nil ? nil : NSNumber(value: newValue!)
+        }
+    }
+    
+    // Based on the current directory entry appMetaDataVersion and an update to be made to the appMetaData, establish the appMetaDataVersion to upload with a new file version.
+    public func appMetaDataVersionToUpload(appMetaDataUpdate: String?) -> AppMetaDataVersionInt? {
+        if appMetaDataUpdate == nil {
+            return nil
+        }
+        else if appMetaDataVersion == nil {
+            return 0
+        }
+        else {
+            return appMetaDataVersion! + 1
+        }
+    }
+    
     public class func entityName() -> String {
         return "DirectoryEntry"
     }

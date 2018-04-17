@@ -59,7 +59,7 @@ class AppBadge {
         if AppBadge.badgesAuthorized.boolValue && SignInManager.session.userIsSignedIn {
             SyncServer.session.getStats() { stats in
                 if let stats = stats {
-                    let total = stats.downloadDeletionsAvailable + stats.downloadsAvailable
+                    let total = stats.downloadDeletionsAvailable + stats.contentDownloadsAvailable
                     setBadge(number: total)
                     if total > 0 {
                         completionHandler?(.newData)

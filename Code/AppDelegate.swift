@@ -52,7 +52,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Call this as soon as possible in your launch sequence.
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.12.1"))
+        // Version 0.14.0 of the server is the first with appMetaData versioning, and SharedImages needs this now.
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.14.0"))
     
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Shared Images"

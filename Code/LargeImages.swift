@@ -62,7 +62,7 @@ class LargeImages : UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         ImageExtras.resetToSmallerImageCache() {
-            collectionView.reloadData()
+            collectionView?.reloadData()
         }
     }
     
@@ -81,21 +81,23 @@ class LargeImages : UIViewController {
         super.viewWillTransition(to: size, with: coordinator)
         
         // Because the order of indexPathsForVisibleItems doesn't appear sorted-- otherwise, with repeated device rotation, we get too much image motion. Looks odd.
-        let visibleItems = collectionView.indexPathsForVisibleItems as [IndexPath]
-        let sortedArray = visibleItems.sorted {$0 < $1}
-        
-        // When the discussion thread screen is open, and the device is rotated, we can get a crash without this test.
-        guard sortedArray.count > 0 else {
-            return
-        }
-        
-        seekToIndexPath = sortedArray[0]
-        // I get some odd effects if I retain zooming across the rotation-- cells show up as being empty.
-        zoomedCells.removeAll()
-        
-        // This is my solution to an annoying problem: I need to reload the images at their changed size after rotation. This is how I'm getting a callback *after* the rotation has completed when the cells have been sized properly.
-        coordinator.animate(alongsideTransition: nil) { context in
-            self.collectionView.reloadData()
+        if let collectionView = collectionView {
+            let visibleItems = collectionView.indexPathsForVisibleItems as [IndexPath]
+            let sortedArray = visibleItems.sorted {$0 < $1}
+            
+            // When the discussion thread screen is open, and the device is rotated, we can get a crash without this test.
+            guard sortedArray.count > 0 else {
+                return
+            }
+            
+            seekToIndexPath = sortedArray[0]
+            // I get some odd effects if I retain zooming across the rotation-- cells show up as being empty.
+            zoomedCells.removeAll()
+            
+            // This is my solution to an annoying problem: I need to reload the images at their changed size after rotation. This is how I'm getting a callback *after* the rotation has completed when the cells have been sized properly.
+            coordinator.animate(alongsideTransition: nil) { context in
+                collectionView.reloadData()
+            }
         }
     }
     
@@ -109,9 +111,10 @@ class LargeImages : UIViewController {
     }
     
     func invalidateLayout(withAnimation animation: Bool = false) {
-        if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+        if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
             if animation {
-                collectionView.performBatchUpdates({
+                // 4/15/18: Crash in here. Perhaps related to recent crashes such as https://github.com/crspybits/SharedImages/issues/100 (Just added `?`).
+                collectionView?.performBatchUpdates({
                     flowLayout.invalidateLayout()
                 }, completion: nil)
                 }
@@ -130,7 +133,7 @@ class LargeImages : UIViewController {
             DispatchQueue.main.async {[unowned self] in
                 // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
                 if self.seekToIndexPath != nil {
-                    self.collectionView.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
+                    self.collectionView?.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
                     self.seekToIndexPath = nil
                 }
             }
@@ -167,17 +170,17 @@ extension LargeImages : CoreDataSourceDelegate {
     func coreDataSource(_ cds: CoreDataSource!, objectWasDeleted indexPathOfDeletedObject: IndexPath!) {
     
         // 8/24/17; Looks like this is where the crash happens.
-        collectionView.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
+        collectionView?.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
         Log.msg("LargeImages: objectWasDeleted")
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasUpdated indexPathOfUpdatedObject: IndexPath!) {
-        collectionView.reloadData()
+        collectionView?.reloadData()
     }
     
     // 5/20/16; Odd. This gets called when an object is updated, sometimes. It may be because the sorting key I'm using in the fetched results controller changed.
     func coreDataSource(_ cds: CoreDataSource!, objectWasMovedFrom oldIndexPath: IndexPath!, to newIndexPath: IndexPath!) {
-        collectionView.reloadData()
+        collectionView?.reloadData()
     }
 }
 
@@ -232,7 +235,7 @@ extension LargeImages : UICollectionViewDataSource {
         let discussionModal = DiscussionVC()
         discussionModal.show(fromParentVC: self, discussion:discussion, delegate: self) { [unowned self] in
             // To clear the unread count.
-            self.collectionView.reloadData()
+            self.collectionView?.reloadData()
         }
     }
 }
@@ -265,7 +268,7 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
 extension LargeImages : LargeImageCellDelegate {
     func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize) {
     
-        if let indexPath = collectionView.indexPath(for: cell) {
+        if let indexPath = collectionView?.indexPath(for: cell) {
             // Don't let the cell shrink too small-- get odd effects here. The cell can get so small it shrinks out of sight. Don't know why that is. I thought the minimum scaling I put in the collection view cell would handle it.
             if zoomSize.width > originalSize.width && zoomSize.height > originalSize.height {
                 if zoomedCells[indexPath] == nil {
@@ -298,7 +301,7 @@ extension LargeImages : DiscussionVCDelegate {
     }
     
     func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion) {
-        collectionView.reloadData()
+        collectionView?.reloadData()
     }
     
     func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?) {

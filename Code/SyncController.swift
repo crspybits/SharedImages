@@ -166,17 +166,18 @@ class SyncController {
 }
 
 extension SyncController : SyncServerDelegate {
-    func syncServerMustResolveFileDownloadConflict(downloadedFile: SMRelativeLocalURL, downloadedFileAttributes: SyncAttributes, uploadConflict: SyncServerConflict<FileDownloadResolution>) {
-    
-        let errorResolution: FileDownloadResolution = .acceptFileDownload
+    func syncServerMustResolveContentDownloadConflict(downloadedFile: SMRelativeLocalURL?, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>) {
+
+        let errorResolution: ContentDownloadResolution = .acceptContentDownload
         
         switch uploadConflict.conflictType! {
-        case .fileUpload:
+        case .contentUpload:
             // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
             
-            guard let discussion = Discussion.fetchObjectWithUUID(uuid: downloadedFileAttributes.fileUUID),
+            guard let discussion = Discussion.fetchObjectWithUUID(uuid: downloadedContentAttributes.fileUUID),
                 let discussionURL = discussion.url as URL?,
                 let localDiscussion = FixedObjects(withFile: discussionURL),
+                let downloadedFile = downloadedFile,
                 let serverDiscussion = FixedObjects(withFile: downloadedFile as URL) else {
                 Log.error("Error! Yark! We had a conflict but had problems. Oh. My.")
                 uploadConflict.resolveConflict(resolution: errorResolution)
@@ -184,7 +185,7 @@ extension SyncController : SyncServerDelegate {
             }
             
             let (mergedDiscussion, unreadCount) = localDiscussion.merge(with: serverDiscussion)
-            let attr = SyncAttributes(fileUUID: downloadedFileAttributes.fileUUID, mimeType: downloadedFileAttributes.mimeType)
+            let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, mimeType: downloadedContentAttributes.mimeType)
             
             // I'm going to use a new file, just in case we have an error writing.
             let mergeURL = ImageExtras.newJSONFile()
@@ -207,16 +208,18 @@ extension SyncController : SyncServerDelegate {
             
             SyncServer.session.sync()
             
-            uploadConflict.resolveConflict(resolution: .rejectFileDownload(.removeAll))
+            uploadConflict.resolveConflict(resolution: .rejectContentDownload(.removeAll))
         
         // For now, we're going to prioritize the server operation. We've queued up a local deletion-- seems no loss if we accept the new download. We can always try the deletion again.
-        case .uploadDeletion, .bothFileUploadAndDeletion:
-            uploadConflict.resolveConflict(resolution: .acceptFileDownload)
+        case .uploadDeletion, .both:
+            uploadConflict.resolveConflict(resolution: .acceptContentDownload)
         }
     }
     
-    func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, ImageExtras.FileType?) {
+    func syncServerAppMetaDataDownloadComplete(attr: SyncAttributes) {
+    }
     
+    func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, ImageExtras.FileType?) {
         if let appMetaData = appMetaData,
             let jsonDict = jsonStringToDict(appMetaData),
             let fileTypeString = jsonDict[ImageExtras.appMetaDataFileTypeKey] as? String {
@@ -350,7 +353,7 @@ extension SyncController : SyncServerDelegate {
         case .syncStarted:
             delegate.syncEvent(syncController: self, event: .syncStarted)
             
-        case .willStartDownloads(numberFileDownloads: let numberFileDownloads, numberDownloadDeletions: let numberDownloadDeletions):
+        case .willStartDownloads(numberContentDownloads: let numberContentDownloads, numberDownloadDeletions: let numberDownloadDeletions):
         
             RosterDevInjectTest.if(TestCases.session.testCrashNextDownload) {[unowned self] in
 #if DEBUG
@@ -358,7 +361,7 @@ extension SyncController : SyncServerDelegate {
 #endif
             }
             
-            Progress.session.start(withTotalNumber: Int(numberFileDownloads + numberDownloadDeletions))
+            Progress.session.start(withTotalNumber: Int(numberContentDownloads + numberDownloadDeletions))
             
             // TESTING
             // TimedCallback.withDuration(30, andCallback: {
@@ -366,7 +369,7 @@ extension SyncController : SyncServerDelegate {
             // })
             // TESTING
 
-        case .willStartUploads(numberFileUploads: let numberFileUploads, numberUploadDeletions: let numberUploadDeletions):
+        case .willStartUploads(numberContentUploads: let numberContentUploads, numberUploadDeletions: let numberUploadDeletions):
         
             RosterDevInjectTest.if(TestCases.session.testCrashNextUpload) {[unowned self] in
 #if DEBUG
@@ -374,7 +377,7 @@ extension SyncController : SyncServerDelegate {
 #endif
             }
         
-            Progress.session.start(withTotalNumber: Int(numberFileUploads + numberUploadDeletions))
+            Progress.session.start(withTotalNumber: Int(numberContentUploads + numberUploadDeletions))
             
         case .singleFileUploadComplete(attr: let attr):
             let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)

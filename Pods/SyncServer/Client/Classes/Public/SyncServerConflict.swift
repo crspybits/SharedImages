@@ -7,43 +7,45 @@
 
 import Foundation
 
+// In the following the term `content` refers to either appMetaData or file data contents.
+
 public enum DownloadDeletionResolution {
-    // Download deletions can only conflict with file uploads. A server download deletion and a client file upload deletion don't conflict (it's just two people trying to delete at about the same time, which is fine).
+    // Download deletions can conflict with file uploads and/or appMetaData uploads. A server download deletion and a client file upload deletion don't conflict (it's just two people trying to delete at about the same time, which is fine).
     
-    public enum FileUploadResolution {
-        case keepFileUpload
-        case removeFileUpload
+    public enum ContentUploadResolution {
+        case keepContentUpload
+        case removeContentUpload
     }
     
-    // Deletes the existing file upload.
+    // Deletes the existing content upload.
     case acceptDownloadDeletion
     
-    case rejectDownloadDeletion(FileUploadResolution)
+    case rejectDownloadDeletion(ContentUploadResolution)
 }
 
-public enum FileDownloadResolution {
-    // File downloads can conflict with file upload(s) and/or an upload deletion. See the conflictType of the specific `SyncServerConflict`.
+public enum ContentDownloadResolution {
+    // Content downloads can conflict with content upload(s) and/or an upload deletion. See the conflictType of the specific `SyncServerConflict`.
     
-    // This is used in `rejectFileDownload` below.
+    // This is used in `rejectContentDownload` below.
     public struct UploadResolution : OptionSet {
         public let rawValue: Int
         public init(rawValue:Int){ self.rawValue = rawValue}
         
-        // If you are going to use `rejectFileDownload` (see below), this the typical upload resolution.
-        public static let keepAll:UploadResolution = [keepFileUploads, keepUploadDeletions]
+        // If you are going to use `rejectContentDownload` (see below), this is the typical upload resolution.
+        public static let keepAll:UploadResolution = [keepContentUploads, keepUploadDeletions]
         
-        // Remove any conflicting local file uploads and/or upload deletions.
+        // Remove any conflicting local content uploads and/or upload deletions.
         public static let removeAll = UploadResolution(rawValue: 0)
         
-        // Not having this option means to remove your conflicting file uploads
-        public static let keepFileUploads = UploadResolution(rawValue: 1 << 0)
+        // Not having this option means to remove your conflicting content uploads
+        public static let keepContentUploads = UploadResolution(rawValue: 1 << 0)
         
-        public var keepFileUploads:Bool {
-            return self.contains(UploadResolution.keepFileUploads)
+        public var keepContentUploads:Bool {
+            return self.contains(UploadResolution.keepContentUploads)
         }
         
-        public var removeFileUploads:Bool {
-            return !self.contains(UploadResolution.keepFileUploads)
+        public var removeContentUploads:Bool {
+            return !self.contains(UploadResolution.keepContentUploads)
         }
         
         // Not having this option means to remove your conflicting upload deletions.
@@ -58,10 +60,10 @@ public enum FileDownloadResolution {
         }
     }
     
-    // Deletes any conflicting file upload and/or upload deletion.
-    case acceptFileDownload
+    // Deletes any conflicting content upload and/or upload deletion.
+    case acceptContentDownload
     
-    case rejectFileDownload(UploadResolution)
+    case rejectContentDownload(UploadResolution)
 }
 
 // When you receive a conflict in a callback method, you must resolve the conflict by calling resolveConflict.
@@ -76,12 +78,12 @@ public class SyncServerConflict<R> {
         self.resolutionCallback = resolutionCallback
     }
     
-    // Because downloads are higher-priority (than uploads) with the SyncServer, all conflicts effectively originate from a server download operation: A download-deletion or a file-download. The type of server operation will be apparent from the context.
+    // Because downloads are higher-priority (than uploads) with the SyncServer, all conflicts effectively originate from a server download operation: A download-deletion, a file-download, or an appMetaData download. The type of server operation will be apparent from the context.
     // And the conflict is between the server operation and a local, client operation:
     public enum ClientOperation : String {
         case uploadDeletion
-        case fileUpload
-        case bothFileUploadAndDeletion
+        case contentUpload
+        case both
     }
     
     public private(set) var conflictType:ClientOperation!

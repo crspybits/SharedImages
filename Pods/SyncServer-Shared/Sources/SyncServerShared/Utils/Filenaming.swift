@@ -31,22 +31,24 @@ public struct Extension {
 
 // In some situations on the client, I need this
 #if !SERVER
-public struct FilenamingObject : Filenaming {
+public struct FilenamingWithAppMetaDataVersion : Filenaming {
     public let fileUUID:String!
     public let fileVersion:Int32!
-    
+    public var appMetaDataVersion:AppMetaDataVersionInt?
+
     // The default member-wise initializer is not public. :(. See https://stackoverflow.com/questions/26224693/how-can-i-make-public-by-default-the-member-wise-initialiser-for-structs-in-swif
-    public init(fileUUID:String, fileVersion:Int32) {
+    public init(fileUUID:String, fileVersion:Int32, appMetaDataVersion:AppMetaDataVersionInt?) {
         self.fileUUID = fileUUID
         self.fileVersion = fileVersion
+        self.appMetaDataVersion = appMetaDataVersion
     }
 }
 #endif
 
 public protocol Filenaming {
     var fileUUID:String! {get}
-    var fileVersion:Int32! {get}
-
+    var fileVersion:FileVersionInt! {get}
+    
 #if SERVER
     func cloudFileName(deviceUUID:String, mimeType:String) -> String
 #endif

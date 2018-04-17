@@ -23,6 +23,10 @@ public class DownloadFileRequest : NSObject, RequestMessage {
     public static let fileVersionKey = "fileVersion"
     public var fileVersion:FileVersionInt!
     
+    // This must indicate the current version of the app meta data for the file in the FileIndex (or nil if there is none yet).
+    public static let appMetaDataVersionKey = "appMetaDataVersion"
+    public var appMetaDataVersion:AppMetaDataVersionInt?
+    
     // Overall version for files for the specific user; assigned by the server.
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
@@ -32,7 +36,7 @@ public class DownloadFileRequest : NSObject, RequestMessage {
     }
     
     public func allKeys() -> [String] {
-        return self.nonNilKeys()
+        return self.nonNilKeys() + [DownloadFileRequest.appMetaDataVersionKey]
     }
     
     public required init?(json: JSON) {
@@ -42,7 +46,8 @@ public class DownloadFileRequest : NSObject, RequestMessage {
         
         self.masterVersion = Decoder.decode(int64ForKey: DownloadFileRequest.masterVersionKey)(json)
         self.fileVersion = Decoder.decode(int32ForKey: DownloadFileRequest.fileVersionKey)(json)
-
+        self.appMetaDataVersion = Decoder.decode(int32ForKey: DownloadFileRequest.appMetaDataVersionKey)(json)
+        
         if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
             return nil
         }
@@ -62,7 +67,8 @@ public class DownloadFileRequest : NSObject, RequestMessage {
         return jsonify([
             DownloadFileRequest.fileUUIDKey ~~> self.fileUUID,
             DownloadFileRequest.masterVersionKey ~~> self.masterVersion,
-            DownloadFileRequest.fileVersionKey ~~> self.fileVersion
+            DownloadFileRequest.fileVersionKey ~~> self.fileVersion,
+            DownloadFileRequest.appMetaDataVersionKey ~~> self.appMetaDataVersion
         ])
     }
 }

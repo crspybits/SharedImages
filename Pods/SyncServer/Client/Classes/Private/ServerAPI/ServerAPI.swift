@@ -23,6 +23,11 @@ protocol ServerAPIDelegate : class {
 }
 
 class ServerAPI {
+    enum Result<T> {
+        case success(T)
+        case error(Error)
+    }
+    
     // These need to be set by user of this class.
     var baseURL:String!
     weak var delegate:ServerAPIDelegate!
@@ -263,7 +268,7 @@ class ServerAPI {
         let fileUUID:String!
         let mimeType:MimeType!
         let deviceUUID:String!
-        let appMetaData:String?
+        let appMetaData:AppMetaData?
         let fileVersion:FileVersionInt!
     }
     
@@ -281,7 +286,6 @@ class ServerAPI {
         var params:[String : Any] = [
             UploadFileRequest.fileUUIDKey: file.fileUUID,
             UploadFileRequest.mimeTypeKey: file.mimeType.rawValue,
-            UploadFileRequest.appMetaDataKey: file.appMetaData as Any,
             UploadFileRequest.fileVersionKey: file.fileVersion,
             UploadFileRequest.masterVersionKey: serverMasterVersion
         ]
@@ -294,6 +298,8 @@ class ServerAPI {
             completion?(nil, .couldNotCreateRequest);
             return;
         }
+        
+        uploadRequest.appMetaData = file.appMetaData
         
         assert(endpoint.method == .post)
         
@@ -396,7 +402,7 @@ class ServerAPI {
     struct DownloadedFile {
     let url: SMRelativeLocalURL
     let fileSizeBytes:Int64
-    let appMetaData:String?
+    let appMetaData:AppMetaData?
     }
     
     enum DownloadFileResult {
@@ -404,13 +410,14 @@ class ServerAPI {
     case serverMasterVersionUpdate(Int64)
     }
     
-    func downloadFile(file: Filenaming, serverMasterVersion:MasterVersionInt!, completion:((DownloadFileResult?, SyncServerError?)->(Void))?) {
+    func downloadFile(fileNamingObject: FilenamingWithAppMetaDataVersion, serverMasterVersion:MasterVersionInt!, completion:((DownloadFileResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.downloadFile
         
         var params = [String : Any]()
         params[DownloadFileRequest.masterVersionKey] = serverMasterVersion
-        params[DownloadFileRequest.fileUUIDKey] = file.fileUUID
-        params[DownloadFileRequest.fileVersionKey] = file.fileVersion
+        params[DownloadFileRequest.fileUUIDKey] = fileNamingObject.fileUUID
+        params[DownloadFileRequest.fileVersionKey] = fileNamingObject.fileVersion
+        params[DownloadFileRequest.appMetaDataVersionKey] = fileNamingObject.appMetaDataVersion
 
         guard let downloadFileRequest = DownloadFileRequest(json: params) else {
             completion?(nil, .couldNotCreateRequest)
@@ -419,7 +426,7 @@ class ServerAPI {
 
         let parameters = downloadFileRequest.urlParameters()!
         let serverURL = makeURL(forEndpoint: endpoint, parameters: parameters)
-        let file = ServerNetworkingLoadingFile(fileUUID: file.fileUUID, fileVersion: file.fileVersion)
+        let file = ServerNetworkingLoadingFile(fileUUID: fileNamingObject.fileUUID, fileVersion: fileNamingObject.fileVersion)
         
         download(file: file, fromServerURL: serverURL, method: endpoint.method) { (resultURL, response, statusCode, error) in
         
@@ -436,26 +443,21 @@ class ServerAPI {
                 if let parms = response!.allHeaderFields[ServerConstants.httpResponseMessageParams] as? String,
                     let jsonDict = self.toJSONDictionary(jsonString: parms) {
                     Log.msg("jsonDict: \(jsonDict)")
+                    
+                    guard let downloadFileResponse = DownloadFileResponse(json: jsonDict) else {
+                        completion?(nil, .couldNotObtainHeaderParameters)
+                        return
+                    }
 
-                    if let fileSizeBytes = jsonDict[DownloadFileResponse.fileSizeBytesKey] as? Int64 {
-                        var appMetaDataString:String?
-                        let appMetaData = jsonDict[DownloadFileResponse.appMetaDataKey]
-                        if appMetaData != nil {
-                            if appMetaData is String {
-                                appMetaDataString = (appMetaData as! String)
-                            }
-                            else {
-                                completion?(nil, .obtainedAppMetaDataButWasNotString)
-                                return
-                            }
-                        }
-                        
+                    if let fileSizeBytes = downloadFileResponse.fileSizeBytes {
                         guard resultURL != nil else {
                             completion?(nil, .resultURLObtainedWasNil)
                             return
                         }
                         
-                        let downloadedFile = DownloadedFile(url: resultURL!, fileSizeBytes: fileSizeBytes, appMetaData: appMetaDataString)
+                        let appMetaData = AppMetaData(version: fileNamingObject.appMetaDataVersion, contents: downloadFileResponse.appMetaData)
+                        
+                        let downloadedFile = DownloadedFile(url: resultURL!, fileSizeBytes: fileSizeBytes, appMetaData: appMetaData)
                         completion?(.success(downloadedFile), nil)
                     }
                     else if let masterVersionUpdate = jsonDict[DownloadFileResponse.masterVersionUpdateKey] as? Int64 {
@@ -645,6 +647,83 @@ class ServerAPI {
             }
             else {
                 completion?(nil, resultError)
+            }
+        }
+    }
+    
+    enum UploadAppMetaDataResult {
+    case success
+    case serverMasterVersionUpdate(Int64)
+    }
+    
+    func uploadAppMetaData(appMetaData: AppMetaData, fileUUID: String, serverMasterVersion: MasterVersionInt, completion:((Result<UploadAppMetaDataResult>)->(Void))?) {
+        let endpoint = ServerEndpoints.uploadAppMetaData
+        
+        let uploadRequest = UploadAppMetaDataRequest()
+        uploadRequest.appMetaData = appMetaData
+        uploadRequest.fileUUID = fileUUID
+        uploadRequest.masterVersion = serverMasterVersion
+        
+        let parameters = uploadRequest.urlParameters()!
+        let serverURL = makeURL(forEndpoint: endpoint, parameters: parameters)
+        
+        sendRequestUsing(method: endpoint.method, toURL: serverURL) { (response,  httpStatus, error) in
+            if let resultError = self.checkForError(statusCode: httpStatus, error: error) {
+                completion?(.error(resultError))
+            }
+            else {
+                if let uploadAppMetaDataResponse = UploadAppMetaDataResponse(json: response!) {
+                    if let masterVersionUpdate = uploadAppMetaDataResponse.masterVersionUpdate {
+                        completion?(.success(.serverMasterVersionUpdate(masterVersionUpdate)))
+                    }
+                    else {
+                        completion?(.success(.success))
+                    }
+                }
+                else {
+                    completion?(.error(SyncServerError.couldNotCreateResponse))
+                }
+            }
+        }
+    }
+    
+    enum DownloadAppMetaDataResult {
+    case appMetaData(String)
+    case serverMasterVersionUpdate(Int64)
+    }
+
+    func downloadAppMetaData(appMetaDataVersion: AppMetaDataVersionInt, fileUUID: String, serverMasterVersion: MasterVersionInt, completion:((Result<DownloadAppMetaDataResult>)->(Void))?) {
+    
+        let endpoint = ServerEndpoints.downloadAppMetaData
+        
+        var paramsForRequest:[String:Any] = [:]
+        paramsForRequest[DownloadAppMetaDataRequest.fileUUIDKey] = fileUUID
+        paramsForRequest[DownloadAppMetaDataRequest.appMetaDataVersionKey] = appMetaDataVersion
+        paramsForRequest[DownloadAppMetaDataRequest.masterVersionKey] = serverMasterVersion
+        let downloadAppMetaData = DownloadAppMetaDataRequest(json: paramsForRequest)!
+        
+        let parameters = downloadAppMetaData.urlParameters()!
+        let serverURL = makeURL(forEndpoint: endpoint, parameters: parameters)
+        
+        sendRequestUsing(method: endpoint.method, toURL: serverURL) { (response,  httpStatus, error) in
+            if let resultError = self.checkForError(statusCode: httpStatus, error: error) {
+                completion?(.error(resultError))
+            }
+            else {
+                if let downloadAppMetaDataResponse = DownloadAppMetaDataResponse(json: response!) {
+                    if let masterVersionUpdate = downloadAppMetaDataResponse.masterVersionUpdate {
+                        completion?(.success(.serverMasterVersionUpdate(masterVersionUpdate)))
+                    }
+                    else if let appMetaData = downloadAppMetaDataResponse.appMetaData {
+                        completion?(.success(.appMetaData(appMetaData)))
+                    }
+                    else {
+                        completion?(.error(SyncServerError.nilResponse))
+                    }
+                }
+                else {
+                    completion?(.error(SyncServerError.couldNotCreateResponse))
+                }
             }
         }
     }

@@ -27,11 +27,45 @@ public class FileTracker: NSManagedObject, Filenaming, FileUUID {
     
     public var fileVersion:Int32! {
         get {
-            return fileVersionInternal
+            return fileVersionInternal as? Int32
         }
         
         set {
-            fileVersionInternal = newValue
+            fileVersionInternal = newValue as NSNumber?
+        }
+    }
+    
+    public var appMetaDataVersion: AppMetaDataVersionInt? {
+        get {
+            return appMetaDataVersionInternal?.int32Value
+        }
+        
+        set {
+            appMetaDataVersionInternal = newValue == nil ? nil : NSNumber(value: newValue!)
+        }
+    }
+    
+    public enum Operation: String {
+        case file // File upload or download
+        case appMetaData // appMetaData upload or download.
+        case deletion // Upload or download deletion
+        
+        var isContents: Bool {
+            return self == .file || self == .appMetaData
+        }
+        
+        var isDeletion: Bool {
+            return self == .deletion
+        }
+    }
+    
+    public var operation: Operation! {
+        get {
+            return operationInternal == nil ? nil : Operation(rawValue: operationInternal!)
+        }
+        
+        set {
+            operationInternal = newValue.rawValue
         }
     }
     

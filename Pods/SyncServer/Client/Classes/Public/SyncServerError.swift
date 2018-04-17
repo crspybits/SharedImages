@@ -34,7 +34,7 @@ public enum SyncServerError: Error {
     case couldNotMoveDownloadFile
     case couldNotCreateNewFile
     case couldNotRemoveFileTracker
-    case obtainedAppMetaDataButWasNotString
+    case badAppMetaData
     case noExpectedResultKey
     case nilResponse
     case couldNotObtainHeaderParameters
@@ -48,6 +48,7 @@ public enum SyncServerError: Error {
     case badAddUser
     case unknownServerError
     case coreDataError(Error)
+    case otherError(Error)
     case fileManagerError(Error)
     case generic(String)
     

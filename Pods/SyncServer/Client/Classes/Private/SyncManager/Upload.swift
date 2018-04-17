@@ -29,7 +29,8 @@ class Upload {
     }
     
     enum NextCompletion {
-    case fileUploaded(SyncAttributes)
+    case fileUploaded(SyncAttributes, uft: UploadFileTracker)
+    case appMetaDataUploaded(uft: UploadFileTracker)
     case uploadDeletion(fileUUID:String)
     case masterVersionUpdate
     case error(SyncServerError)
@@ -43,8 +44,8 @@ class Upload {
         var masterVersion:MasterVersionInt!
         var nextToUpload:UploadFileTracker!
         var uploadQueue:UploadQueue!
-        var deleteOnServer:Bool!
-        var numberFileUploads:Int!
+        var operation: FileTracker.Operation!
+        var numberContentUploads:Int!
         var numberUploadDeletions:Int!
         
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
@@ -54,14 +55,14 @@ class Upload {
                 return
             }
             
-            numberFileUploads =
+            numberContentUploads =
                 uploadQueue.uploadFileTrackers.filter {
-                    $0.status == .notStarted && !$0.deleteOnServer
+                    $0.status == .notStarted && $0.operation.isContents
                 }.count
             
             numberUploadDeletions =
                 uploadQueue.uploadFileTrackers.filter {
-                    $0.status == .notStarted && $0.deleteOnServer
+                    $0.status == .notStarted && $0.operation.isDeletion
                 }.count
             
             let alreadyUploading =
@@ -79,7 +80,7 @@ class Upload {
             }
 
             nextToUpload.status = .uploading
-            deleteOnServer = nextToUpload.deleteOnServer
+            operation = nextToUpload.operation
             
             masterVersion = Singleton.get().masterVersion
             
@@ -95,14 +96,18 @@ class Upload {
         }
         
         if first {
-            EventDesired.reportEvent(.willStartUploads(numberFileUploads: UInt(numberFileUploads), numberUploadDeletions: UInt(numberUploadDeletions)), mask: desiredEvents, delegate: delegate)
+            EventDesired.reportEvent(.willStartUploads(numberContentUploads: UInt(numberContentUploads), numberUploadDeletions: UInt(numberUploadDeletions)), mask: desiredEvents, delegate: delegate)
         }
         
-        if deleteOnServer! {
-            return uploadDeletion(nextToUpload:nextToUpload, uploadQueue:uploadQueue, masterVersion:masterVersion)
-        }
-        else {
+        switch operation! {
+        case .file:
             return uploadFile(nextToUpload: nextToUpload, uploadQueue: uploadQueue, masterVersion: masterVersion)
+            
+        case .appMetaData:
+            return uploadAppMetaData(nextToUpload: nextToUpload, uploadQueue: uploadQueue, masterVersion: masterVersion)
+            
+        case .deletion:
+            return uploadDeletion(nextToUpload:nextToUpload, uploadQueue:uploadQueue, masterVersion:masterVersion)
         }
     }
     
@@ -132,19 +137,10 @@ class Upload {
             return nextResult!
         }
         
-        ServerAPI.session.uploadDeletion(file: fileToDelete, serverMasterVersion: masterVersion) { (uploadDeletionResult, error) in
+        ServerAPI.session.uploadDeletion(file: fileToDelete, serverMasterVersion: masterVersion) {[weak self] (uploadDeletionResult, error) in
         
             guard error == nil else {
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    nextToUpload.status = .notStarted
-                    
-                    // We already have an error, not going to worry about handling one with saveContext.
-                    CoreData.sessionNamed(Constants.coreDataName).saveContext()
-                }
-                
-                let message = "Error: \(String(describing: error))"
-                Log.error(message)
-                self.completion?(.error(error!))
+                self?.uploadError(.otherError(error!), nextToUpload: nextToUpload)
                 return
             }
             
@@ -164,42 +160,22 @@ class Upload {
                     completionResult = .uploadDeletion(fileUUID: nextToUpload.fileUUID)
                 }
 
-                self.completion?(completionResult!)
+                self?.completion?(completionResult!)
                 
             case .serverMasterVersionUpdate(let masterVersionUpdate):
-                var completionResult:NextCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    // Simplest method for now: Mark all uft's as .notStarted
-                    // TODO: *4* This could be better-- performance-wise, it doesn't make sense to do all the uploads over again.
-                    _ = uploadQueue.uploadFileTrackers.map { uft in
-                        uft.status = .notStarted
-                    }
-
-                    Singleton.get().masterVersion = masterVersionUpdate
-                    
-                    do {
-                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
-                    } catch (let error) {
-                        completionResult = .error(.coreDataError(error))
-                        return
-                    }
-                    
-                    completionResult = .masterVersionUpdate
-                }
-                
-                self.completion?(completionResult!)
+                self?.masterVersionUpdate(uploadQueue:uploadQueue, masterVersionUpdate: masterVersionUpdate)
             }
         }
         
         return .started
     }
     
-    private func uploadFile(nextToUpload:UploadFileTracker, uploadQueue:UploadQueue,masterVersion:MasterVersionInt) -> NextResult {
-        
-        var file:ServerAPI.File!
-        var nextResult:NextResult?
+    private func uploadAppMetaData(nextToUpload:UploadFileTracker, uploadQueue:UploadQueue, masterVersion:MasterVersionInt) -> NextResult {
+    
         var directoryEntry:DirectoryEntry?
-        var undelete = false
+        var nextResult:NextResult?
+        var fileUUID: String!
+        var appMetaData:AppMetaData!
         
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             // 1/11/18; Determing the version to upload immediately before the upload. See https://github.com/crspybits/SyncServerII/issues/12
@@ -210,12 +186,7 @@ class Upload {
                 return
             }
             
-            if directoryEntry!.fileVersion == nil {
-                nextToUpload.fileVersion = 0
-            }
-            else {
-                nextToUpload.fileVersion = directoryEntry!.fileVersion! + 1
-            }
+            nextToUpload.appMetaDataVersion = directoryEntry!.appMetaDataVersionToUpload(appMetaDataUpdate: nextToUpload.appMetaData)
             
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
@@ -224,8 +195,82 @@ class Upload {
                 return
             }
             
+            appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
+            fileUUID = nextToUpload.fileUUID
+        }
+        
+        guard nextResult == nil else {
+            return nextResult!
+        }
+        
+        ServerAPI.session.uploadAppMetaData(appMetaData: appMetaData, fileUUID: fileUUID, serverMasterVersion: masterVersion) {[weak self] result in
+            switch result {
+            case .success(.success):
+                var completionResult:NextCompletion?
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    nextToUpload.status = .uploaded
+                    
+                    do {
+                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
+                    } catch (let error) {
+                        completionResult = .error(.coreDataError(error))
+                        return
+                    }
+                    
+                    completionResult = .appMetaDataUploaded(uft: nextToUpload)
+                }
+                
+                self?.completion?(completionResult!)
+            
+            case .success(.serverMasterVersionUpdate(let masterVersionUpdate)):
+                self?.masterVersionUpdate(uploadQueue: uploadQueue, masterVersionUpdate: masterVersionUpdate)
+
+            case .error(let error):
+                self?.uploadError(.otherError(error), nextToUpload: nextToUpload)
+            }
+        }
+        
+        return .started
+    }
+    
+    private func uploadFile(nextToUpload:UploadFileTracker, uploadQueue:UploadQueue, masterVersion:MasterVersionInt) -> NextResult {
+        
+        var file:ServerAPI.File!
+        var nextResult:NextResult?
+        var directoryEntry:DirectoryEntry?
+        var undelete = false
+        
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            // 1/11/18; Determining the version to upload immediately before the upload. See https://github.com/crspybits/SyncServerII/issues/12
+            
+            directoryEntry = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID)
+            guard directoryEntry != nil else {
+                nextResult = .error(.couldNotFindFileUUID(nextToUpload.fileUUID))
+                return
+            }
+            
+            // Establish versions for both the file and app meta data.
+            
+            if directoryEntry!.fileVersion == nil {
+                nextToUpload.fileVersion = 0
+            }
+            else {
+                nextToUpload.fileVersion = directoryEntry!.fileVersion! + 1
+            }
+            
+            nextToUpload.appMetaDataVersion = directoryEntry!.appMetaDataVersionToUpload(appMetaDataUpdate: nextToUpload.appMetaData)
+            
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                nextResult = .error(.coreDataError(error))
+                return
+            }
+            
+            let appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
+            
             let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
-            file = ServerAPI.File(localURL: nextToUpload.localURL! as URL!, fileUUID: nextToUpload.fileUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: nextToUpload.appMetaData, fileVersion: nextToUpload.fileVersion)
+            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
             
             undelete = nextToUpload.uploadUndeletion
         }
@@ -234,24 +279,10 @@ class Upload {
             return nextResult!
         }
 
-        ServerAPI.session.uploadFile(file: file, serverMasterVersion: masterVersion, undelete: undelete) { (uploadResult, error) in
+        ServerAPI.session.uploadFile(file: file, serverMasterVersion: masterVersion, undelete: undelete) {[weak self] (uploadResult, error) in
         
             guard error == nil else {
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    nextToUpload.status = .notStarted
-                    
-                    // Already have an error, not going to worry about reporting one for saveContext.
-                    CoreData.sessionNamed(Constants.coreDataName).saveContext()
-                }
-                
-                /* TODO: *0* Need to deal with this error:
-                    1) Do retry(s)
-                    2) Fail if retries don't work and put the SyncServer client interface into an error state.
-                    3) Deal with other, similar, errors too, in a similar way.
-                */
-                let message = "Error: \(String(describing: error))"
-                Log.error(message)
-                self.completion?(.error(error!))
+                self?.uploadError(error!, nextToUpload: nextToUpload)
                 return
             }
  
@@ -260,6 +291,14 @@ class Upload {
                 var completionResult:NextCompletion?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     nextToUpload.status = .uploaded
+                    
+                    do {
+                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
+                    } catch (let error) {
+                        completionResult = .error(.coreDataError(error))
+                        return
+                    }
+            
                     let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
 
                     // 1/27/18; See [2] below.
@@ -278,37 +317,59 @@ class Upload {
                     }
                     
                     attr.appMetaData = appMetaData
-                    completionResult = .fileUploaded(attr)
+                    completionResult = .fileUploaded(attr, uft: nextToUpload)
                 }
                 
-                self.completion?(completionResult!)
+                self?.completion?(completionResult!)
 
             case .serverMasterVersionUpdate(let masterVersionUpdate):
-                var completionResult:NextCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    // Simplest method for now: Mark all uft's as .notStarted
-                    // TODO: *4* This could be better-- performance-wise, it doesn't make sense to do all the uploads over again.
-                    _ = uploadQueue.uploadFileTrackers.map { uft in
-                        uft.status = .notStarted
-                    }
-
-                    Singleton.get().masterVersion = masterVersionUpdate
-                    
-                    do {
-                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
-                    } catch (let error) {
-                        completionResult = .error(.coreDataError(error))
-                        return
-                    }
-                    
-                    completionResult = .masterVersionUpdate
-                }
-                
-                self.completion?(completionResult!)
+                self?.masterVersionUpdate(uploadQueue: uploadQueue, masterVersionUpdate: masterVersionUpdate)
             }
         }
         
         return .started
+    }
+    
+    private func masterVersionUpdate(uploadQueue:UploadQueue, masterVersionUpdate: MasterVersionInt) {
+        var completionResult:NextCompletion?
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            // Simplest method for now: Mark all uft's as .notStarted
+            // TODO: *4* This could be better-- performance-wise, it doesn't make sense to do all the uploads over again.
+            _ = uploadQueue.uploadFileTrackers.map { uft in
+                uft.status = .notStarted
+            }
+
+            Singleton.get().masterVersion = masterVersionUpdate
+            
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                completionResult = .error(.coreDataError(error))
+                return
+            }
+            
+            completionResult = .masterVersionUpdate
+        }
+
+        completion?(completionResult!)
+    }
+    
+    private func uploadError(_ error: SyncServerError, nextToUpload:UploadFileTracker) {
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            nextToUpload.status = .notStarted
+            
+            // Already have an error, not going to worry about reporting one for saveContext.
+            CoreData.sessionNamed(Constants.coreDataName).saveContext()
+        }
+
+        /* TODO: *0* Need to deal with this error:
+            1) Do retry(s)
+            2) Fail if retries don't work and put the SyncServer client interface into an error state.
+            3) Deal with other, similar, errors too, in a similar way.
+        */
+        let message = "Error: \(String(describing: error))"
+        Log.error(message)
+        self.completion?(.error(error))
     }
     
     enum DoneUploadsCompletion {
