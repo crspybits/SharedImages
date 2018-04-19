@@ -66,7 +66,8 @@ public class SyncServer {
         ]);
         
         CoreData.registerSession(coreDataSession, forName: Constants.coreDataName)
-        
+        Migrations.session.run()
+
         Network.session().appStartup()
         ServerAPI.session.baseURL = serverURL.absoluteString
         

@@ -13,10 +13,7 @@ import ODRefreshControl
 import LottiesBottom
 import SyncServer_Shared
 
-class ImagesVC: UIViewController {
-    // Key in discussion JSON file.
-    private let imageUUIDKey = "imageUUID"
-    
+class ImagesVC: UIViewController {    
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
     var addImageBarButton:UIBarButtonItem!
@@ -238,8 +235,7 @@ class ImagesVC: UIViewController {
         }
         
         let uuids = Image.fetchAll().map { $0.uuid! }
-        SyncServer.session.consistencyCheck(localFiles: uuids, repair: false) { error in
-        }
+        SyncServer.session.consistencyCheck(localFiles: uuids, repair: false) { error in }
     }
     
     @objc private func refresh() {
@@ -284,6 +280,17 @@ class ImagesVC: UIViewController {
         if let discussionUUID = newImageData.discussionUUID,
             let discussion = Discussion.fetchObjectWithUUID(uuid: discussionUUID) {
             newImage.discussion = discussion
+            
+            // 4/17/18; If that discussion has the image title, get that too.
+            if newImageData.title == nil {
+                if let url = discussion.url,
+                    let fixedObjects = FixedObjects(withFile: url as URL) {
+                    newImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
+                }
+                else {
+                    Log.error("Could not load discussion!")
+                }
+            }
         }
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
@@ -300,6 +307,7 @@ class ImagesVC: UIViewController {
     @discardableResult
     func addToLocalDiscussion(discussionData: FileData, type: AddToDiscussion) -> Discussion {
         var localDiscussion: Discussion!
+        var imageTitle: String?
         
         switch type {
         case .newLocalDiscussion:
@@ -329,6 +337,8 @@ class ImagesVC: UIViewController {
                     } catch (let error) {
                         Log.error("Error removing old discussion file: \(error)")
                     }
+                    
+                    imageTitle = newFixedObjects[DiscussionKeys.imageTitleKey] as? String
                 }
             }
             else {
@@ -339,6 +349,7 @@ class ImagesVC: UIViewController {
                 // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
                 if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
                     localDiscussion.unreadCount = Int32(fixedObjects.count)
+                    imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
                 }
                 else {
                     Log.error("Could not load discussion!")
@@ -350,8 +361,13 @@ class ImagesVC: UIViewController {
         localDiscussion.url = discussionData.url
         
         // Look up and connect the Image if we have one.
+        // 4/17/18; And if this discussion has the image title, set the image title from that.
         if let image = Image.fetchObjectWithDiscussionUUID(discussionUUID: localDiscussion.uuid!) {
             localDiscussion.image = image
+            
+            if let imageTitle = imageTitle {
+                image.title = imageTitle
+            }
         }
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
@@ -363,13 +379,16 @@ class ImagesVC: UIViewController {
         ImageExtras.removeLocalImages(uuids:uuids)
     }
     
-    private func createEmptyDiscussion(image:Image, discussionUUID: String) -> FileData? {
+    private func createEmptyDiscussion(image:Image, discussionUUID: String, imageTitle: String?) -> FileData? {
         let newDiscussionFileURL = ImageExtras.newJSONFile()
         var fixedObjects = FixedObjects()
         
         // This is so that we have the possibility of reconstructing the image/discussions if we lose the server data. This will explicitly connect the discussion to the image.
-        fixedObjects[imageUUIDKey] = image.uuid
-    
+        fixedObjects[DiscussionKeys.imageUUIDKey] = image.uuid
+        
+        // 4/17/18; Image titles are now stored in the "discussion" file. This may reduce the amount of data we need store in the server database.
+        fixedObjects[DiscussionKeys.imageTitleKey] = imageTitle
+
         do {
             try fixedObjects.save(toFile: newDiscussionFileURL as URL)
         }
@@ -448,7 +467,7 @@ extension ImagesVC : SMAcquireImageDelegate {
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = addLocalImage(newImageData: imageData)
         
-        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID) else {
+        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, imageTitle: userName) else {
             return
         }
         

@@ -104,7 +104,10 @@ class SyncController {
         var imageAttr = SyncAttributes(fileUUID:image.uuid!, mimeType:imageMimeTypeEnum)
         
         var imageAppMetaData = [String: Any]()
-        imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
+        
+        // 4/17/18; Image titles, for new images, are stored in the "discussion" file.
+        // imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
+        
         imageAppMetaData[ImageExtras.appMetaDataDiscussionUUIDKey] = discussion.uuid
         imageAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.image.rawValue
 
@@ -166,50 +169,68 @@ class SyncController {
 }
 
 extension SyncController : SyncServerDelegate {
-    func syncServerMustResolveContentDownloadConflict(downloadedFile: SMRelativeLocalURL?, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>) {
+    func syncServerMustResolveContentDownloadConflict(_ downloadContent: ServerContentType, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>) {
 
         let errorResolution: ContentDownloadResolution = .acceptContentDownload
         
         switch uploadConflict.conflictType! {
-        case .contentUpload:
-            // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
-            
-            guard let discussion = Discussion.fetchObjectWithUUID(uuid: downloadedContentAttributes.fileUUID),
-                let discussionURL = discussion.url as URL?,
-                let localDiscussion = FixedObjects(withFile: discussionURL),
-                let downloadedFile = downloadedFile,
-                let serverDiscussion = FixedObjects(withFile: downloadedFile as URL) else {
-                Log.error("Error! Yark! We had a conflict but had problems. Oh. My.")
+        case .contentUpload(let conflictingUploadType):
+            guard conflictingUploadType == .file else {
+                // For now, the only use we're making of appMetaData is for storing file type information, and that's set only once-- when the files are created. So, should never have a conflict.
+                Log.error("Conflict in appMetaData being uploaded!")
                 uploadConflict.resolveConflict(resolution: errorResolution)
                 return
             }
             
-            let (mergedDiscussion, unreadCount) = localDiscussion.merge(with: serverDiscussion)
-            let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, mimeType: downloadedContentAttributes.mimeType)
-            
-            // I'm going to use a new file, just in case we have an error writing.
-            let mergeURL = ImageExtras.newJSONFile()
-            
-            do {
-                try mergedDiscussion.save(toFile: mergeURL as URL)
-                try FileManager.default.removeItem(at: discussionURL)
+            switch downloadContent {
+            case .both:
+                // As above, this shouldn't happen.
+                Log.error("Conflict in appMetaData being downloaded!")
+                uploadConflict.resolveConflict(resolution: errorResolution)
                 
-                discussion.url = mergeURL
-                discussion.unreadCount = Int32(unreadCount)
-                CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-
-                // As before, discussion are mutable-- upload a copy.
-                try SyncServer.session.uploadCopy(localFile: mergeURL, withAttributes: attr)
-            } catch (let error) {
-                Log.error("Problems writing merged discussion or uploading: \(error)")
+            case .appMetaData:
+                // As above, this shouldn't happen.
+                Log.error("Conflict in appMetaData being downloaded!")
                 uploadConflict.resolveConflict(resolution: errorResolution)
-                return
+                
+            case .file(let downloadedFile):
+                // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
+                guard let discussion = Discussion.fetchObjectWithUUID(uuid: downloadedContentAttributes.fileUUID),
+                    let discussionURL = discussion.url as URL?,
+                    let localDiscussion = FixedObjects(withFile: discussionURL),
+                    let serverDiscussion = FixedObjects(withFile: downloadedFile as URL) else {
+                    Log.error("Error! Yark! We had a conflict but had problems. Oh. My.")
+                    uploadConflict.resolveConflict(resolution: errorResolution)
+                    return
+                }
+
+                let (mergedDiscussion, unreadCount) = localDiscussion.merge(with: serverDiscussion)
+                let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, mimeType: downloadedContentAttributes.mimeType)
+                
+                // I'm going to use a new file, just in case we have an error writing.
+                let mergeURL = ImageExtras.newJSONFile()
+                
+                do {
+                    try mergedDiscussion.save(toFile: mergeURL as URL)
+                    try FileManager.default.removeItem(at: discussionURL)
+                    
+                    discussion.url = mergeURL
+                    discussion.unreadCount = Int32(unreadCount)
+                    CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+
+                    // As before, discussion are mutable-- upload a copy.
+                    try SyncServer.session.uploadCopy(localFile: mergeURL, withAttributes: attr)
+                } catch (let error) {
+                    Log.error("Problems writing merged discussion or uploading: \(error)")
+                    uploadConflict.resolveConflict(resolution: errorResolution)
+                    return
+                }
+                
+                SyncServer.session.sync()
+                
+                uploadConflict.resolveConflict(resolution: .rejectContentDownload(.removeAll))
             }
             
-            SyncServer.session.sync()
-            
-            uploadConflict.resolveConflict(resolution: .rejectContentDownload(.removeAll))
-        
         // For now, we're going to prioritize the server operation. We've queued up a local deletion-- seems no loss if we accept the new download. We can always try the deletion again.
         case .uploadDeletion, .both:
             uploadConflict.resolveConflict(resolution: .acceptContentDownload)
@@ -217,6 +238,8 @@ extension SyncController : SyncServerDelegate {
     }
     
     func syncServerAppMetaDataDownloadComplete(attr: SyncAttributes) {
+        // We're using appMetaData only for file type info, which is established when a new image/discussion is uploaded. We shouldn't get appMetaData updates/downloads.
+        Log.warning("appMetaData download!")
     }
     
     func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, ImageExtras.FileType?) {
@@ -255,6 +278,7 @@ extension SyncController : SyncServerDelegate {
             return
         }
         
+        // We don't have type info in the appMetaData-- too early of a file version. Assume it's an image.
         imageDownloadComplete(url: url, attr: attr)
     }
     
@@ -275,7 +299,11 @@ extension SyncController : SyncServerDelegate {
         // If present, the appMetaData will be a JSON string
         if let appMetaData = attr.appMetaData,
             let jsonDict = jsonStringToDict(appMetaData) {
+            
+            // Early files in the system won't give a title in the appMetaData, and later files won't either. Later files put the title into the "discussion" file.
             title = jsonDict[ImageExtras.appMetaDataTitleKey] as? String
+            
+            // Similarly, early files in the system won't have this. And later one's won't either-- discussion threads are connected to images in that case by the fileGroupUUID in the SyncAttributes.
             discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
         }
 

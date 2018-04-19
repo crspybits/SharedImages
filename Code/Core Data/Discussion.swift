@@ -7,6 +7,8 @@
 //
 //
 
+// These are called "Discussion" objects, but the underlying file is used for representing discussion comments, and other items-- e.g., the image title.
+
 import Foundation
 import CoreData
 import SMCoreLib
