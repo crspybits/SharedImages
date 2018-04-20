@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SMCoreLib
 
 // In the following the term `content` refers to either appMetaData or file data contents.
 
@@ -66,27 +67,60 @@ public enum ContentDownloadResolution {
     case rejectContentDownload(UploadResolution)
 }
 
+public enum ServerContentType {
+    case appMetaData
+    case file(SMRelativeLocalURL)
+    case both(downloadURL: SMRelativeLocalURL) // both a file download and an appMetaData update.
+}
+
+// Because downloads are higher-priority (than uploads) with the SyncServer, all conflicts effectively originate from a server download operation: A download-deletion, a file-download, or an appMetaData download. The type of server operation will be apparent from the context.
+// And the conflict is between the server operation and a local, client operation:
+public enum ConflictingClientOperation: Equatable {
+    public enum ContentType {
+        case appMetaData
+        case file
+        case both // there are both appMetaData and file uploads conflicting
+    }
+
+    case uploadDeletion
+    case contentUpload(ContentType)
+    case both // there are both upload deletions and content uploads conflicting.
+
+    public static func == (lhs: ConflictingClientOperation, rhs: ConflictingClientOperation) -> Bool {
+        switch lhs {
+        case .uploadDeletion:
+            if case .uploadDeletion = rhs {
+                return true
+            }
+
+        case .contentUpload(let contentTypeLHS):
+            if case .contentUpload(let contentTypeRHS) = rhs, contentTypeLHS == contentTypeRHS {
+                return true
+            }
+            
+        case .both:
+            if case .both = rhs {
+                return true
+            }
+        }
+        
+        return false
+    }
+}
+
 // When you receive a conflict in a callback method, you must resolve the conflict by calling resolveConflict.
 public class SyncServerConflict<R> {
-    typealias callbackType = ((R)->())!
+    typealias callbackType = ((R)->())?
     
     var conflictResolved:Bool = false
     var resolutionCallback:((R)->())!
     
-    init(conflictType: ClientOperation, resolutionCallback:callbackType) {
+    init(conflictType: ConflictingClientOperation, resolutionCallback:callbackType) {
         self.conflictType = conflictType
         self.resolutionCallback = resolutionCallback
     }
     
-    // Because downloads are higher-priority (than uploads) with the SyncServer, all conflicts effectively originate from a server download operation: A download-deletion, a file-download, or an appMetaData download. The type of server operation will be apparent from the context.
-    // And the conflict is between the server operation and a local, client operation:
-    public enum ClientOperation : String {
-        case uploadDeletion
-        case contentUpload
-        case both
-    }
-    
-    public private(set) var conflictType:ClientOperation!
+    public private(set) var conflictType:ConflictingClientOperation!
     
     public func resolveConflict(resolution:R) {
         assert(!conflictResolved, "Already resolved!")

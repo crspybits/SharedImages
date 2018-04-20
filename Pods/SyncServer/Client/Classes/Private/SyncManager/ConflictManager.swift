@@ -12,7 +12,7 @@ import SMCoreLib
 class ConflictManager {
     // completion's are called when the client has resolved all conflicts if there are any. If there are no conflicts, the call to the completion is synchronous.
     
-    static func handleAnyContentDownloadConflict(attr:SyncAttributes, url: SMRelativeLocalURL?, delegate: SyncServerDelegate, completion:@escaping (_ keepThisOne: SyncAttributes?)->()) {
+    static func handleAnyContentDownloadConflict(attr:SyncAttributes, content: ServerContentType, delegate: SyncServerDelegate, completion:@escaping (_ keepThisOne: SyncAttributes?)->()) {
     
         var resolver: SyncServerConflict<ContentDownloadResolution>?
         
@@ -29,14 +29,15 @@ class ConflictManager {
             let conflictingContentUploads = pendingUploads.filter(
                 {$0.operation.isContents && $0.fileUUID == attr.fileUUID})
 
-            var conflictType:SyncServerConflict<ContentDownloadResolution>.ClientOperation?
+            var conflictType:ConflictingClientOperation?
             
             if conflictingUploadDeletions.count > 0 && conflictingContentUploads.count > 0 {
                 // This can arise when a file was queued for upload, synced, and then queued for deletion and synced
                 conflictType = .both
             }
             else if conflictingContentUploads.count > 0 {
-                conflictType = .contentUpload
+                let conflictingContent =                 conflictContentTypeFor(conflictingContentUploads: conflictingContentUploads)
+                conflictType = .contentUpload(conflictingContent)
             }
             else if conflictingUploadDeletions.count > 0 {
                 conflictType = .uploadDeletion
@@ -69,10 +70,42 @@ class ConflictManager {
         
         if let resolver = resolver {
             // See note [1] below re: why I'm not calling this on the main thread.
-            delegate.syncServerMustResolveContentDownloadConflict(downloadedFile: url, downloadedContentAttributes: attr, uploadConflict: resolver)
+            delegate.syncServerMustResolveContentDownloadConflict(content, downloadedContentAttributes: attr, uploadConflict: resolver)
         }
         else {
             completion(nil)
+        }
+    }
+    
+    static func conflictContentTypeFor(conflictingContentUploads: [UploadFileTracker]) -> ConflictingClientOperation.ContentType {
+    
+        let appMetaDataUploads = conflictingContentUploads.filter { uft in
+            uft.operation == .appMetaData
+        }
+        
+        let fileUploads = conflictingContentUploads.filter { uft in
+            // We could have a file upload here that *also* is uploading a new appMetaData version.
+            uft.operation == .file
+        }
+
+        // We could have a file upload that *also* is uploading a new appMetaData version.
+        let fileWithAppMetaDataUpload = conflictingContentUploads.filter { uft in
+            // Check the appMetaData itself because the appMetaDataVersion doen't get set until close to actual upload.
+            uft.operation == .file && uft.appMetaData != nil
+        }
+
+        if fileWithAppMetaDataUpload.count > 0 {
+            // Count this as "both" even though it's within the same file.
+            return .both
+        }
+        else if appMetaDataUploads.count > 0 && fileUploads.count > 0  {
+            return .both
+        }
+        else if appMetaDataUploads.count > 0 {
+            return .appMetaData
+        }
+        else {
+            return .file
         }
     }
     
@@ -122,8 +155,9 @@ class ConflictManager {
                 var deletionsToIgnore = [SyncAttributes]()
                 
                 conflictingContentUploads.forEach { (conflictUft, attr) in
+                    let conflictingContent =                 conflictContentTypeFor(conflictingContentUploads: [conflictUft])
                     let resolver = SyncServerConflict<DownloadDeletionResolution>(
-                        conflictType: .contentUpload, resolutionCallback: { resolution in
+                        conflictType: .contentUpload(conflictingContent), resolutionCallback: { resolution in
                     
                         switch resolution {
                         case .acceptDownloadDeletion:

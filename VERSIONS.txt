@@ -1,7 +1,11 @@
 SharedImages
 
-Version (NEXT)
+Version (4/19/18)
 	* Using `rosterdev` from Cocoapods.org; update pods
+	* Using v0.14.0 of server, through v14.1.0 of client library, with appMetaData versioning.
+	* New images now have title in the "discussion" file.
+	* Attempting to fix crash issue
+		https://github.com/crspybits/SharedImages/issues/100
 
 Version 0.13.1 (3/3/18)
 	* Bug fix: Crash when you were viewing a discussion thread and you rotate the device multiple times.

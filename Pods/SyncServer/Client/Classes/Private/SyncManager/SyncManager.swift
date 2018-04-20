@@ -138,12 +138,23 @@ class SyncManager {
     func normalDelegateAndAfterCalls(dft: DownloadFileTracker, url: SMRelativeLocalURL?, attr:SyncAttributes, callback:((SyncServerError?)->())? = nil) {
     
         var operation: FileTracker.Operation!
+        var conflictingContent: ServerContentType = .appMetaData
+        
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
             operation = dft.operation
+            
+            if let url = url {
+                if dft.appMetaData == nil {
+                    conflictingContent = .file(url)
+                }
+                else {
+                    conflictingContent = .both(downloadURL: url)
+                }
+            }
         }
         
         Thread.runSync(onMainThread: {[unowned self] in
-            ConflictManager.handleAnyContentDownloadConflict(attr: attr, url: url, delegate: self.delegate!) { ignoreDownload in
+            ConflictManager.handleAnyContentDownloadConflict(attr: attr, content: conflictingContent, delegate: self.delegate!) { ignoreDownload in
             
                 if ignoreDownload == nil {
                     // Not 100% sure we're running on main thread-- its possible that the client didn't call the completion on the main thread.
@@ -397,10 +408,22 @@ class SyncManager {
                 var uploadQueue:UploadQueue!
                 var fileUploads:[UploadFileTracker]!
                 var uploadDeletions:[UploadFileTracker]!
-                
+                var errorResult:SyncServerError?
+
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    uploadQueue = Upload.getHeadSyncQueue()!
+                    // 4/18/18; Got a crash here during testing because `Upload.getHeadSyncQueue()` returned nil. How is that possible? An earlier test failed-- wonder if it could have "leaked" into a later test?
+                    uploadQueue = Upload.getHeadSyncQueue()
+                    if uploadQueue == nil {
+                        errorResult = .generic("Nil result from getHeadSyncQueue.")
+                        return
+                    }
+                    
                     fileUploads = uploadQueue.uploadFileTrackers.filter {$0.operation.isContents}
+                }
+                
+                if errorResult != nil {
+                    self.callback?(errorResult)
+                    return
                 }
                 
                 if fileUploads.count > 0 {
@@ -445,7 +468,6 @@ class SyncManager {
                     EventDesired.reportEvent(.uploadDeletionsCompleted(numberOfFiles: uploadDeletions.count), mask: self.desiredEvents, delegate: self.delegate)
                 }
                 
-                var errorResult:SyncServerError?
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     if uploadDeletions.count > 0 {
                         // Each of the DirectoryEntry's for the uploads needs to now be marked as deleted.
