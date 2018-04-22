@@ -129,16 +129,16 @@
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eGG-qb-2Yk" userLabel="Container">
-                                                <rect key="frame" x="50" y="0.0" width="275" height="71"/>
+                                                <rect key="frame" x="62.5" y="0.0" width="250" height="70"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Newest images at top" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PjW-Cs-lvK">
-                                                        <rect key="frame" x="36" y="25" width="166" height="21"/>
+                                                        <rect key="frame" x="0.0" y="24.5" width="230" height="21"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J7U-aW-d5P">
-                                                        <rect key="frame" x="226" y="20" width="51" height="31"/>
+                                                        <rect key="frame" x="201" y="19.5" width="51" height="31"/>
                                                         <connections>
                                                             <action selector="imageOrderSwitchAction:" destination="LgV-c1-lQr" eventType="valueChanged" id="ZkI-2v-Cqe"/>
                                                         </connections>
@@ -147,10 +147,10 @@
                                                 <constraints>
                                                     <constraint firstItem="J7U-aW-d5P" firstAttribute="centerY" secondItem="eGG-qb-2Yk" secondAttribute="centerY" id="4up-vr-AWF"/>
                                                     <constraint firstItem="PjW-Cs-lvK" firstAttribute="centerY" secondItem="eGG-qb-2Yk" secondAttribute="centerY" id="58w-ni-rTb"/>
-                                                    <constraint firstItem="PjW-Cs-lvK" firstAttribute="leading" secondItem="eGG-qb-2Yk" secondAttribute="leading" constant="36" id="GhZ-vs-8n0"/>
+                                                    <constraint firstItem="PjW-Cs-lvK" firstAttribute="leading" secondItem="eGG-qb-2Yk" secondAttribute="leading" id="GhZ-vs-8n0"/>
                                                     <constraint firstAttribute="trailing" secondItem="J7U-aW-d5P" secondAttribute="trailing" id="HEs-Ls-Wiv"/>
-                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="PjW-Cs-lvK" secondAttribute="trailing" constant="20" symbolic="YES" id="brf-qv-2tS"/>
-                                                    <constraint firstAttribute="width" constant="275" id="vef-NK-Mgs"/>
+                                                    <constraint firstAttribute="trailing" secondItem="PjW-Cs-lvK" secondAttribute="trailing" constant="20" symbolic="YES" id="brf-qv-2tS"/>
+                                                    <constraint firstAttribute="width" constant="250" id="vef-NK-Mgs"/>
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OE1-i8-nLE" userLabel="Separator">
@@ -164,7 +164,7 @@
                                         <constraints>
                                             <constraint firstItem="eGG-qb-2Yk" firstAttribute="centerX" secondItem="pZQ-Rb-DO3" secondAttribute="centerX" id="9V4-qj-hNk"/>
                                             <constraint firstAttribute="height" constant="70" id="ECU-o2-vVe"/>
-                                            <constraint firstAttribute="bottom" secondItem="eGG-qb-2Yk" secondAttribute="bottom" constant="-1" id="I2Q-Ef-E8R"/>
+                                            <constraint firstAttribute="bottom" secondItem="eGG-qb-2Yk" secondAttribute="bottom" id="I2Q-Ef-E8R"/>
                                             <constraint firstItem="eGG-qb-2Yk" firstAttribute="top" secondItem="pZQ-Rb-DO3" secondAttribute="top" id="IhD-aM-Cok"/>
                                             <constraint firstAttribute="trailing" secondItem="OE1-i8-nLE" secondAttribute="trailing" id="Oxf-St-SjQ"/>
                                             <constraint firstItem="OE1-i8-nLE" firstAttribute="leading" secondItem="pZQ-Rb-DO3" secondAttribute="leading" id="PLF-1g-Tkb"/>
