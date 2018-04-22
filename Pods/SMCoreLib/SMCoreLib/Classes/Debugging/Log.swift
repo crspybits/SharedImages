@@ -18,6 +18,7 @@ open class Log {
 
     private let log = SwiftyBeaver.self
     fileprivate static let session = Log()
+    fileprivate static let file = FileDestination()
     
     // Setting this to nil results in no logging output.
     public static var minLevel:SwiftyBeaver.Level? = nil {
@@ -32,9 +33,7 @@ open class Log {
                 console.minLevel = minLevel!
                 Log.session.log.addDestination(console)
 
-                let file = FileDestination()
                 file.minLevel = minLevel!
-                file.logFileURL = Log.logFileURL
                 Log.session.log.addDestination(file)
             }
         }
@@ -51,6 +50,7 @@ open class Log {
     //  also doesn't work.
     
     fileprivate init() {
+        Log.file.logFileURL = Log.logFileURL
     }
     
     open class func redirectConsoleLogToDocumentFolder(clearRedirectLog:Bool) {
@@ -135,6 +135,10 @@ open class Log {
         
         output = self.formatLogString(message, functionName: functionName, fileNameWithPath: fileNameWithPath, lineNumber: lineNumber)
         LogFile.write(output + "\n")
+    }
+    
+    open class func deleteLogFile() -> Bool {
+        return Log.file.deleteLogFile()
     }
 }
 

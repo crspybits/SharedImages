@@ -19,6 +19,8 @@ target 'SharedImages' do
 	
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
 
+	pod 'SMCoreLib', '~> 1.3.1'
+	
 	# For a discussion thread on images
 	pod 'MessageKit', '~> 0.13'
 

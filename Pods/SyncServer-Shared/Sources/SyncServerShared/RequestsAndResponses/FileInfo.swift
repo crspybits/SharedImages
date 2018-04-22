@@ -29,6 +29,9 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
     public static let deviceUUIDKey = "deviceUUID"
     public var deviceUUID: String?
     
+    public static let fileGroupUUIDKey = "fileGroupUUID"
+    public var fileGroupUUID: String?
+    
     // The creation & update dates are not used on upload-- they are established from dates on the server so they are not dependent on possibly mis-behaving clients.
     
     public static let creationDateKey = "creationDate"
@@ -61,6 +64,7 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
     required public init?(json: JSON) {
         self.fileUUID = FileInfo.fileUUIDKey <~~ json
         self.deviceUUID = FileInfo.deviceUUIDKey <~~ json
+        self.fileGroupUUID = FileInfo.fileGroupUUIDKey <~~ json
         self.mimeType = FileInfo.mimeTypeKey <~~ json
         self.deleted = FileInfo.deletedKey <~~ json
         
@@ -84,6 +88,7 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
         return jsonify([
             FileInfo.fileUUIDKey ~~> self.fileUUID,
             FileInfo.deviceUUIDKey ~~> self.deviceUUID,
+            FileInfo.fileGroupUUIDKey ~~> self.fileGroupUUID,
             FileInfo.mimeTypeKey ~~> self.mimeType,
             FileInfo.appMetaDataVersionKey ~~> self.appMetaDataVersion,
             FileInfo.deletedKey ~~> self.deleted,

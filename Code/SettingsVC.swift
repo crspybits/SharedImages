@@ -63,4 +63,20 @@ class SettingsVC : UIViewController {
         email.setToRecipients(["chris@SpasticMuffin.biz"])
         email.show()
     }
+    
+    @IBAction func resetLogAction(_ sender: Any) {
+        SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Really reset log file?", allowCancel: true, okCompletion: {
+            _ = Log.deleteLogFile()
+        })
+    }
+    
+    @IBAction func resetUnreadCountsAction(_ sender: Any) {
+        SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Really reset all discussion thread unread counts?", allowCancel: true, okCompletion: {
+            let discussions = Discussion.fetchAll()
+            discussions.forEach { discussion in
+                discussion.unreadCount = 0
+            }
+            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        })
+    }
 }
