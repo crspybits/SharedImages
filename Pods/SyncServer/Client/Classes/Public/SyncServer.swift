@@ -81,6 +81,15 @@ public class SyncServer {
         
         // SyncServerUser sets up the delegate for the ServerAPI. Need to set it up early in the launch sequence.
         SyncServerUser.session.appLaunchSetup(cloudFolderName: cloudFolderName)
+        
+        // Debugging
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            let pendingUploads = UploadFileTracker.fetchAll()
+            Log.msg("Upload file tracker count: \(pendingUploads.count)")
+            pendingUploads.forEach { uft in
+                Log.msg("Upload file tracker status: \(uft.status)")
+            }
+        }
     }
     
     // For dealing with background uploading/downloading.

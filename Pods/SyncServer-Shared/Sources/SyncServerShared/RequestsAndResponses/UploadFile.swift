@@ -24,6 +24,10 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public static let fileUUIDKey = "fileUUID"
     public var fileUUID:String!
     
+    // If given, must be with version 0 of a file. Cannot be non-nil after version 0.
+    public static let fileGroupUUIDKey = "fileGroupUUID"
+    public var fileGroupUUID:String?
+    
     public static let mimeTypeKey = "mimeType"
     public var mimeType:String!
     
@@ -53,13 +57,14 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     }
     
     public func allKeys() -> [String] {
-        return self.nonNilKeys() + [UploadFileRequest.undeleteServerFileKey, AppMetaData.contentsKey, AppMetaData.versionKey]
+        return self.nonNilKeys() + [UploadFileRequest.undeleteServerFileKey, AppMetaData.contentsKey, AppMetaData.versionKey, UploadFileRequest.fileGroupUUIDKey]
     }
     
     public required init?(json: JSON) {
         super.init()
         
         self.fileUUID = UploadFileRequest.fileUUIDKey <~~ json
+        self.fileGroupUUID = UploadFileRequest.fileGroupUUIDKey <~~ json
         self.mimeType = UploadFileRequest.mimeTypeKey <~~ json
         self.fileVersion = Decoder.decode(int32ForKey: UploadFileRequest.fileVersionKey)(json)
         self.masterVersion = Decoder.decode(int64ForKey: UploadFileRequest.masterVersionKey)(json)
@@ -96,6 +101,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public func toJSON() -> JSON? {
         var result = [
             UploadFileRequest.fileUUIDKey ~~> self.fileUUID,
+            UploadFileRequest.fileGroupUUIDKey ~~> self.fileGroupUUID,
             UploadFileRequest.mimeTypeKey ~~> self.mimeType,
             UploadFileRequest.fileVersionKey ~~> self.fileVersion,
             UploadFileRequest.masterVersionKey ~~> self.masterVersion,
