@@ -340,6 +340,7 @@ class SyncManager {
             break
             
         case .noUploads:
+            SyncManager.cleanupUploads()
             callback?(nil)
             
         case .allUploadsCompleted:
@@ -496,8 +497,27 @@ class SyncManager {
                     }
                 }
                 
+                SyncManager.cleanupUploads()
+                
                 self.callback?(errorResult)
             }
+        }
+    }
+
+    // 4/22/18; I ran into the need for this during a crash Dany was having. For some reason there were 10 uft's on his app that were marked as uploaded. But for some reason had never been deleted. I'm calling this from places where there should not be uft's in this state-- so they should be removed. This is along the lines of garbage collection. Not sure why it's needed...
+    // Not marking this as `private` so I can add a test case.
+    static func cleanupUploads() {
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            let uploadedUfts = UploadFileTracker.fetchAll().filter { $0.status == .uploaded }
+            uploadedUfts.forEach { uft in
+                do {
+                    try uft.remove()
+                } catch (let error) {
+                    Log.error("Error removing uft: \(error)")
+                }
+            }
+            
+            CoreData.sessionNamed(Constants.coreDataName).saveContext()
         }
     }
 }
