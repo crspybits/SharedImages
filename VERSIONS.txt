@@ -1,6 +1,9 @@
 SharedImages
 
-Version (4/19/18)
+Version 0.14.1 (4/23/18)
+	* Trying to fix Dany's issue-- crash and removing cruft UploadFileTrackers.
+	
+Version 0.14.0 (4/19/18)
 	* Using `rosterdev` from Cocoapods.org; update pods
 	* Using v0.14.0 of server, through v14.1.0 of client library, with appMetaData versioning.
 	* New images now have title in the "discussion" file.
