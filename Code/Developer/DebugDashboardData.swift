@@ -9,6 +9,7 @@
 import Foundation
 import rosterdev
 import SMCoreLib
+import SyncServer
 
 class DebugDashboardData {
     private init() {
@@ -40,7 +41,21 @@ class DebugDashboardData {
         return [useDev, useProd]
     }()
     
+    var otherControls: [RosterDevRowContents] = {
+        var resetTrackers = RosterDevRowContents(name: "Reset internal trackers", action: { parentVC in
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Really reset internal trackers?") {
+                do {
+                    try SyncServer.session.reset(type: .tracking)
+                } catch (let error) {
+                    SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Alert!", message: "Error resetting internal trackers: \(error)")
+                }
+            }
+        })
+        
+        return [resetTrackers]
+    }()
+    
     func sections() -> [[RosterDevRowContents]] {
-        return [debugDashboardEnvironments]
+        return [debugDashboardEnvironments, otherControls]
     }
 }

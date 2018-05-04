@@ -73,6 +73,24 @@ extension AllOperations {
         }
     }
     
+    static func printAll() {
+        do {
+            let entries = try CoreData.sessionNamed(Constants.coreDataName).fetchAllObjects(withEntityName: self.entityName())
+            
+            Log.msg("Core Data Entity: \(self.entityName()) has \(entries.count) objects.")
+
+            for entry in entries {
+                // Fault in object https://stackoverflow.com/questions/14634395/what-is-coredata-faulting so we can print it.
+                (entry as! NSManagedObject).willAccessValue(forKey: nil)
+                
+                Log.msg("\(String(describing: entry))")
+            }
+        } catch (let error) {
+            Log.error("Error: \(error)")
+            assert(false)
+        }
+    }
+    
     func save() {
         CoreData.sessionNamed(Constants.coreDataName).saveContext()
     }

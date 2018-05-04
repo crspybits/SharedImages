@@ -435,9 +435,15 @@ public class SyncServer {
         }
     }
     
-     // This is powerful method. It permanently removes all local/cached metadata known by the client interface. E.g., metadata about files that you have previously uploaded. It makes no server calls. This is similar to deleting and re-installing the app-- except that it does not delete the files referenced by the meta data. You must keep track of files and, if desired, delete them. It also doesn't sign out the user or require that the user is signed in.
-     // This method may only be called when the client is not doing any sync operations.
-    public func reset() throws {
+    public enum ResetType {
+        case tracking // Resets only persistent data that tracks uploads and downloads in the SyncServer. Makes no server calls. This should not be required, but sometimes is useful due to bugs or crashes in the SyncServer and could be required.
+        
+        case all // A powerful operation. Permanently removes all local/cached metadata known by the client interface. E.g., metadata about files that you have previously uploaded. It makes no server calls. This is similar to deleting and re-installing the app-- except that it does not delete the files referenced by the meta data. You must keep track of files and, if desired, delete them.
+    }
+    
+    // Doesn't sign out the user or require that the user is signed in.
+    // This method may only be called when the client is not doing any sync operations.
+    public func reset(type: ResetType) throws {
         var result:SyncServerError?
         
         Synchronized.block(self) {
@@ -446,7 +452,7 @@ public class SyncServer {
             }
             else {
                 do {
-                    try SyncServer.resetMetaData()
+                    try SyncServer.resetMetaData(type: type)
                 } catch (let error) {
                     result = (error as! SyncServerError)
                 }
@@ -459,17 +465,23 @@ public class SyncServer {
     }
     
     // Separated out of the `reset` method above to use this one for testing.
-    internal static func resetMetaData() throws /* SyncServerError */ {
+    internal static func resetMetaData(type: ResetType = .all) throws /* SyncServerError */ {
         var result:SyncServerError?
 
         CoreData.sessionNamed(Constants.coreDataName).performAndWait {
-            DownloadFileTracker.removeAll()
-            DirectoryEntry.removeAll()
-            UploadFileTracker.removeAll()
-            UploadQueue.removeAll()
-            UploadQueues.removeAll()
-            Singleton.removeAll()
-            NetworkCached.removeAll()
+            switch type {
+            case .all:
+                DirectoryEntry.removeAll()
+                fallthrough
+                
+            case .tracking:
+                DownloadFileTracker.removeAll()
+                UploadFileTracker.removeAll()
+                UploadQueue.removeAll()
+                UploadQueues.removeAll()
+                Singleton.removeAll()
+                NetworkCached.removeAll()
+            }
 
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
@@ -481,6 +493,20 @@ public class SyncServer {
         if let result = result {
             throw result
         }
+    }
+    
+    // Logs information about all tracking internal meta data.
+    public func logAllTracking() {
+        Log.msg("*************** Starts: logAllTracking ***************")
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+            DownloadFileTracker.printAll()
+            UploadFileTracker.printAll()
+            UploadQueue.printAll()
+            UploadQueues.printAll()
+            Singleton.printAll()
+            NetworkCached.printAll()
+        }
+        Log.msg("*************** logAllTracking: Ends ***************")
     }
     
     public struct LocalConsistencyResults {

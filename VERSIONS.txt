@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.14.2 (5/3/18)
+	* Still working on Dany's issue: Resetting internal trackers and adding logging of internal trackers to log output.
+	
 Version 0.14.1 (4/23/18)
 	* Trying to fix Dany's issue-- crash and removing cruft UploadFileTrackers.
 	
