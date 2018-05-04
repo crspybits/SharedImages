@@ -16,33 +16,47 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKAccessToken.h>
-#import <FBSDKCoreKit/FBSDKAppEvents.h>
-#import <FBSDKCoreKit/FBSDKApplicationDelegate.h>
-#import <FBSDKCoreKit/FBSDKButton.h>
-#import <FBSDKCoreKit/FBSDKConstants.h>
-#import <FBSDKCoreKit/FBSDKCopying.h>
-#import <FBSDKCoreKit/FBSDKGraphRequest.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestConnection.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestDataAttachment.h>
-#import <FBSDKCoreKit/FBSDKMacros.h>
-#import <FBSDKCoreKit/FBSDKSettings.h>
-#import <FBSDKCoreKit/FBSDKTestUsersManager.h>
-#import <FBSDKCoreKit/FBSDKUtility.h>
+NS_ASSUME_NONNULL_BEGIN
 
-#if !TARGET_OS_TV
-#import <FBSDKCoreKit/FBSDKAppLinkResolver.h>
-#import <FBSDKCoreKit/FBSDKAppLinkUtility.h>
-#import <FBSDKCoreKit/FBSDKGraphErrorRecoveryProcessor.h>
-#import <FBSDKCoreKit/FBSDKMutableCopying.h>
-#import <FBSDKCoreKit/FBSDKProfile.h>
-#import <FBSDKCoreKit/FBSDKProfilePictureView.h>
-#else
-#import <FBSDKCoreKit/FBSDKDeviceButton.h>
-#import <FBSDKCoreKit/FBSDKDeviceViewControllerBase.h>
-#endif
+/*!
+ @abstract Describes the initial response when starting the device login flow.
+ @discussion This is used by `FBSDKDeviceLoginManager`.
+ */
+@interface FBSDKDeviceLoginCodeInfo : NSObject
 
-#define FBSDK_VERSION_STRING @"4.33.0"
-#define FBSDK_TARGET_PLATFORM_VERSION @"v3.0"
+/*!
+ @abstract There is no public initializer.
+ */
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/*!
+ @abstract the unique id for this login flow.
+*/
+@property (nonatomic, copy, readonly) NSString *identifier;
+
+/*!
+ @abstract the short "user_code" that should be presented to the user.
+*/
+@property (nonatomic, copy, readonly) NSString *loginCode;
+
+/*!
+ @abstract the verification URL.
+*/
+@property (nonatomic, copy, readonly) NSURL *verificationURL;
+
+/*!
+ @abstract the expiration date.
+*/
+@property (nonatomic, copy, readonly) NSDate *expirationDate;
+
+/*!
+ @abstract the polling interval
+*/
+@property (nonatomic, assign, readonly) NSUInteger pollingInterval;
+
+@end
+
+NS_ASSUME_NONNULL_END

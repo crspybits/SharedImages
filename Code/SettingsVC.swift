@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SMCoreLib
+import SyncServer
 
 class SettingsVC : UIViewController {
     @IBOutlet weak var imageOrderSwitch: UISwitch!
@@ -44,6 +45,9 @@ class SettingsVC : UIViewController {
     
     @IBAction func emailLogAction(_ sender: Any) {
         Log.msg("Log.logFileURL: \(Log.logFileURL!)")
+        
+        // First, log tracking info-- to try to give as much info as possible about user's state.
+        SyncServer.session.logAllTracking()
         
         guard let logFileData = try? Data(contentsOf: Log.logFileURL!, options: NSData.ReadingOptions()) else {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "No log file present in app!")
