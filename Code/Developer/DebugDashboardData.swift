@@ -43,7 +43,7 @@ class DebugDashboardData {
     
     var otherControls: [RosterDevRowContents] = {
         var resetTrackers = RosterDevRowContents(name: "Reset internal trackers", action: { parentVC in
-            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Really reset internal trackers?") {
+            SMCoreLib.Alert.show(fromVC: parentVC, withTitle: "Really reset internal trackers?", allowCancel: true) {
                 do {
                     try SyncServer.session.reset(type: .tracking)
                 } catch (let error) {
