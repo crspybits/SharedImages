@@ -81,6 +81,15 @@ public class SyncServer {
         
         // SyncServerUser sets up the delegate for the ServerAPI. Need to set it up early in the launch sequence.
         SyncServerUser.session.appLaunchSetup(cloudFolderName: cloudFolderName)
+        
+        // Debugging
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            let pendingUploads = UploadFileTracker.fetchAll()
+            Log.msg("Upload file tracker count: \(pendingUploads.count)")
+            pendingUploads.forEach { uft in
+                Log.msg("Upload file tracker status: \(uft.status)")
+            }
+        }
     }
     
     // For dealing with background uploading/downloading.
@@ -95,6 +104,7 @@ public class SyncServer {
     // When uploading a file for the 2nd or more time ("multi-version upload"):
     // a) the 2nd and following updates must have the same mimeType as the first version of the file.
     // b) If the attr.appMetaData is given as nil, and an earlier version had non-nil appMetaData, then the nil appMetaData is ignored-- i.e., the existing app meta data is not set to nil.
+    // You can only set the fileGroupUUID (in the SyncAttributes) when the file is first uploaded.
     // Warning: If you indicate that the mime type is "text/plain", and you are using Google Drive and the text contains unusual characters, you may run into problems-- e.g., downloading the files may fail.
     public func uploadImmutable(localFile:SMRelativeLocalURL, withAttributes attr: SyncAttributes) throws {
         try upload(fileURL: localFile, withAttributes: attr)
@@ -119,6 +129,7 @@ public class SyncServer {
                 entry = (DirectoryEntry.newObject() as! DirectoryEntry)
                 entry!.fileUUID = attr.fileUUID
                 entry!.mimeType = attr.mimeType.rawValue
+                entry!.fileGroupUUID = attr.fileGroupUUID
             }
             else {
                 guard let entryMimeTypeString = entry!.mimeType,
@@ -128,13 +139,21 @@ public class SyncServer {
                 }
                 
                 if attr.mimeType != entryMimeType {
+                    Log.error("attr.mimeType: \(String(describing: attr.mimeType)); entryMimeType: \(entryMimeType); attr.fileUUID: \(String(describing: attr.fileUUID))")
                     errorToThrow = SyncServerError.mimeTypeOfFileChanged
                     return
                 }
                 
-                if entry!.deletedOnServer {
+                if entry!.deletedLocally {
                     errorToThrow = SyncServerError.fileAlreadyDeleted
                     return
+                }
+                
+                if let fileGroupUUID = attr.fileGroupUUID {
+                    guard entry!.fileGroupUUID == fileGroupUUID else {
+                        errorToThrow = SyncServerError.fileGroupUUIDChanged
+                        return
+                    }
                 }
             }
             
@@ -144,6 +163,7 @@ public class SyncServer {
             newUft.mimeType = attr.mimeType.rawValue
             newUft.uploadCopy = copy
             newUft.operation = .file
+            newUft.fileGroupUUID = attr.fileGroupUUID
             
             if copy {
                 // Make a copy of the file
@@ -191,6 +211,7 @@ public class SyncServer {
         var errorToThrow:Error?
 
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {[weak self] in
+            // In part, this ensures you can't do an appMetaData upload as v0 of a file.
             guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID) else {
                 errorToThrow = SyncServerError.couldNotFindFileUUID(attr.fileUUID)
                 return
@@ -203,13 +224,21 @@ public class SyncServer {
             }
             
             if mimeType != entryMimeType {
+                Log.error("mimeType: \(mimeType); entryMimeType: \(entryMimeType); attr.fileUUID: \(String(describing: attr.fileUUID))")
                 errorToThrow = SyncServerError.mimeTypeOfFileChanged
                 return
             }
             
-            if entry.deletedOnServer {
+            if entry.deletedLocally {
                 errorToThrow = SyncServerError.fileAlreadyDeleted
                 return
+            }
+            
+            if let fileGroupUUID = attr.fileGroupUUID {
+                guard entry.fileGroupUUID == fileGroupUUID else {
+                    errorToThrow = SyncServerError.fileGroupUUIDChanged
+                    return
+                }
             }
             
             let newUft = UploadFileTracker.newObject() as! UploadFileTracker
@@ -307,7 +336,7 @@ public class SyncServer {
             throw SyncServerError.deletingUnknownFile
         }
 
-        guard !entry.deletedOnServer else {
+        guard !entry.deletedLocally else {
             throw SyncServerError.fileAlreadyDeleted
         }
 
@@ -333,8 +362,8 @@ public class SyncServer {
                 if entry.fileVersion == nil {
                     let results = UploadFileTracker.fetchAll().filter {$0.fileUUID == uuid}
                     if results.count == 0 {
-                        // This is a slight mis-representation of terms. The file never actually made it to the server.
-                        entry.deletedOnServer = true
+                        // Note that this file never actually made it to the server.
+                        entry.deletedLocally = true
                         return
                     }
                 }
@@ -481,8 +510,9 @@ public class SyncServer {
                 UploadQueues.removeAll()
                 Singleton.removeAll()
                 NetworkCached.removeAll()
+                DownloadContentGroup.removeAll()
             }
-
+            
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
             } catch (let error) {
@@ -495,10 +525,13 @@ public class SyncServer {
         }
     }
     
-    // Logs information about all tracking internal meta data.
-    public func logAllTracking() {
+    static let trailingMarker = "*************** logAllTracking: Ends ***************"
+    
+    // Logs information about all tracking internal meta data. When the completion handler is called, the file data logged should be present in persistent storage. The completion runs asynchronously on the main thread.
+    public func logAllTracking(completion: (()->())? = nil) {
         Log.msg("*************** Starts: logAllTracking ***************")
         CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+            DownloadContentGroup.printAll()
             DownloadFileTracker.printAll()
             UploadFileTracker.printAll()
             UploadQueue.printAll()
@@ -506,7 +539,14 @@ public class SyncServer {
             Singleton.printAll()
             NetworkCached.printAll()
         }
-        Log.msg("*************** logAllTracking: Ends ***************")
+        Log.msg(SyncServer.trailingMarker)
+        
+        // See also https://stackoverflow.com/questions/50311546/ios-flush-all-output-files/50311616
+        if let completion = completion {
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
     }
     
     public struct LocalConsistencyResults {
@@ -536,7 +576,7 @@ public class SyncServer {
                         let directoryEntries = try CoreData.sessionNamed(Constants.coreDataName).fetchAllObjects(withEntityName: DirectoryEntry.entityName()) as? [DirectoryEntry]
                         if directoryEntries != nil {
                             for entry in directoryEntries! {
-                                if !entry.deletedOnServer {
+                                if !entry.deletedLocally {
                                     directory.insert(entry.fileUUID!)
                                 }
                             }
@@ -559,7 +599,7 @@ public class SyncServer {
                 // Check to see if these are deleted from the directory
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                     for missing in clientMissing {
-                        if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: missing), !entry.deletedOnServer {
+                        if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: missing), !entry.deletedLocally {
                             clientMissingNotDeleted.insert(missing)
                         }
                     }
@@ -567,7 +607,7 @@ public class SyncServer {
                 
                 let clientMissingAndDeleted = clientMissing.subtracting(clientMissingNotDeleted)
                 
-                // Elements in directory that are missing in client
+                // Elements in directory that are missing in client. At least some of these could be files that were deleted on the server before they were ever actually processed by the client.
                 let directoryMissing = directory.subtracting(intersection)
                 
                 Log.msg("clientMissingAndDeleted: \(clientMissingAndDeleted)")
@@ -643,6 +683,13 @@ public class SyncServer {
             ufts.forEach(){ uft in
                 if uft.status == .uploading {
                     uft.status = .notStarted
+                }
+            }
+            
+            let dcgs = DownloadContentGroup.fetchAll()
+            dcgs.forEach { dcg in
+                if dcg.status == .downloading {
+                    dcg.status = .notStarted
                 }
             }
 

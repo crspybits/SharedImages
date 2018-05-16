@@ -16,6 +16,7 @@ import SMCoreLib
 @objc(Discussion)
 public class Discussion: NSManagedObject {
     static let UUID_KEY = "uuid"
+    static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
 
     var url:SMRelativeLocalURL? {
         get {
@@ -53,8 +54,13 @@ public class Discussion: NSManagedObject {
         return newObjectAndMakeUUID(makeUUID: false)
     }
 
-    class func fetchObjectWithUUID(uuid:String) -> Discussion? {
+    class func fetchObjectWithUUID(_ uuid:String) -> Discussion? {
         let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
+        return managedObject as? Discussion
+    }
+    
+    class func fetchObjectWithFileGroupUUID(_ fileGroupUUID:String) -> Discussion? {
+        let managedObject = CoreData.fetchObjectWithUUID(fileGroupUUID, usingUUIDKey: FILE_GROUP_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
         return managedObject as? Discussion
     }
     

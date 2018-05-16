@@ -84,7 +84,7 @@ extension AllOperations {
                 (entry as! NSManagedObject).willAccessValue(forKey: nil)
                 
                 Log.msg("\(String(describing: entry))")
-            }
+            }            
         } catch (let error) {
             Log.error("Error: \(error)")
             assert(false)

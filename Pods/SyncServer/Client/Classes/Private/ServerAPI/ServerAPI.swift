@@ -266,6 +266,7 @@ class ServerAPI {
     struct File : Filenaming {
         let localURL:URL!
         let fileUUID:String!
+        let fileGroupUUID:String?
         let mimeType:MimeType!
         let deviceUUID:String!
         let appMetaData:AppMetaData?
@@ -290,13 +291,17 @@ class ServerAPI {
             UploadFileRequest.masterVersionKey: serverMasterVersion
         ]
         
+        if file.fileVersion == 0 {
+            params[UploadFileRequest.fileGroupUUIDKey] = file.fileGroupUUID
+        }
+        
         if undelete {
             params[UploadFileRequest.undeleteServerFileKey] = 1
         }
         
         guard let uploadRequest = UploadFileRequest(json: params) else {
-            completion?(nil, .couldNotCreateRequest);
-            return;
+            completion?(nil, .couldNotCreateRequest)
+            return
         }
         
         uploadRequest.appMetaData = file.appMetaData
@@ -656,6 +661,7 @@ class ServerAPI {
     case serverMasterVersionUpdate(Int64)
     }
     
+    // Note that you can't do an undeletion for an appMetaData upload-- because there is no content to upload. I.e., when an uploadDeletion occurs the file is deleted in cloud storage. Thus, there is no option for this method to undelete.
     func uploadAppMetaData(appMetaData: AppMetaData, fileUUID: String, serverMasterVersion: MasterVersionInt, completion:((Result<UploadAppMetaDataResult>)->(Void))?) {
         let endpoint = ServerEndpoints.uploadAppMetaData
         

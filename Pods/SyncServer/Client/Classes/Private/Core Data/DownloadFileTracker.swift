@@ -9,9 +9,10 @@
 import Foundation
 import CoreData
 import SMCoreLib
+import SyncServer_Shared
 
 @objc(DownloadFileTracker)
-class DownloadFileTracker: FileTracker, AllOperations {
+public class DownloadFileTracker: FileTracker, AllOperations {
     typealias COREDATAOBJECT = DownloadFileTracker
     
     enum Status : String {
@@ -30,14 +31,26 @@ class DownloadFileTracker: FileTracker, AllOperations {
         }
     }
     
-    class func entityName() -> String {
+    var attr: SyncAttributes {
+        let mimeType = MimeType(rawValue: self.mimeType!)!
+        var attr = SyncAttributes(fileUUID: fileUUID, mimeType: mimeType, creationDate: creationDate! as Date, updateDate: updateDate! as Date)
+        attr.appMetaData = appMetaData
+        attr.fileGroupUUID = fileGroupUUID
+        return attr
+    }
+    
+    public class func entityName() -> String {
         return "DownloadFileTracker"
     }
     
-    class func newObject() -> NSManagedObject {
+    public class func newObject() -> NSManagedObject {
         let dft = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! DownloadFileTracker
         dft.status = .notStarted
         dft.addAge()
         return dft
+    }
+    
+    func remove()  {
+        CoreData.sessionNamed(Constants.coreDataName).remove(self)
     }
 }

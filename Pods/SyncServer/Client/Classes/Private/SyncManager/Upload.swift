@@ -270,7 +270,7 @@ class Upload {
             let appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
             
             let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
-            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
+            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, fileGroupUUID: nextToUpload.fileGroupUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
             
             undelete = nextToUpload.uploadUndeletion
         }

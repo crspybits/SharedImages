@@ -31,8 +31,9 @@ public struct SyncAttributes : FileUUID {
     
     public var appMetaData:String?
     
-    public init(fileUUID:UUIDString, mimeType:MimeType, creationDate: Date? = nil, updateDate: Date? = nil) {
+    public init(fileUUID:UUIDString, mimeType:MimeType, fileGroupUUID: UUIDString? = nil, creationDate: Date? = nil, updateDate: Date? = nil) {
         self.fileUUID = fileUUID
+        self.fileGroupUUID = fileGroupUUID
         self.mimeType = mimeType
         self.creationDate = creationDate
         self.updateDate = updateDate

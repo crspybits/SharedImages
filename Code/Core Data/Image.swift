@@ -10,12 +10,15 @@ import Foundation
 import CoreData
 import SMCoreLib
 
+// 5/13/18-- The discussionUUID is old as of today. The fileGroupUUID property is the new way to connect discussion and image.
+
 @objc(Image)
 public class Image: NSManagedObject {
     static let CREATION_DATE_KEY = "creationDate"
     static let UUID_KEY = "uuid"
     static let DISCUSSION_UUID_KEY = "discussionUUID"
-
+    static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
+    
     var originalSize:CGSize {
         var originalImageSize = CGSize()
 
@@ -86,13 +89,18 @@ public class Image: NSManagedObject {
         return fetchRequest
     }
     
-    class func fetchObjectWithUUID(uuid:String) -> Image? {
+    class func fetchObjectWithUUID(_ uuid:String) -> Image? {
         let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
         return managedObject as? Image
     }
     
-    class func fetchObjectWithDiscussionUUID(discussionUUID:String) -> Image? {
+    class func fetchObjectWithDiscussionUUID(_ discussionUUID:String) -> Image? {
         let managedObject = CoreData.fetchObjectWithUUID(discussionUUID, usingUUIDKey: DISCUSSION_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
+        return managedObject as? Image
+    }
+    
+    class func fetchObjectWithFileGroupUUID(_ fileGroupUUID:String) -> Image? {
+        let managedObject = CoreData.fetchObjectWithUUID(fileGroupUUID, usingUUIDKey: FILE_GROUP_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
         return managedObject as? Image
     }
     
@@ -113,6 +121,7 @@ public class Image: NSManagedObject {
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
     
+    // Also removes associated discussion.
     func remove() throws {
         if let discussion = discussion {
             try discussion.remove()
