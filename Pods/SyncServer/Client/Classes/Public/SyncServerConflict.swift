@@ -23,6 +23,7 @@ public enum DownloadDeletionResolution {
     // Deletes the existing content upload.
     case acceptDownloadDeletion
     
+    // For a file with a non-nil fileGroupUUID, this will also reject all pending download deletions for files with the same fileGroupUUID.
     case rejectDownloadDeletion(ContentUploadResolution)
 }
 

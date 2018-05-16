@@ -157,26 +157,17 @@ public struct DownloadOperation {
         case deletion
     }
     
-    let type: OperationType
-    let attr: SyncAttributes
+    public let type: OperationType
+    public let attr: SyncAttributes
 }
 
 // Except as noted, these delegate methods are called on the main thread.
 public protocol SyncServerDelegate : class {
     // The client has to decide how to resolve the content-download conflicts. The resolveConflict method of the SyncServerConflict must be called. The statements below apply for the SMRelativeLocalURL's.
     // Not called on the main thread. You must call the conflict resolution callbacks on the same thread as this was called on.
-    // The `syncServerSingleFileDownloadComplete` will be called after, if you allow the download to continue. i.e., if you use acceptContentDownload of ContentDownloadResolution.
+    // The `syncServerFileGroupDownloadComplete` will be called after, if you allow the download to continue. i.e., if you use acceptContentDownload of ContentDownloadResolution.
     func syncServerMustResolveContentDownloadConflict(_ downloadContent: ServerContentType, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>)
     
-    /* Called at the end of a group download, on non-error conditions.
-    For file downloads, the client owns the file referenced by the url after this call completes. This file is temporary in the sense that it will not be backed up to iCloud, could be removed when the device or app is restarted, and should be copied and/or moved to a more permanent location. Client should replace their existing data with that from the given file.
-    This method doesn't get called for a particular download if (a) there is a conflict and (b) the client resolves that conflict by using .rejectContentDownload
-    The operation is appMetaData if the app meta data on the server was updated without a corresponding file content change.
-    For deletion operations, clients should delete the files referenced by the SyncAttributes's (i.e., the UUID's).
-    For files you upload without file groups, this callback always has a single element in the array passed.
-    */
-    func syncServerFileGroupDownloadComplete(group: [DownloadOperation])
-
     // The client has to decide how to resolve the download-deletion conflicts. The resolveConflict method of each SyncServerConflict must be called.
     // Conflicts will not include UploadDeletion.
     // Not called on the main thread. You must call the conflict resolution callbacks on the same thread as this was called on.
@@ -184,6 +175,15 @@ public protocol SyncServerDelegate : class {
     
     // The number of elements in this array reflects the number of conflicts in the download deletions. E.g., if there is only a single download deletion, there can be at most one conflict.
     func syncServerMustResolveDownloadDeletionConflicts(conflicts:[DownloadDeletionConflict])
+    
+    /* Called at the end of a group download, on non-error conditions, after resolution of conflicts.
+    For file downloads, the client owns the file referenced by the url after this call completes. This file is temporary in the sense that it will not be backed up to iCloud, could be removed when the device or app is restarted, and should be copied and/or moved to a more permanent location. Client should replace their existing data with that from the given file.
+    This method doesn't get called for a particular download if (a) there is a conflict and (b) the client resolves that conflict by using .rejectContentDownload
+    The operation is appMetaData if the app meta data on the server was updated without a corresponding file content change.
+    For deletion operations, clients should delete the files referenced by the SyncAttributes's (i.e., the UUID's).
+    For files you upload without file groups, this callback always has a single element in the array passed.
+    */
+    func syncServerFileGroupDownloadComplete(group: [DownloadOperation])
     
     func syncServerErrorOccurred(error:SyncServerError)
 

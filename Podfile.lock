@@ -59,25 +59,25 @@ PODS:
   - SwiftyBeaver (1.5.2)
   - SwiftyDropbox (4.5.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (15.0.0):
+  - SyncServer (15.0.2):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.1)
-    - SyncServer/Lite (= 15.0.0)
+    - SyncServer/Lite (= 15.0.2)
   - SyncServer-Shared (6.2.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (15.0.0):
+  - SyncServer/Dropbox (15.0.2):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
     - SyncServer-Shared (~> 6.1)
-  - SyncServer/Facebook (15.0.0):
+  - SyncServer/Facebook (15.0.2):
     - FacebookCore (~> 0.2)
     - FacebookLogin (~> 0.2)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.1)
-  - SyncServer/Lite (15.0.0):
+  - SyncServer/Lite (15.0.2):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.1)
@@ -132,7 +132,7 @@ SPEC CHECKSUMS:
   SMCoreLib: 1fc2a916a45470cf41deb193bc509432b1987efc
   SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af
   SwiftyDropbox: ccdbd21dc81d59363b75241bf7c88fb906e8ffcb
-  SyncServer: 5941bd7fd60771de1073c5be10a8ff6a0d1ae071
+  SyncServer: fdfde89865249ad5fdcea7b3c5e034330f5ffdd5
   SyncServer-Shared: ddbe358cdb10920ff9ddbfe3c1a8c7853b35a6de
 
 PODFILE CHECKSUM: 36466d2cabd0508099c61fdcecba38d3233a0b43

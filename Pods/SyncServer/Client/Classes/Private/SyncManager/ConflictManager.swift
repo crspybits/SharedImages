@@ -178,14 +178,31 @@ class ConflictManager {
             downloadDeletionAttrs: deletionAttrs, delegate: delegate) { ignoreDownloadDeletions, havePendingUploadDeletions, uploadUndeletions in
                 
             let deleteFromLocalDirectory = deletionAttrs.filter({ deletion in
-                let ignore = ignoreDownloadDeletions.filter({$0.fileUUID == deletion.fileUUID})
+                let ignore = ignoreDownloadDeletions.filter({
+                    var matchesGroup = false
+                    if $0.fileGroupUUID != nil {
+                        matchesGroup = $0.fileGroupUUID == deletion.fileGroupUUID
+                    }
+                    
+                    return $0.fileUUID == deletion.fileUUID || matchesGroup
+                })
                 return ignore.count == 0
             })
             
+            var ignoreDownloadDeletionsExpandedForGroups =  Set<SyncAttributes>(ignoreDownloadDeletions)
+            ignoreDownloadDeletions.forEach { downloadDeletion in
+                if let fileGroupUUID = downloadDeletion.fileGroupUUID {
+                    let result = deletionAttrs.filter {$0.fileGroupUUID == fileGroupUUID}
+                    ignoreDownloadDeletionsExpandedForGroups.formUnion(result)
+                }
+            }
+            
             CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
                 Directory.session.updateAfterDownloadDeletingFiles(deletions: deleteFromLocalDirectory, pendingUploadUndeletions: uploadUndeletions)
-
-                (havePendingUploadDeletions + ignoreDownloadDeletions).forEach { attr in
+                
+                let deleteAllOfThese = ignoreDownloadDeletionsExpandedForGroups.union(
+                    havePendingUploadDeletions)
+                deleteAllOfThese.forEach { attr in
                     let dft = dfts.filter {$0.fileUUID == attr.fileUUID}[0]
                     dft.remove()
                 }
@@ -284,7 +301,7 @@ class ConflictManager {
                             } // End switch uploadResolution
                             
                             if !error {
-                                // We're going to disregard the download deletion.
+                                // We're going to disregard the download deletion, and for files that are part of a group, need to disregard the download deletions for all files in the group.
                                 deletionsToIgnore += [attr]
                             }
                         }
@@ -319,6 +336,16 @@ class ConflictManager {
                 return uft1.age < uft2.age
             })
             toKeep[0].uploadUndeletion = true
+            
+            if let fileGroupUUID = toKeep[0].fileGroupUUID {
+                // Mark all other entries in the group, if any, as deletedOnServer-- to allow them to be upload undeleted.
+                let entries = DirectoryEntry.fetchAll()
+                let pendingUndeletionEntries = entries.filter {$0.fileGroupUUID == fileGroupUUID && $0.fileUUID != fileUUID}
+                pendingUndeletionEntries.forEach { pendingUndeletionEntry in
+                    pendingUndeletionEntry.deletedOnServer = true
+                }
+            }
+            
             CoreData.sessionNamed(Constants.coreDataName).saveContext()
         }
     }

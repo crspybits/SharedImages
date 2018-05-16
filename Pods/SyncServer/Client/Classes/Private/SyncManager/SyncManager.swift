@@ -345,7 +345,7 @@ class SyncManager {
                                 uploadedEntry.appMetaDataVersion = uft.appMetaDataVersion
                             }
                             
-                            // Deal with conflict case in updateAfterDownloadDeletingFiles where we had marked directory entry as `deletedOnServer`.
+                            // Deal with special case where we had marked directory entry as `deletedOnServer`.
                             if uft.uploadUndeletion && uploadedEntry.deletedOnServer {
                                 uploadedEntry.deletedOnServer = false
                             }

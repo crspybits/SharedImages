@@ -125,11 +125,14 @@ public class SyncServer {
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {[weak self] in
             var entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID)
             
+            var fileGroupUUID:String?
+            
             if nil == entry {
                 entry = (DirectoryEntry.newObject() as! DirectoryEntry)
                 entry!.fileUUID = attr.fileUUID
                 entry!.mimeType = attr.mimeType.rawValue
                 entry!.fileGroupUUID = attr.fileGroupUUID
+                fileGroupUUID = attr.fileGroupUUID
             }
             else {
                 guard let entryMimeTypeString = entry!.mimeType,
@@ -155,6 +158,9 @@ public class SyncServer {
                         return
                     }
                 }
+                
+                // Make sure I've got a fileGroupUUID in the uft, if there is one, to deal with conflicts
+                fileGroupUUID = entry!.fileGroupUUID
             }
             
             let newUft = UploadFileTracker.newObject() as! UploadFileTracker
@@ -163,7 +169,7 @@ public class SyncServer {
             newUft.mimeType = attr.mimeType.rawValue
             newUft.uploadCopy = copy
             newUft.operation = .file
-            newUft.fileGroupUUID = attr.fileGroupUUID
+            newUft.fileGroupUUID = fileGroupUUID
             
             if copy {
                 // Make a copy of the file

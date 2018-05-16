@@ -250,7 +250,6 @@ class Upload {
             }
             
             // Establish versions for both the file and app meta data.
-            
             if directoryEntry!.fileVersion == nil {
                 nextToUpload.fileVersion = 0
             }
@@ -259,6 +258,10 @@ class Upload {
             }
             
             nextToUpload.appMetaDataVersion = directoryEntry!.appMetaDataVersionToUpload(appMetaDataUpdate: nextToUpload.appMetaData)
+            
+            // Are we undeleting the file?
+            nextToUpload.uploadUndeletion = nextToUpload.uploadUndeletion ||
+                (!directoryEntry!.deletedLocally && directoryEntry!.deletedOnServer)
             
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
