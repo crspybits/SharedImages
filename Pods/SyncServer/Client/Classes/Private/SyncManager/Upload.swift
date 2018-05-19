@@ -250,7 +250,6 @@ class Upload {
             }
             
             // Establish versions for both the file and app meta data.
-            
             if directoryEntry!.fileVersion == nil {
                 nextToUpload.fileVersion = 0
             }
@@ -259,6 +258,10 @@ class Upload {
             }
             
             nextToUpload.appMetaDataVersion = directoryEntry!.appMetaDataVersionToUpload(appMetaDataUpdate: nextToUpload.appMetaData)
+            
+            // Are we undeleting the file?
+            nextToUpload.uploadUndeletion = nextToUpload.uploadUndeletion ||
+                (!directoryEntry!.deletedLocally && directoryEntry!.deletedOnServer)
             
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
@@ -270,7 +273,7 @@ class Upload {
             let appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
             
             let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
-            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
+            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, fileGroupUUID: nextToUpload.fileGroupUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
             
             undelete = nextToUpload.uploadUndeletion
         }

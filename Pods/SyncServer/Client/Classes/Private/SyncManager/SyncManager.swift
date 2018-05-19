@@ -12,7 +12,7 @@ import SyncServer_Shared
 
 class SyncManager {
     static let session = SyncManager()
-    weak var delegate:SyncServerDelegate?
+    weak var delegate:SyncServerDelegate!
     private var _stopSync = false
     
     // The getter returns the current value and sets it to false. Operates in an atomic manner.
@@ -34,10 +34,6 @@ class SyncManager {
             return result
         }
     }
-
-#if DEBUG
-    weak var testingDelegate:SyncServerTestingDelegate?
-#endif
 
     private var callback:((SyncServerError?)->())?
     var desiredEvents:EventDesired = .defaults
@@ -73,11 +69,19 @@ class SyncManager {
         // First: Do we have previously queued downloads that need to be done?
         let nextResult = Download.session.next(first: first) {[weak self] nextCompletionResult in
             switch nextCompletionResult {
-            case .fileDownloaded(let url, let attr, let dft):
-                self?.downloadCompleted(dft: dft, url: url, attr:attr, callback:callback)
+            case .fileDownloaded(let dft):
+                var dcg: DownloadContentGroup!
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    dcg = dft.group!
+                }
+                self?.downloadCompleted(dcg: dcg, callback:callback)
                 
-            case .appMetaDataDownloaded(attr: let attr, dft: let dft):
-                self?.downloadCompleted(dft: dft, url: nil, attr:attr, callback:callback)
+            case .appMetaDataDownloaded(dft: let dft):
+                var dcg: DownloadContentGroup!
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    dcg = dft.group!
+                }
+                self?.downloadCompleted(dcg: dcg, callback:callback)
 
             case .masterVersionUpdate:
                 // Need to start all over again.
@@ -89,194 +93,101 @@ class SyncManager {
         }
         
         switch nextResult {
+        case .currentGroupCompleted(let dcg):
+            downloadCompleted(dcg: dcg, callback:callback)
+            
         case .noDownloadsOrDeletions:
             checkForDownloads()
 
         case .error(let error):
-            callback?(error)
+            callback?(SyncServerError.otherError(error))
             
         case .started:
             // Don't do anything. `next` completion will invoke callback.
             return
             
         case .allDownloadsCompleted:
-            allDownloadsCompleted()
+            checkForPendingUploads(first: true)
         }
     }
     
-    private func downloadCompleted(dft: DownloadFileTracker, url: SMRelativeLocalURL?, attr:SyncAttributes, callback:((SyncServerError?)->())? = nil) {
-
-        if delegate == nil {
-            afterDownloadCompleted(dft: dft, callback: callback)
+    private func downloadCompleted(dcg: DownloadContentGroup, callback:((SyncServerError?)->())? = nil) {
+        var allCompleted:Bool!
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            allCompleted = dcg.allDftsCompleted()
+            if allCompleted {
+                dcg.status = .downloaded
+                CoreData.sessionNamed(Constants.coreDataName).saveContext()
+            }
+        }
+        
+        if allCompleted {
+            // All downloads completed for this group. Wrap it up.
+            completeGroup(dcg: dcg)
         }
         else {
-#if DEBUG
-            // Assuming that in testing self.delegate will not be nil.
-            if testingDelegate == nil {
-                normalDelegateAndAfterCalls(dft: dft, url: url, attr:attr, callback:callback)
+            // Downloads are not completed for this group. Recursively check for any next downloads (i.e., other groups). Using `async` so we don't consume extra space on the stack.
+            DispatchQueue.global().async {
+                self.start(callback)
             }
-            else {
-                Thread.runSync(onMainThread: {
-                    var fileOperation: Bool = false
-                    CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                        fileOperation = dft.operation == .file
-                    }
-                    
-                    if fileOperation {
-                        self.testingDelegate!.singleFileDownloadComplete(url: url!, attr: attr) {
-                            self.afterDownloadCompleted(dft: dft, callback: callback)
-                        }
-                    }
-                })
-            }
-#else
-            normalDelegateAndAfterCalls(dft: dft, url: url, attr:attr, callback:callback)
-#endif
         }
     }
     
-    func normalDelegateAndAfterCalls(dft: DownloadFileTracker, url: SMRelativeLocalURL?, attr:SyncAttributes, callback:((SyncServerError?)->())? = nil) {
-    
-        var operation: FileTracker.Operation!
-        var conflictingContent: ServerContentType = .appMetaData
+    private func completeGroup(dcg:DownloadContentGroup) {
+        var contentDownloads:[DownloadFileTracker]!
+        var downloadDeletions:[DownloadFileTracker]!
         
+        Log.msg("Completed DownloadContentGroup: Checking for conflicts")
+        
+        // Deal with any content download conflicts and any download deletion conflicts.
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-            operation = dft.operation
-            
-            if let url = url {
-                if dft.appMetaData == nil {
-                    conflictingContent = .file(url)
-                }
-                else {
-                    conflictingContent = .both(downloadURL: url)
-                }
-            }
+            contentDownloads = dcg.dfts.filter {$0.operation.isContents}
+            downloadDeletions = dcg.dfts.filter {$0.operation.isDeletion}
         }
         
-        Thread.runSync(onMainThread: {[unowned self] in
-            ConflictManager.handleAnyContentDownloadConflict(attr: attr, content: conflictingContent, delegate: self.delegate!) { ignoreDownload in
+        ConflictManager.handleAnyContentDownloadConflicts(dfts: contentDownloads, delegate: self.delegate) {
             
-                if ignoreDownload == nil {
-                    // Not 100% sure we're running on main thread-- its possible that the client didn't call the completion on the main thread.
-                    Thread.runSync(onMainThread: {
-                        switch operation! {
+            ConflictManager.handleAnyDownloadDeletionConflicts(dfts: downloadDeletions, delegate: self.delegate) {
+
+                var groupContent:[DownloadOperation]!
+                
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    groupContent = dcg.dfts.map { dft in
+                        var contentType:DownloadOperation.OperationType!
+                        switch dft.operation! {
                         case .file:
-                            self.delegate!.syncServerSingleFileDownloadComplete(url: url!, attr: attr)
+                            contentType = .file(dft.localURL!)
                         case .appMetaData:
-                            self.delegate!.syncServerAppMetaDataDownloadComplete(attr: attr)
+                            contentType = .appMetaData
                         case .deletion:
-                            assert(false)
+                            contentType = .deletion
                         }
-                    })
-                }
-                else {
-                    Log.msg("ignoreDownload not nil")
-                }
-                
-                DispatchQueue.global(qos: .default).sync {
-                    self.afterDownloadCompleted(dft: dft, callback: callback)
-                }
-            }
-        })
-    }
-    
-    func afterDownloadCompleted(dft: DownloadFileTracker, callback:((SyncServerError?)->())? = nil) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-            Directory.session.updateAfterDownloading(downloads: [dft])
-        
-            // 9/16/17; We're doing downloads in an eventually consistent manner. Remove the DownloadFileTracker-- we don't want to repeat this download. See http://www.spasticmuffin.biz/blog/2017/09/15/making-downloads-more-flexible-in-the-syncserver/
-            CoreData.sessionNamed(Constants.coreDataName).remove(dft)
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
-        }
-        
-        // Recursively check for any next download. Using `async` so we don't consume extra space on the stack.
-        DispatchQueue.global().async {
-            self.start(callback)
-        }
-    }
-    
-    private func allDownloadsCompleted() {
-        // Inform client via delegate of any download deletions.
-
-        var deletions = [SyncAttributes]()
-        var downloadDeletionDfts:[DownloadFileTracker]!
-
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-            let dfts = DownloadFileTracker.fetchAll()
-            downloadDeletionDfts = dfts.filter {$0.operation.isDeletion}
-
-            downloadDeletionDfts.forEach { dft in
-                let mimeType = MimeType(rawValue: dft.mimeType!)!
-
-                let attr = SyncAttributes(fileUUID: dft.fileUUID, mimeType: mimeType, creationDate: dft.creationDate! as Date, updateDate: dft.updateDate! as Date)
-                deletions += [attr]
-            }
-            
-            Log.msg("Deletions: count: \(deletions.count)")
-        }
-    
-        if deletions.count > 0 {
-            if let delegate = self.delegate {
-                /* Callback parameters:
-                    `ignoreDownloadDeletions`: The download deletions that conflict resolution tells us *not* to delete.
-                    `alreadyDeletedLocally`: Don't call the delegate method `syncServerShouldDoDeletions` for these download deletions. These have already been deleted locally.
-                */
-                ConflictManager.handleAnyDownloadDeletionConflicts(
-                    downloadDeletionAttrs: deletions, delegate: delegate) { ignoreDownloadDeletions, havePendingUploadDeletions in
-                    
-                    let makeDelegateCalls = deletions.filter({ deletion in
-                        let ignore = (havePendingUploadDeletions + ignoreDownloadDeletions).filter({$0.fileUUID == deletion.fileUUID})
-                        return ignore.count == 0
-                    })
-                    
-                    if makeDelegateCalls.count > 0 {
-                        Thread.runSync(onMainThread: {
-                            delegate.syncServerShouldDoDeletions(downloadDeletions: makeDelegateCalls)
-                        })
-                    }
-                    
-                    let deleteFromLocalDirectory = deletions.filter({ deletion in
-                        let ignore = ignoreDownloadDeletions.filter({$0.fileUUID == deletion.fileUUID})
-                        return ignore.count == 0
-                    })
-                    
-                    // I'd like to wrap up by switching to the original thread we were on prior to switching to the main thread. Not quite sure how to do that. Do this instead.
-                    DispatchQueue.global(qos: .default).sync {[unowned self] in
-                        self.wrapup(deletions: deletions, deleteTheseLocally: deleteFromLocalDirectory)
+                        
+                        return DownloadOperation(type: contentType, attr: dft.attr)
                     }
                 }
-            }
-        }
-        else {
-            wrapup(deletions: [], deleteTheseLocally: [])
-        }
-    }
-    
-    private func wrapup(deletions: [SyncAttributes], deleteTheseLocally: [SyncAttributes]) {
-        var errorResult:Error?
-    
-        // This is broken out of the above `performAndWait` to not get a deadlock when I do the `Thread.runSync(onMainThread:`.
-        if deletions.count > 0 {
-            CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                Directory.session.updateAfterDownloadDeletingFiles(deletions: deleteTheseLocally)
                 
-                // This will be removing DownloadFileTracker's for download deletions only. The DownloadFileTrackers for file downloads will have been removed already.
-                DownloadFileTracker.removeAll()
-                do {
-                    try CoreData.sessionNamed(Constants.coreDataName).context.save()
-                } catch (let error) {
-                    errorResult = error
-                    return
+                if groupContent.count > 0 {
+                    Thread.runSync(onMainThread: {
+                        self.delegate!.syncServerFileGroupDownloadComplete(group: groupContent)
+                    })
+                }
+                
+                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {                    
+                    // Remove the DownloadContentGroup and related dft's -- We're finished their downloading.
+                    dcg.dfts.forEach { dft in
+                        dft.remove()
+                    }
+                    dcg.remove()
+                    CoreData.sessionNamed(Constants.coreDataName).saveContext()
                 }
             }
+
+            // Downloads are completed for this group, but we may have other groups to download.
+            DispatchQueue.global().async {
+                self.start(self.callback)
+            }
         }
-    
-        guard errorResult == nil else {
-            callback?(.coreDataError(errorResult!))
-            return
-        }
-    
-        self.checkForPendingUploads(first: true)
     }
 
     // No DownloadFileTracker's queued up. Check the FileIndex to see if there are pending downloads on the server.
@@ -352,47 +263,28 @@ class SyncManager {
     }
     
     private func contentWasUploaded(attr:SyncAttributes?, uft: UploadFileTracker) {
+        var operation: FileTracker.Operation!
+        var fileUUID:String!
+        
         CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-            switch uft.operation! {
-            case .file:
-                EventDesired.reportEvent(.singleFileUploadComplete(attr: attr!), mask: self.desiredEvents, delegate: self.delegate)
-            case .appMetaData:
-                EventDesired.reportEvent(.singleAppMetaDataUploadComplete(fileUUID: uft.fileUUID), mask: self.desiredEvents, delegate: self.delegate)
-            case .deletion:
-                assert(false)
-            }
+            operation = uft.operation
+            fileUUID = uft.fileUUID
         }
         
-        func after() {
-            // Recursively see if there is a next upload to do.
-            DispatchQueue.global().async {
-                self.checkForPendingUploads()
-            }
+        switch operation! {
+        case .file:
+            EventDesired.reportEvent(.singleFileUploadComplete(attr: attr!), mask: self.desiredEvents, delegate: self.delegate)
+            
+        case .appMetaData:
+            EventDesired.reportEvent(.singleAppMetaDataUploadComplete(fileUUID: fileUUID), mask: self.desiredEvents, delegate: self.delegate)
+        case .deletion:
+            assert(false)
         }
-
-#if DEBUG
-        if self.testingDelegate == nil {
-            after()
+        
+        // Recursively see if there is a next upload to do.
+        DispatchQueue.global().async {
+            self.checkForPendingUploads()
         }
-        else {
-            Thread.runSync(onMainThread: {
-                var fileUpload: Bool = false
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    if uft.operation == .file {
-                        fileUpload = true
-                    }
-                }
-                
-                if fileUpload {
-                    self.testingDelegate!.syncServerSingleFileUploadCompleted(next: {
-                        after()
-                    })
-                }
-            })
-        }
-#else
-        after()
-#endif
     }
     
     private func doneUploads() {
@@ -407,7 +299,7 @@ class SyncManager {
             // `numTransferred` may not be accurate in the case of retries/recovery.
             case .doneUploads(numberTransferred: _):
                 var uploadQueue:UploadQueue!
-                var fileUploads:[UploadFileTracker]!
+                var contentUploads:[UploadFileTracker]!
                 var uploadDeletions:[UploadFileTracker]!
                 var errorResult:SyncServerError?
 
@@ -419,7 +311,7 @@ class SyncManager {
                         return
                     }
                     
-                    fileUploads = uploadQueue.uploadFileTrackers.filter {$0.operation.isContents}
+                    contentUploads = uploadQueue.uploadFileTrackers.filter {$0.operation.isContents}
                 }
                 
                 if errorResult != nil {
@@ -427,14 +319,14 @@ class SyncManager {
                     return
                 }
                 
-                if fileUploads.count > 0 {
-                    EventDesired.reportEvent(.fileUploadsCompleted(numberOfFiles: fileUploads.count), mask: self.desiredEvents, delegate: self.delegate)
+                if contentUploads.count > 0 {
+                    EventDesired.reportEvent(.contentUploadsCompleted(numberOfFiles: contentUploads.count), mask: self.desiredEvents, delegate: self.delegate)
                 }
     
                 CoreData.sessionNamed(Constants.coreDataName).performAndWait() { [unowned self] in
-                    if fileUploads.count > 0 {
+                    if contentUploads.count > 0 {
                         // Each of the DirectoryEntry's for the uploads needs to now be given its version, as uploaded. And appMetaData needs to be updated in directory if it has been updated on this upload.
-                        fileUploads.forEach { uft in
+                        contentUploads.forEach { uft in
                             guard let uploadedEntry = DirectoryEntry.fetchObjectWithUUID(uuid: uft.fileUUID) else {
                                 assert(false)
                                 return
@@ -451,6 +343,11 @@ class SyncManager {
                              if let _ = uft.appMetaData {
                                 uploadedEntry.appMetaData = uft.appMetaData
                                 uploadedEntry.appMetaDataVersion = uft.appMetaDataVersion
+                            }
+                            
+                            // Deal with special case where we had marked directory entry as `deletedOnServer`.
+                            if uft.uploadUndeletion && uploadedEntry.deletedOnServer {
+                                uploadedEntry.deletedOnServer = false
                             }
                             
                             do {
@@ -478,7 +375,7 @@ class SyncManager {
                                 return
                             }
 
-                            uploadedEntry.deletedOnServer = true
+                            uploadedEntry.deletedLocally = true
                             do {
                                 try uft.remove()
                             } catch {

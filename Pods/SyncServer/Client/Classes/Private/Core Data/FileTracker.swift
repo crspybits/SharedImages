@@ -12,7 +12,7 @@ import SMCoreLib
 import SyncServer_Shared
 
 @objc(FileTracker)
-public class FileTracker: NSManagedObject, Filenaming, FileUUID {
+public class FileTracker: NSManagedObject, Filenaming, FileUUID, LocalURLData {
     // FileTracker age keeps track of relative age -- larger numbers mean they were created later in time.
     
     public var fileUUID:String! {
@@ -66,6 +66,16 @@ public class FileTracker: NSManagedObject, Filenaming, FileUUID {
         
         set {
             operationInternal = newValue.rawValue
+        }
+    }
+    
+    var localURL:SMRelativeLocalURL? {
+        get {
+            return getLocalURLData()
+        }
+        
+        set {
+            setLocalURLData(newValue: newValue)
         }
     }
     

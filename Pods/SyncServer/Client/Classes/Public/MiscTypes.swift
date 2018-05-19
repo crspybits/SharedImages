@@ -17,7 +17,7 @@ public protocol FileUUID {
 }
 
 // Attributes for a file being synced.
-public struct SyncAttributes : FileUUID {
+public struct SyncAttributes : FileUUID, Hashable {
     public var mimeType:MimeType!
 
     public var fileUUID:UUIDString!
@@ -31,11 +31,20 @@ public struct SyncAttributes : FileUUID {
     
     public var appMetaData:String?
     
-    public init(fileUUID:UUIDString, mimeType:MimeType, creationDate: Date? = nil, updateDate: Date? = nil) {
+    public init(fileUUID:UUIDString, mimeType:MimeType, fileGroupUUID: UUIDString? = nil, creationDate: Date? = nil, updateDate: Date? = nil) {
         self.fileUUID = fileUUID
+        self.fileGroupUUID = fileGroupUUID
         self.mimeType = mimeType
         self.creationDate = creationDate
         self.updateDate = updateDate
+    }
+    
+    public var hashValue: Int {
+        return fileUUID.hashValue
+    }
+    
+    public static func == (lhs: SyncAttributes, rhs: SyncAttributes) -> Bool {
+        return lhs.fileUUID == rhs.fileUUID
     }
 }
 

@@ -12,7 +12,7 @@ import CoreData
 import SMCoreLib
 
 @objc(UploadFileTracker)
-public class UploadFileTracker: FileTracker, AllOperations, LocalURLData {
+public class UploadFileTracker: FileTracker, AllOperations {
     typealias COREDATAOBJECT = UploadFileTracker
 
     enum Status : String {
@@ -28,16 +28,6 @@ public class UploadFileTracker: FileTracker, AllOperations, LocalURLData {
         
         set {
             statusRaw = newValue.rawValue
-        }
-    }
-    
-    var localURL:SMRelativeLocalURL? {
-        get {
-            return getLocalURLData()
-        }
-        
-        set {
-            setLocalURLData(newValue: newValue)
         }
     }
     

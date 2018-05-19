@@ -14,13 +14,16 @@ public enum DownloadDeletionResolution {
     // Download deletions can conflict with file uploads and/or appMetaData uploads. A server download deletion and a client file upload deletion don't conflict (it's just two people trying to delete at about the same time, which is fine).
     
     public enum ContentUploadResolution {
+        // It is an error to select this for a conflict with a purely appMetaData upload -- because a pure appMetaData upload cannot undelete or restore the content of a file that has already been deleted.
         case keepContentUpload
+        
         case removeContentUpload
     }
     
     // Deletes the existing content upload.
     case acceptDownloadDeletion
     
+    // For a file with a non-nil fileGroupUUID, this will also reject all pending download deletions for files with the same fileGroupUUID.
     case rejectDownloadDeletion(ContentUploadResolution)
 }
 

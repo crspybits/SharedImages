@@ -38,6 +38,18 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         }
     }
     
+    // Setting this assumes the file has also been deleted on the server.
+    public var deletedLocally:Bool {
+        get {
+            return deletedLocallyInternal
+        }
+        
+        set {
+            deletedLocallyInternal = newValue
+            deletedOnServer = newValue
+        }
+    }
+    
     // Based on the current directory entry appMetaDataVersion and an update to be made to the appMetaData, establish the appMetaDataVersion to upload with a new file version.
     public func appMetaDataVersionToUpload(appMetaDataUpdate: String?) -> AppMetaDataVersionInt? {
         if appMetaDataUpdate == nil {
@@ -57,7 +69,7 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
     
     public class func newObject() -> NSManagedObject {
         let directoryEntry = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! DirectoryEntry
-        directoryEntry.deletedOnServer = false
+        directoryEntry.deletedLocally = false
         return directoryEntry
     }
     

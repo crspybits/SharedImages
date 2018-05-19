@@ -46,8 +46,8 @@ class Consistency {
                     if entry == nil {
                         messageResult += "Server file: \(file.fileUUID!) not in DirectoryEntry meta data\n"
                     }
-                    else if entry!.deletedOnServer != file.deleted {
-                        messageResult += "Server file: \(file.fileUUID!) and DirectoryEntry meta data have inconsistent deletion status: \(file.deleted!) versus \(entry!.deletedOnServer)\n"
+                    else if entry!.deletedLocally != file.deleted {
+                        messageResult += "Server file: \(file.fileUUID!) and DirectoryEntry meta data have inconsistent deletion status: \(file.deleted!) versus \(entry!.deletedLocally)\n"
                     }
                 }
             }
@@ -68,7 +68,7 @@ class Consistency {
                     if entry == nil {
                         messageResult += "Local file: \(localFile) not in DirectoryEntry meta data\n"
                     }
-                    else if entry!.deletedOnServer {
+                    else if entry!.deletedLocally {
                         messageResult += "Local file: \(localFile) marked as deleted in DirectoryEntry meta data\n"
                     }
                 }

@@ -47,25 +47,25 @@ class SettingsVC : UIViewController {
         Log.msg("Log.logFileURL: \(Log.logFileURL!)")
         
         // First, log tracking info-- to try to give as much info as possible about user's state.
-        SyncServer.session.logAllTracking()
-        
-        guard let logFileData = try? Data(contentsOf: Log.logFileURL!, options: NSData.ReadingOptions()) else {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "No log file present in app!")
-            return
-        }
-        
-        guard let email = SMEmail(parentViewController: self) else {
-            // SMEmail gives the user an alert about this.
-            return
-        }
-        
-        email.addAttachmentData(logFileData, mimeType: "text/plain", fileName: Log.logFileName)
+        SyncServer.session.logAllTracking() {
+            guard let logFileData = try? Data(contentsOf: Log.logFileURL!, options: NSData.ReadingOptions()) else {
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "No log file present in app!")
+                return
+            }
+            
+            guard let email = SMEmail(parentViewController: self) else {
+                // SMEmail gives the user an alert about this.
+                return
+            }
+            
+            email.addAttachmentData(logFileData, mimeType: "text/plain", fileName: Log.logFileName)
 
-        let versionDetails = SMEmail.getVersionDetails(for: "SharedImages")!
-        email.setMessageBody(versionDetails, isHTML: false)
-        email.setSubject("Log for developer of SharedImages")
-        email.setToRecipients(["chris@SpasticMuffin.biz"])
-        email.show()
+            let versionDetails = SMEmail.getVersionDetails(for: "SharedImages")!
+            email.setMessageBody(versionDetails, isHTML: false)
+            email.setSubject("Log for developer of SharedImages")
+            email.setToRecipients(["chris@SpasticMuffin.biz"])
+            email.show()
+        }
     }
     
     @IBAction func resetLogAction(_ sender: Any) {

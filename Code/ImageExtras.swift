@@ -69,7 +69,7 @@ class ImageExtras {
     // Also removes associated discussions.
     static func removeLocalImages(uuids:[String]) {        
         for uuid in uuids {
-            guard let image = Image.fetchObjectWithUUID(uuid: uuid) else {
+            guard let image = Image.fetchObjectWithUUID(uuid) else {
                 Log.error("Cannot find image with UUID: \(uuid)")
                 return
             }
@@ -78,6 +78,7 @@ class ImageExtras {
             
             // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
             do {
+                // This also removes the associated discussion.
                 try image.remove()
             }
             catch (let error) {
