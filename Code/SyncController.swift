@@ -263,7 +263,7 @@ extension SyncController : SyncServerDelegate {
                 Progress.session.next(count: 1)
 
             case .file(let url):
-                singleFileDownloadComplete(url:url, attr: group[0].attr)
+                singleFileDownloadComplete(url:url, attr: operation.attr)
             }
         }
     }
