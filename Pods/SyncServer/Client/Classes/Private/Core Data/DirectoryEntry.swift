@@ -63,6 +63,14 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         }
     }
     
+    var attr: SyncAttributes {
+        let mimeType = MimeType(rawValue: self.mimeType!)!
+        var attr = SyncAttributes(fileUUID: fileUUID!, mimeType: mimeType)
+        attr.appMetaData = appMetaData
+        attr.fileGroupUUID = fileGroupUUID
+        return attr
+    }
+    
     public class func entityName() -> String {
         return "DirectoryEntry"
     }

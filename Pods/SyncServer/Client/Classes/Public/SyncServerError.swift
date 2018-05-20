@@ -23,6 +23,7 @@ public enum SyncServerError: Error {
     case fileGroupUUIDChanged
     case fileQueuedForDeletion
     case deletingUnknownFile
+    case getAttributesForUnknownFile
     case syncIsOperating
     case alreadyDownloadingAFile
     case alreadyUploadingAFile

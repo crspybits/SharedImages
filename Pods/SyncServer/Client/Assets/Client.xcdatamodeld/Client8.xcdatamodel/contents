@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17D47" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17E202" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="DirectoryEntry" representedClassName="DirectoryEntry" syncable="YES">
         <attribute name="appMetaData" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="appMetaDataVersionInternal" optional="YES" attributeType="Integer 32" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="deletedLocallyInternal" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="deletedLocallyInternal" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="deletedOnServer" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="fileGroupUUID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="fileUUID" optional="YES" attributeType="String" syncable="YES"/>

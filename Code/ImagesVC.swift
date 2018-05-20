@@ -598,6 +598,11 @@ extension ImagesVC : SyncControllerDelegate {
             // To refresh the badge unread counts, if we have new messages.
             collectionView.reloadData()
             
+            // 5/19/18; Can remove this once my three test users have upgraded to 0.15.0.
+            Migrations.session.v0_15_0() {
+                self.collectionView.reloadData()
+            }
+            
         case .syncError:
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Synchronization error")
         }
