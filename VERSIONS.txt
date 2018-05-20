@@ -5,6 +5,7 @@ Version 0.15.0
 	* Deal with https://github.com/crspybits/SharedImages/issues/77
 	* Use completion handler on logAllTracking() to ensure flushing of output.
 	* Don't resolve download deletion/appMetaData upload conflicts by keeping upload-- this is now disallowed by client interface.
+	* Added migration-- to add fileGroupUUID to Image's.
 	
 Version 0.14.2 (5/3/18)
 	* Still working on Dany's issue: Resetting internal trackers and adding logging of internal trackers to log output.

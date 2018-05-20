@@ -58,6 +58,8 @@ class Download {
                     completionResult = .error(.coreDataError(error))
                 }
                 
+                CoreData.sessionNamed(Constants.coreDataName).saveContext()
+                
                 completion?(completionResult)
             }
         }

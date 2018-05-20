@@ -11,38 +11,17 @@ import SMCoreLib
 class Migrations {
     static let session = Migrations()
     
-    private static let migration1 = SMPersistItemBool(name:"Migrations.migration1", initialBoolValue:false,  persistType: .userDefaults)
-    
-    private static let migration2 = SMPersistItemBool(name:"Migrations.migration2", initialBoolValue:false,  persistType: .userDefaults)
+    private static let migration2 = SMPersistItemBool(name:"biz.SpasticMuffin.SyncServer.Migrations.migration2", initialBoolValue:false,  persistType: .userDefaults)
 
     private init() {
     }
     
     func run() {
-        // 5/15/18; Remove these migrations after they are used by my three users :).
-        
-        if !Migrations.migration1.boolValue {
-            Migrations.migration1.boolValue = true
-            appMetaDataVersionMigration()
-        }
+        // 5/15/18; Remove this migration after it is used by my three users :).
         
         if !Migrations.migration2.boolValue {
             Migrations.migration2.boolValue = true
             v0_15_2()
-        }
-    }
-    
-    // 4/16/18
-    private func appMetaDataVersionMigration() {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-            let dirEntries = DirectoryEntry.fetchAll()
-            dirEntries.forEach { dirEntry in
-                if dirEntry.appMetaData != nil {
-                    dirEntry.appMetaDataVersion = 0
-                }
-            }
-            
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
         }
     }
     

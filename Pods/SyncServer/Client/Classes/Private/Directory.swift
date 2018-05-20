@@ -33,7 +33,7 @@ class Directory {
         }
     }
     
-    // Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. The directory is not changed as a result of this call, except for the case where the file isn't in the directory already, but has been deleted on the server.
+    // Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. The directory is not changed as a result of this call, except for the case where the file isn't in the directory already, but has been deleted on the server. 5/19/18; And in a case of migration to using file groups.
     // Does not do `CoreData.sessionNamed(Constants.coreDataName).performAndWait`
     // 1/25/18; Now dealing with the case where a file is marked as deleted locally, but was undeleted on the server-- we need to download the file again.
     // 3/23/18; Now dealing with appMetaData versioning.
@@ -80,6 +80,11 @@ class Directory {
                         // Not the same appMetaData version locally as on server.
                         action = .needToDownloadAppMetaData
                     }
+                }
+                
+                // 5/19/18; This is really more of a migration, but it seem simplest to put it here. This is needed to change to using file groups.
+                if entry.fileGroupUUID == nil {
+                    entry.fileGroupUUID = serverFile.fileGroupUUID
                 }
             }
             else { // File is unknown to the client.

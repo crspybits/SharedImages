@@ -450,6 +450,32 @@ public class SyncServer {
         }
     }
     
+    // Operates synchronously and quickly. A file must have already been uploaded (or downloaded) for you to be able to get its attributes. It is an error to call this for a uuid that doesn't yet exist, or for one that has already been deleted.
+    public func getAttributes(forUUID uuid: String) throws -> SyncAttributes {
+        var error:Error?
+        var attr: SyncAttributes?
+        
+        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: uuid) else {
+                error = SyncServerError.getAttributesForUnknownFile
+                return
+            }
+            
+            guard !entry.deletedLocally else {
+                error = SyncServerError.fileAlreadyDeleted
+                return
+            }
+            
+            attr = entry.attr
+        }
+        
+        if let error = error {
+            throw error
+        }
+        
+        return attr!
+    }
+    
     public struct Stats {
         public let contentDownloadsAvailable:Int
         public let downloadDeletionsAvailable:Int
