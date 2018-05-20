@@ -64,7 +64,15 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
     }
     
     var attr: SyncAttributes {
-        let mimeType = MimeType(rawValue: self.mimeType!)!
+        // 5/19/18; I don't know why this should happen-- but I was getting a nil mimeType in a DirectoryEntry. The following code is so this doesn't cause an explosion.
+        var mimeType:MimeType!
+        if let rawMimeType = self.mimeType {
+            mimeType = MimeType(rawValue: rawMimeType)
+        }
+        if mimeType == nil {
+            mimeType = .unknown
+        }
+        
         var attr = SyncAttributes(fileUUID: fileUUID!, mimeType: mimeType)
         attr.appMetaData = appMetaData
         attr.fileGroupUUID = fileGroupUUID

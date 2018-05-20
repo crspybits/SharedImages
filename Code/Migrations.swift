@@ -13,19 +13,20 @@ import SyncServer
 class Migrations {
     static let session = Migrations()
     
-    private static let migration1 = SMPersistItemBool(name:"Migrations.migration1", initialBoolValue:false,  persistType: .userDefaults)
+    private static let migration1 = SMPersistItemInt(name:"Migrations.migration1", initialIntValue:0,  persistType: .userDefaults)
 
     private init() {
     }
     
     // We've added file group UUID's to some images-- need to update those locally.
     func v0_15_0(completion:@escaping ()->()) {
-        if Migrations.migration1.boolValue {
+        // I've got a hack in here. Not quite sure why I have to do this more than once.
+        if Migrations.migration1.intValue >= 3 {
             completion()
             return
         }
         
-        Migrations.migration1.boolValue = true
+        Migrations.migration1.intValue += 1
         
         // I'm not quite sure why, but without this async dispatch, when I callback into the SyncServer below, my code blocks-- seems due to the fact that this method is getting called from a SyncServer callback.
         DispatchQueue.main.async {

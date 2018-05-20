@@ -83,8 +83,13 @@ class Directory {
                 }
                 
                 // 5/19/18; This is really more of a migration, but it seem simplest to put it here. This is needed to change to using file groups.
-                if entry.fileGroupUUID == nil {
+                if entry.fileGroupUUID == nil && serverFile.fileGroupUUID != nil {
                     entry.fileGroupUUID = serverFile.fileGroupUUID
+                }
+                
+                // 5/19/18; Dealing with a bug that came up today.
+                if entry.mimeType == nil && serverFile.mimeType != nil {
+                    entry.mimeType = serverFile.mimeType
                 }
             }
             else { // File is unknown to the client.

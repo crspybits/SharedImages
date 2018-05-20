@@ -11,6 +11,9 @@ import Foundation
 public enum MimeType: String {
     case text = "text/plain"
     case jpeg = "image/jpeg"
+    
+    // This is really an error state. Use it with care.
+    case unknown = "unknown"
 }
 
 public struct Extension {
@@ -25,6 +28,8 @@ public struct Extension {
             return "txt"
         case .jpeg:
             return "jpg"
+        case .unknown:
+            return "unknown"
         }
     }
 }
