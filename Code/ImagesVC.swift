@@ -386,7 +386,6 @@ class ImagesVC: UIViewController {
                 // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
                 if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
                     localDiscussion.unreadCount = Int32(fixedObjects.count)
-                    UnreadCountBadge.update()
                     imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
                 }
                 else {
@@ -422,6 +421,7 @@ class ImagesVC: UIViewController {
         }
         
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        UnreadCountBadge.update()
         
         return localDiscussion
     }
