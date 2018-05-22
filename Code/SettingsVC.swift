@@ -12,7 +12,6 @@ import SMCoreLib
 import SyncServer
 
 class SettingsVC : UIViewController {
-    @IBOutlet weak var imageOrderSwitch: UISwitch!
     @IBOutlet weak var versionAndBuild: UILabel!
     
     var vb:String {
@@ -30,17 +29,6 @@ class SettingsVC : UIViewController {
         
         versionAndBuild.text = vb
         versionAndBuild.sizeToFit()
-        
-        imageOrderSwitch.isOn = ImageExtras.currentSortingOrder.stringValue == SortingOrder.newerAtTop.rawValue
-    }
-    
-    @IBAction func imageOrderSwitchAction(_ imageOrderSwitch: UISwitch) {
-        if imageOrderSwitch.isOn {
-            ImageExtras.currentSortingOrder.stringValue = SortingOrder.newerAtTop.rawValue
-        }
-        else {
-            ImageExtras.currentSortingOrder.stringValue = SortingOrder.newerAtBottom.rawValue
-        }
     }
     
     @IBAction func emailLogAction(_ sender: Any) {
@@ -81,6 +69,7 @@ class SettingsVC : UIViewController {
                 discussion.unreadCount = 0
             }
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+            UnreadCountBadge.update()
         })
     }
 }

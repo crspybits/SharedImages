@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '7853A2CA5A447F8394AAABE602ECB93E'
-               BlueprintName = 'Reachability'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'Reachability.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0E0AB387EA2BFD80FF0D0E76C4EA4F4A"
+               BlueprintName = "Reachability"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "Reachability.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

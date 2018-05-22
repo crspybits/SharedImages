@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '364334BF88882D3E52B228936962B012'
-               BlueprintName = 'rosterdev'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'rosterdev.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "331A8FA891D3C3A87C08C726904EE4EF"
+               BlueprintName = "rosterdev"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "rosterdev.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

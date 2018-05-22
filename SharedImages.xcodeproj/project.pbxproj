@@ -43,6 +43,13 @@
 		83C34081201E42C400DAD865 /* Discussion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* Discussion.swift */; };
 		83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */; };
 		83D0BE1820B0C56200555B73 /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE1720B0C56200555B73 /* Migrations.swift */; };
+		83D0BE1D20B37D6F00555B73 /* SortyFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */; };
+		83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */; };
+		83D0BE2120B3817800555B73 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2020B3817800555B73 /* Parameters.swift */; };
+		83D0BE2520B39C7000555B73 /* SortControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2220B39C6F00555B73 /* SortControl.swift */; };
+		83D0BE2620B39C7000555B73 /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2320B39C6F00555B73 /* SegmentedControl.swift */; };
+		83D0BE2720B39C7000555B73 /* SortControl.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D0BE2420B39C6F00555B73 /* SortControl.xib */; };
+		83D0BE2920B3B81C00555B73 /* UnreadCountBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2820B3B81C00555B73 /* UnreadCountBadge.swift */; };
 		83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D1FE331EAB074A00DD468F /* LargeImages.swift */; };
 		83D49C981F49468200409B0F /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D49C971F49468200409B0F /* SettingsVC.swift */; };
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
@@ -117,6 +124,13 @@
 		83C3407E201E42C400DAD865 /* Discussion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Discussion.swift; path = "Core Data/Discussion.swift"; sourceTree = "<group>"; };
 		83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discussion+CoreDataProperties.swift"; path = "Core Data/Discussion+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		83D0BE1720B0C56200555B73 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
+		83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortyFilter.swift; path = "Sorting and Filtering/SortyFilter.swift"; sourceTree = "<group>"; };
+		83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = SortyFilter.xib; path = "Sorting and Filtering/SortyFilter.xib"; sourceTree = "<group>"; };
+		83D0BE2020B3817800555B73 /* Parameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Parameters.swift; path = "Sorting and Filtering/Parameters.swift"; sourceTree = "<group>"; };
+		83D0BE2220B39C6F00555B73 /* SortControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortControl.swift; path = "Sorting and Filtering/SortControl.swift"; sourceTree = "<group>"; };
+		83D0BE2320B39C6F00555B73 /* SegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SegmentedControl.swift; path = "Sorting and Filtering/SegmentedControl.swift"; sourceTree = "<group>"; };
+		83D0BE2420B39C6F00555B73 /* SortControl.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = SortControl.xib; path = "Sorting and Filtering/SortControl.xib"; sourceTree = "<group>"; };
+		83D0BE2820B3B81C00555B73 /* UnreadCountBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnreadCountBadge.swift; sourceTree = "<group>"; };
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83D49C971F49468200409B0F /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
@@ -226,6 +240,7 @@
 		8324EE311E763DBE000656AF /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				83D0BE1920B37D0D00555B73 /* Sorting and Filtering */,
 				83FAF3A01F45549E0009111B /* Sharing Activity */,
 				83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */,
 				83F8824C1E712004008F644A /* ImagesVC.swift */,
@@ -234,6 +249,7 @@
 				8324EE321E764907000656AF /* SyncController.swift */,
 				830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */,
 				837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */,
+				83D0BE2820B3B81C00555B73 /* UnreadCountBadge.swift */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -300,6 +316,19 @@
 				831A759D20279C76004F330A /* DiscussionMessage.swift */,
 			);
 			path = "DIscussion Threads";
+			sourceTree = "<group>";
+		};
+		83D0BE1920B37D0D00555B73 /* Sorting and Filtering */ = {
+			isa = PBXGroup;
+			children = (
+				83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */,
+				83D0BE2020B3817800555B73 /* Parameters.swift */,
+				83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */,
+				83D0BE2320B39C6F00555B73 /* SegmentedControl.swift */,
+				83D0BE2220B39C6F00555B73 /* SortControl.swift */,
+				83D0BE2420B39C6F00555B73 /* SortControl.xib */,
+			);
+			name = "Sorting and Filtering";
 			sourceTree = "<group>";
 		};
 		83D49C961F49466600409B0F /* Settings */ = {
@@ -399,8 +428,6 @@
 				830B1DF21EFCC03E0022FCC7 /* Sources */,
 				830B1DF31EFCC03E0022FCC7 /* Frameworks */,
 				830B1DF41EFCC03E0022FCC7 /* Resources */,
-				702BE60C0D349EDFEAC2E002 /* [CP] Embed Pods Frameworks */,
-				0D238A3640EA6FD90C9FA940 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -454,7 +481,7 @@
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = BH68R29JBE;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 1;
@@ -501,12 +528,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				83A2E6AC1F76F84500A2E303 /* D.json in Resources */,
+				83D0BE2720B39C7000555B73 /* SortControl.xib in Resources */,
 				83F882471E711FC6008F644A /* Main.storyboard in Resources */,
 				83A2E6AB1F76F84500A2E303 /* C.json in Resources */,
 				83F882671E74A600008F644A /* Server.plist in Resources */,
 				83A2E6AE1F76F84500A2E303 /* R.json in Resources */,
 				83A2E6AD1F76F84500A2E303 /* N.json in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
+				83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
@@ -516,24 +545,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0D238A3640EA6FD90C9FA940 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		18A33E4BA3CF880E3AC4364B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -552,52 +563,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		702BE60C0D349EDFEAC2E002 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
-				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
-				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
-				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
-				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/Gloss/Gloss.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
-				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
-				"${BUILT_PRODUCTS_DIR}/SMCoreLib/SMCoreLib.framework",
-				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
-				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
-				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gloss.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SMCoreLib.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		7BAE33266BEE9E3F633FC8A4 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -609,7 +574,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -657,6 +622,7 @@
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/BadgeSwift/BadgeSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
+				"${BUILT_PRODUCTS_DIR}/DropDown/DropDown.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
@@ -669,6 +635,7 @@
 				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/ODRefreshControl/ODRefreshControl.framework",
+				"${BUILT_PRODUCTS_DIR}/Presentr/Presentr.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/SDCAlertView/SDCAlertView.framework",
 				"${BUILT_PRODUCTS_DIR}/SMCoreLib/SMCoreLib.framework",
@@ -684,6 +651,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BadgeSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DropDown.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
@@ -696,6 +664,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ODRefreshControl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Presentr.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDCAlertView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SMCoreLib.framework",
@@ -742,9 +711,13 @@
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83F8824D1E712004008F644A /* AppDelegate.swift in Sources */,
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
+				83D0BE2920B3B81C00555B73 /* UnreadCountBadge.swift in Sources */,
+				83D0BE2620B39C7000555B73 /* SegmentedControl.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
+				83D0BE2520B39C7000555B73 /* SortControl.swift in Sources */,
 				8324EE301E75EC62000656AF /* SignInVC.swift in Sources */,
 				83F882561E73B2DC008F644A /* Image.swift in Sources */,
+				83D0BE2120B3817800555B73 /* Parameters.swift in Sources */,
 				831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */,
 				831EEC4E2002D76B001821B9 /* TestCases.swift in Sources */,
 				83D49C981F49468200409B0F /* SettingsVC.swift in Sources */,
@@ -767,6 +740,7 @@
 				834A7E7C2037858800969B18 /* AppBadge.swift in Sources */,
 				831A759E20279C76004F330A /* DiscussionMessage.swift in Sources */,
 				8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */,
+				83D0BE1D20B37D6F00555B73 /* SortyFilter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -947,18 +921,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = BH68R29JBE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "87d3c9ce-6339-4b7c-b4ed-b6b3e7828d0e";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -971,18 +945,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = BH68R29JBE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "87d3c9ce-6339-4b7c-b4ed-b6b3e7828d0e";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;

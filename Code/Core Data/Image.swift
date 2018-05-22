@@ -18,6 +18,7 @@ public class Image: NSManagedObject {
     static let UUID_KEY = "uuid"
     static let DISCUSSION_UUID_KEY = "discussionUUID"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
+    static let UNREAD_COUNT = "discussion.unreadCount"
     
     var originalSize:CGSize {
         var originalImageSize = CGSize()
@@ -77,12 +78,40 @@ public class Image: NSManagedObject {
         return newObjectAndMakeUUID(makeUUID: false)
     }
     
-    class func fetchRequestForAllObjects(ascending:Bool) -> NSFetchRequest<NSFetchRequestResult>? {
+    struct SortFilterParams {
+        let sortingOrder: Parameters.SortOrder
+        let isAscending: Bool
+        let unreadCounts: Parameters.UnreadCounts
+    }
+    
+    class func fetchRequestForAllObjects(params:SortFilterParams) -> NSFetchRequest<NSFetchRequestResult>? {
         var fetchRequest: NSFetchRequest<NSFetchRequestResult>?
-        fetchRequest = CoreData.sessionNamed(CoreDataExtras.sessionName).fetchRequest(withEntityName: self.entityName(), modifyingFetchRequestWith: nil)
+        fetchRequest = CoreData.sessionNamed(CoreDataExtras.sessionName).fetchRequest(withEntityName: self.entityName(), modifyingFetchRequestWith: { request in
+            
+            var subpredicates = [NSPredicate]()
+            
+            switch params.unreadCounts {
+            case .all:
+                break
+                
+            case .unread:
+                subpredicates += [NSPredicate(format: "(%K > 0)", UNREAD_COUNT)]
+            }
+            
+            if subpredicates.count > 0 {
+                let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subpredicates)
+                request.predicate = compoundPredicate
+            }
+        })
         
         if fetchRequest != nil {
-            let sortDescriptor = NSSortDescriptor(key: CREATION_DATE_KEY, ascending: ascending)
+            var sortDescriptor:NSSortDescriptor!
+            
+            switch params.sortingOrder {
+            case .creationDate:
+                sortDescriptor = NSSortDescriptor(key: CREATION_DATE_KEY, ascending: params.isAscending)
+            }
+            
             fetchRequest!.sortDescriptors = [sortDescriptor]
         }
         

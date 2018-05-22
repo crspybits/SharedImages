@@ -45,10 +45,7 @@ class ImagesVC: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         
-        // Adding images
-        addImageBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addImageAction))
-        navigationItem.rightBarButtonItem = addImageBarButton
-        setAddButtonState()
+
         
         acquireImage = SMAcquireImage(withParentViewController: self)
         acquireImage.delegate = self
@@ -75,12 +72,17 @@ class ImagesVC: UIViewController {
         
         // A label and a means to do a consistency check.
         let titleLabel = UILabel()
-        titleLabel.text = "Shared Images"
+        titleLabel.text = "Images"
         titleLabel.sizeToFit()
         navigationItem.titleView = titleLabel
         let lp = UILongPressGestureRecognizer(target: self, action: #selector(consistencyCheckAction(gesture:)))
         titleLabel.addGestureRecognizer(lp)
         titleLabel.isUserInteractionEnabled = true
+        
+        // Right nav button
+        addImageBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addImageAction))
+        setAddButtonState()
+        setupRightBarButtonItems()
         
         // For sharing images via email, text messages, and for deleting images.
         actionButton = UIBarButtonItem(image: #imageLiteral(resourceName: "Action"), style: .plain, target: self, action: #selector(actionButtonAction))
@@ -103,6 +105,30 @@ class ImagesVC: UIViewController {
         
         // Getting an odd effect-- of LottiesBottom showing initially or if we have newer at bottom.
         bottomAnimation.animating = false
+    }
+    
+    private func setupRightBarButtonItems() {
+        var sortImage:UIImage
+        if Parameters.sortingOrderIsAscending {
+            sortImage = #imageLiteral(resourceName: "sortFilterUp")
+        }
+        else {
+            sortImage = #imageLiteral(resourceName: "sortFilterDown")
+        }
+        
+        sortImage = sortImage.withRenderingMode(.alwaysTemplate)
+        
+        let sortFilter = UIBarButtonItem(image: sortImage, style: .plain, target: self, action: #selector(sortFilterAction))
+        
+        if Parameters.filterApplied {
+            sortFilter.tintColor = .lightGray
+        }
+        
+        navigationItem.rightBarButtonItems = [addImageBarButton!, sortFilter]
+    }
+    
+    @objc private func sortFilterAction() {
+        SortyFilter.show(fromParentVC: self, delegate: self)
     }
     
     func remove(images:[Image]) {
@@ -154,16 +180,16 @@ class ImagesVC: UIViewController {
         var position:UICollectionViewScrollPosition
         var indexPath:IndexPath
         
-        if ImageExtras.currentSortingOrder.stringValue == SortingOrder.newerAtTop.rawValue {
-            indexPath = IndexPath(item: 0, section: 0)
-            position = .bottom
-        }
-        else {
+        if Parameters.sortingOrderIsAscending {
             indexPath = IndexPath(item: count-1, section: 0)
             position = .top
             
             // Getting an odd effect-- of LottiesBottom showing if we have newer at bottom.
             bottomAnimation.animating = false
+        }
+        else {
+            indexPath = IndexPath(item: 0, section: 0)
+            position = .bottom
         }
 
         UIView.animate(withDuration: 0.3, animations: {
@@ -207,9 +233,6 @@ class ImagesVC: UIViewController {
         // If we navigated to the large images and are just coming back now, don't bother with the scrolling.
         if navigatedToLargeImages {
             navigatedToLargeImages = false
-            
-            // To clear unread count(s).
-            collectionView.reloadData()
         }
         else {
             scrollIfNeeded(animated: true)
@@ -217,6 +240,9 @@ class ImagesVC: UIViewController {
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
         setAddButtonState()
+        
+        // To clear unread count(s)-- both in the case of coming back from navigating to large images, and in the case of resetting unread counts in Settings.
+        collectionView.reloadData()
     }
 
     func setAddButtonState() {
@@ -360,6 +386,7 @@ class ImagesVC: UIViewController {
                 // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
                 if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
                     localDiscussion.unreadCount = Int32(fixedObjects.count)
+                    UnreadCountBadge.update()
                     imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
                 }
                 else {
@@ -510,8 +537,8 @@ extension ImagesVC : SMAcquireImageDelegate {
 extension ImagesVC : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let ascending = ImageExtras.currentSortingOrder.stringValue == SortingOrder.newerAtBottom.rawValue
-        return Image.fetchRequestForAllObjects(ascending:ascending)
+        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts)
+        return Image.fetchRequestForAllObjects(params: params)
     }
     
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
@@ -722,5 +749,13 @@ extension ImagesVC {
         if let cell = cell as? ImageCollectionVC {
             cell.userSelected = selectedImages.contains(imageUUID)
         }
+    }
+}
+
+extension ImagesVC : SortyFilterDelegate {
+    func sortyFilter(sortFilterByParameters: SortyFilter) {
+        coreDataSource.fetchData()
+        setupRightBarButtonItems()
+        collectionView.reloadData()
     }
 }

@@ -229,6 +229,7 @@ extension SyncController : SyncServerDelegate {
                     discussion.url = mergeURL
                     discussion.unreadCount = Int32(unreadCount)
                     CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+                    UnreadCountBadge.update()
 
                     // As before, discussion are mutable-- upload a copy.
                     try SyncServer.session.uploadCopy(localFile: mergeURL, withAttributes: attr)

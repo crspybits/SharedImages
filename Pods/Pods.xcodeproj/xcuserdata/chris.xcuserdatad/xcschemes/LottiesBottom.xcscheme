@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '20D35404C4CE9582548D804203698DC1'
-               BlueprintName = 'LottiesBottom'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'LottiesBottom.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "20D35404C4CE9582548D804203698DC1"
+               BlueprintName = "LottiesBottom"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "LottiesBottom.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

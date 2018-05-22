@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SortyFilter" customModule="SharedImages" customModuleProvider="target">
+            <connections>
+                <outlet property="navItem" destination="rE4-LI-YMi" id="9IL-lo-LMr"/>
+                <outlet property="onlyUnreadButton" destination="Ykt-mV-gM7" id="eI0-eS-sAv"/>
+                <outlet property="sortingControls" destination="18n-bb-r9K" id="VbM-Xv-fM2"/>
+                <outlet property="view" destination="iN0-l3-epB" id="ZXk-mb-l0t"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="422" height="231"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="18n-bb-r9K" userLabel="Sorting controls">
+                    <rect key="frame" x="161" y="64" width="100" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="100" id="Sc5-1p-D85"/>
+                        <constraint firstAttribute="height" constant="30" id="kDN-4c-vDn"/>
+                    </constraints>
+                </view>
+                <navigationBar contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="45S-bU-Lf8">
+                    <rect key="frame" x="0.0" y="0.0" width="422" height="44"/>
+                    <items>
+                        <navigationItem title="Sort/Filter" id="rE4-LI-YMi"/>
+                    </items>
+                </navigationBar>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="top" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="K9v-p4-Iag">
+                    <rect key="frame" x="101" y="171.5" width="220" height="37"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1Oy-kU-QKf" userLabel="Only Unread Container">
+                            <rect key="frame" x="0.0" y="0.0" width="220" height="37"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Discussions" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X2d-ur-tMF">
+                                    <rect key="frame" x="5" y="8.5" width="91.5" height="20.5"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ykt-mV-gM7">
+                                    <rect key="frame" x="125" y="3" width="90" height="31"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="90" id="6YM-w4-Yfr"/>
+                                        <constraint firstAttribute="height" constant="31" id="kFu-fc-7Cf"/>
+                                    </constraints>
+                                    <state key="normal" title="Only Unread"/>
+                                    <connections>
+                                        <action selector="onlyUnreadAction:" destination="-1" eventType="touchUpInside" id="qfA-n3-Cyf"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.86490885419999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="trailing" secondItem="Ykt-mV-gM7" secondAttribute="trailing" constant="5" id="KaR-Ox-THr"/>
+                                <constraint firstItem="X2d-ur-tMF" firstAttribute="centerY" secondItem="1Oy-kU-QKf" secondAttribute="centerY" id="P3E-Z2-Ddu"/>
+                                <constraint firstItem="X2d-ur-tMF" firstAttribute="leading" secondItem="1Oy-kU-QKf" secondAttribute="leading" constant="5" id="keF-dj-dXK"/>
+                                <constraint firstAttribute="height" constant="37" id="uuM-um-u9G"/>
+                                <constraint firstItem="Ykt-mV-gM7" firstAttribute="centerY" secondItem="1Oy-kU-QKf" secondAttribute="centerY" id="vO5-ea-fkN"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="220" id="EZz-Dl-g8m"/>
+                        <constraint firstItem="1Oy-kU-QKf" firstAttribute="centerX" secondItem="K9v-p4-Iag" secondAttribute="centerX" id="r62-Dx-m3L"/>
+                    </constraints>
+                </stackView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Filter" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VLW-Xk-v5m">
+                    <rect key="frame" x="185.5" y="124" width="51.5" height="27.5"/>
+                    <fontDescription key="fontDescription" type="system" weight="medium" pointSize="23"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="45S-bU-Lf8" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="DQh-mt-8Be"/>
+                <constraint firstItem="K9v-p4-Iag" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="E9e-YG-33w"/>
+                <constraint firstItem="45S-bU-Lf8" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="G6d-kZ-8vG"/>
+                <constraint firstItem="18n-bb-r9K" firstAttribute="top" secondItem="45S-bU-Lf8" secondAttribute="bottom" constant="20" id="LRB-hp-jQc"/>
+                <constraint firstItem="18n-bb-r9K" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Wdo-Li-8q0"/>
+                <constraint firstItem="45S-bU-Lf8" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="auL-LC-v98"/>
+                <constraint firstItem="VLW-Xk-v5m" firstAttribute="top" secondItem="18n-bb-r9K" secondAttribute="bottom" constant="30" id="ohA-MT-y6S"/>
+                <constraint firstItem="K9v-p4-Iag" firstAttribute="top" secondItem="VLW-Xk-v5m" secondAttribute="bottom" constant="20" id="pfZ-p1-nEt"/>
+                <constraint firstItem="VLW-Xk-v5m" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="xls-W6-BbI"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="53" y="-92.5"/>
+        </view>
+    </objects>
+</document>

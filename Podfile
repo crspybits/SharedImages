@@ -35,12 +35,18 @@ target 'SharedImages' do
     pod 'LottiesBottom', '~> 0.4'
     # pod 'LottiesBottom', :path => '../LottiesBottom/'
     
-    # developer dashbaord
+    # developer dashboard
     # pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
     pod 'rosterdev', '~> 0.1'
     
     # for badges for updates to discussion threads
     pod 'BadgeSwift', '~> 5.0'
+    
+    # Improved presentation of smaller modals
+    pod 'Presentr', '~> 1.3'
+    
+    # For sorting/filter modal.
+    pod 'DropDown', '~> 2.3'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

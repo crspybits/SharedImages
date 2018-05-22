@@ -14,9 +14,7 @@ case newerAtTop
 case newerAtBottom
 }
 
-class ImageExtras {
-    static var currentSortingOrder = SMPersistItemString(name:"ImageExtras.currentSortingOrder", initialStringValue:SortingOrder.newerAtBottom.rawValue,  persistType: .userDefaults)
-    
+class ImageExtras {    
     static let discussionsDirectoryPath = "Discussions"
 
     static let iconDirectory = "SmallImages"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '3534D1DAA4A4D9B7325E7FC9CDF48B2C'
-               BlueprintName = 'ODRefreshControl'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'ODRefreshControl.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3534D1DAA4A4D9B7325E7FC9CDF48B2C"
+               BlueprintName = "ODRefreshControl"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "ODRefreshControl.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
