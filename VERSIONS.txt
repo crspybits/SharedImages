@@ -6,7 +6,19 @@ Version 0.16.0
 	* Added badge to images tab to give total number of unread comments.
 	* Reset unread counts: Badges not cleared on images screen
 		https://github.com/crspybits/SharedImages/issues/113
+	* Fixed: LottiesBottom-- still leaves some bits after refresh
+		https://github.com/crspybits/SharedImages/issues/91
+	* Added more positive indication that a sync has started, and completed--
+		And didn't find anything to download. (When it downloads, there is a clear
+		positive indication of that already).
 		
+	IN PROGRESS:
+
+	* Dany: Sync error
+		https://github.com/crspybits/SharedImages/issues/89
+	* Lots of "Synchronization error"s.
+		https://github.com/crspybits/SharedImages/issues/105
+
 Version 0.15.0
 	* Now using fileGroupUUID's-- new image/discussions are now linked using this method.
 	* Deal with https://github.com/crspybits/SharedImages/issues/77

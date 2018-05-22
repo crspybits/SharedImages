@@ -28,6 +28,7 @@
 		834A7E7E2037858800969B18 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E752037858800969B18 /* ProgressView.swift */; };
 		834A7E7F2037858800969B18 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 834A7E762037858800969B18 /* ProgressView.xib */; };
 		834A7E802037858800969B18 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E772037858800969B18 /* Types.swift */; };
+		834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834E3E9220B3FF90006AC504 /* BottomRefresh.swift */; };
 		835A3E471FB954AF009DB032 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A3E461FB954AF009DB032 /* Environment.swift */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
@@ -107,6 +108,7 @@
 		834A7E752037858800969B18 /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		834A7E762037858800969B18 /* ProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgressView.xib; sourceTree = "<group>"; };
 		834A7E772037858800969B18 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		834E3E9220B3FF90006AC504 /* BottomRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomRefresh.swift; sourceTree = "<group>"; };
 		835A3E461FB954AF009DB032 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 				830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */,
 				837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */,
 				83D0BE2820B3B81C00555B73 /* UnreadCountBadge.swift */,
+				834E3E9220B3FF90006AC504 /* BottomRefresh.swift */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -722,6 +725,7 @@
 				831EEC4E2002D76B001821B9 /* TestCases.swift in Sources */,
 				83D49C981F49468200409B0F /* SettingsVC.swift in Sources */,
 				83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */,
+				834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */,
 				834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */,
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
 				83D0BE1820B0C56200555B73 /* Migrations.swift in Sources */,

@@ -14,7 +14,7 @@ import SyncServer_Shared
 
 enum SyncControllerEvent {
     case syncStarted
-    case syncDone
+    case syncDone(numberOperations: Int)
     case syncError
 }
 
@@ -63,6 +63,7 @@ class SyncController {
     }
     
     weak var delegate:SyncControllerDelegate!
+    private var numberOperations = 0
     
     func sync(completion: (()->())? = nil) {
         syncDone = completion
@@ -434,10 +435,13 @@ extension SyncController : SyncServerDelegate {
 
         switch event {
         case .syncStarted:
+            numberOperations = 0
             delegate.syncEvent(syncController: self, event: .syncStarted)
             
         case .willStartDownloads(numberContentDownloads: let numberContentDownloads, numberDownloadDeletions: let numberDownloadDeletions):
-        
+            
+            numberOperations += Int(numberContentDownloads + numberDownloadDeletions)
+            
             RosterDevInjectTest.if(TestCases.session.testCrashNextDownload) {[unowned self] in
 #if DEBUG
                 self.delayedCrash()
@@ -454,6 +458,8 @@ extension SyncController : SyncServerDelegate {
 
         case .willStartUploads(numberContentUploads: let numberContentUploads, numberUploadDeletions: let numberUploadDeletions):
         
+            numberOperations += Int(numberContentUploads + numberUploadDeletions)
+
             RosterDevInjectTest.if(TestCases.session.testCrashNextUpload) {[unowned self] in
 #if DEBUG
                 self.delayedCrash()
@@ -476,7 +482,7 @@ extension SyncController : SyncServerDelegate {
             Progress.session.next()
             
         case .syncDone:
-            delegate.syncEvent(syncController: self, event: .syncDone)
+            delegate.syncEvent(syncController: self, event: .syncDone(numberOperations: numberOperations))
             syncDone?()
             syncDone = nil
             Progress.session.finish()
