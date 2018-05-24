@@ -635,8 +635,8 @@ extension ImagesVC : SyncControllerDelegate {
                 self.collectionView.reloadData()
             }
             
-        case .syncError:
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Synchronization error")
+        case .syncError(let message):
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: message)
         }
     }
     

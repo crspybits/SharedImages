@@ -11,13 +11,14 @@ Version 0.16.0
 	* Added more positive indication that a sync has started, and completed--
 		And didn't find anything to download. (When it downloads, there is a clear
 		positive indication of that already).
-		
-	IN PROGRESS:
-
 	* Dany: Sync error
 		https://github.com/crspybits/SharedImages/issues/89
+		(There was not enough info to fix, but improved logging and alerts)
 	* Lots of "Synchronization error"s.
 		https://github.com/crspybits/SharedImages/issues/105
+		I added in a minimum time interval of 60s between error reports to the UI from the SyncServer client.
+	* Added check for cellular data connection
+		https://github.com/crspybits/SharedImages/issues/106
 
 Version 0.15.0
 	* Now using fileGroupUUID's-- new image/discussions are now linked using this method.

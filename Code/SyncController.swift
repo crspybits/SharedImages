@@ -15,7 +15,7 @@ import SyncServer_Shared
 enum SyncControllerEvent {
     case syncStarted
     case syncDone(numberOperations: Int)
-    case syncError
+    case syncError(message: String)
 }
 
 struct ImageData {
@@ -54,7 +54,9 @@ protocol SyncControllerDelegate : class {
 }
 
 class SyncController {
+    let minIntervalBetweenErrorReports: TimeInterval = 60
     private var syncDone:(()->())?
+    private var lastReportedErrorTime: Date?
     
     init() {
         SyncServer.session.delegate = self
@@ -393,7 +395,7 @@ extension SyncController : SyncServerDelegate {
                 uploadConflict.resolveConflict(resolution:
                     .rejectDownloadDeletion(.keepContentUpload))
                 
-                // I'm not sure if this going to work embedded in the conflict resolution callback. I'm going to run it on the main thread to be safe.
+                // I'm not sure if this is going to work embedded in the conflict resolution callback. I'm going to run it on the main thread to be safe.
                 DispatchQueue.main.async {
                     self.delegate.redoImageUpload(syncController: self, forDiscussion: downloadDeletion)
                 }
@@ -402,22 +404,41 @@ extension SyncController : SyncServerDelegate {
     }
     
     func syncServerErrorOccurred(error:SyncServerError) {
-        Log.error("Server error occurred: \(error)")
+        let syncServerError = "Server error occurred: \(error)"
+        Log.error(syncServerError)
+        
+        // Because these errors (a) result in UI prompts, and (b) we don't want too frequent of UI prompts, make sure there are not too many close together in time.
+        let currErrorTime = Date()
+        
+        if let lastErrorTime = lastReportedErrorTime {
+            let errorInterval = currErrorTime.timeIntervalSince(lastErrorTime)
+            if errorInterval < minIntervalBetweenErrorReports {
+                return
+            }
+        }
+        
+        lastReportedErrorTime = currErrorTime
         
         switch error {
+        case .noCellularDataConnection:
+            SMCoreLib.Alert.show(withTitle: "The network connection was lost!", message: "It seems there was no wifi and cellular data is turned off for this app.")
+            return
+            
         case .noNetworkError:
             SMCoreLib.Alert.show(withTitle: "The network connection was lost!", message: "Please try again later.")
+            return
             
         case .badServerVersion(let actualServerVersion):
             let version = actualServerVersion == nil ? "nil" : actualServerVersion!.rawValue
             SMCoreLib.Alert.show(withTitle: "Bad server version", message: "actualServerVersion: \(version)")
+            return
             
         default:
             break
         }
         
         if let delegate = delegate {
-            delegate.syncEvent(syncController: self, event: .syncError)
+            delegate.syncEvent(syncController: self, event: .syncError(message: syncServerError))
         }
     }
 
