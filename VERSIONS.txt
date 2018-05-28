@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.16.0
+Version 0.16.0 (5/27/18)
 	* Added filter/sorting dropdown-- moved sorting option from Settings to this new dropdown. Added filtering by discussions with unread counts.
 		https://github.com/crspybits/SharedImages/issues/117
 	* Added badge to images tab to give total number of unread comments.
