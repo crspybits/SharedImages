@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'E28963EF7EDB48DE7DC2562835D5835D'
-               BlueprintName = 'SMCoreLib'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'SMCoreLib.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D83248EEEC584567EDB74087700EF63C"
+               BlueprintName = "SMCoreLib"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "SMCoreLib.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

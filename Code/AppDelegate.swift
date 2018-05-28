@@ -99,6 +99,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Progress.session.stop = {
             SyncServer.session.stopSync()
         }
+        
+        UnreadCountBadge.update()
 
         return true
     }
@@ -112,6 +114,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func selectTabInController(tab:Tab) {
         tabBarController.selectedIndex = tab.rawValue
+    }
+    
+    func tabInController(tab:Tab) -> UITabBarItem {
+        return tabBarController.tabBar.items![tab.rawValue]
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '306E48BD23BBA2D4040AD6857F6E6760'
-               BlueprintName = 'SyncServer'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'SyncServer.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FB9FE8096155683605DE964F815B77B6"
+               BlueprintName = "SyncServer"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "SyncServer.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

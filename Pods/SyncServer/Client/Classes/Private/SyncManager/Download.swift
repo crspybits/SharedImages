@@ -48,7 +48,7 @@ class Download {
 
             var completionResult:OnlyCheckCompletion!
             
-            CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 do {
                     let downloadSet =
                         try Directory.session.checkFileIndex(serverFileIndex: fileIndex!)
@@ -59,9 +59,9 @@ class Download {
                 }
                 
                 CoreData.sessionNamed(Constants.coreDataName).saveContext()
-                
-                completion?(completionResult)
             }
+            
+            completion?(completionResult)
         }
     }
     
@@ -82,7 +82,7 @@ class Download {
             case .checkResult(downloadSet: let downloadSet, let masterVersion):
                 var completionResult:CheckCompletion!
 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     Singleton.get().masterVersion = masterVersion!
                     
                     if downloadSet.allFiles().count > 0 {
@@ -131,7 +131,7 @@ class Download {
                         completionResult = .error(.coreDataError(error))
                         return
                     }
-                } // End performAndWait
+                } // End perform
                 
                 completion?(completionResult)
             }
@@ -164,7 +164,7 @@ class Download {
         var operation:FileTracker.Operation!
         
         // Get statistics & report event if needed.
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let dfts = DownloadFileTracker.fetchAll()
             guard dfts.count != 0 else {
                 nextResult = .noDownloadsOrDeletions
@@ -190,7 +190,7 @@ class Download {
             EventDesired.reportEvent( .willStartDownloads(numberContentDownloads: UInt(numberContentDownloads), numberDownloadDeletions: UInt(numberDownloadDeletions)), mask: desiredEvents, delegate: delegate)
         }
 
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             var currentGroup:DownloadContentGroup!
             
             do {
@@ -228,7 +228,7 @@ class Download {
             
             masterVersion = Singleton.get().masterVersion
             
-            // Need this inside the `performAndWait` to bridge the gap without an NSManagedObject
+            // Need this inside the `perform` to bridge the gap without an NSManagedObject
             downloadFile = FilenamingWithAppMetaDataVersion(fileUUID: nextToDownload.fileUUID, fileVersion: nextToDownload.fileVersion, appMetaDataVersion: nextToDownload.appMetaDataVersion)
             operation = nextToDownload.operation
         }
@@ -256,7 +256,7 @@ class Download {
     
         ServerAPI.session.downloadFile(fileNamingObject: downloadFile, serverMasterVersion: masterVersion) {[weak self] (result, error)  in
         
-            // Don't hold the performAndWait while we do completion-- easy to get a deadlock!
+            // Don't hold the `perform` while we do completion-- easy to get a deadlock!
 
             guard error == nil else {
                 self?.doError(nextToDownload: nextToDownload, error: .otherError(error!), completion: completion)
@@ -266,7 +266,7 @@ class Download {
             switch result! {
             case .success(let downloadedFile):
                 var nextCompletionResult:NextCompletion!
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // 3/23/18; Because we're not getting appMetaData in the FileIndex any more.
                     nextToDownload.appMetaData = downloadedFile.appMetaData?.contents
                     nextToDownload.appMetaDataVersion = downloadedFile.appMetaData?.version
@@ -284,7 +284,7 @@ class Download {
                     // Not removing nextToDownload yet because I haven't called the client completion callback yet-- will do the deletion after that.
                     
                     nextCompletionResult = .fileDownloaded(dft: nextToDownload)
-                }
+                } // end perform
         
                 completion?(nextCompletionResult)
                 
@@ -303,7 +303,7 @@ class Download {
             switch result {
             case .success(.appMetaData(let appMetaData)):
                 var nextCompletionResult:NextCompletion!
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     nextToDownload.appMetaData = appMetaData
                     nextToDownload.status = .downloaded
                     CoreData.sessionNamed(Constants.coreDataName).saveContext()
@@ -325,7 +325,7 @@ class Download {
     }
     
     private func doError(nextToDownload: DownloadFileTracker, error:SyncServerError, completion:((NextCompletion)->())?) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             nextToDownload.status = .notStarted
             
             // Not going to check for exceptions on saveContext; we already have an error.
@@ -340,7 +340,7 @@ class Download {
         // The following will remove any outstanding DownloadFileTrackers. If we've already downloaded a file group-- those dft's will have been removed already.
         
         var nextCompletionResult:NextCompletion!
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             DownloadFileTracker.removeAll()
             DownloadContentGroup.removeAll()
             Singleton.get().masterVersion = masterVersionUpdate

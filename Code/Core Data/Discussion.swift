@@ -78,6 +78,14 @@ public class Discussion: NSManagedObject {
         return discussions
     }
     
+    static func totalUnreadCount() -> Int {
+        let discussions = Discussion.fetchAll()
+        let result = discussions.reduce(0) { current, discussion in
+            return current + discussion.unreadCount
+        }
+        return Int(result)
+    }
+    
     func remove() throws {
         if let url = url {
             try FileManager.default.removeItem(at: url as URL)

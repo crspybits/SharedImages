@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'E822B1B8C646417A0E1C7C27280B07CB'
-               BlueprintName = 'SwiftyDropbox'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'SwiftyDropbox.framework'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C775A39C3AB4F1C1B18EE0EB4EBC38D5"
+               BlueprintName = "SwiftyDropbox"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "SwiftyDropbox.framework">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

@@ -43,7 +43,7 @@ class ServerNetworkingLoading : NSObject {
         
         createURLSession()
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             NetworkCached.deleteOldCacheEntries()
         }
     }
@@ -118,7 +118,7 @@ class ServerNetworkingLoading : NSObject {
     
     // Start off by assuming we're going to lose the handler because the app moves into the background -- cache the upload or download.
     fileprivate func makeCache(file:ServerNetworkingLoadingFile, serverURL: URL) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let cachedResults = NetworkCached.newObject() as! NetworkCached
             
             // These serve as a key back to the client's info.
@@ -133,7 +133,7 @@ class ServerNetworkingLoading : NSObject {
     }
     
     fileprivate func cacheResult(serverURLKey: URL, response:HTTPURLResponse, localURL: SMRelativeLocalURL? = nil) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             guard let cache = NetworkCached.fetchObjectWithServerURLKey(serverURLKey.absoluteString) else {
                 return
             }
@@ -152,7 +152,7 @@ class ServerNetworkingLoading : NSObject {
         
         var result:(HTTPURLResponse, SMRelativeLocalURL?)?
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             guard let fetchedCache = NetworkCached.fetchObjectWithUUID(file.fileUUID, andVersion: file.fileVersion, download: download) else {
                 return
             }
@@ -179,7 +179,7 @@ class ServerNetworkingLoading : NSObject {
     }
     
     fileprivate func removeCache(serverURLKey: URL) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             guard let cache = NetworkCached.fetchObjectWithServerURLKey(serverURLKey.absoluteString) else {
                 Log.error("Could not find NetworkCached object for serverURLKey: \(serverURLKey)")
                 return

@@ -14,6 +14,11 @@ public class LottiesBottom : UIView {
     private weak var scrollView: UIScrollView!
     private var animationView:LOTAnimationView!
     
+    // In some cases, animation remnants get left on the screen. And that doesn't look so good.
+    public var durationAfterLastScrollToClearAnimation: TimeInterval = 0.5
+    
+    private var timer:Timer!
+
     public var completionThreshold: Float = 1.0 {
         didSet {
             assert(completionThreshold > 0.0 && completionThreshold <= 1.0)
@@ -97,6 +102,8 @@ public class LottiesBottom : UIView {
     }
     
     private func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        timer?.invalidate()
+        
         // 11/29/17; I'm using a few strategies to try to avoid scroll down from the top triggering  lotties bottom.
         
         // Strategy 1: Is the scroll location in the top 1/2 or the bottom half of the scroll view?
@@ -140,6 +147,9 @@ public class LottiesBottom : UIView {
         }
         else {
             animationToFullSizeFinished = false
+            
+            // 5/22/18; Having problems with animation just staying on the screen, partially finished. Use a timer to make it disappear if user stops scrolling for a period of time.
+            timer = Timer.scheduledTimer(timeInterval: durationAfterLastScrollToClearAnimation, target: self, selector: #selector(timerComplete), userInfo: nil, repeats: false)
         }
         
         if position > currProgress && direction == .up {
@@ -162,6 +172,12 @@ public class LottiesBottom : UIView {
                 print("Playing backward to \(position)")
             }
         }
+    }
+    
+    @objc private func timerComplete() {
+        animationToFullSizeFinished = true
+        animationView.play(fromProgress: animationView.animationProgress, toProgress: 0)
+        reset()
     }
     
     public func reset() {

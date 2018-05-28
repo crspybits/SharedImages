@@ -1,5 +1,32 @@
 SharedImages
 
+Version 0.16.0
+	* Added filter/sorting dropdown-- moved sorting option from Settings to this new dropdown. Added filtering by discussions with unread counts.
+		https://github.com/crspybits/SharedImages/issues/117
+	* Added badge to images tab to give total number of unread comments.
+	* Reset unread counts: Badges not cleared on images screen
+		https://github.com/crspybits/SharedImages/issues/113
+	* Fixed: LottiesBottom-- still leaves some bits after refresh
+		https://github.com/crspybits/SharedImages/issues/91
+	* Added more positive indication that a sync has started, and completed--
+		And didn't find anything to download. (When it downloads, there is a clear
+		positive indication of that already).
+	* Dany: Sync error
+		https://github.com/crspybits/SharedImages/issues/89
+		(There was not enough info to fix, but improved logging and alerts)
+	* Lots of "Synchronization error"s.
+		https://github.com/crspybits/SharedImages/issues/105
+		I added in a minimum time interval of 60s between error reports to the UI from the SyncServer client.
+	* Added check for cellular data connection
+		https://github.com/crspybits/SharedImages/issues/106
+	* Various issues with bottom LottiesBottom refresh
+		https://github.com/crspybits/SharedImages/issues/121
+		a) LottiesBottom appears on screens other than the Images tab.
+		c) N sticks around
+	* Numerous network (?) issues
+		https://github.com/crspybits/SharedImages/issues/120
+		I had been trying an experiment to *not* check for a lack of a network connection prior to making server calls. It seems that's not a very good way to go-- I think these errors are arising most due to that. I'm going to stop this experiment and use a different means to detect the lack of a network connection prior to making server calls.
+
 Version 0.15.0
 	* Now using fileGroupUUID's-- new image/discussions are now linked using this method.
 	* Deal with https://github.com/crspybits/SharedImages/issues/77

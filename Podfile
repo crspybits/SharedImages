@@ -7,9 +7,9 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 15.1'
-	pod 'SyncServer/Facebook', '~> 15.1'
-	pod 'SyncServer/Dropbox', '~> 15.1'
+	pod 'SyncServer', '~> 15.3'
+	pod 'SyncServer/Facebook', '~> 15.3'
+	pod 'SyncServer/Dropbox', '~> 15.3'
 	
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
@@ -32,15 +32,21 @@ target 'SharedImages' do
     pod 'SDCAlertView', '~> 7.1'
     
     # pull-up from the bottom to refresh
-    pod 'LottiesBottom', '~> 0.4'
-    # pod 'LottiesBottom', :path => '../LottiesBottom/'
+    pod 'LottiesBottom', '~> 0.5'
+#     pod 'LottiesBottom', :path => '../LottiesBottom/'
     
-    # developer dashbaord
+    # developer dashboard
     # pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
     pod 'rosterdev', '~> 0.1'
     
     # for badges for updates to discussion threads
     pod 'BadgeSwift', '~> 5.0'
+    
+    # Improved presentation of smaller modals
+    pod 'Presentr', '~> 1.3'
+    
+    # For sorting/filter modal.
+    pod 'DropDown', '~> 2.3'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

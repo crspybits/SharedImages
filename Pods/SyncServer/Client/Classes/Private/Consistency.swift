@@ -40,7 +40,7 @@ class Consistency {
                     }
                 }
                 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // We should have *every* entry in the local DirectoryEntry meta data also. These issues should never happen: Our sync should prevent these.
                     let entry = DirectoryEntry.fetchObjectWithUUID(uuid: file.fileUUID)
                     if entry == nil {
@@ -62,7 +62,7 @@ class Consistency {
                     messageResult += "Local file: \(localFile) deleted on server\n"
                 }
                 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // And those local files should *all* be in the local meta data.
                     let entry = DirectoryEntry.fetchObjectWithUUID(uuid: localFile)
                     if entry == nil {
@@ -76,7 +76,7 @@ class Consistency {
 
             var entries:[DirectoryEntry]!
 
-            CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 // All the local data should be on the server.
                 entries = DirectoryEntry.fetchAll()
                 if entries.count != fileInfo!.count {
@@ -115,7 +115,7 @@ class Consistency {
         
         var resultError: Error?
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             // The simplest means to deal with this seems to be to remove the associated DirectoryEntry, and then sync again.
             for fileUUID in fileUUIDs {
                 let entry = DirectoryEntry.fetchObjectWithUUID(uuid: fileUUID)

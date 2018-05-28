@@ -7,9 +7,10 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Crashlytics (3.10.1):
-    - Fabric (~> 1.7.5)
-  - Fabric (1.7.6)
+  - Crashlytics (3.10.2):
+    - Fabric (~> 1.7.7)
+  - DropDown (2.3.2)
+  - Fabric (1.7.7)
   - FacebookCore (0.3.0):
     - Bolts (~> 1.8)
     - FBSDKCoreKit (~> 4.27)
@@ -24,18 +25,18 @@ PODS:
     - FBSDKCoreKit
   - Gloss (1.2.4)
   - GoogleSignIn (4.1.2):
-    - GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)
-    - GoogleToolboxForMac/NSString+URLArguments (~> 2.1)
+    - "GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)"
+    - "GoogleToolboxForMac/NSString+URLArguments (~> 2.1)"
     - GTMOAuth2 (~> 1.0)
     - GTMSessionFetcher/Core (~> 1.1)
   - GoogleToolboxForMac/DebugUtils (2.1.4):
     - GoogleToolboxForMac/Defines (= 2.1.4)
   - GoogleToolboxForMac/Defines (2.1.4)
-  - GoogleToolboxForMac/NSDictionary+URLArguments (2.1.4):
+  - "GoogleToolboxForMac/NSDictionary+URLArguments (2.1.4)":
     - GoogleToolboxForMac/DebugUtils (= 2.1.4)
     - GoogleToolboxForMac/Defines (= 2.1.4)
-    - GoogleToolboxForMac/NSString+URLArguments (= 2.1.4)
-  - GoogleToolboxForMac/NSString+URLArguments (2.1.4)
+    - "GoogleToolboxForMac/NSString+URLArguments (= 2.1.4)"
+  - "GoogleToolboxForMac/NSString+URLArguments (2.1.4)"
   - GTMOAuth2 (1.1.6):
     - GTMSessionFetcher (~> 1.1)
   - GTMSessionFetcher (1.1.15):
@@ -45,57 +46,102 @@ PODS:
     - GTMSessionFetcher/Core (= 1.1.15)
   - HPTextViewTapGestureRecognizer (0.1)
   - lottie-ios (2.5.0)
-  - LottiesBottom (0.4.0):
+  - LottiesBottom (0.5.0):
     - lottie-ios (~> 2.1)
   - MessageKit (0.13.5)
   - ODRefreshControl (1.2)
+  - Presentr (1.3.2)
   - Reachability (3.2)
+  - RealReachability (1.2.2):
+    - RealReachability/Connection (= 1.2.2)
+    - RealReachability/Ping (= 1.2.2)
+  - RealReachability/Connection (1.2.2)
+  - RealReachability/Ping (1.2.2)
   - rosterdev (0.1.0)
   - SDCAlertView (7.1.2)
   - SMCoreLib (1.3.2):
     - HPTextViewTapGestureRecognizer (~> 0.1)
     - Reachability
     - SwiftyBeaver
-  - SwiftyBeaver (1.5.2)
-  - SwiftyDropbox (4.5.0):
+  - SwiftyBeaver (1.6.0)
+  - SwiftyDropbox (4.6.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (15.1.1):
+  - SyncServer (15.3.0):
     - Gloss (~> 1.2)
+    - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.3)
-    - SyncServer/Lite (= 15.1.1)
+    - SyncServer/Lite (= 15.3.0)
   - SyncServer-Shared (6.3.1):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (15.1.1):
+  - SyncServer/Dropbox (15.3.0):
     - Gloss (~> 1.2)
+    - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
     - SyncServer-Shared (~> 6.3)
-  - SyncServer/Facebook (15.1.1):
-    - FacebookCore (~> 0.2)
-    - FacebookLogin (~> 0.2)
+  - SyncServer/Facebook (15.3.0):
+    - FacebookCore
+    - FacebookLogin
     - Gloss (~> 1.2)
+    - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.3)
-  - SyncServer/Lite (15.1.1):
+  - SyncServer/Lite (15.3.0):
     - Gloss (~> 1.2)
+    - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.3)
 
 DEPENDENCIES:
   - BadgeSwift (~> 5.0)
   - Crashlytics
+  - DropDown (~> 2.3)
   - Fabric
   - GoogleSignIn (~> 4.1)
-  - LottiesBottom (~> 0.4)
+  - LottiesBottom (~> 0.5)
   - MessageKit (~> 0.13)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
+  - Presentr (~> 1.3)
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.3.1)
-  - SyncServer (~> 15.1)
-  - SyncServer/Dropbox (~> 15.1)
-  - SyncServer/Facebook (~> 15.1)
+  - SyncServer (~> 15.3)
+  - SyncServer/Dropbox (~> 15.3)
+  - SyncServer/Facebook (~> 15.3)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - BadgeSwift
+    - Bolts
+    - Crashlytics
+    - DropDown
+    - Fabric
+    - FacebookCore
+    - FacebookLogin
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - Gloss
+    - GoogleSignIn
+    - GoogleToolboxForMac
+    - GTMOAuth2
+    - GTMSessionFetcher
+    - HPTextViewTapGestureRecognizer
+    - lottie-ios
+    - LottiesBottom
+    - MessageKit
+    - Presentr
+    - Reachability
+    - RealReachability
+    - rosterdev
+    - SDCAlertView
+    - SwiftyBeaver
+    - SwiftyDropbox
+  https://github.com/crspybits/Specs.git:
+    - SMCoreLib
+    - SyncServer
+    - SyncServer-Shared
 
 EXTERNAL SOURCES:
   ODRefreshControl:
@@ -110,8 +156,9 @@ SPEC CHECKSUMS:
   Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
   BadgeSwift: 3defa56f504bfb46f2300122c4a565ec9e405c1e
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Crashlytics: aee1a064cbbf99b32efa3f056a5f458d846bc8ff
-  Fabric: f8d42c893bb187326a7968b62abe55c36a987a46
+  Crashlytics: 0360624eea1c978a743feddb2fb1ef8b37fb7a0d
+  DropDown: 7f87abecc28f9b4edad810fe1211c5c018c257e5
+  Fabric: bda89e242bce1b7b8ab264248cf3407774ce0095
   FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
   FacebookLogin: 0af839ea858faef99550d16596b87b4a8e8906e6
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
@@ -123,18 +170,20 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
-  LottiesBottom: 576ecb1cd2dfd6fc0eba2d56595d77c045e10533
+  LottiesBottom: a3428d59b99264d08a79870e74118de7fb0c24c8
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
+  Presentr: 797ae6ec8904eaba4ec58a4c2065bd66e31569ea
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  RealReachability: 7ea2093650004e5e30635edbf9d29ce9b9091001
   rosterdev: 2a7b69c5d01133bd714161e1e80deea1da9cb90f
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
   SMCoreLib: 1fc2a916a45470cf41deb193bc509432b1987efc
-  SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af
-  SwiftyDropbox: ccdbd21dc81d59363b75241bf7c88fb906e8ffcb
-  SyncServer: 3c603e7ccfd33a47cef6c2728003c2e4a7d26950
+  SwiftyBeaver: e45759613e50b522b0e6f53b1f0f14389b45ca34
+  SwiftyDropbox: 8af645e744de6f17b4e9fdeba21365b8dc55a542
+  SyncServer: 058cf77bfc75297e327f4df8dea213e2d08e851c
   SyncServer-Shared: 930787de975c7e4372380711ff2166f78d893f90
 
-PODFILE CHECKSUM: 08bb046177298225a877c4d673c60721a861d3d1
+PODFILE CHECKSUM: 4c9ac203a11921e47a1e5efcb11f56e6c61c2529
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.5.2

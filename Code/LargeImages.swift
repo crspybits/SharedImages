@@ -154,8 +154,8 @@ class LargeImages : UIViewController {
 extension LargeImages : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let ascending = ImageExtras.currentSortingOrder.stringValue == SortingOrder.newerAtBottom.rawValue
-        return Image.fetchRequestForAllObjects(ascending:ascending)
+        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts)
+        return Image.fetchRequestForAllObjects(params: params)
     }
     
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
@@ -309,6 +309,7 @@ extension LargeImages : DiscussionVCDelegate {
             // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
             discussion.unreadCount = 0
             discussion.save()
+            UnreadCountBadge.update()
             
             refreshWithCompletion?()
         }
