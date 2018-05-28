@@ -71,14 +71,14 @@ class SyncManager {
             switch nextCompletionResult {
             case .fileDownloaded(let dft):
                 var dcg: DownloadContentGroup!
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     dcg = dft.group!
                 }
                 self?.downloadCompleted(dcg: dcg, callback:callback)
                 
             case .appMetaDataDownloaded(dft: let dft):
                 var dcg: DownloadContentGroup!
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     dcg = dft.group!
                 }
                 self?.downloadCompleted(dcg: dcg, callback:callback)
@@ -113,7 +113,7 @@ class SyncManager {
     
     private func downloadCompleted(dcg: DownloadContentGroup, callback:((SyncServerError?)->())? = nil) {
         var allCompleted:Bool!
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             allCompleted = dcg.allDftsCompleted()
             if allCompleted {
                 dcg.status = .downloaded
@@ -140,7 +140,7 @@ class SyncManager {
         Log.msg("Completed DownloadContentGroup: Checking for conflicts")
         
         // Deal with any content download conflicts and any download deletion conflicts.
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             contentDownloads = dcg.dfts.filter {$0.operation.isContents}
             downloadDeletions = dcg.dfts.filter {$0.operation.isDeletion}
         }
@@ -151,7 +151,7 @@ class SyncManager {
 
                 var groupContent:[DownloadOperation]!
                 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     groupContent = dcg.dfts.map { dft in
                         var contentType:DownloadOperation.OperationType!
                         switch dft.operation! {
@@ -173,7 +173,7 @@ class SyncManager {
                     })
                 }
                 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {                    
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {                    
                     // Remove the DownloadContentGroup and related dft's -- We're finished their downloading.
                     dcg.dfts.forEach { dft in
                         dft.remove()
@@ -266,7 +266,7 @@ class SyncManager {
         var operation: FileTracker.Operation!
         var fileUUID:String!
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             operation = uft.operation
             fileUUID = uft.fileUUID
         }
@@ -303,7 +303,7 @@ class SyncManager {
                 var uploadDeletions:[UploadFileTracker]!
                 var errorResult:SyncServerError?
 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // 4/18/18; Got a crash here during testing because `Upload.getHeadSyncQueue()` returned nil. How is that possible? An earlier test failed-- wonder if it could have "leaked" into a later test?
                     uploadQueue = Upload.getHeadSyncQueue()
                     if uploadQueue == nil {
@@ -323,7 +323,7 @@ class SyncManager {
                     EventDesired.reportEvent(.contentUploadsCompleted(numberOfFiles: contentUploads.count), mask: self.desiredEvents, delegate: self.delegate)
                 }
     
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() { [unowned self] in
+                CoreDataSync.perform(sessionName: Constants.coreDataName) { [unowned self] in
                     if contentUploads.count > 0 {
                         // Each of the DirectoryEntry's for the uploads needs to now be given its version, as uploaded. And appMetaData needs to be updated in directory if it has been updated on this upload.
                         contentUploads.forEach { uft in
@@ -360,13 +360,13 @@ class SyncManager {
                     }
                     
                     uploadDeletions = uploadQueue.uploadFileTrackers.filter {$0.operation.isDeletion}
-                }
+                } // end perform
 
                 if uploadDeletions.count > 0 {
                     EventDesired.reportEvent(.uploadDeletionsCompleted(numberOfFiles: uploadDeletions.count), mask: self.desiredEvents, delegate: self.delegate)
                 }
                 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     if uploadDeletions.count > 0 {
                         // Each of the DirectoryEntry's for the uploads needs to now be marked as deleted.
                         uploadDeletions.forEach { uft in
@@ -392,7 +392,7 @@ class SyncManager {
                         errorResult = .coreDataError(error)
                         return
                     }
-                }
+                } // end perform
                 
                 SyncManager.cleanupUploads()
                 
@@ -404,7 +404,7 @@ class SyncManager {
     // 4/22/18; I ran into the need for this during a crash Dany was having. For some reason there were 10 uft's on his app that were marked as uploaded. But for some reason had never been deleted. I'm calling this from places where there should not be uft's in this state-- so they should be removed. This is along the lines of garbage collection. Not sure why it's needed...
     // Not marking this as `private` so I can add a test case.
     static func cleanupUploads() {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let uploadedUfts = UploadFileTracker.fetchAll().filter { $0.status == .uploaded }
             uploadedUfts.forEach { uft in
                 do {

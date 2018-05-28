@@ -19,6 +19,13 @@ Version 0.16.0
 		I added in a minimum time interval of 60s between error reports to the UI from the SyncServer client.
 	* Added check for cellular data connection
 		https://github.com/crspybits/SharedImages/issues/106
+	* Various issues with bottom LottiesBottom refresh
+		https://github.com/crspybits/SharedImages/issues/121
+		a) LottiesBottom appears on screens other than the Images tab.
+		c) N sticks around
+	* Numerous network (?) issues
+		https://github.com/crspybits/SharedImages/issues/120
+		I had been trying an experiment to *not* check for a lack of a network connection prior to making server calls. It seems that's not a very good way to go-- I think these errors are arising most due to that. I'm going to stop this experiment and use a different means to detect the lack of a network connection prior to making server calls.
 
 Version 0.15.0
 	* Now using fileGroupUUID's-- new image/discussions are now linked using this method.

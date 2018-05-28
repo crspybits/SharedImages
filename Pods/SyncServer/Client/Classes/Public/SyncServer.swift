@@ -9,6 +9,7 @@
 import Foundation
 import SMCoreLib
 import SyncServer_Shared
+import RealReachability
 
 public class SyncServer {
     public static let session = SyncServer()
@@ -52,6 +53,8 @@ public class SyncServer {
         Log.msg("cloudFolderName: \(String(describing: cloudFolderName))")
         Log.msg("serverURL: \(serverURL.absoluteString)")
         
+        RealReachability.sharedInstance().startNotifier()
+        
         // This seems a little hacky, but can't find a better way to get the bundle of the framework containing our model. I.e., "this" framework. Just using a Core Data object contained in this framework to track it down.
         // Without providing this bundle reference, I wasn't able to dynamically locate the model contained in the framework.
         let bundle = Bundle(for: NSClassFromString(Singleton.entityName())!)
@@ -83,7 +86,7 @@ public class SyncServer {
         SyncServerUser.session.appLaunchSetup(cloudFolderName: cloudFolderName)
         
         // Debugging
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let pendingUploads = UploadFileTracker.fetchAll()
             Log.msg("Upload file tracker count: \(pendingUploads.count)")
             pendingUploads.forEach { uft in
@@ -122,7 +125,7 @@ public class SyncServer {
             throw SyncServerError.noMimeType
         }
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {[weak self] in
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {[weak self] in
             var entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID)
             
             var fileGroupUUID:String?
@@ -195,7 +198,7 @@ public class SyncServer {
             // Similarly, the appMetaData version will be determined immediately before the upload.
             
             errorToThrow = self?.tryToAddUploadFileTracker(attr: attr, newUft: newUft)
-        }
+        } // end perform
         
         guard errorToThrow == nil else {
             throw errorToThrow!
@@ -216,7 +219,7 @@ public class SyncServer {
         
         var errorToThrow:Error?
 
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {[weak self] in
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {[weak self] in
             // In part, this ensures you can't do an appMetaData upload as v0 of a file.
             guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID) else {
                 errorToThrow = SyncServerError.couldNotFindFileUUID(attr.fileUUID)
@@ -257,7 +260,7 @@ public class SyncServer {
             // The appMetaData version will be determined immediately before the upload. The file version is not used in this case.
             
             errorToThrow = self?.tryToAddUploadFileTracker(attr: attr, newUft: newUft)
-        }
+        } // end perform
         
         guard errorToThrow == nil else {
             throw errorToThrow!
@@ -305,7 +308,7 @@ public class SyncServer {
     public func delete(filesWithUUIDs uuids:[UUIDString]) throws {
         var errorToThrow:Error?
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             // 8/25/17; I added an undo manager to deal with queueing up the deletion of a series of files, and undoing if one of them fails.
             CoreData.sessionNamed(Constants.coreDataName).context.undoManager = UndoManager()
 
@@ -418,13 +421,15 @@ public class SyncServer {
                 return
             }
             
-            CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            // 5/24/18; The positioning of this block of code has given me some consternation. It *must* come before block [2] below-- because the `sync` operation must do a sync, and `movePendingSyncToSynced` is core to what the sync operation is-- any delay aspect just doesn't trigger it with the `start` operation. HOWEVER, I found that https://github.com/crspybits/SharedImages/issues/101 was due to a deadlock of performAndWait calls. So, I've ended up with a rather different means of dealing with Core Data synchronization in the form of `CoreDataSync` used below.
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 // TODO: *0* Need an error reporting mechanism. These should not be `try!`
                 if try! Upload.pendingSync().uploadFileTrackers.count > 0  {
                     try! Upload.movePendingSyncToSynced()
                 }
             }
             
+            // [2]
             if syncOperating {
                 delayedSync = true
                 doStart = false
@@ -455,7 +460,7 @@ public class SyncServer {
         var error:Error?
         var attr: SyncAttributes?
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: uuid) else {
                 error = SyncServerError.getAttributesForUnknownFile
                 return
@@ -529,7 +534,7 @@ public class SyncServer {
     internal static func resetMetaData(type: ResetType = .all) throws /* SyncServerError */ {
         var result:SyncServerError?
 
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             switch type {
             case .all:
                 DirectoryEntry.removeAll()
@@ -562,7 +567,7 @@ public class SyncServer {
     // Logs information about all tracking internal meta data. When the completion handler is called, the file data logged should be present in persistent storage. The completion runs asynchronously on the main thread.
     public func logAllTracking(completion: (()->())? = nil) {
         Log.msg("*************** Starts: logAllTracking ***************")
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             DownloadContentGroup.printAll()
             DownloadFileTracker.printAll()
             UploadFileTracker.printAll()
@@ -603,7 +608,7 @@ public class SyncServer {
                 let client = Set(clientFiles)
                 var directory = Set<UUIDString>()
                 
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     do {
                         let directoryEntries = try CoreData.sessionNamed(Constants.coreDataName).fetchAllObjects(withEntityName: DirectoryEntry.entityName()) as? [DirectoryEntry]
                         if directoryEntries != nil {
@@ -629,7 +634,7 @@ public class SyncServer {
                 var clientMissingNotDeleted = Set<UUIDString>()
                 
                 // Check to see if these are deleted from the directory
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     for missing in clientMissing {
                         if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: missing), !entry.deletedLocally {
                             clientMissingNotDeleted.insert(missing)
@@ -682,8 +687,8 @@ public class SyncServer {
             var doStart = false
             
             Synchronized.block(self) { [unowned self] in
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
-                    if !self.stoppingSync && (Upload.haveSyncQueue()  || self.delayedSync) {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                    if !self.stoppingSync && (Upload.haveSyncQueue() || self.delayedSync) {
                         self.delayedSync = false
                         doStart = true
                     }
@@ -702,7 +707,7 @@ public class SyncServer {
     }
 
     private func resetFileTrackers() {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let dfts = DownloadFileTracker.fetchAll()
             dfts.forEach { dft in
                 if dft.status == .downloading {

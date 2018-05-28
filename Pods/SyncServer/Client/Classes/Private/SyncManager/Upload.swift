@@ -48,7 +48,7 @@ class Upload {
         var numberContentUploads:Int!
         var numberUploadDeletions:Int!
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             uploadQueue = Upload.getHeadSyncQueue()
             guard uploadQueue != nil else {
                 nextResult = .noUploads
@@ -89,7 +89,7 @@ class Upload {
             } catch (let error) {
                 nextResult = .error(.coreDataError(error))
             }
-        }
+        } // end perform
         
         guard nextResult == nil else {
             return nextResult!
@@ -118,7 +118,7 @@ class Upload {
         var fileToDelete:ServerAPI.FileToDelete!
         
         var nextResult:NextResult?
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let entry = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID)
             if entry == nil {
                 nextResult = .error(.couldNotFindFileUUID(nextToUpload.fileUUID))
@@ -147,7 +147,7 @@ class Upload {
             switch uploadDeletionResult! {
             case .success:
                 var completionResult:NextCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     nextToUpload.status = .uploaded
                     
                     do {
@@ -177,7 +177,7 @@ class Upload {
         var fileUUID: String!
         var appMetaData:AppMetaData!
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             // 1/11/18; Determing the version to upload immediately before the upload. See https://github.com/crspybits/SyncServerII/issues/12
             
             directoryEntry = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID)
@@ -197,7 +197,7 @@ class Upload {
             
             appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
             fileUUID = nextToUpload.fileUUID
-        }
+        } // end perform
         
         guard nextResult == nil else {
             return nextResult!
@@ -207,7 +207,7 @@ class Upload {
             switch result {
             case .success(.success):
                 var completionResult:NextCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     nextToUpload.status = .uploaded
                     
                     do {
@@ -240,7 +240,7 @@ class Upload {
         var directoryEntry:DirectoryEntry?
         var undelete = false
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             // 1/11/18; Determining the version to upload immediately before the upload. See https://github.com/crspybits/SyncServerII/issues/12
             
             directoryEntry = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID)
@@ -276,7 +276,7 @@ class Upload {
             file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, fileGroupUUID: nextToUpload.fileGroupUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
             
             undelete = nextToUpload.uploadUndeletion
-        }
+        } // end perform
         
         guard nextResult == nil else {
             return nextResult!
@@ -292,7 +292,7 @@ class Upload {
             switch uploadResult! {
             case .success(sizeInBytes: _, creationDate: let creationDate, updateDate: let updateDate):
                 var completionResult:NextCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     nextToUpload.status = .uploaded
                     
                     do {
@@ -321,7 +321,7 @@ class Upload {
                     
                     attr.appMetaData = appMetaData
                     completionResult = .fileUploaded(attr, uft: nextToUpload)
-                }
+                } // end perform
                 
                 self?.completion?(completionResult!)
 
@@ -335,7 +335,7 @@ class Upload {
     
     private func masterVersionUpdate(uploadQueue:UploadQueue, masterVersionUpdate: MasterVersionInt) {
         var completionResult:NextCompletion?
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             // Simplest method for now: Mark all uft's as .notStarted
             // TODO: *4* This could be better-- performance-wise, it doesn't make sense to do all the uploads over again.
             _ = uploadQueue.uploadFileTrackers.map { uft in
@@ -358,7 +358,7 @@ class Upload {
     }
     
     private func uploadError(_ error: SyncServerError, nextToUpload:UploadFileTracker) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             nextToUpload.status = .notStarted
             
             // Already have an error, not going to worry about reporting one for saveContext.
@@ -383,7 +383,7 @@ class Upload {
     
     func doneUploads(completion:((DoneUploadsCompletion)->())?) {
         var masterVersion:MasterVersionInt!
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             masterVersion = Singleton.get().masterVersion
         }
         
@@ -396,7 +396,7 @@ class Upload {
             switch result! {
             case .success(numberUploadsTransferred: let numberTransferred):
                 var completionResult:DoneUploadsCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // Master version was incremented on the server as part of normal doneUploads operation. Update ours locally.
                     Singleton.get().masterVersion = masterVersion + MasterVersionInt(1)
                     
@@ -414,7 +414,7 @@ class Upload {
                 
             case .serverMasterVersionUpdate(let masterVersionUpdate):
                 var completionResult:DoneUploadsCompletion?
-                CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     guard let uploadQueue = Upload.getHeadSyncQueue() else {
                         completionResult = .error(.generic("Failed on getHeadSyncQueue"))
                         return
@@ -436,7 +436,7 @@ class Upload {
                     }
                                         
                     completionResult = .masterVersionUpdate
-                }
+                } // end perform
                 
                 completion?(completionResult!)
             }

@@ -34,7 +34,7 @@ class Directory {
     }
     
     // Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. The directory is not changed as a result of this call, except for the case where the file isn't in the directory already, but has been deleted on the server. 5/19/18; And in a case of migration to using file groups.
-    // Does not do `CoreData.sessionNamed(Constants.coreDataName).performAndWait`
+    // Does not do `CoreDataSync.perform(sessionName: Constants.coreDataName)`
     // 1/25/18; Now dealing with the case where a file is marked as deleted locally, but was undeleted on the server-- we need to download the file again.
     // 3/23/18; Now dealing with appMetaData versioning.
     func checkFileIndex(serverFileIndex:[FileInfo]) throws -> DownloadSet {
@@ -132,7 +132,7 @@ class Directory {
         return downloadSet
     }
     
-    // Does not do `CoreData.sessionNamed(Constants.coreDataName).performAndWait`
+    // Does not do `CoreDataSync.perform(sessionName: Constants.coreDataName)`
     // This for file and appMetaData downloads (not download deletions).
     func updateAfterDownloading(downloads:[DownloadFileTracker]) {
         downloads.forEach { dft in
@@ -184,7 +184,7 @@ class Directory {
         }
     }
     
-    // Does not do `CoreData.sessionNamed(Constants.coreDataName).performAndWait`
+    // Does not do `CoreDataSync.perform(sessionName: Constants.coreDataName)`
     func updateAfterDownloadDeletingFiles(deletions:[SyncAttributes], pendingUploadUndeletions: [SyncAttributes]) {
         deletions.forEach { attr in
             // Have already dealt with case where we didn't know about this file locally and were download deleting it.

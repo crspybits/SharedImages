@@ -48,4 +48,8 @@ class BottomRefresh {
     func reset() {
         bottomAnimation.reset()
     }
+    
+    func hide() {
+        self.bottomAnimation.hide()
+    }
 }

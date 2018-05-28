@@ -21,7 +21,7 @@ class ConflictManager {
             var possiblyConflictingContent: ServerContentType = .appMetaData
             var attr: SyncAttributes!
             
-            CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 if let url = dft.localURL {
                     if dft.appMetaData == nil {
                         possiblyConflictingContent = .file(url)
@@ -38,13 +38,13 @@ class ConflictManager {
                 ConflictManager.handleAnyContentDownloadConflict(attr: attr, content: possiblyConflictingContent, delegate: delegate) { ignoreDownload in
                     
                     // Update the directory whether or not we're ignoring this download -- we need the updated version of the file and/or appMetaData.
-                    CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                    CoreDataSync.perform(sessionName: Constants.coreDataName) {
                         Directory.session.updateAfterDownloading(downloads: [dft])
                     }
                     
                     if let _ = ignoreDownload {
                         // Ignoring the download-- remove the dft.
-                        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+                        CoreDataSync.perform(sessionName: Constants.coreDataName) {
                             dft.remove()
                             CoreData.sessionNamed(Constants.coreDataName).saveContext()
                         }
@@ -63,60 +63,64 @@ class ConflictManager {
     
         var resolver: SyncServerConflict<ContentDownloadResolution>?
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        var conflictingUploadDeletions: [UploadFileTracker]!
+        var conflictingContentUploads: [UploadFileTracker]!
+        
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let pendingUploads = UploadFileTracker.fetchAll()
             
             // For this content download we could have (a) an upload deletion conflict, (b) content upload conflict(s), or (c) both an upload deletion conflict and content upload conflict(s).
             
             // Do we have a pending upload deletion that conflicts with the file download? In this case there could be at most a single upload deletion. It's an error for the client to try to queue up more than one deletion (with sync's between them).
-            let conflictingUploadDeletions = pendingUploads.filter {
+            conflictingUploadDeletions = pendingUploads.filter {
                 // 4/22/18; The optional chaining here is to deal with a problem with data migrations. It should only be temporarily necessary.
                 return ($0.operation?.isDeletion ?? false) && $0.fileUUID == attr.fileUUID
             }
 
             // Do we have pending content upload(s) that conflict with the content download? In this case there could be more than one upload with the same uuid. For example, if the client does a file upload of uuid X, syncs, then another upload of X, and then sync.
-            let conflictingContentUploads = pendingUploads.filter {
+            conflictingContentUploads = pendingUploads.filter {
                 // 4/22/18; As above.
                 ($0.operation?.isContents ?? false) && $0.fileUUID == attr.fileUUID
             }
-
-            var conflictType:ConflictingClientOperation?
-            
-            if conflictingUploadDeletions.count > 0 && conflictingContentUploads.count > 0 {
-                // This can arise when a file was queued for upload, synced, and then queued for deletion and synced
-                conflictType = .both
-            }
-            else if conflictingContentUploads.count > 0 {
+        }
+        
+        var conflictType:ConflictingClientOperation?
+        
+        if conflictingUploadDeletions.count > 0 && conflictingContentUploads.count > 0 {
+            // This can arise when a file was queued for upload, synced, and then queued for deletion and synced
+            conflictType = .both
+        }
+        else if conflictingContentUploads.count > 0 {
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 let conflictingContent =                 conflictContentTypeFor(conflictingContentUploads: conflictingContentUploads)
                 conflictType = .contentUpload(conflictingContent)
             }
-            else if conflictingUploadDeletions.count > 0 {
-                conflictType = .uploadDeletion
-            }
+        }
+        else if conflictingUploadDeletions.count > 0 {
+            conflictType = .uploadDeletion
+        }
+        
+        if let conflictType = conflictType {
+            resolver = SyncServerConflict<ContentDownloadResolution>(
+                conflictType: conflictType, resolutionCallback: { resolution in
             
-            if let conflictType = conflictType {
-                resolver = SyncServerConflict<ContentDownloadResolution>(
-                    conflictType: conflictType, resolutionCallback: { resolution in
-                
-                    switch resolution {
-                    case .acceptContentDownload:
+                switch resolution {
+                case .acceptContentDownload:
+                    removeManagedObjects(conflictingContentUploads, delegate: delegate)
+                    removeManagedObjects(conflictingUploadDeletions, delegate: delegate)
+                    completion(nil)
+                    
+                case .rejectContentDownload(let uploadResolution):
+                    if uploadResolution.removeContentUploads {
                         removeManagedObjects(conflictingContentUploads, delegate: delegate)
-                        removeManagedObjects(conflictingUploadDeletions, delegate: delegate)
-                        completion(nil)
-                        
-                    case .rejectContentDownload(let uploadResolution):
-                        if uploadResolution.removeContentUploads {
-                            removeManagedObjects(conflictingContentUploads, delegate: delegate)
-                        }
-                        
-                        if uploadResolution.removeUploadDeletions {
-                            removeManagedObjects(conflictingUploadDeletions, delegate: delegate)
-                        }
-                        
-                        completion(attr)
                     }
-                })
-            }
+                    
+                    if uploadResolution.removeUploadDeletions {
+                        removeManagedObjects(conflictingUploadDeletions, delegate: delegate)
+                    }
+                    completion(attr)
+                }
+            })
         }
         
         if let resolver = resolver {
@@ -169,7 +173,7 @@ class ConflictManager {
         
         var deletionAttrs:[SyncAttributes]!
 
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             deletionAttrs = dfts.map {$0.attr}
             Log.msg("Deletions: count: \(dfts.count)")
         }
@@ -197,7 +201,7 @@ class ConflictManager {
                 }
             }
             
-            CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 Directory.session.updateAfterDownloadDeletingFiles(deletions: deleteFromLocalDirectory, pendingUploadUndeletions: uploadUndeletions)
                 
                 let deleteAllOfThese = ignoreDownloadDeletionsExpandedForGroups.union(
@@ -231,7 +235,10 @@ class ConflictManager {
         // We'll want no deletion delegate callback for these.
         var havePendingUploadDeletions = [SyncAttributes]()
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        var conflictingContentUploads:[(UploadFileTracker, SyncAttributes)]!
+        var pendingContentUploads:[UploadFileTracker]!
+        
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let pendingUploadDeletions = UploadFileTracker.fetchAll().filter({$0.operation.isDeletion})
             
             let pendingDeletionsToRemove = fileUUIDIntersection(pendingUploadDeletions, downloadDeletionAttrs)
@@ -254,68 +261,72 @@ class ConflictManager {
             
             // Now, let's see if we have pending file uploads conflicting with any of these deletions. This is a prioritization issue. There is a pending download deletion. The client has a pending file upload. The client needs to make a judgement call: Should their upload take priority and upload undelete the file, or should the download deletion be accepted?
             
-            let pendingContentUploads = UploadFileTracker.fetchAll().filter({$0.operation.isContents})
-            let conflictingContentUploads = fileUUIDIntersection(pendingContentUploads, remainingDownloadDeletionAttrs)
+            pendingContentUploads = UploadFileTracker.fetchAll().filter({$0.operation.isContents})
+            conflictingContentUploads = fileUUIDIntersection(pendingContentUploads, remainingDownloadDeletionAttrs)
+        }
+        
+        if conflictingContentUploads.count > 0 {
+            var numberConflicts = conflictingContentUploads.count
             
-            if conflictingContentUploads.count > 0 {
-                var numberConflicts = conflictingContentUploads.count
-                
-                var deletionsToIgnore = [SyncAttributes]()
-                var uploadUndeletions = [SyncAttributes]()
-                
-                conflictingContentUploads.forEach { (conflictUft, attr) in
-                    // Note that I'm depending in the download deletion case on there just being a single uft passed as a parameter to `conflictContentTypeFor`-- because I'm assuming below in the `both` case in .keepContentUpload is for a file upload.
-                    let conflictingContent = conflictContentTypeFor(conflictingContentUploads: [conflictUft])
-                    let resolver = SyncServerConflict<DownloadDeletionResolution>(
-                        conflictType: .contentUpload(conflictingContent), resolutionCallback: { resolution in
-                        
-                        // The following code runs *after* the client has made their decision as to how to handle the conflict. i.e., `resolution` tells us how they want to handle the conflict.
-                        var error = false
-                        
-                        switch resolution {
-                        case .acceptDownloadDeletion:
-                            removeConflictingUpload(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID, delegate: delegate)
-                            
-                        case .rejectDownloadDeletion(let uploadResolution):
-                            switch uploadResolution {
-                            case .keepContentUpload:
-                                // Need to mark the uft as an upload undeletion, but only in the case of a file upload-- can't do this for an appMetaData upload because we don't have file contents in that case to replace the already deleted cloud storage file.
-                                switch conflictingContent {
-                                case .both, .file:
-                                    markUftAsUploadUndeletion(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID)
-                                    uploadUndeletions += [attr]
-                                    
-                                case .appMetaData:
-                                    error = true
-
-                                    Thread.runSync(onMainThread: {
-                                        delegate.syncServerErrorOccurred(error: .appMetaDataUploadUndeletionAttempt)
-                                    })
+            var deletionsToIgnore = [SyncAttributes]()
+            var uploadUndeletions = [SyncAttributes]()
             
-                                    // Just so this error doesn't cause an infinite loop attempting to do the download deletion-- I'm going to convert this to an .acceptDownloadDeletion
-                                    removeConflictingUpload(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID, delegate: delegate)
-                                }
-
-                            case .removeContentUpload:
-                                removeConflictingUpload(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID, delegate: delegate)
-                            } // End switch uploadResolution
-                            
-                            if !error {
-                                // We're going to disregard the download deletion, and for files that are part of a group, need to disregard the download deletions for all files in the group.
-                                deletionsToIgnore += [attr]
-                            }
-                        }
-                        
-                        numberConflicts -= 1
-                        
-                        if numberConflicts == 0 {
-                            completion(deletionsToIgnore, havePendingUploadDeletions, uploadUndeletions)
-                        }
-                    })
+            conflictingContentUploads.forEach { (conflictUft, attr) in
+                // Note that I'm depending in the download deletion case on there just being a single uft passed as a parameter to `conflictContentTypeFor`-- because I'm assuming below in the `both` case in .keepContentUpload is for a file upload.
+                var conflictingContent:ConflictingClientOperation.ContentType!
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                    conflictingContent = conflictContentTypeFor(conflictingContentUploads: [conflictUft])
+                }
+                
+                let resolver = SyncServerConflict<DownloadDeletionResolution>(
+                    conflictType: .contentUpload(conflictingContent), resolutionCallback: { resolution in
                     
-                    conflicts += [(attr, resolver)]
-                } // End conflictingContentUploads.forEach
-            }
+                    // The following code runs *after* the client has made their decision as to how to handle the conflict. i.e., `resolution` tells us how they want to handle the conflict.
+                    var error = false
+                    
+                    switch resolution {
+                    case .acceptDownloadDeletion:
+                        removeConflictingUpload(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID, delegate: delegate)
+                        
+                    case .rejectDownloadDeletion(let uploadResolution):
+                        switch uploadResolution {
+                        case .keepContentUpload:
+                            // Need to mark the uft as an upload undeletion, but only in the case of a file upload-- can't do this for an appMetaData upload because we don't have file contents in that case to replace the already deleted cloud storage file.
+                            switch conflictingContent! {
+                            case .both, .file:
+                                markUftAsUploadUndeletion(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID)
+                                uploadUndeletions += [attr]
+                                
+                            case .appMetaData:
+                                error = true
+
+                                Thread.runSync(onMainThread: {
+                                    delegate.syncServerErrorOccurred(error: .appMetaDataUploadUndeletionAttempt)
+                                })
+        
+                                // Just so this error doesn't cause an infinite loop attempting to do the download deletion-- I'm going to convert this to an .acceptDownloadDeletion
+                                removeConflictingUpload(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID, delegate: delegate)
+                            }
+
+                        case .removeContentUpload:
+                            removeConflictingUpload(pendingContentUploads: pendingContentUploads, fileUUID: attr.fileUUID, delegate: delegate)
+                        } // End switch uploadResolution
+                        
+                        if !error {
+                            // We're going to disregard the download deletion, and for files that are part of a group, need to disregard the download deletions for all files in the group.
+                            deletionsToIgnore += [attr]
+                        }
+                    }
+                    
+                    numberConflicts -= 1
+                    
+                    if numberConflicts == 0 {
+                        completion(deletionsToIgnore, havePendingUploadDeletions, uploadUndeletions)
+                    }
+                })
+                
+                conflicts += [(attr, resolver)]
+            } // End conflictingContentUploads.forEach
         }
         
         if conflicts.count > 0 {
@@ -330,7 +341,7 @@ class ConflictManager {
     // Where this gets tricky is what we need is that only the very first uft for this fileUUID needs to be an upload undeletion. i.e., the uft that will get serviced the first.
     private static func markUftAsUploadUndeletion(pendingContentUploads: [UploadFileTracker], fileUUID: String) {
     
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             var toKeep = pendingContentUploads.filter({$0.fileUUID == fileUUID})
             toKeep.sort(by: { (uft1, uft2) -> Bool in
                 return uft1.age < uft2.age
@@ -353,7 +364,7 @@ class ConflictManager {
     // Remove any pending content upload's with this UUID.
     private static func removeConflictingUpload(pendingContentUploads: [UploadFileTracker], fileUUID:String, delegate: SyncServerDelegate) {
         // [1] Having deadlock issue here. Resolving it by documenting that delegate is *not* called on main thread for the two conflict delegate methods. Not the best solution.
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let toDelete = pendingContentUploads.filter({$0.fileUUID == fileUUID})
             toDelete.forEach { uft in
                 do {
@@ -369,7 +380,7 @@ class ConflictManager {
     }
     
     private static func removeManagedObjects(_ managedObjects:[NSManagedObject], delegate: SyncServerDelegate) {
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait() {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             managedObjects.forEach { managedObject in
                 if let uft = managedObject as? UploadFileTracker {
                     do {

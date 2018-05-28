@@ -9,6 +9,9 @@ import Foundation
 
 // Many of these only have internal meaning to the client. Some are documented because they can be useful to the code using the client.
 public enum SyncServerError: Error {
+    // If this is reported, it is diagnostic of a network error. It is not reported simply due to a check for a cellular data connection. i.e., no network was present and this may be the reason why.
+    case noCellularDataConnection
+
     // The network connection was lost.
     case noNetworkError
     

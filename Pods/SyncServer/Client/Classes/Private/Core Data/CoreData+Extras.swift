@@ -14,6 +14,21 @@ protocol CoreDataSingleton : CoreDataModel {
     static func get() -> COREDATAOBJECT
 }
 
+class CoreDataSync {
+    // It looks like a dispatch queue can be used to serialize Core Data requests: https://stackoverflow.com/questions/22091696/how-to-dispatch-code-blocks-to-the-same-thread-in-ios
+    // The reason I'm doing this is because my needs are not for concurrent access to Core Data. Rather, the SyncServer class (which is directly used by clients) and the internals of the SyncServer (e.g., the SyncManager) each need access to the Core Data objects. And each of these can run on different threads. But, I don't need concurrent access to Core Data. For example, each Core Data access is fairly quick running.
+    private static let serialQueue = DispatchQueue(label: "CoreDataSync")
+    
+    // This is *not* reentrant.
+    static func perform(sessionName: String, block: @escaping ()->()) {
+        serialQueue.sync {
+            CoreData.sessionNamed(sessionName).performAndWait() {
+                block()
+            }
+        }
+    }
+}
+
 extension CoreDataSingleton {
     static func get() -> COREDATAOBJECT {
         var cdos = [COREDATAOBJECT]()

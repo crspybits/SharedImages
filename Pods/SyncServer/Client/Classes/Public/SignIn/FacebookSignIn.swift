@@ -13,8 +13,8 @@
 
 import Foundation
 import SMCoreLib
-import FacebookLogin
 import FacebookCore
+import FacebookLogin
 import SyncServer_Shared
 
 public class FacebookCredentials : GenericCredentials {

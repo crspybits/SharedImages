@@ -73,7 +73,7 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
         return completed.count == self.dfts.count
     }
     
-    // Get current downloading DownloadContentGroup or get next if there is not one downloading. Does not do a `performAndWait`.
+    // Get current downloading DownloadContentGroup or get next if there is not one downloading. Does not do a `perform`.
     static func getNextToDownload() throws -> DownloadContentGroup? {
         var result:DownloadContentGroup?
         

@@ -236,6 +236,13 @@ class ImagesVC: UIViewController {
         // To clear unread count(s)-- both in the case of coming back from navigating to large images, and in the case of resetting unread counts in Settings.
         collectionView.reloadData()
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // https://github.com/crspybits/SharedImages/issues/121 (a)
+        bottomRefresh.hide()
+    }
 
     func setAddButtonState() {
         switch SignInVC.sharingPermission {
@@ -602,16 +609,15 @@ extension ImagesVC : SyncControllerDelegate {
     func syncEvent(syncController:SyncController, event:SyncControllerEvent) {
         switch event {
         case .syncStarted:
-            break
+            // Put this hide here (instead of in syncDone) to try to deal with https://github.com/crspybits/SharedImages/issues/121 (c)
+            self.bottomRefresh.hide()
             
         case .syncDone (let numberOperations):
             // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
             AppBadge.setBadge(number: 0)
             
             Progress.session.finish()
-            
-            self.bottomRefresh.reset()
-            
+                        
             // 2/13/18; I had been resetting the unread counts on first use of the app, but I don't think that's appropriate. See https://github.com/crspybits/SharedImages/issues/83
             
             // To refresh the badge unread counts, if we have new messages.

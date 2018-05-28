@@ -38,7 +38,7 @@ class Migrations {
             Log.error("Problem resetting trackers: \(error)")
         }
         
-        CoreData.sessionNamed(Constants.coreDataName).performAndWait {
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let entries = DirectoryEntry.fetchAll()
             entries.forEach { entry in
                 entry.deletedLocally = entry.deletedOnServer
