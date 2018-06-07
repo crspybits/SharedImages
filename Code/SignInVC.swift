@@ -277,4 +277,14 @@ extension UIView {
         heightAnchor.constraint(equalToConstant: frame.size.height).isActive = true
         widthAnchor.constraint(equalToConstant: frame.size.width).isActive = true
     }
+
+    static func createFromXib<T>() -> T? {
+        let bundle = Bundle(for: SignInManager.self)
+        guard let viewType = bundle.loadNibNamed(typeName(self), owner: self, options: nil)?[0] as? T else {
+            assert(false)
+            return nil
+        }
+        
+        return viewType
+    }
 }

@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D83248EEEC584567EDB74087700EF63C"
+               BlueprintIdentifier = "164F15F1313BACA95494334AAC4B374F"
                BlueprintName = "SMCoreLib"
                ReferencedContainer = "container:Pods.xcodeproj"
                BuildableName = "SMCoreLib.framework">

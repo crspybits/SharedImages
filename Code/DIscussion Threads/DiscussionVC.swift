@@ -143,7 +143,7 @@ class DiscussionVC: MessagesViewController {
     }
     
     @objc private func refresh() {
-        delegate.discussionVC(self, discussion: discussion, refreshWithCompletion: {[unowned self] in
+        delegate?.discussionVC(self, discussion: discussion, refreshWithCompletion: {[unowned self] in
             self.loadDiscussion()
             self.messagesCollectionView.reloadData()
         })

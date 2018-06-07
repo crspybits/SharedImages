@@ -11,7 +11,6 @@
 		2987D796FBECCBAD42606057 /* Pods_SharedImagesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */; };
 		830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */; };
 		830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */; };
-		8310F5151F11D8FA00735EDB /* GoogleSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8310F5131F11D8FA00735EDB /* GoogleSignIn.swift */; };
 		831A759E20279C76004F330A /* DiscussionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831A759D20279C76004F330A /* DiscussionMessage.swift */; };
 		831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831EEC4B2002D76B001821B9 /* DebugDashboardData.swift */; };
 		831EEC4E2002D76B001821B9 /* TestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831EEC4C2002D76B001821B9 /* TestCases.swift */; };
@@ -89,7 +88,6 @@
 		830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedImagesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedImagesTests.swift; sourceTree = "<group>"; };
 		830B1DFA1EFCC03E0022FCC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8310F5131F11D8FA00735EDB /* GoogleSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GoogleSignIn.swift; path = "../../SyncServer-iOSClient/Client/SignIn/GoogleSignIn.swift"; sourceTree = "<group>"; };
 		831A759D20279C76004F330A /* DiscussionMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscussionMessage.swift; sourceTree = "<group>"; };
 		831EEC4B2002D76B001821B9 /* DebugDashboardData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugDashboardData.swift; sourceTree = "<group>"; };
 		831EEC4C2002D76B001821B9 /* TestCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCases.swift; sourceTree = "<group>"; };
@@ -234,7 +232,6 @@
 			isa = PBXGroup;
 			children = (
 				8324EE2F1E75EC62000656AF /* SignInVC.swift */,
-				8310F5131F11D8FA00735EDB /* GoogleSignIn.swift */,
 			);
 			name = SignIn;
 			sourceTree = "<group>";
@@ -451,7 +448,6 @@
 				83F8821C1E711600008F644A /* Frameworks */,
 				83F8821D1E711600008F644A /* Resources */,
 				C1556D21C4BD5BF879CF9960 /* [CP] Embed Pods Frameworks */,
-				7BAE33266BEE9E3F633FC8A4 /* [CP] Copy Pods Resources */,
 				83611DEC1F3802C700464E49 /* ShellScript */,
 			);
 			buildRules = (
@@ -566,24 +562,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7BAE33266BEE9E3F633FC8A4 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		83611DEC1F3802C700464E49 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -630,10 +608,7 @@
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/Gloss/Gloss.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
 				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
@@ -660,10 +635,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gloss.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
@@ -704,7 +676,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8310F5151F11D8FA00735EDB /* GoogleSignIn.swift in Sources */,
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
 				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
 				834A7E802037858800969B18 /* Types.swift in Sources */,

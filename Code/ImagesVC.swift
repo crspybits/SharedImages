@@ -683,7 +683,9 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
         let boundingCellSize = CGSize(width: size, height: size)
         
         // And then figure out how big the image will be.
+        // Seems like the crash Dany was getting was here: https://github.com/crspybits/SharedImages/issues/123
         let image = self.coreDataSource.object(at: indexPath) as! Image
+        
         let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
 
         return CGSize(width: boundedImageSize.width, height: boundedImageSize.height + ImageCollectionVC.smallTitleHeight)
