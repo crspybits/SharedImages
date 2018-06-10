@@ -24,6 +24,7 @@ PODS:
   - FBSDKLoginKit (4.33.0):
     - FBSDKCoreKit
   - Gloss (1.2.4)
+  - GoogleSignIn (0.1.0)
   - HPTextViewTapGestureRecognizer (0.1)
   - lottie-ios (2.5.0)
   - LottiesBottom (0.5.0):
@@ -46,33 +47,34 @@ PODS:
   - SwiftyBeaver (1.6.0)
   - SwiftyDropbox (4.6.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (15.4.1):
+  - SyncServer (15.4.2):
     - Gloss (~> 1.2)
     - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.3)
-    - SyncServer/Lite (= 15.4.1)
+    - SyncServer/Lite (= 15.4.2)
   - SyncServer-Shared (6.3.1):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (15.4.1):
+  - SyncServer/Dropbox (15.4.2):
     - Gloss (~> 1.2)
     - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.3)
     - SyncServer-Shared (~> 6.3)
-  - SyncServer/Facebook (15.4.1):
+  - SyncServer/Facebook (15.4.2):
     - FacebookCore
     - FacebookLogin
     - Gloss (~> 1.2)
     - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.3)
-  - SyncServer/Google (15.4.1):
+  - SyncServer/Google (15.4.2):
     - Gloss (~> 1.2)
+    - GoogleSignIn (~> 0.1)
     - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 6.3)
-  - SyncServer/Lite (15.4.1):
+  - SyncServer/Lite (15.4.2):
     - Gloss (~> 1.2)
     - RealReachability (~> 1.2)
     - SMCoreLib (~> 1.2)
@@ -120,6 +122,7 @@ SPEC REPOS:
     - SwiftyBeaver
     - SwiftyDropbox
   https://github.com/crspybits/Specs.git:
+    - GoogleSignIn
     - SMCoreLib
     - SyncServer
     - SyncServer-Shared
@@ -145,6 +148,7 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
   FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
   Gloss: 4e036074610fdb993abcb958ebcd7332588e2333
+  GoogleSignIn: 4e455c28182fb8759f3683b1429faddf9cb82272
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   LottiesBottom: a3428d59b99264d08a79870e74118de7fb0c24c8
@@ -158,9 +162,9 @@ SPEC CHECKSUMS:
   SMCoreLib: 1fc2a916a45470cf41deb193bc509432b1987efc
   SwiftyBeaver: e45759613e50b522b0e6f53b1f0f14389b45ca34
   SwiftyDropbox: 8af645e744de6f17b4e9fdeba21365b8dc55a542
-  SyncServer: 0d4a5e312543008b46a0b104165021243d92c49b
+  SyncServer: e58502affcf43987dc6d71d09ff5bf6e35aa8a79
   SyncServer-Shared: 930787de975c7e4372380711ff2166f78d893f90
 
-PODFILE CHECKSUM: 65a106e34f13872210f6826d9908aec8d80e4754
+PODFILE CHECKSUM: a7e7576df95a89daebbe86190d04d0ba0c9fdc33
 
 COCOAPODS: 1.5.3

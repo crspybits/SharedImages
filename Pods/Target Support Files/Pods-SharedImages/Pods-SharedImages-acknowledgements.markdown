@@ -227,6 +227,10 @@ SOFTWARE.
 
 
 
+## GoogleSignIn
+
+Copyright 2018 Google
+
 ## HPTextViewTapGestureRecognizer
 
 Apache License

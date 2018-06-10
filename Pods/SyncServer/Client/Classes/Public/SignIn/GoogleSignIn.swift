@@ -13,7 +13,7 @@
 import Foundation
 import SMCoreLib
 import SyncServer_Shared
-import GoogleySignIn
+import GoogleSignIn
 
 public class GoogleCredentials : GenericCredentials, CustomDebugStringConvertible {
     public var userId:String = ""

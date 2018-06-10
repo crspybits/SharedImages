@@ -449,6 +449,7 @@
 				83F8821D1E711600008F644A /* Resources */,
 				C1556D21C4BD5BF879CF9960 /* [CP] Embed Pods Frameworks */,
 				83611DEC1F3802C700464E49 /* ShellScript */,
+				22C7F4E644D323C383DB3EF8 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -562,6 +563,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		22C7F4E644D323C383DB3EF8 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Framework/GoogleSignIn.framework/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		83611DEC1F3802C700464E49 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -609,6 +628,7 @@
 				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/Gloss/Gloss.framework",
+				"${PODS_ROOT}/GoogleSignIn/Framework/GoogleSignIn.framework",
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
 				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
@@ -620,7 +640,6 @@
 				"${BUILT_PRODUCTS_DIR}/SMCoreLib/SMCoreLib.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyDropbox/SwiftyDropbox.framework",
-				"${PODS_ROOT}/SyncServer/VendoredFrameworks/GoogleySignIn.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
@@ -637,6 +656,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gloss.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleSignIn.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
@@ -648,7 +668,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SMCoreLib.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyDropbox.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleySignIn.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",

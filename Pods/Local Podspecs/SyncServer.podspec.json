@@ -1,6 +1,6 @@
 {
   "name": "SyncServer",
-  "version": "15.3.0",
+  "version": "15.4.2",
   "summary": "iOS Client for the SyncServerII server",
   "description": "SyncServerII enables apps to save user files in users cloud storage, and\nenables safe sharing of those files.",
   "homepage": "https://github.com/crspybits/SyncServer-iOSClient",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/crspybits/SyncServer-iOSClient.git",
-    "tag": "15.3.0"
+    "tag": "15.4.2"
   },
   "platforms": {
     "ios": "9.0"
@@ -39,12 +39,8 @@
     ],
     "RealReachability": [
       "~> 1.2"
-    ],
-    "GSignIn": [
-      "~> 0.1"
     ]
   },
-  "static_framework": true,
   "default_subspecs": "Lite",
   "subspecs": [
     {
@@ -74,6 +70,13 @@
           "~> 4.3"
         ]
       }
+    },
+    {
+      "name": "Google",
+      "xcconfig": {
+        "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_GOOGLE_SIGNIN"
+      },
+      "vendored_frameworks": "VendoredFrameworks/GoogleSignIn.framework"
     }
   ]
 }
