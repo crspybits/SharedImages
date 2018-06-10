@@ -11,8 +11,11 @@ import SMCoreLib
 import SyncServer_Shared
 import RealReachability
 
+/// Synchronize files and app meta data with other instances of the same client app.
 public class SyncServer {
+    /// The singleton for this class.
     public static let session = SyncServer()
+    
     private var syncOperating = false
     private var delayedSync = false
     private var stoppingSync = false
@@ -20,6 +23,7 @@ public class SyncServer {
     private init() {
     }
     
+    /// Enable reporting of only events desired by the client app.
     public var eventsDesired:EventDesired {
         set {
             SyncManager.session.desiredEvents = newValue
@@ -33,7 +37,8 @@ public class SyncServer {
         }
     }
     
-    public weak var delegate:SyncServerDelegate? {
+    /// The delegate enables operations such as file downloads & conflict resolution.
+    public weak var delegate:SyncServerDelegate! {
         set {
             SyncManager.session.delegate = newValue
             ServerAPI.session.syncServerDelegate = newValue
@@ -48,7 +53,14 @@ public class SyncServer {
         }
     }
     
-    // Leave the minimumServerVersion as nil if your app doesn't have a specific server version requirement. `cloudFolderName` is optional because it's only needed for some of the cloud storage services (e.g., Google Drive).
+    /**
+     Put a call to this in your AppDelegate or other place early in the launch sequence of your app.
+     
+     - parameters:
+       - withServerURL: URL for the SyncServerII server.
+       - cloudFolderName: In the cloud storage service, the path of the directory/folder in which to put files. `cloudFolderName` is optional because it's only needed for some of the cloud storage services (e.g., Google Drive).
+       - minimumServerVersion: The minimum SyncServerII server version needed by your app. Leave nil if your app doesn't have a specific server version requirement.
+     */
     public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil) {
         Log.msg("cloudFolderName: \(String(describing: cloudFolderName))")
         Log.msg("serverURL: \(serverURL.absoluteString)")
@@ -95,25 +107,43 @@ public class SyncServer {
         }
     }
     
-    // For dealing with background uploading/downloading.
+    /**
+     For dealing with background uploading/downloading. Call this from the same named delegate method in your AppDelegate.
+     */
     public func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         ServerNetworkingLoading.session.application(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
     }
     
-    // Enqueue a local immutable file for subsequent upload. Immutable files are assumed to not change (at least until after the upload has completed). This immutable characteristic is not enforced by this class but needs to be enforced by the caller of this class.
-    // This operation survives app launches, as long as the call itself completes.
-    // If there are contents with the same uuid, which has been enqueued for upload (file upload or appMetaData upload) but not yet `sync`'ed, it will be replaced by this upload request. That is, if you want to do both a file upload and an appMetaData upload in the same sync, then set the SyncAttributes with the appMetaData, and use one of the file upload operations.
-    // This operation does not access the server, and thus runs quickly and synchronously.
-    // When uploading a file for the 2nd or more time ("multi-version upload"):
-    // a) the 2nd and following updates must have the same mimeType as the first version of the file.
-    // b) If the attr.appMetaData is given as nil, and an earlier version had non-nil appMetaData, then the nil appMetaData is ignored-- i.e., the existing app meta data is not set to nil.
-    // You can only set the fileGroupUUID (in the SyncAttributes) when the file is first uploaded.
-    // Warning: If you indicate that the mime type is "text/plain", and you are using Google Drive and the text contains unusual characters, you may run into problems-- e.g., downloading the files may fail.
+    /**
+        ## Enqueue a local immutable file for subsequent upload.
+        
+        Immutable files are assumed to not change (at least until after the upload has completed). This immutable characteristic is not enforced by this class but needs to be enforced by the caller of this class.
+     
+        This operation survives app launches, as long as the call itself completes.
+        
+        If there are contents with the same uuid, which have been enqueued for upload (file upload or appMetaData upload) but not yet `sync`'ed, they will be replaced by this upload request. That is, if you want to do both a file upload and an appMetaData upload in the same sync, then set the SyncAttributes with the appMetaData, and use one of the file upload operations.
+     
+        This operation does not access the server, and thus runs quickly and synchronously.
+     
+        You can only set the fileGroupUUID (in the SyncAttributes) when the file is first uploaded.
+
+        ### When uploading a file for the 2nd or more time ("multi-version upload"):
+        1. the 2nd and following updates must have the same mimeType as the first version of the file.
+        2. If the attr.appMetaData is given as nil, and an earlier version had non-nil appMetaData, then the nil appMetaData is ignored-- i.e., the existing app meta data is not set to nil.
+     
+        `Warning`: If you indicate that the mime type is "text/plain", and you are using Google Drive and the text contains unusual characters, you may run into problems-- e.g., downloading the files may fail.
+     
+        - parameters:
+            - localFile: URL for the file to upload.
+            - withAttributes: Attributes of the file to upload.
+     */
     public func uploadImmutable(localFile:SMRelativeLocalURL, withAttributes attr: SyncAttributes) throws {
         try upload(fileURL: localFile, withAttributes: attr)
     }
     
-    // A copy of the file is made, and that is used for uploading. The caller can then change their original and it doesn't affect the upload. The copy is removed after the upload completes. This operation proceeds like `uploadImmutable` otherwise.
+    /**
+        A copy of the file is made, and that is used for uploading. The caller can then change their original and it doesn't affect the upload. The copy is removed after the upload completes. This operation proceeds like `uploadImmutable` otherwise.
+    */
     public func uploadCopy(localFile:SMRelativeLocalURL, withAttributes attr: SyncAttributes) throws {
         try upload(fileURL: localFile, withAttributes: attr, copy: true)
     }
@@ -205,8 +235,18 @@ public class SyncServer {
         }
     }
     
-    // Enqueue an upload of changed app meta data for an existing file. The appMetaData of the attr must not be nil.
-    // Like the other uploads above: This operation survives app launches, as long as the call itself completes, this operation does not access the server, and thus runs quickly and synchronously, and if there is a file with the same uuid, which has been enqueued for upload (file contents or appMetaData) but not yet `sync`'ed, it will be replaced by this upload request.
+    /**
+        Enqueue an upload of changed app meta data for an existing file.
+     
+        ### Like the other uploads above:
+        1. This operation survives app launches, as long as the call itself completes,
+        2. This operation does not access the server, and thus runs quickly and synchronously, and
+        3. If there is a file with the same uuid, which has been enqueued for upload (file contents or appMetaData) but not yet `sync`'ed, it will be replaced by this upload request.
+     
+        - parameters:
+            - attr: These attributes must have non-nil `appMetaData`.
+    */
+
     public func uploadAppMetaData(attr: SyncAttributes) throws {
         guard let _ = attr.appMetaData else {
             throw SyncServerError.badAppMetaData
@@ -296,15 +336,28 @@ public class SyncServer {
         return errorToThrow
     }
     
-    // The following two methods enqueue upload deletion operation(s). The operation(s) persists across app launches. It is an error to try again later to upload, or delete the file(s) referenced by the(se) UUID. You can only delete files that are already known to the SyncServer (e.g., that you've uploaded).
-    // If there is a file with the same uuid, which has been enqueued for upload but not yet `sync`'ed, it will be removed.
-    // These operations do not access the server, and thus run quickly and synchronously.
-    // These operations undo their work if they throw errors.
-    
+    /**
+        This  method enqueues an upload deletion operation. The operation persists across app launches. It is an error to try again later to upload, or delete the file referenced by this UUID. You can only delete files that are already known to the SyncServer (e.g., that you've uploaded).
+     
+        If there is a file with the same uuid, which has been enqueued for upload but not yet `sync`'ed, it will be removed.
+     
+        This operation does not access the server, and thus runss quickly and synchronously.
+     
+        This operation undoes its work if it throws an error.
+     
+        - parameters:
+            - fileWithUUID: The UUID of the file to delete.
+    */
     public func delete(fileWithUUID uuid:UUIDString) throws {
         try delete(filesWithUUIDs: [uuid])
     }
     
+    /**
+        As above, but you can give multiple UUIDs.
+     
+        - parameters:
+            - filesWithUUIDs: The UUID of the files to delete.
+    */
     public func delete(filesWithUUIDs uuids:[UUIDString]) throws {
         var errorToThrow:Error?
         
@@ -405,8 +458,13 @@ public class SyncServer {
         }
     }
     
-    // If no other `sync` is taking place, this will asynchronously do pending downloads, file uploads, and upload deletions. If there is a `sync` currently taking place, this will wait until after that is done, and try again. If a stopSync is currently pending, then this will be ignored.
-    // Non-blocking in all cases.
+    /**
+        If no other `sync` is taking place, this will asynchronously do pending downloads, file uploads, and upload deletions. If there is a `sync` currently taking place, this closes the collection of uploads/deletions queued, and will wait until after the current sync is done, and try again.
+     
+        If a stopSync is currently pending, then this call will be ignored.
+     
+        Non-blocking in all cases.
+    */
     public func sync() {
         sync(completion:nil)
     }
@@ -444,7 +502,8 @@ public class SyncServer {
         }
     }
     
-    // Stop an ongoing sync operation. This will stop the operation at the next "natural" stopping point. E.g., after a next download completes. No effect if no ongoing sync operation. Any delayed sync is cancelled.
+    /** Stop an ongoing sync operation. This will stop the operation at the next "natural" stopping point. E.g., after a next download completes. No effect if no ongoing sync operation. Any delayed sync is cancelled.
+    */
     public func stopSync() {
         Synchronized.block(self) {
             if syncOperating {
@@ -455,7 +514,12 @@ public class SyncServer {
         }
     }
     
-    // Operates synchronously and quickly. A file must have already been uploaded (or downloaded) for you to be able to get its attributes. It is an error to call this for a uuid that doesn't yet exist, or for one that has already been deleted.
+    /**
+        Operates synchronously and quickly. A file must have already been uploaded (or downloaded) for you to be able to get its attributes. It is an error to call this for a uuid that doesn't yet exist, or for one that has already been deleted.
+    
+        - parameters:
+            - forUUID: The UUID of the file to get attributes for.
+    */
     public func getAttributes(forUUID uuid: String) throws -> SyncAttributes {
         var error:Error?
         var attr: SyncAttributes?
@@ -481,12 +545,20 @@ public class SyncServer {
         return attr!
     }
     
+    /// Object returned by call to `getStats`.
     public struct Stats {
+        /// file downloads and/or appMetaData downloads.
         public let contentDownloadsAvailable:Int
+        
         public let downloadDeletionsAvailable:Int
     }
     
-    // completion gives nil if there was an error. This information is for general purpose use (e.g., UI) and makes no guarantees about files to be downloaded when you next do a `sync` operation.
+    /**
+        This information is for general purpose use (e.g., UI) and makes no guarantees about files to be downloaded when you next do a `sync` operation.
+    
+        - parameters:
+            - completion: Gives stats about downloads that are currently available; gives nil if there was an error.
+    */
     public func getStats(completion:@escaping (Stats?)->()) {
         Download.session.onlyCheck() { onlyCheckResult in
             switch onlyCheckResult {
@@ -501,14 +573,25 @@ public class SyncServer {
         }
     }
     
+    /// The type of reset to perform with a call to `reset`.
     public enum ResetType {
-        case tracking // Resets only persistent data that tracks uploads and downloads in the SyncServer. Makes no server calls. This should not be required, but sometimes is useful due to bugs or crashes in the SyncServer and could be required.
+        /// Resets only persistent data that tracks uploads and downloads in the SyncServer. Makes no server calls. This should not be required, but sometimes is useful due to bugs or crashes in the SyncServer and could be required.
+        case tracking
         
-        case all // A powerful operation. Permanently removes all local/cached metadata known by the client interface. E.g., metadata about files that you have previously uploaded. It makes no server calls. This is similar to deleting and re-installing the app-- except that it does not delete the files referenced by the meta data. You must keep track of files and, if desired, delete them.
+        /// A powerful operation. Permanently removes all local/cached metadata known by the client interface. E.g., metadata about files that you have previously uploaded. It makes no server calls. This is similar to deleting and re-installing the app-- except that it does not delete the files referenced by the meta data. You must keep track of files and, if desired, delete them.
+        case all
     }
     
-    // Doesn't sign out the user or require that the user is signed in.
-    // This method may only be called when the client is not doing any sync operations.
+    /**
+        Does a reset of local (not server) tracking data.
+     
+        Doesn't sign the user out or require that the user is signed in.
+     
+        This method may only be called when the client is not doing any sync operations.
+     
+        - parameters:
+            - type: type of reset to perform.
+    */
     public func reset(type: ResetType) throws {
         var result:SyncServerError?
         
@@ -564,7 +647,12 @@ public class SyncServer {
     
     static let trailingMarker = "*************** logAllTracking: Ends ***************"
     
-    // Logs information about all tracking internal meta data. When the completion handler is called, the file data logged should be present in persistent storage. The completion runs asynchronously on the main thread.
+    /**
+        Logs information about all tracking internal meta data.
+    
+        - parameter:
+            - completion: When the completion handler is called, the file data logged should be present in persistent storage. Runs asynchronously on the main thread.
+    */
     public func logAllTracking(completion: (()->())? = nil) {
         Log.msg("*************** Starts: logAllTracking ***************")
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
@@ -586,13 +674,24 @@ public class SyncServer {
         }
     }
     
+    /// Return result from `localConsistencyCheck`.
     public struct LocalConsistencyResults {
+        /// Files not known to the caller of this interface and known to be deleted by this SyncServer interface.
         public let clientMissingAndDeleted:Set<UUIDString>!
+        
+        /// Files not known to the caller of this interface and known to be not deleted by this SyncServer interface.
         public let clientMissingNotDeleted:Set<UUIDString>!
+        
+        /// Files not tracked or otherwise known about by this SyncServer interface.
         public let directoryMissing:Set<UUIDString>!
     }
     
-    // Performs a similar operation to a file system consistency or integrity check. Only operates if not currently synchronizing. Suitable for running at app startup.
+    /**
+        Performs a similar operation to a file system consistency or integrity check. Only operates if not currently synchronizing. Suitable for running at app startup.
+    
+        - parameters:
+            - clientFiles: UUID's of files known to the client.
+    */
     public func localConsistencyCheck(clientFiles:[UUIDString]) throws -> LocalConsistencyResults? {
         var error: Error?
         var results:LocalConsistencyResults!
@@ -735,8 +834,8 @@ public class SyncServer {
         }
     }
 
-    // This is intended for development/debug only. This enables you do a consistency check between your local files and SyncServer meta data. Does a sync first to ensure files are synchronized.
     // TODO: *2* This is incomplete. Needs more work.
+    /// This is intended for development/debug only. This enables you do a consistency check between your local files and SyncServer meta data. Does a sync first to ensure files are synchronized.
     public func consistencyCheck(localFiles:[UUIDString], repair:Bool = false, completion:((Error?)->())?) {
         sync {
             // TODO: *2* Check for errors in sync.

@@ -13,11 +13,11 @@ import SyncServer_Shared
 
 // This class needs to be derived from NSObject because of use of `Network.session().connectionStateCallbacks` below.
 public class SignInManager : NSObject {
-    // These must be stored in user defaults-- so that if they delete the app, we lose it, and can start again. Storing both the currentUIDisplayName and userId because the userId (at least for Google) is just a number and not intelligible in the UI.
+    /// These must be stored in user defaults-- so that if they delete the app, we lose it, and can start again. Storing both the currentUIDisplayName and userId because the userId (at least for Google) is just a number and not intelligible in the UI.
     public static var currentUIDisplayName = SMPersistItemString(name:"SignInManager.currentUIDisplayName", initialStringValue:"",  persistType: .userDefaults)
     public static var currentUserId = SMPersistItemString(name:"SignInManager.currentUserId", initialStringValue:"",  persistType: .userDefaults)
     
-    // The class name of the current GenericSignIn
+    /// The class name of the current GenericSignIn
     static var currentSignInName = SMPersistItemString(name:"SignInManager.currentSignIn", initialStringValue:"", persistType: .userDefaults)
 
     public static let session = SignInManager()
@@ -52,7 +52,7 @@ public class SignInManager : NSObject {
         return result
     }
     
-    // Set this to establish the current SignIn mechanism in use in the app.
+    /// Set this to establish the current SignIn mechanism in use in the app.
     public var currentSignIn:GenericSignIn? {
         didSet {
             if currentSignIn == nil {
@@ -72,12 +72,12 @@ public class SignInManager : NSObject {
         return "\(mirror.subjectType)"
     }
     
-    // A shorthand-- because it's often used.
+    /// A shorthand-- because it's often used.
     public var userIsSignedIn:Bool {
         return currentSignIn != nil && currentSignIn!.userIsSignedIn
     }
     
-    // At launch, you must set up all the SignIn's that you'll be presenting to the user. This will call their `appLaunchSetup` method.
+    /// At launch, you must set up all the SignIn's that you'll be presenting to the user. This will call their `appLaunchSetup` method.
     public func addSignIn(_ signIn:GenericSignIn, launchOptions options: [UIApplicationLaunchOptionsKey: Any]?) {
         // Make sure we don't already have an instance of this signIn
         let name = stringNameForSignIn(signIn)
@@ -101,7 +101,7 @@ public class SignInManager : NSObject {
         }
     }
     
-    // Based on the currently active signin method, this will call the corresponding method on that class.
+    /// Based on the currently active signin method, this will call the corresponding method on that class.
     public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         
         for signIn in alternativeSignIns {

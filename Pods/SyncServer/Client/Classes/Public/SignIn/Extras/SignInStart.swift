@@ -17,23 +17,7 @@ public class SignInStart : UIView {
     public override func awakeFromNib() {
         super.awakeFromNib()
         signIn.titleLabel?.textAlignment = .center
-        
-        //_ = SignInManager.session.signInStateChanged.addTarget!(self, with: #selector(signInStateChanged))
     }
-    
-    /*
-    deinit {
-        SignInManager.session.signInStateChanged.removeTarget!(self, with: #selector(signInStateChanged))
-    }
-    
-    func signInStateChanged() {
-        // If displayed
-        if superview != nil {
-            if SignInManager.session.userIsSignedIn {
-                delegate?.showSignIns(for: .signedIn, forSignInSubView: self)
-            }
-        }
-    }*/
     
     @IBAction func signInAction(_ sender: Any) {
         delegate?.showSignIns(for: .existingAccount, forSignInSubView: self)

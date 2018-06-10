@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 extension UIView {
-    public static func createFromXib<T>() -> T? {
+    static func createFromXib<T>() -> T? {
         let bundle = Bundle(for: SignInManager.self)
         guard let viewType = bundle.loadNibNamed(typeName(self), owner: self, options: nil)?[0] as? T else {
             assert(false)

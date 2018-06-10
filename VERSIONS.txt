@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.17.0
+	* Updated to changed SyncServer iOS client pod-- that uses dynamic GoogleSignIn framework.
+
 Version 0.16.0
 	* Added filter/sorting dropdown-- moved sorting option from Settings to this new dropdown. Added filtering by discussions with unread counts.
 		https://github.com/crspybits/SharedImages/issues/117

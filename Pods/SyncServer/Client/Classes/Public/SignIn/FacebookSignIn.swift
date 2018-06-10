@@ -6,8 +6,6 @@
 //  Copyright © 2016 Spastic Muffin, LLC. All rights reserved.
 //
 
-// Enables you to sign in as a Facebook user to (a) create a new sharing user (must have an invitation from another SyncServer user), or (b) sign in as an existing sharing user.
-
 // See the .podspec file for this definition.
 #if SYNCSERVER_FACEBOOK_SIGNIN
 
@@ -17,6 +15,7 @@ import FacebookCore
 import FacebookLogin
 import SyncServer_Shared
 
+/// Enables you to sign in as a Facebook user to (a) create a new sharing user (must have an invitation from another SyncServer user), or (b) sign in as an existing sharing user.
 public class FacebookCredentials : GenericCredentials {
     fileprivate var accessToken:AccessToken!
     fileprivate var userProfile:UserProfile!
@@ -111,7 +110,7 @@ public class FacebookSyncServerSignIn : GenericSignIn {
         return stickySignIn
     }
 
-    // Returns non-nil if the user is signed in, and credentials could be refreshed during this app launch.
+    /// Returns non-nil if the user is signed in, and credentials could be refreshed during this app launch.
     public var credentials:GenericCredentials? {
         if stickySignIn && AccessToken.current != nil {
             let creds = FacebookCredentials()

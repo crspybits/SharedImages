@@ -11,14 +11,14 @@ import SMCoreLib
 import SyncServer_Shared
 
 public protocol SharingInvitationDelegate : class {
-func sharingInvitationReceived(_ invite:SharingInvitation.Invitation)
+    func sharingInvitationReceived(_ invite:SharingInvitation.Invitation)
 }
 
 public class SharingInvitation {
     public struct Invitation {
         public let sharingInvitationCode:String
         
-        // It seems odd to have this coming in as a URL parameter, but it has no effect on the permissions granted. Rather, it's here for the UI-- to tell the invited person what kind of permissions they would get if they accept the invitation. (The alternative would be to have a dedicated backend call which would return the sharing permission given the invitation code).
+        /// It seems odd to have this coming in as a URL parameter, but it has no effect on the permissions granted. Rather, it's here for the UI-- to tell the invited person what kind of permissions they would get if they accept the invitation. (The alternative would be to have a dedicated backend call which would return the sharing permission given the invitation code).
         public let sharingInvitationPermission:SharingPermission
     }
     
@@ -37,25 +37,30 @@ public class SharingInvitation {
     private init() {
     }
     
-    // 12/29/17; This to deal with the case where the delegate method of this class wasn't set before the invitation was received. See https://github.com/crspybits/SharedImages/issues/42
-    // This will be nil if the invitation has already been processed by the delegate. If it returns non-nil, it returns non-nil only once for that invitation.
+    /**
+        This to deal with the case where the delegate method of this class wasn't set before the invitation was received. See https://github.com/crspybits/SharedImages/issues/42
+ 
+        This will be nil if the invitation has already been processed by the delegate. If it returns non-nil, it returns non-nil only once for that invitation.
+    */
     public func receive() -> Invitation? {
         let result = invitation
         invitation = nil
         return result
     }
     
-    // This URL/String is suitable for sending in an email to the person being invited.
-    // Handles urls of the form: 
-    //      <BundleId>.invitation://?code=<InvitationCode>&permission=<permission>
-    //      where <BundleId> is something like biz.SpasticMuffin.SharedImages
-    //
+    /**
+        This URL/String is suitable for sending in an email to the person being invited.
+     
+        Handles urls of the form:
+          <BundleId>.invitation://?code=<InvitationCode>&permission=<permission>
+          where <BundleId> is something like biz.SpasticMuffin.SharedImages
+    */
     public static func createSharingURL(invitationCode:String, permission:SharingPermission) -> String {
         let urlString = self.urlScheme + "://?\(queryItemAuthorizationCode)=" + invitationCode + "&\(queryItemPermission)=" + permission.rawValue
         return urlString
     }
     
-    // Returns true iff can handle the url.
+    /// Returns true iff can handle the url.
     public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         Log.msg("url: \(url)")
         

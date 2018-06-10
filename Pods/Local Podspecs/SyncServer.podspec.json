@@ -39,8 +39,12 @@
     ],
     "RealReachability": [
       "~> 1.2"
+    ],
+    "GSignIn": [
+      "~> 0.1"
     ]
   },
+  "static_framework": true,
   "default_subspecs": "Lite",
   "subspecs": [
     {
@@ -68,25 +72,6 @@
       "dependencies": {
         "SwiftyDropbox": [
           "~> 4.3"
-        ]
-      }
-    },
-    {
-      "name": "Google",
-      "xcconfig": {
-        "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_GOOGLE_SIGNIN",
-        "OTHER_LDFLAGS": "$(inherited) -ObjC"
-      },
-      "pod_target_xcconfig": {
-        "FRAMEWORK_SEARCH_PATHS": "$(inherited) $(PODS_TARGET_SRCROOT)/SDKs/google_signin_sdk_4_1_2"
-      },
-      "frameworks": [
-        "GoogleSignIn",
-        "GoogleSignInDependencies"
-      ],
-      "resource_bundles": {
-        "GoogleSignIn": [
-          "$(PODS_TARGET_SRCROOT)/SDKs/google_signin_sdk_4_1_2/*.bundle"
         ]
       }
     }

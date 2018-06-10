@@ -76,17 +76,17 @@ public class DropboxCredentials : GenericCredentials {
         self.accessToken = accessToken
     }
     
-    // A unique identifier for the user. E.g., for Google this is their `sub`.
+    /// A unique identifier for the user. E.g., for Google this is their `sub`.
     public var userId:String {
         return savedCreds.uid
     }
 
-    // This is sent to the server as a human-readable means to identify the user.
+    /// This is sent to the server as a human-readable means to identify the user.
     public var username:String {
         return savedCreds.displayName
     }
 
-    // A name suitable for identifying the user via the UI. If available this should be the users email. Otherwise, it could be the same as the username.
+    /// A name suitable for identifying the user via the UI. If available this should be the users email. Otherwise, it could be the same as the username.
     public var uiDisplayName:String {
         return savedCreds.email
     }
@@ -99,7 +99,7 @@ public class DropboxCredentials : GenericCredentials {
         return result
     }
 
-    // Dropbox doesn't have a creds refresh.
+    /// Dropbox doesn't have a creds refresh.
     public func refreshCredentials(completion: @escaping (SyncServerError?) ->()) {
         // Dropbox access tokens live until the user revokes them, so no need to refresh. See https://www.dropboxforum.com/t5/API-support/API-v2-access-token-validity/td-p/215123
         completion(.noRefreshAvailable)
@@ -222,7 +222,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
         }
     }
 
-    // The parameter must be given with key "viewController" and value, a `UIViewController` conforming object. Returns an object of type `DropboxSignInOutButton`.
+    /// The parameter must be given with key "viewController" and value, a `UIViewController` conforming object.
     @discardableResult
     public func setupSignInButton(params:[String:Any]?) -> TappableButton? {        
         guard let vc = params?["viewController"] as? UIViewController else {

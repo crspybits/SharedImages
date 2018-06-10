@@ -119,11 +119,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>SyncServer-GoogleSignIn.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>SyncServer-Shared.xcscheme</key>
 		<dict>
 			<key>isShown</key>

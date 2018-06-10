@@ -8,40 +8,39 @@
 import Foundation
 import SMCoreLib
 
-// In the following the term `content` refers to either appMetaData or file data contents.
+/// In the following the term `content` refers to either appMetaData or file data contents.
 
+/// Download deletions can conflict with file uploads and/or appMetaData uploads. A server download deletion and a client file upload deletion don't conflict (it's just two people trying to delete at about the same time, which is fine).
 public enum DownloadDeletionResolution {
-    // Download deletions can conflict with file uploads and/or appMetaData uploads. A server download deletion and a client file upload deletion don't conflict (it's just two people trying to delete at about the same time, which is fine).
     
     public enum ContentUploadResolution {
-        // It is an error to select this for a conflict with a purely appMetaData upload -- because a pure appMetaData upload cannot undelete or restore the content of a file that has already been deleted.
+        /// It is an error to select this for a conflict with a purely appMetaData upload -- because a pure appMetaData upload cannot undelete or restore the content of a file that has already been deleted.
         case keepContentUpload
         
         case removeContentUpload
     }
     
-    // Deletes the existing content upload.
+    /// Deletes the existing content upload.
     case acceptDownloadDeletion
     
-    // For a file with a non-nil fileGroupUUID, this will also reject all pending download deletions for files with the same fileGroupUUID.
+    /// For a file with a non-nil fileGroupUUID, this will also reject all pending download deletions for files with the same fileGroupUUID.
     case rejectDownloadDeletion(ContentUploadResolution)
 }
 
+/// Content downloads can conflict with content upload(s) and/or an upload deletion. See the conflictType of the specific `SyncServerConflict`.
 public enum ContentDownloadResolution {
-    // Content downloads can conflict with content upload(s) and/or an upload deletion. See the conflictType of the specific `SyncServerConflict`.
-    
-    // This is used in `rejectContentDownload` below.
+    /// This is used in `rejectContentDownload` below.
     public struct UploadResolution : OptionSet {
         public let rawValue: Int
         public init(rawValue:Int){ self.rawValue = rawValue}
         
-        // If you are going to use `rejectContentDownload` (see below), this is the typical upload resolution.
+        /// If you are going to use `rejectContentDownload` (see below), this is the typical upload resolution.
         public static let keepAll:UploadResolution = [keepContentUploads, keepUploadDeletions]
         
-        // Remove any conflicting local content uploads and/or upload deletions.
+        /// Remove any conflicting local content uploads and/or upload deletions.
         public static let removeAll = UploadResolution(rawValue: 0)
         
-        // Not having this option means to remove your conflicting content uploads
+        /// Not having this option means to remove your conflicting content uploads
         public static let keepContentUploads = UploadResolution(rawValue: 1 << 0)
         
         public var keepContentUploads:Bool {
@@ -52,7 +51,7 @@ public enum ContentDownloadResolution {
             return !self.contains(UploadResolution.keepContentUploads)
         }
         
-        // Not having this option means to remove your conflicting upload deletions.
+        /// Not having this option means to remove your conflicting upload deletions.
         public static let keepUploadDeletions = UploadResolution(rawValue: 1 << 1)
         
         public var keepUploadDeletions:Bool {
@@ -64,7 +63,7 @@ public enum ContentDownloadResolution {
         }
     }
     
-    // Deletes any conflicting content upload and/or upload deletion.
+    /// Deletes any conflicting content upload and/or upload deletion.
     case acceptContentDownload
     
     case rejectContentDownload(UploadResolution)
@@ -73,21 +72,30 @@ public enum ContentDownloadResolution {
 public enum ServerContentType {
     case appMetaData
     case file(SMRelativeLocalURL)
-    case both(downloadURL: SMRelativeLocalURL) // both a file download and an appMetaData update.
+    
+    /// Both a file download and an appMetaData update.
+    case both(downloadURL: SMRelativeLocalURL)
 }
 
-// Because downloads are higher-priority (than uploads) with the SyncServer, all conflicts effectively originate from a server download operation: A download-deletion, a file-download, or an appMetaData download. The type of server operation will be apparent from the context.
-// And the conflict is between the server operation and a local, client operation:
+/**
+    Because downloads are higher-priority (than uploads) with the SyncServer, all conflicts effectively originate from a server download operation: A download-deletion, a file-download, or an appMetaData download. The type of server operation will be apparent from the context.
+ 
+    And the conflict is between the server operation and a local, client operation.
+*/
 public enum ConflictingClientOperation: Equatable {
     public enum ContentType {
         case appMetaData
         case file
-        case both // there are both appMetaData and file uploads conflicting
+        
+        /// There are both appMetaData and file uploads conflicting
+        case both
     }
 
     case uploadDeletion
     case contentUpload(ContentType)
-    case both // there are both upload deletions and content uploads conflicting.
+    
+    /// There are both upload deletions and content uploads conflicting.
+    case both
 
     public static func == (lhs: ConflictingClientOperation, rhs: ConflictingClientOperation) -> Bool {
         switch lhs {
@@ -111,7 +119,7 @@ public enum ConflictingClientOperation: Equatable {
     }
 }
 
-// When you receive a conflict in a callback method, you must resolve the conflict by calling resolveConflict.
+/// When you receive a conflict in a callback method, you must resolve the conflict by calling resolveConflict.
 public class SyncServerConflict<R> {
     typealias callbackType = ((R)->())?
     
@@ -125,6 +133,7 @@ public class SyncServerConflict<R> {
     
     public private(set) var conflictType:ConflictingClientOperation!
     
+    /// Don't call this more than once!
     public func resolveConflict(resolution:R) {
         assert(!conflictResolved, "Already resolved!")
         conflictResolved = true

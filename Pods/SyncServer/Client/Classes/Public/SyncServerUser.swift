@@ -26,7 +26,7 @@ public class SyncServerUser {
     // Persisting this in the keychain for security-- I'd rather this identifier wasn't known to more folks than need it.
     static let syncServerUserId = SMPersistItemString(name: "SyncServerUser.syncServerUserId", initialStringValue: "", persistType: .keyChain)
     
-    // A unique identifier for the user on the SyncServer system. If creds are set this will be set.
+    /// A unique identifier for the user on the SyncServer system. If creds are set this will be set.
     public var syncServerUserId:String? {
         if SyncServerUser.syncServerUserId.stringValue == "" {
             return nil
@@ -58,9 +58,9 @@ public class SyncServerUser {
     }
     
     public enum CheckForExistingUserResult {
-    case noUser
-    case owningUser
-    case sharingUser(sharingPermission:SharingPermission, accessToken:String?)
+        case noUser
+        case owningUser
+        case sharingUser(sharingPermission:SharingPermission, accessToken:String?)
     }
     
     fileprivate func showAlert(with title:String, and message:String? = nil) {
@@ -75,6 +75,7 @@ public class SyncServerUser {
         })
     }
     
+    /// Calls the server API method to check credentials.
     public func checkForExistingUser(creds: GenericCredentials,
         completion:@escaping (_ result: CheckForExistingUserResult?, Error?) ->()) {
         
@@ -129,6 +130,7 @@ public class SyncServerUser {
         }
     }
     
+    /// Calls the server API method to add a user.
     public func addUser(creds: GenericCredentials, completion:@escaping (Error?) ->()) {
         Log.msg("SignInCreds: \(creds)")
 
@@ -153,6 +155,7 @@ public class SyncServerUser {
         }
     }
     
+    /// Calls the server API method to create a sharing invitation.
     public func createSharingInvitation(withPermission permission:SharingPermission, completion:((_ invitationCode:String?, Error?)->(Void))?) {
 
         ServerAPI.session.createSharingInvitation(withPermission: permission) { (sharingInvitationUUID, error) in
@@ -162,6 +165,7 @@ public class SyncServerUser {
         }
     }
     
+    /// Calls the server API method to redeem a sharing invitation.
     public func redeemSharingInvitation(creds: GenericCredentials, invitationCode:String, completion:((_ accessToken:String?, Error?)->())?) {
         
         self.creds = creds
