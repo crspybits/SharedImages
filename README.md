@@ -22,3 +22,6 @@ Eventually, SharedImages will be on the Apple app store. The backend ([SyncServe
 
 If you want to go it alone, and boot up your own [SyncServerII](https://github.com/crspybits/SyncServerII/) instance, you can do that yourself too. [See the instructions here for that](https://crspybits.github.io/SyncServerII/).
 
+## Building this project
+
+[Straight out of the box, this project will not build cleanly. See these instructions.](https://github.com/crspybits/SyncServerII/#SHAREDIMAGES)
