@@ -24,4 +24,4 @@ If you want to go it alone, and boot up your own [SyncServerII](https://github.c
 
 ## Building this project
 
-[Straight out of the box, this project will not build cleanly. See these instructions.](https://github.com/crspybits/SyncServerII/#SHAREDIMAGES)
+[Straight out of the box, this project will not build cleanly. See these instructions.](https://crspybits.github.io/SyncServerII/#SHAREDIMAGES)
