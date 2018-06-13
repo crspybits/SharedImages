@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.17.0
+Version 0.17.0 (6/12/18)
 	* Updated to changed SyncServer iOS client pod-- that uses dynamic GoogleSignIn framework.
 
 Version 0.16.0 (5/27/18)
