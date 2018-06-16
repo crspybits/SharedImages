@@ -24,6 +24,7 @@ public enum SyncEvent {
     case contentUploadsCompleted(numberOfFiles:Int)
     case uploadDeletionsCompleted(numberOfFiles:Int)
     
+    case syncDelayed
     case syncStarted
     
     /// Occurs after call to stopSync, when the synchronization is just about to stop. syncDone will be the next event (if desired).
@@ -47,17 +48,18 @@ public struct EventDesired: OptionSet {
     public static let contentUploadsCompleted = EventDesired(rawValue: 1 << 5)
     public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 6)
     
-    public static let syncStarted = EventDesired(rawValue: 1 << 7)
-    public static let syncDone = EventDesired(rawValue: 1 << 8)
+    public static let syncDelayed = EventDesired(rawValue: 1 << 7)
+    public static let syncStarted = EventDesired(rawValue: 1 << 8)
+    public static let syncDone = EventDesired(rawValue: 1 << 9)
     
-    public static let syncStopping = EventDesired(rawValue: 1 << 9)
+    public static let syncStopping = EventDesired(rawValue: 1 << 10)
 
-    public static let refreshingCredentials = EventDesired(rawValue: 1 << 10)
+    public static let refreshingCredentials = EventDesired(rawValue: 1 << 11)
 
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -76,6 +78,9 @@ public struct EventDesired: OptionSet {
         case .uploadDeletionsCompleted:
             eventIsDesired = .uploadDeletionsCompleted
         
+        case .syncDelayed:
+            eventIsDesired = .syncDelayed
+            
         case .syncStarted:
             eventIsDesired = .syncStarted
             

@@ -9,7 +9,6 @@
 import Foundation
 import SMCoreLib
 import SyncServer_Shared
-import RealReachability
 
 /// Synchronize files and app meta data with other instances of the same client app.
 public class SyncServer {
@@ -64,9 +63,7 @@ public class SyncServer {
     public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil) {
         Log.msg("cloudFolderName: \(String(describing: cloudFolderName))")
         Log.msg("serverURL: \(serverURL.absoluteString)")
-        
-        RealReachability.sharedInstance().startNotifier()
-        
+                
         // This seems a little hacky, but can't find a better way to get the bundle of the framework containing our model. I.e., "this" framework. Just using a Core Data object contained in this framework to track it down.
         // Without providing this bundle reference, I wasn't able to dynamically locate the model contained in the framework.
         let bundle = Bundle(for: NSClassFromString(Singleton.entityName())!)
@@ -489,6 +486,7 @@ public class SyncServer {
             
             // [2]
             if syncOperating {
+                EventDesired.reportEvent(.syncDelayed, mask: self.eventsDesired, delegate: self.delegate)
                 delayedSync = true
                 doStart = false
             }

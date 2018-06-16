@@ -215,7 +215,13 @@ class ImagesVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         coreDataSource.fetchData()
+
+        // 6/16/18; Used to have this in `viewDidAppear`, but I'm getting a crash in that case when the filter is on to only see images with unread messages-- and coming back from large images. See https://github.com/crspybits/SharedImages/issues/123
+        // To clear unread count(s)-- both in the case of coming back from navigating to large images, and in the case of resetting unread counts in Settings.
+        collectionView.reloadData()
+        
         Progress.session.viewController = self
     }
     
@@ -232,9 +238,6 @@ class ImagesVC: UIViewController {
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
         setAddButtonState()
-        
-        // To clear unread count(s)-- both in the case of coming back from navigating to large images, and in the case of resetting unread counts in Settings.
-        collectionView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -608,6 +611,10 @@ extension ImagesVC : SyncControllerDelegate {
     
     func syncEvent(syncController:SyncController, event:SyncControllerEvent) {
         switch event {
+        case .syncDelayed:
+            // Trying to deal with https://github.com/crspybits/SharedImages/issues/126
+            self.bottomRefresh.hide()
+            
         case .syncStarted:
             // Put this hide here (instead of in syncDone) to try to deal with https://github.com/crspybits/SharedImages/issues/121 (c)
             self.bottomRefresh.hide()
@@ -642,6 +649,7 @@ extension ImagesVC : SyncControllerDelegate {
             }
             
         case .syncError(let message):
+            self.bottomRefresh.hide()
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: message)
         }
     }

@@ -54,6 +54,8 @@ class ServerNetworkingLoading : NSObject {
         // https://developer.apple.com/reference/foundation/urlsessionconfiguration/1407496-background
         let sessionConfiguration = URLSessionConfiguration.background(withIdentifier: "biz.SpasticMuffin.SyncServer." + appBundleName)
         
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        
         session = URLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: OperationQueue.main)
     }
     

@@ -4,13 +4,17 @@ source 'https://github.com/CocoaPods/Specs.git'
 use_frameworks!
 
 target 'SharedImages' do
+	# https://stackoverflow.com/questions/13208202
+	# ignore all warnings from all pods
+	inhibit_all_warnings!
+
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 15.4'
-	pod 'SyncServer/Facebook', '~> 15.4'
-	pod 'SyncServer/Dropbox', '~> 15.4'
-	pod 'SyncServer/Google', '~> 15.4'
+	pod 'SyncServer', '~> 15.5'
+	pod 'SyncServer/Facebook', '~> 15.5'
+	pod 'SyncServer/Dropbox', '~> 15.5'
+	pod 'SyncServer/Google', '~> 15.5'
 
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'

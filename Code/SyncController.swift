@@ -13,6 +13,7 @@ import rosterdev
 import SyncServer_Shared
 
 enum SyncControllerEvent {
+    case syncDelayed
     case syncStarted
     case syncDone(numberOperations: Int)
     case syncError(message: String)
@@ -60,7 +61,7 @@ class SyncController {
     
     init() {
         SyncServer.session.delegate = self
-        SyncServer.session.eventsDesired = [.syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
+        SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
                 .singleFileUploadComplete, .singleUploadDeletionComplete]
     }
     
@@ -455,6 +456,9 @@ extension SyncController : SyncServerDelegate {
         Log.msg("Server event occurred: \(event)")
 
         switch event {
+        case .syncDelayed:
+            delegate.syncEvent(syncController: self, event: .syncDelayed)
+
         case .syncStarted:
             numberOperations = 0
             delegate.syncEvent(syncController: self, event: .syncStarted)

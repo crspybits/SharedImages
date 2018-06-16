@@ -10,7 +10,6 @@ import Foundation
 import SMCoreLib
 import SyncServer_Shared
 import CoreTelephony
-import RealReachability
 
 protocol ServerNetworkingDelegate : class {
     // Key/value pairs to be added to the outgoing HTTP header for authentication
@@ -18,6 +17,7 @@ protocol ServerNetworkingDelegate : class {
 }
 
 class ServerNetworking : NSObject {
+    static let defaultTimeout:TimeInterval = 60
     static let session = ServerNetworking()
     var minimumServerVersion:ServerVersion?
     weak var syncServerDelegate:SyncServerDelegate?
@@ -51,7 +51,7 @@ class ServerNetworking : NSObject {
         }
     }
     
-    func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval? = nil,
+    func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval = ServerNetworking.defaultTimeout,
         completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         sendRequestTo(serverURL, method: method, timeoutIntervalForRequest:timeoutIntervalForRequest) { (serverResponse, statusCode, error) in
@@ -63,36 +63,20 @@ class ServerNetworking : NSObject {
     
         // 5/21/18; I'm going to attempt to fix https://github.com/crspybits/SharedImages/issues/110 by just taking this out. I'm wondering if I'm getting false indications of a lack of a network. Use it as a diagnostic after an error instead.
         // 5/27/18; That experiment didn't work out so well. I got a large number of network errors: https://github.com/crspybits/SharedImages/issues/120 I'm going to try using a different reachability method.
-        ifHaveNetwork(withNetwork: {
-            ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) {[unowned self] (serverResponse, statusCode, error) in
+        // 6/15/18; And that experiment didn't work out so well either. It turns out that apparently the background sessions I'm using for upload/download wait for network availability. So, I'm going to rely on that for upload/download.
+        ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) {[unowned self] (serverResponse, statusCode, error) in
+        
+            if let headers = serverResponse?.allHeaderFields, !self.serverVersionIsOK(headerFields: headers) {
+                return
+            }
             
-                if let headers = serverResponse?.allHeaderFields, !self.serverVersionIsOK(headerFields: headers) {
-                    return
-                }
-                
-                guard error == nil else {
-                    self.checkForNetworkAndReport()
-                    completion?(nil, nil, error)
-                    return
-                }
-                
-                completion?(serverResponse, statusCode, error)
+            guard error == nil else {
+                self.checkForNetworkAndReport()
+                completion?(nil, nil, error)
+                return
             }
-        }, elseNoNetwork: {
-            self.checkForNetworkAndReport()
-            completion?(nil, nil, .noNetworkError)
-        })
-    }
-    
-    private func ifHaveNetwork(withNetwork: @escaping ()->(), elseNoNetwork:@escaping ()->()) {
-        RealReachability.sharedInstance().reachability { status in
-            switch status {
-            case .RealStatusViaWWAN, .RealStatusViaWiFi:
-                withNetwork()
-                
-            case .RealStatusUnknown, .RealStatusNotReachable:
-                elseNoNetwork()
-            }
+            
+            completion?(serverResponse, statusCode, error)
         }
     }
     
@@ -121,65 +105,62 @@ class ServerNetworking : NSObject {
     
     public func download(file: ServerNetworkingLoadingFile, fromServerURL serverURL: URL, method: ServerHTTPMethod, completion:((SMRelativeLocalURL?, _ serverResponse:HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
 
-        ifHaveNetwork(withNetwork: {
-            ServerNetworkingLoading.session.download(file: file, fromServerURL: serverURL, method: method) { (url, urlResponse, status, error) in
+        ServerNetworkingLoading.session.download(file: file, fromServerURL: serverURL, method: method) { (url, urlResponse, status, error) in
 
-                // Check first to see if we've got a bad server version. If we do, all bets are off-- `serverVersionIsOK` reports an error, and we'll return *without* calling the callback, since this is rather severe.
-                if let headers = urlResponse?.allHeaderFields, !self.serverVersionIsOK(headerFields: headers) {
+            // Check first to see if we've got a bad server version. If we do, all bets are off-- `serverVersionIsOK` reports an error, and we'll return *without* calling the callback, since this is rather severe.
+            if let headers = urlResponse?.allHeaderFields, !self.serverVersionIsOK(headerFields: headers) {
+                return
+            }
+            
+            if error == nil {
+                guard url != nil else {
+                    completion?(nil, nil, urlResponse?.statusCode, .didNotGetDownloadURL)
                     return
                 }
-                
-                if error == nil {
-                    guard url != nil else {
-                        completion?(nil, nil, urlResponse?.statusCode, .didNotGetDownloadURL)
-                        return
-                    }
-                    completion?(url, urlResponse, urlResponse?.statusCode, nil)
-                }
-                else {
-                    // There was an error-- check to see if it was due to network issues.
-                    self.checkForNetworkAndReport()
-                    completion?(nil, nil, nil, error)
-                }
+                completion?(url, urlResponse, urlResponse?.statusCode, nil)
             }
-        }, elseNoNetwork: {
-            self.checkForNetworkAndReport()
-            completion?(nil, nil, nil, .noNetworkError)
-        })
+            else {
+                // There was an error-- check to see if it was due to network issues.
+                self.checkForNetworkAndReport()
+                completion?(nil, nil, nil, error)
+            }
+        }
     }
     
-    private func sendRequestTo(_ serverURL: URL, method: ServerHTTPMethod, dataToUpload:Data? = nil, timeoutIntervalForRequest:TimeInterval? = nil, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
+    private func sendRequestTo(_ serverURL: URL, method: ServerHTTPMethod, dataToUpload:Data? = nil, timeoutIntervalForRequest:TimeInterval, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
     
-        ifHaveNetwork(withNetwork: {
-            let sessionConfiguration = URLSessionConfiguration.default
-            if timeoutIntervalForRequest != nil {
-                sessionConfiguration.timeoutIntervalForRequest = timeoutIntervalForRequest!
-            }
-            
-            sessionConfiguration.httpAdditionalHeaders = self.delegate?.serverNetworkingHeaderAuthentication(
-                    forServerNetworking: self)
-            Log.msg("httpAdditionalHeaders: \(String(describing: sessionConfiguration.httpAdditionalHeaders))")
-            
-            // If needed, use a delegate here to track upload progress.
-            let session = URLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
-            
-            // Data uploading task. We could use NSURLSessionUploadTask instead of NSURLSessionDataTask if we needed to support uploads in the background
-            
-            var request = URLRequest(url: serverURL)
-            request.httpMethod = method.rawValue.uppercased()
-            request.httpBody = dataToUpload
-            
-            Log.msg("sendRequestTo: serverURL: \(serverURL)")
-            
-            let uploadTask:URLSessionDataTask = session.dataTask(with: request) { (data, urlResponse, error) in
-                self.processResponse(data: data, urlResponse: urlResponse, error: error, completion: completion)
-            }
-            
-            uploadTask.resume()
-        }, elseNoNetwork: {
-            self.checkForNetworkAndReport()
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = timeoutIntervalForRequest
+        
+        if #available(iOS 11, *) {
+            // https://useyourloaf.com/blog/urlsession-waiting-for-connectivity/
+            sessionConfiguration.waitsForConnectivity = true
+        }
+        else if !Network.connected() {
             completion?(nil, nil, .noNetworkError)
-        })
+            return
+        }
+        
+        sessionConfiguration.httpAdditionalHeaders = self.delegate?.serverNetworkingHeaderAuthentication(
+                forServerNetworking: self)
+        Log.msg("httpAdditionalHeaders: \(String(describing: sessionConfiguration.httpAdditionalHeaders))")
+        
+        // If needed, use a delegate here to track upload progress.
+        let session = URLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
+        
+        // Data uploading task. We could use NSURLSessionUploadTask instead of NSURLSessionDataTask if we needed to support uploads in the background
+        
+        var request = URLRequest(url: serverURL)
+        request.httpMethod = method.rawValue.uppercased()
+        request.httpBody = dataToUpload
+        
+        Log.msg("sendRequestTo: serverURL: \(serverURL)")
+        
+        let uploadTask:URLSessionDataTask = session.dataTask(with: request) { (data, urlResponse, error) in
+            self.processResponse(data: data, urlResponse: urlResponse, error: error, completion: completion)
+        }
+        
+        uploadTask.resume()
     }
     
     private func processResponse(data:Data?, urlResponse:URLResponse?, error: Error?, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
@@ -230,8 +211,7 @@ class ServerNetworking : NSObject {
     
     // Only use this for a diagnostic purpose, not for a check to decide whether to make a network call. Reports network error, if found via syncServerErrorOccurred.
     private func checkForNetworkAndReport() {
-        switch RealReachability.sharedInstance().currentReachabilityStatus() {
-        case .RealStatusUnknown, .RealStatusNotReachable:
+        if !Network.connected() {
             if let haveCellularData = haveCellularData, !haveCellularData {
                 Thread.runSync(onMainThread: {
                     self.syncServerDelegate?.syncServerErrorOccurred(error: .noCellularDataConnection)
@@ -242,9 +222,6 @@ class ServerNetworking : NSObject {
                     self.syncServerDelegate?.syncServerErrorOccurred(error: .noNetworkError)
                 })
             }
-            
-        case .RealStatusViaWiFi, .RealStatusViaWWAN:
-            break
         }
     }
 }

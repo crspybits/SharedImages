@@ -360,11 +360,10 @@ class ServerAPI {
         let endpoint = ServerEndpoints.doneUploads
         
         // See https://developer.apple.com/reference/foundation/nsurlsessionconfiguration/1408259-timeoutintervalforrequest
-        let defaultTimeout = 60.0
         
-        var timeoutIntervalForRequest:TimeInterval?
+        var timeoutIntervalForRequest:TimeInterval = ServerNetworking.defaultTimeout
         if numberOfDeletions > 0 {
-            timeoutIntervalForRequest = defaultTimeout + Double(numberOfDeletions) * 5.0
+            timeoutIntervalForRequest += Double(numberOfDeletions) * 5.0
         }
         
         var params = [String : Any]()

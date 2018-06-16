@@ -138,7 +138,7 @@ extension ServerAPI {
         delegate?.userWasUnauthorized(forServerAPI: self)
     }
     
-    func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval? = nil, retryIfError retry:Bool=true, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
+    func sendRequestUsing(method: ServerHTTPMethod, toURL serverURL: URL, timeoutIntervalForRequest:TimeInterval = ServerNetworking.defaultTimeout, retryIfError retry:Bool=true, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(retryIfError: retry, creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         

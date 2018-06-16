@@ -1,5 +1,13 @@
 SharedImages
 
+Version 0.18.0 (6/16/18)
+	* Updated to changed SyncServer iOS client pod-- changed method of checking for lack of network. 
+		https://github.com/crspybits/SharedImages/issues/125
+	* Trying to deal with: "R" remains
+		https://github.com/crspybits/SharedImages/issues/126
+	* Dany: Crash in v0.16.0
+		https://github.com/crspybits/SharedImages/issues/123
+		
 Version 0.17.0 (6/12/18)
 	* Updated to changed SyncServer iOS client pod-- that uses dynamic GoogleSignIn framework.
 
