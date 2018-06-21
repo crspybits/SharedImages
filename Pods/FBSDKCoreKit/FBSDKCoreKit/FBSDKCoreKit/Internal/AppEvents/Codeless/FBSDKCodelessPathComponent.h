@@ -16,33 +16,29 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKAccessToken.h>
-#import <FBSDKCoreKit/FBSDKAppEvents.h>
-#import <FBSDKCoreKit/FBSDKApplicationDelegate.h>
-#import <FBSDKCoreKit/FBSDKButton.h>
-#import <FBSDKCoreKit/FBSDKConstants.h>
-#import <FBSDKCoreKit/FBSDKCopying.h>
-#import <FBSDKCoreKit/FBSDKGraphRequest.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestConnection.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestDataAttachment.h>
-#import <FBSDKCoreKit/FBSDKMacros.h>
-#import <FBSDKCoreKit/FBSDKSettings.h>
-#import <FBSDKCoreKit/FBSDKTestUsersManager.h>
-#import <FBSDKCoreKit/FBSDKUtility.h>
+typedef NS_OPTIONS(int, FBSDKCodelessMatchBitmaskField)
+{
+  FBSDKCodelessMatchBitmaskFieldID = 1,
+  FBSDKCodelessMatchBitmaskFieldText = 1 << 1,
+  FBSDKCodelessMatchBitmaskFieldTag = 1 << 2,
+  FBSDKCodelessMatchBitmaskFieldDescription = 1 << 3,
+  FBSDKCodelessMatchBitmaskFieldHint = 1 << 4
+};
 
-#if !TARGET_OS_TV
-#import <FBSDKCoreKit/FBSDKAppLinkResolver.h>
-#import <FBSDKCoreKit/FBSDKAppLinkUtility.h>
-#import <FBSDKCoreKit/FBSDKGraphErrorRecoveryProcessor.h>
-#import <FBSDKCoreKit/FBSDKMutableCopying.h>
-#import <FBSDKCoreKit/FBSDKProfile.h>
-#import <FBSDKCoreKit/FBSDKProfilePictureView.h>
-#else
-#import <FBSDKCoreKit/FBSDKDeviceButton.h>
-#import <FBSDKCoreKit/FBSDKDeviceViewControllerBase.h>
-#endif
+@interface FBSDKCodelessPathComponent : NSObject
 
-#define FBSDK_VERSION_STRING @"4.34.0"
-#define FBSDK_TARGET_PLATFORM_VERSION @"v3.0"
+@property (nonatomic, copy, readonly) NSString *className;
+@property (nonatomic, copy, readonly) NSString *text;
+@property (nonatomic, copy, readonly) NSString *hint;
+@property (nonatomic, copy, readonly) NSString *desc; // description
+@property (nonatomic, readonly) int index;
+@property (nonatomic, readonly) int tag;
+@property (nonatomic, readonly) int section;
+@property (nonatomic, readonly) int row;
+@property (nonatomic, readonly) int matchBitmask;
+
+- (instancetype)initWithJSON:(NSDictionary*)dict;
+
+@end

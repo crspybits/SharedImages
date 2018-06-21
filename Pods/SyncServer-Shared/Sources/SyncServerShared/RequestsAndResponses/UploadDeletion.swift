@@ -63,7 +63,7 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
         self.actualDeletion = Decoder.decode(int32ForKey:  UploadDeletionRequest.actualDeletionKey)(json)
 #endif
         
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
             return nil
         }
         

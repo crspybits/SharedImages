@@ -50,7 +50,7 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
         self.testLockSync = DoneUploadsRequest.testLockSyncKey <~~ json
 #endif
 
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !self.nonNilKeysHaveValues(in: json) {
 #if SERVER
             Log.debug(message: "json was: \(json)")
 #endif

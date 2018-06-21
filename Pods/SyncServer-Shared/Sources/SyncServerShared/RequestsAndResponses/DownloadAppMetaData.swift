@@ -41,7 +41,7 @@ public class DownloadAppMetaDataRequest : NSObject, RequestMessage {
         self.masterVersion = Decoder.decode(int64ForKey: DownloadAppMetaDataRequest.masterVersionKey)(json)
         self.appMetaDataVersion = Decoder.decode(int32ForKey: DownloadAppMetaDataRequest.appMetaDataVersionKey)(json)
 
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !self.nonNilKeysHaveValues(in: json) {
             return nil
         }
         

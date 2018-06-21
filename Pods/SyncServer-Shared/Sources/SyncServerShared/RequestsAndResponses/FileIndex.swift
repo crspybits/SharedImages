@@ -33,7 +33,7 @@ public class FileIndexRequest : NSObject, RequestMessage {
         Log.info(message: "FileIndexRequest.testServerSleep: \(String(describing: testServerSleep))")
 #endif
 
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
 #if SERVER
             Log.debug(message: "json was: \(json)")
 #endif

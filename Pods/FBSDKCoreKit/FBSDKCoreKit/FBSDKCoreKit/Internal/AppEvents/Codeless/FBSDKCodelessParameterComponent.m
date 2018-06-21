@@ -16,33 +16,30 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import "FBSDKCodelessParameterComponent.h"
 
-#import <FBSDKCoreKit/FBSDKAccessToken.h>
-#import <FBSDKCoreKit/FBSDKAppEvents.h>
-#import <FBSDKCoreKit/FBSDKApplicationDelegate.h>
-#import <FBSDKCoreKit/FBSDKButton.h>
-#import <FBSDKCoreKit/FBSDKConstants.h>
-#import <FBSDKCoreKit/FBSDKCopying.h>
-#import <FBSDKCoreKit/FBSDKGraphRequest.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestConnection.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestDataAttachment.h>
-#import <FBSDKCoreKit/FBSDKMacros.h>
-#import <FBSDKCoreKit/FBSDKSettings.h>
-#import <FBSDKCoreKit/FBSDKTestUsersManager.h>
-#import <FBSDKCoreKit/FBSDKUtility.h>
+#import "FBSDKCodelessMacros.h"
+#import "FBSDKCodelessPathComponent.h"
 
-#if !TARGET_OS_TV
-#import <FBSDKCoreKit/FBSDKAppLinkResolver.h>
-#import <FBSDKCoreKit/FBSDKAppLinkUtility.h>
-#import <FBSDKCoreKit/FBSDKGraphErrorRecoveryProcessor.h>
-#import <FBSDKCoreKit/FBSDKMutableCopying.h>
-#import <FBSDKCoreKit/FBSDKProfile.h>
-#import <FBSDKCoreKit/FBSDKProfilePictureView.h>
-#else
-#import <FBSDKCoreKit/FBSDKDeviceButton.h>
-#import <FBSDKCoreKit/FBSDKDeviceViewControllerBase.h>
-#endif
+@implementation FBSDKCodelessParameterComponent
 
-#define FBSDK_VERSION_STRING @"4.34.0"
-#define FBSDK_TARGET_PLATFORM_VERSION @"v3.0"
+- (instancetype)initWithJSON:(NSDictionary *)dict {
+  if (self = [super init]) {
+    _name = [[dict objectForKey:CODELESS_MAPPING_PARAMETER_NAME_KEY] copy];
+    _value = [[dict objectForKey:CODELESS_MAPPING_PARAMETER_VALUE_KEY] copy];
+    _pathType = [[dict objectForKey:CODELESS_MAPPING_PATH_TYPE_KEY] copy];
+
+    NSArray *ary = [dict objectForKey:CODELESS_MAPPING_PATH_KEY];
+    NSMutableArray *mut = [NSMutableArray array];
+    for (NSDictionary *info in ary) {
+      FBSDKCodelessPathComponent *component = [[FBSDKCodelessPathComponent alloc]
+                                            initWithJSON:info];
+      [mut addObject:component];
+    }
+    _path = [mut copy];
+  }
+
+  return self;
+}
+
+@end

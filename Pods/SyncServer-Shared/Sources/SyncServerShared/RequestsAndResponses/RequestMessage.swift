@@ -25,22 +25,6 @@ public protocol RequestMessage : NSObjectProtocol, Gloss.Encodable, Gloss.Decoda
     func nonNilKeys() -> [String]
 }
 
-// See http://stackoverflow.com/questions/43794228/getting-the-value-of-a-property-using-its-string-name-in-pure-swift-using-refle
-// Don't pass this an unwrapped optional. i.e., unwrap an optional before you pass it.
-public func valueFor(property:String, of object:Any) -> Any? {
-    func isNilDescendant(_ any: Any?) -> Bool {
-        return String(describing: any) == "Optional(nil)"
-    }
-    
-    let mirror = Mirror(reflecting: object)
-    if let child = mirror.descendant(property), !isNilDescendant(child) {
-        return child
-    }
-    else {
-        return nil
-    }
-}
-
 public extension RequestMessage {
     public func allKeys() -> [String] {
         return []
@@ -50,17 +34,18 @@ public extension RequestMessage {
         return []
     }
     
-    // http://stackoverflow.com/questions/27989094/how-to-unwrap-an-optional-value-from-any-type/43754449#43754449
-    private func unwrap<T>(_ any: T) -> Any {
-        let mirror = Mirror(reflecting: any)
-        guard mirror.displayStyle == .optional, let first = mirror.children.first else {
-            return any
+    // Lots of problems trying to use reflection to do this. This is simpler. See also http://stackoverflow.com/questions/43794228/getting-the-value-of-a-property-using-its-string-name-in-pure-swift-using-refle
+    func nonNilKeysHaveValues(in dictionary: [String: Any]) -> Bool {
+        for key in self.nonNilKeys() {
+            if dictionary[key] == nil {
+                return false
+            }
         }
-        return unwrap(first.value)
+        return true
     }
     
     public func urlParameters() -> String? {
-        // 6/9/17; I was previously using `valueFor` method, and not just converting to a dict. Can't recall why. However, this started giving me grief when I started using dates.
+        // 6/9/17; I was previously using reflection to do this, and not just converting to a dict. Can't recall why. However, this started giving me grief when I started using dates.
         guard let jsonDict = toJSON() else {
 #if SERVER
             Log.error(message: "Could not convert toJSON()!")
@@ -97,32 +82,6 @@ public extension RequestMessage {
         else {
             return result
         }
-    }
-    
-    public func propertyHasValue(propertyName:String) -> Bool {
-        if valueFor(property: propertyName, of: self) == nil {
-            return false
-        }
-        else {
-            return true
-        }
-    }
-    
-    // Returns false if any of the properties do not have value.
-    public func propertiesHaveValues(propertyNames:[String]) -> Bool {
-        for propertyName in propertyNames {
-            if !self.propertyHasValue(propertyName: propertyName) {
-                let message = "Property: \(propertyName) does not have a value"
-#if SERVER
-                Log.info(message: message)
-#else
-                print(message)
-#endif
-                return false
-            }
-        }
-        
-        return true
     }
 }
 

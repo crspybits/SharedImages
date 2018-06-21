@@ -75,7 +75,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
         self.undeleteServerFile = Decoder.decode(int32ForKey:  UploadFileRequest.undeleteServerFileKey)(json)
         
 #if SERVER
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
             return nil
         }
 #endif

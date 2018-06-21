@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.18.1 (6/20/18)
+	* Updated to changed SyncServer iOS client pod-- which reflects update to server. Server updated to using new libraries and new Swift version.
+	
 Version 0.18.0 (6/16/18)
 	* Updated to changed SyncServer iOS client pod-- changed method of checking for lack of network. 
 		https://github.com/crspybits/SharedImages/issues/125

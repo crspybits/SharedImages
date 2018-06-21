@@ -30,7 +30,7 @@ public class GetUploadsRequest : NSObject, RequestMessage {
         super.init()
         
 #if SERVER
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
             return nil
         }
 #endif

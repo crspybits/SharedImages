@@ -16,33 +16,18 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKAccessToken.h>
-#import <FBSDKCoreKit/FBSDKAppEvents.h>
-#import <FBSDKCoreKit/FBSDKApplicationDelegate.h>
-#import <FBSDKCoreKit/FBSDKButton.h>
-#import <FBSDKCoreKit/FBSDKConstants.h>
-#import <FBSDKCoreKit/FBSDKCopying.h>
-#import <FBSDKCoreKit/FBSDKGraphRequest.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestConnection.h>
-#import <FBSDKCoreKit/FBSDKGraphRequestDataAttachment.h>
-#import <FBSDKCoreKit/FBSDKMacros.h>
-#import <FBSDKCoreKit/FBSDKSettings.h>
-#import <FBSDKCoreKit/FBSDKTestUsersManager.h>
-#import <FBSDKCoreKit/FBSDKUtility.h>
+// Cast to turn things that are not ids into NSMapTable keys
+#define MAPTABLE_ID(x) (__bridge id)((void *)x)
 
-#if !TARGET_OS_TV
-#import <FBSDKCoreKit/FBSDKAppLinkResolver.h>
-#import <FBSDKCoreKit/FBSDKAppLinkUtility.h>
-#import <FBSDKCoreKit/FBSDKGraphErrorRecoveryProcessor.h>
-#import <FBSDKCoreKit/FBSDKMutableCopying.h>
-#import <FBSDKCoreKit/FBSDKProfile.h>
-#import <FBSDKCoreKit/FBSDKProfilePictureView.h>
-#else
-#import <FBSDKCoreKit/FBSDKDeviceButton.h>
-#import <FBSDKCoreKit/FBSDKDeviceViewControllerBase.h>
-#endif
+typedef void (^swizzleBlock)();
 
-#define FBSDK_VERSION_STRING @"4.34.0"
-#define FBSDK_TARGET_PLATFORM_VERSION @"v3.0"
+// Rename to avoid duplicate symbol errors
+@interface FBSDKSwizzler : NSObject
+
++ (void)swizzleSelector:(SEL)aSelector onClass:(Class)aClass withBlock:(swizzleBlock)block named:(NSString *)aName;
++ (void)unswizzleSelector:(SEL)aSelector onClass:(Class)aClass named:(NSString *)aName;
++ (void)printSwizzles;
+
+@end

@@ -48,7 +48,7 @@ public class DownloadFileRequest : NSObject, RequestMessage {
         self.fileVersion = Decoder.decode(int32ForKey: DownloadFileRequest.fileVersionKey)(json)
         self.appMetaDataVersion = Decoder.decode(int32ForKey: DownloadFileRequest.appMetaDataVersionKey)(json)
         
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !self.nonNilKeysHaveValues(in: json) {
             return nil
         }
         

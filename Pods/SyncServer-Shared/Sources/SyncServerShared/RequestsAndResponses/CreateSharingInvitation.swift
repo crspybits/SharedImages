@@ -24,7 +24,7 @@ public class CreateSharingInvitationRequest : NSObject, RequestMessage {
         self.sharingPermission = Decoder.decodeSharingPermission(key: CreateSharingInvitationRequest.sharingPermissionKey, json: json)
         
 #if SERVER
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
             return nil
         }
 #endif

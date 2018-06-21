@@ -22,11 +22,9 @@ public class RedeemSharingInvitationRequest : NSObject, RequestMessage {
         
         self.sharingInvitationUUID = RedeemSharingInvitationRequest.sharingInvitationUUIDKey <~~ json
 
-#if SERVER
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
             return nil
         }
-#endif
     }
     
 #if SERVER

@@ -99,7 +99,7 @@ public class UploadAppMetaDataRequest : NSObject, RequestMessage {
         self.masterVersion = Decoder.decode(int64ForKey: UploadAppMetaDataRequest.masterVersionKey)(json)
         
 #if SERVER
-        if !self.propertiesHaveValues(propertyNames: self.nonNilKeys()) {
+        if !nonNilKeysHaveValues(in: json) {
             return nil
         }
     
