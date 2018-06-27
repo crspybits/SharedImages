@@ -4,9 +4,10 @@
 
 <kbd>
   <img src="./Screenshots/SignIn.png">
+  <img src="./Screenshots/Images.png">
 </kbd>
 
-![Images](./Screenshots/Images.png) ![Large Image](./Screenshots/Plants.png) ![Discussion](./Screenshots/Discussion.png) ![Settings](./Screenshots/Settings.png)
+![Large Image](./Screenshots/Plants.png) ![Discussion](./Screenshots/Discussion.png) ![Settings](./Screenshots/Settings.png)
 
 ## Features
 
