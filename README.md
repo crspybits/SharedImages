@@ -2,7 +2,11 @@
 
 ## Screen grabs
 
-![Sign-in](./Screenshots/SignIn.png) ![Images](./Screenshots/Images.png) ![Large Image](./Screenshots/Plants.png) ![Discussion](./Screenshots/Discussion.png) ![Settings](./Screenshots/Settings.png)
+<kbd>
+  <img src="./Screenshots/SignIn.png">
+</kbd>
+
+![Images](./Screenshots/Images.png) ![Large Image](./Screenshots/Plants.png) ![Discussion](./Screenshots/Discussion.png) ![Settings](./Screenshots/Settings.png)
 
 ## Features
 
