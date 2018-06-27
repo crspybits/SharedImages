@@ -10,7 +10,17 @@
   <img src="./Screenshots/Images.png">
 </kbd>
 
-![Large Image](./Screenshots/Plants.png) ![Discussion](./Screenshots/Discussion.png) ![Settings](./Screenshots/Settings.png)
+<kbd>
+  <img src="./Screenshots/Plants.png">
+</kbd>
+
+<kbd>
+  <img src="./Screenshots/Discussion.png">
+</kbd>
+
+<kbd>
+  <img src="./Screenshots/Settings.png">
+</kbd>
 
 ## Features
 
