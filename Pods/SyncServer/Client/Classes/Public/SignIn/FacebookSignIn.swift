@@ -58,7 +58,7 @@ public class FacebookSyncServerSignIn : GenericSignIn {
         signInOutButton.signIn = self
     }
     
-    public var signInTypesAllowed:SignInType = .sharingUser
+    public var userType:UserType = .sharing
     
     public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
     
@@ -171,15 +171,8 @@ public class FacebookSyncServerSignIn : GenericSignIn {
                         // 10/22/17; It seems legit to sign the user out. The server told us the user was not on the system.
                         self.signUserOut()
                         Log.msg("signUserOut: FacebookSignIn: noUser in checkForExistingUser")
-                        
-                    case .owningUser:
-                        // This should never happen!
-                        // 10/22/17; Also legit to sign the user out -- a really odd case!
-                        self.signUserOut()
-                        Log.msg("signUserOut: FacebookSignIn: owningUser in checkForExistingUser")
-                        Log.error("Somehow a Facebook user signed in as an owning user!!")
-                        
-                    case .sharingUser(sharingPermission: let permission, accessToken: let accessToken):
+                    
+                    case .user(permission: let permission, accessToken: let accessToken):
                         Log.msg("Sharing user signed in: access token: \(String(describing: accessToken))")
                         self.delegate?.userActionOccurred(action: .existingUserSignedIn(permission), signIn: self)
                         self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
@@ -210,10 +203,10 @@ public class FacebookSyncServerSignIn : GenericSignIn {
             Log.msg("signUserOut: FacebookSignIn: tried to create an owning user!")
             
         case .createSharingUser(invitationCode: let invitationCode):
-            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode) {[unowned self] longLivedAccessToken, error in
-                if error == nil {
+            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] longLivedAccessToken, sharingGroupId, error in
+                if error == nil, let sharingGroupId = sharingGroupId {
                     Log.msg("Facebook long-lived access token: \(String(describing: longLivedAccessToken))")
-                    self.successCreatingSharingUser()
+                    self.successCreatingSharingUser(sharingGroupId: sharingGroupId)
                 }
                 else {
                     Log.error("Error: \(error!)")

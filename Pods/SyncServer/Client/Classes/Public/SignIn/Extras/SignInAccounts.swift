@@ -78,7 +78,7 @@ class SignInAccounts : UIView {
     }
     
     fileprivate func getCurrentSignIns() -> [GenericSignIn] {
-        let signIns = SignInManager.session.getSignIns(for: .both)
+        let signIns = SignInManager.session.getSignIns(for: nil)
         if SignInManager.session.userIsSignedIn {
             changeTitle(.signedIn)
 

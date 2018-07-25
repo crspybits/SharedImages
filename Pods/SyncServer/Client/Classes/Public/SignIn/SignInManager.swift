@@ -40,12 +40,22 @@ public class SignInManager : NSObject {
     
     fileprivate var alternativeSignIns = [GenericSignIn]()
     
-    public func getSignIns(`for` signInType: SignInType) -> [GenericSignIn]  {
+    // Pass userType of nil for both sharing and owning.
+    public func getSignIns(`for` userType: UserType?) -> [GenericSignIn]  {
         var result = [GenericSignIn]()
         
         for signIn in alternativeSignIns {
-            if signInType == .both || signIn.signInTypesAllowed.contains(signInType) {
+            switch userType {
+            case .none:
                 result += [signIn]
+            case .some(.sharing):
+                // Owning user types can also be sharing, i.e., it doesn't matter what the signIn.userType is when the ask is for sharing sign ins.
+                result += [signIn]
+            case .some(.owning):
+                // But purely sharing user types (e.g., Facebook) cannot be owning.
+                if signIn.userType == .owning {
+                    result += [signIn]
+                }
             }
         }
         
@@ -56,6 +66,7 @@ public class SignInManager : NSObject {
     public var currentSignIn:GenericSignIn? {
         didSet {
             if currentSignIn == nil {
+                SyncServerUser.session.creds = nil
                 SignInManager.currentSignInName.stringValue = ""
             }
             else {

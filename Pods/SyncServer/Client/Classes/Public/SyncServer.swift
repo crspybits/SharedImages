@@ -128,6 +128,8 @@ public class SyncServer {
         1. the 2nd and following updates must have the same mimeType as the first version of the file.
         2. If the attr.appMetaData is given as nil, and an earlier version had non-nil appMetaData, then the nil appMetaData is ignored-- i.e., the existing app meta data is not set to nil.
      
+        The sharingGroupId for a series of files up until a sync() operation must be the same. If you want to change to dealing with a different sharing group, you must call sync().
+     
         `Warning`: If you indicate that the mime type is "text/plain", and you are using Google Drive and the text contains unusual characters, you may run into problems-- e.g., downloading the files may fail.
      
         - parameters:
@@ -153,6 +155,11 @@ public class SyncServer {
         }
         
         CoreDataSync.perform(sessionName: Constants.coreDataName) {[weak self] in
+            errorToThrow = self?.checkIfSameSharingGroup(sharingGroupId: attr.sharingGroupId)
+            if errorToThrow != nil {
+                return
+            }
+            
             var entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID)
             
             var fileGroupUUID:String?
@@ -162,6 +169,7 @@ public class SyncServer {
                 entry!.fileUUID = attr.fileUUID
                 entry!.mimeType = attr.mimeType.rawValue
                 entry!.fileGroupUUID = attr.fileGroupUUID
+                entry!.sharingGroupId = attr.sharingGroupId
                 fileGroupUUID = attr.fileGroupUUID
             }
             else {
@@ -197,6 +205,7 @@ public class SyncServer {
             newUft.appMetaData = attr.appMetaData
             newUft.fileUUID = attr.fileUUID
             newUft.mimeType = attr.mimeType.rawValue
+            newUft.sharingGroupId = attr.sharingGroupId
             newUft.uploadCopy = copy
             newUft.operation = .file
             newUft.fileGroupUUID = fileGroupUUID
@@ -257,6 +266,11 @@ public class SyncServer {
         var errorToThrow:Error?
 
         CoreDataSync.perform(sessionName: Constants.coreDataName) {[weak self] in
+            errorToThrow = self?.checkIfSameSharingGroup(sharingGroupId: attr.sharingGroupId)
+            if errorToThrow != nil {
+                return
+            }
+            
             // In part, this ensures you can't do an appMetaData upload as v0 of a file.
             guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID) else {
                 errorToThrow = SyncServerError.couldNotFindFileUUID(attr.fileUUID)
@@ -291,6 +305,7 @@ public class SyncServer {
             newUft.appMetaData = attr.appMetaData
             newUft.fileUUID = attr.fileUUID
             newUft.mimeType = attr.mimeType.rawValue
+            newUft.sharingGroupId = attr.sharingGroupId
             newUft.uploadCopy = false
             newUft.operation = .appMetaData
             
@@ -302,6 +317,25 @@ public class SyncServer {
         guard errorToThrow == nil else {
             throw errorToThrow!
         }
+    }
+    
+    // Do this in a Core Data perform block.
+    private func checkIfSameSharingGroup(sharingGroupId: SharingGroupId) -> Error? {
+        var errorToThrow: Error?
+        
+        Synchronized.block(self) {
+            do {
+                let uploadFileTrackers = try Upload.pendingSync().uploadFileTrackers
+                let result = uploadFileTrackers.filter {$0.sharingGroupId == sharingGroupId}
+                if result.count != uploadFileTrackers.count {
+                    errorToThrow = SyncServerError.sharingGroupIdInconsistent
+                }
+            } catch (let error) {
+                errorToThrow = error
+            }
+        }
+        
+        return errorToThrow
     }
     
     // Do this in a Core Data perform block.
@@ -338,7 +372,7 @@ public class SyncServer {
      
         If there is a file with the same uuid, which has been enqueued for upload but not yet `sync`'ed, it will be removed.
      
-        This operation does not access the server, and thus runss quickly and synchronously.
+        This operation does not access the server, and thus runs quickly and synchronously.
      
         This operation undoes its work if it throws an error.
      
@@ -394,6 +428,14 @@ public class SyncServer {
         guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: uuid) else {
             throw SyncServerError.deletingUnknownFile
         }
+        
+        guard let sharingGroupId = entry.sharingGroupId else {
+            throw SyncServerError.noSharingGroupId
+        }
+        
+        if let errorToThrow = checkIfSameSharingGroup(sharingGroupId: sharingGroupId) {
+            throw errorToThrow
+        }
 
         guard !entry.deletedLocally else {
             throw SyncServerError.fileAlreadyDeleted
@@ -430,7 +472,8 @@ public class SyncServer {
                 let newUft = UploadFileTracker.newObject() as! UploadFileTracker
                 newUft.operation = .deletion
                 newUft.fileUUID = uuid
-                
+                newUft.sharingGroupId = entry.sharingGroupId
+
                 /* [1]: `entry.fileVersion` will be nil if we are in the process of uploading a new file. Which causes the following to fail:
                         newUft.fileVersion = entry.fileVersion
                     AND: In general, there can be any number of uploads queued and sync'ed prior to this upload deletion, which would mean we can't simply determine the version to delete at this point in time. It seems easiest to wait until the last possible moment to determine the file version we are deleting.
@@ -456,17 +499,17 @@ public class SyncServer {
     }
     
     /**
-        If no other `sync` is taking place, this will asynchronously do pending downloads, file uploads, and upload deletions. If there is a `sync` currently taking place, this closes the collection of uploads/deletions queued, and will wait until after the current sync is done, and try again.
+        If no other `sync` is taking place, this will asynchronously do pending downloads, file uploads, and upload deletions for the given sharing group. If there is a `sync` currently taking place (for any sharing group), this closes the collection of uploads/deletions queued, and will wait until after the current sync is done, and try again.
      
         If a stopSync is currently pending, then this call will be ignored.
      
         Non-blocking in all cases.
     */
-    public func sync() {
-        sync(completion:nil)
+    public func sync(sharingGroupId: SharingGroupId) {
+        sync(sharingGroupId:sharingGroupId, completion:nil)
     }
     
-    func sync(completion:(()->())?) {
+    func sync(sharingGroupId: SharingGroupId, completion:(()->())?) {
         var doStart = true
         
         Synchronized.block(self) {
@@ -496,7 +539,7 @@ public class SyncServer {
         }
         
         if doStart {
-            start(completion: completion)
+            start(sharingGroupId: sharingGroupId, completion: completion)
         }
     }
     
@@ -557,8 +600,8 @@ public class SyncServer {
         - parameters:
             - completion: Gives stats about downloads that are currently available; gives nil if there was an error.
     */
-    public func getStats(completion:@escaping (Stats?)->()) {
-        Download.session.onlyCheck() { onlyCheckResult in
+    public func getStats(sharingGroupId: SharingGroupId, completion:@escaping (Stats?)->()) {
+        Download.session.onlyCheck(sharingGroupId: sharingGroupId) { onlyCheckResult in
             switch onlyCheckResult {
             case .error(let error):
                 Log.error("Error on Download onlyCheck: \(error)")
@@ -758,11 +801,11 @@ public class SyncServer {
         return results
     }
     
-    private func start(completion:(()->())?) {
+    private func start(sharingGroupId: SharingGroupId, completion:(()->())?) {
         EventDesired.reportEvent(.syncStarted, mask: self.eventsDesired, delegate: self.delegate)
         Log.msg("SyncServer.start")
         
-        SyncManager.session.start(first: true) { error in
+        SyncManager.session.start(sharingGroupId: sharingGroupId, first: true) { error in
             if error != nil {
                 Thread.runSync(onMainThread: {
                     self.delegate?.syncServerErrorOccurred(error: error!)
@@ -785,7 +828,7 @@ public class SyncServer {
             
             Synchronized.block(self) { [unowned self] in
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                    if !self.stoppingSync && (Upload.haveSyncQueue() || self.delayedSync) {
+                    if !self.stoppingSync && (Upload.haveSyncQueue(forSharingGroupId: sharingGroupId) || self.delayedSync) {
                         self.delayedSync = false
                         doStart = true
                     }
@@ -798,7 +841,7 @@ public class SyncServer {
             }
             
             if doStart {
-                self.start(completion:completion)
+                self.start(sharingGroupId: sharingGroupId, completion:completion)
             }
         }
     }
@@ -834,10 +877,10 @@ public class SyncServer {
 
     // TODO: *2* This is incomplete. Needs more work.
     /// This is intended for development/debug only. This enables you do a consistency check between your local files and SyncServer meta data. Does a sync first to ensure files are synchronized.
-    public func consistencyCheck(localFiles:[UUIDString], repair:Bool = false, completion:((Error?)->())?) {
-        sync {
+    public func consistencyCheck(sharingGroupId: SharingGroupId, localFiles:[UUIDString], repair:Bool = false, completion:((Error?)->())?) {
+        sync(sharingGroupId: sharingGroupId) {
             // TODO: *2* Check for errors in sync.
-            Consistency.check(localFiles: localFiles, repair: repair, callback: completion)
+            Consistency.check(sharingGroupId: sharingGroupId, localFiles: localFiles, repair: repair, callback: completion)
         }
     }
 }

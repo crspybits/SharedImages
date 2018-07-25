@@ -26,11 +26,11 @@ class Download {
     
     // TODO: *0* while this check is occurring, we want to make sure we don't have a concurrent check operation.
     // Doesn't create DownloadFileTracker's or update MasterVersion.
-    func onlyCheck(completion:((OnlyCheckCompletion)->())? = nil) {
+    func onlyCheck(sharingGroupId: SharingGroupId, completion:((OnlyCheckCompletion)->())? = nil) {
         
         Log.msg("Download.onlyCheckForDownloads")
         
-        ServerAPI.session.fileIndex { (fileIndex, masterVersion, error) in
+        ServerAPI.session.fileIndex(sharingGroupId: sharingGroupId) { (fileIndex, masterVersion, error) in
             guard error == nil else {
                 completion?(.error(error!))
                 return
@@ -73,8 +73,8 @@ class Download {
     
     // TODO: *0* while this check is occurring, we want to make sure we don't have a concurrent check operation.
     // Creates DownloadFileTracker's to represent files that need downloading/download deleting. Updates MasterVersion with the master version on the server.
-    func check(completion:((CheckCompletion)->())? = nil) {
-        onlyCheck() { onlyCheckResult in
+    func check(sharingGroupId: SharingGroupId, completion:((CheckCompletion)->())? = nil) {
+        onlyCheck(sharingGroupId: sharingGroupId) { onlyCheckResult in
             switch onlyCheckResult {
             case .error(let error):
                 completion?(.error(error))
@@ -91,6 +91,7 @@ class Download {
                             dft.fileUUID = file.fileUUID
                             dft.fileVersion = file.fileVersion
                             dft.mimeType = file.mimeType
+                            dft.sharingGroupId = file.sharingGroupId
                             
                             if downloadSet.downloadFiles.contains(file) {
                                 dft.operation = .file
@@ -109,7 +110,13 @@ class Download {
                             dft.appMetaDataVersion = file.appMetaDataVersion
                             dft.fileGroupUUID = file.fileGroupUUID
 
-                            DownloadContentGroup.addDownloadFileTracker(dft, to: file.fileGroupUUID)
+                            do {
+                                try DownloadContentGroup.addDownloadFileTracker(dft, to: file.fileGroupUUID)
+                            }
+                            catch (let error) {
+                                completionResult = .error(.coreDataError(error))
+                                return
+                            }
                             
                             if file.creationDate != nil {
                                 dft.creationDate = file.creationDate! as NSDate
@@ -139,18 +146,18 @@ class Download {
     }
 
     enum NextResult {
-    case started
-    case noDownloadsOrDeletions
-    case currentGroupCompleted(DownloadContentGroup)
-    case allDownloadsCompleted
-    case error(Error)
+        case started
+        case noDownloadsOrDeletions
+        case currentGroupCompleted(DownloadContentGroup)
+        case allDownloadsCompleted
+        case error(Error)
     }
     
     enum NextCompletion {
-    case fileDownloaded(dft: DownloadFileTracker)
-    case appMetaDataDownloaded(dft: DownloadFileTracker)
-    case masterVersionUpdate
-    case error(SyncServerError)
+        case fileDownloaded(dft: DownloadFileTracker)
+        case appMetaDataDownloaded(dft: DownloadFileTracker)
+        case masterVersionUpdate
+        case error(SyncServerError)
     }
     
     // Starts download of next file or appMetaData, if there is one. There should be no files/appMetaData downloading already. Only if .started is the NextResult will the completion handler be called. With a masterVersionUpdate response for NextCompletion, the MasterVersion Core Data object is updated by this method, and all the DownloadFileTracker objects have been reset.
@@ -162,6 +169,7 @@ class Download {
         var numberContentDownloads = 0
         var numberDownloadDeletions = 0
         var operation:FileTracker.Operation!
+        var sharingGroupId: SharingGroupId!
         
         // Get statistics & report event if needed.
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
@@ -231,6 +239,9 @@ class Download {
             // Need this inside the `perform` to bridge the gap without an NSManagedObject
             downloadFile = FilenamingWithAppMetaDataVersion(fileUUID: nextToDownload.fileUUID, fileVersion: nextToDownload.fileVersion, appMetaDataVersion: nextToDownload.appMetaDataVersion)
             operation = nextToDownload.operation
+            
+            // We are only downloading from a single sharing group, so it's ok to grab the sharing group from the core data object.
+            sharingGroupId = nextToDownload.sharingGroupId
         }
         
         guard nextResult == nil else {
@@ -239,10 +250,10 @@ class Download {
         
         switch operation! {
         case .file:
-            doDownloadFile(masterVersion: masterVersion, downloadFile: downloadFile, nextToDownload: nextToDownload, completion:completion)
+            doDownloadFile(masterVersion: masterVersion, downloadFile: downloadFile, nextToDownload: nextToDownload, sharingGroupId: sharingGroupId, completion:completion)
         
         case .appMetaData:
-            doAppMetaDataDownload(masterVersion: masterVersion, downloadFile: downloadFile, nextToDownload: nextToDownload, completion:completion)
+            doAppMetaDataDownload(masterVersion: masterVersion, downloadFile: downloadFile, nextToDownload: nextToDownload, sharingGroupId: sharingGroupId, completion:completion)
             
         case .deletion:
             // Should not get here because we're checking for deletions above.
@@ -252,9 +263,9 @@ class Download {
         return .started
     }
     
-    private func doDownloadFile(masterVersion: MasterVersionInt, downloadFile: FilenamingWithAppMetaDataVersion, nextToDownload: DownloadFileTracker, completion:((NextCompletion)->())?) {
+    private func doDownloadFile(masterVersion: MasterVersionInt, downloadFile: FilenamingWithAppMetaDataVersion, nextToDownload: DownloadFileTracker, sharingGroupId: SharingGroupId, completion:((NextCompletion)->())?) {
     
-        ServerAPI.session.downloadFile(fileNamingObject: downloadFile, serverMasterVersion: masterVersion) {[weak self] (result, error)  in
+        ServerAPI.session.downloadFile(fileNamingObject: downloadFile, serverMasterVersion: masterVersion, sharingGroupId: sharingGroupId) {[weak self] (result, error)  in
         
             // Don't hold the `perform` while we do completion-- easy to get a deadlock!
 
@@ -294,11 +305,11 @@ class Download {
         }
     }
     
-    private func doAppMetaDataDownload(masterVersion: MasterVersionInt, downloadFile: FilenamingWithAppMetaDataVersion, nextToDownload: DownloadFileTracker, completion:((NextCompletion)->())?) {
+    private func doAppMetaDataDownload(masterVersion: MasterVersionInt, downloadFile: FilenamingWithAppMetaDataVersion, nextToDownload: DownloadFileTracker, sharingGroupId: SharingGroupId, completion:((NextCompletion)->())?) {
     
         assert(downloadFile.appMetaDataVersion != nil)
 
-        ServerAPI.session.downloadAppMetaData(appMetaDataVersion: downloadFile.appMetaDataVersion!, fileUUID: downloadFile.fileUUID, serverMasterVersion: masterVersion) {[weak self] result in
+        ServerAPI.session.downloadAppMetaData(appMetaDataVersion: downloadFile.appMetaDataVersion!, fileUUID: downloadFile.fileUUID, serverMasterVersion: masterVersion, sharingGroupId: sharingGroupId) {[weak self] result in
 
             switch result {
             case .success(.appMetaData(let appMetaData)):

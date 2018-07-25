@@ -8,6 +8,7 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer_Shared
 
 extension Upload {
     private class func createNewPendingSync() throws {
@@ -39,21 +40,38 @@ extension Upload {
         return UploadQueues.get()
     }
     
-    class func haveSyncQueue() -> Bool {
-        return synced().queues!.count > 0
+    class func haveSyncQueue(forSharingGroupId sharingGroupId: SharingGroupId) -> Bool {
+        if let queues = queues(forSharingGroupId: sharingGroupId),
+            queues.count > 0 {
+            return true
+        }
+        else {
+            return false
+        }
     }
     
-    class func getHeadSyncQueue() -> UploadQueue? {
-        if !haveSyncQueue()  {
+    private class func queues(forSharingGroupId sharingGroupId: SharingGroupId) -> [UploadQueue]? {
+        guard let queues = Array(synced().queues!) as? [UploadQueue] else {
             return nil
         }
         
-        return (synced().queues![0] as! UploadQueue)
+        return queues.filter {
+            $0.uploadFileTrackers.count > 0 && $0.uploadFileTrackers[0].sharingGroupId == sharingGroupId
+        }
+    }
+    
+    class func getHeadSyncQueue(forSharingGroupId sharingGroupId: SharingGroupId) -> UploadQueue? {
+        guard let queues = queues(forSharingGroupId: sharingGroupId),
+            queues.count > 0 else {
+            return nil
+        }
+        
+        return queues[0]
     }
     
     // There must be a head sync queue.
-    class func removeHeadSyncQueue() {
-        let head = getHeadSyncQueue()
+    class func removeHeadSyncQueue(sharingGroupId: SharingGroupId) {
+        let head = getHeadSyncQueue(forSharingGroupId: sharingGroupId)
         assert(head != nil)
         CoreData.sessionNamed(Constants.coreDataName).remove(head!)
     }

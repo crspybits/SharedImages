@@ -26,8 +26,11 @@ public class DownloadAppMetaDataRequest : NSObject, RequestMessage {
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
     
+    public var sharingGroupId: SharingGroupId!
+    
     public func nonNilKeys() -> [String] {
-        return [DownloadAppMetaDataRequest.fileUUIDKey, DownloadAppMetaDataRequest.appMetaDataVersionKey, DownloadAppMetaDataRequest.masterVersionKey]
+        return [DownloadAppMetaDataRequest.fileUUIDKey, DownloadAppMetaDataRequest.appMetaDataVersionKey, DownloadAppMetaDataRequest.masterVersionKey,
+            ServerEndpoint.sharingGroupIdKey]
     }
     
     public func allKeys() -> [String] {
@@ -40,7 +43,8 @@ public class DownloadAppMetaDataRequest : NSObject, RequestMessage {
         self.fileUUID = DownloadAppMetaDataRequest.fileUUIDKey <~~ json
         self.masterVersion = Decoder.decode(int64ForKey: DownloadAppMetaDataRequest.masterVersionKey)(json)
         self.appMetaDataVersion = Decoder.decode(int32ForKey: DownloadAppMetaDataRequest.appMetaDataVersionKey)(json)
-
+        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        
         if !self.nonNilKeysHaveValues(in: json) {
             return nil
         }
@@ -60,7 +64,8 @@ public class DownloadAppMetaDataRequest : NSObject, RequestMessage {
         return jsonify([
             DownloadAppMetaDataRequest.fileUUIDKey ~~> self.fileUUID,
             DownloadAppMetaDataRequest.masterVersionKey ~~> self.masterVersion,
-            DownloadAppMetaDataRequest.appMetaDataVersionKey ~~> self.appMetaDataVersion
+            DownloadAppMetaDataRequest.appMetaDataVersionKey ~~> self.appMetaDataVersion,
+            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
         ])
     }
 }

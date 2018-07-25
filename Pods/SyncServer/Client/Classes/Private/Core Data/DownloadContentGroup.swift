@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import SMCoreLib
+import SyncServer_Shared
 
 // Groups of download operations-- including appMetaData, file version contents, and deletions. I'm including deletions because it seems reasonable that a file group could have files added and/or deleted, and we'd want to encompass both adding and deleting in the file group unit.
 
@@ -32,6 +33,16 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
         }
     }
     
+    public var sharingGroupId: SharingGroupId? {
+        get {
+            return sharingGroupIdInternal?.int64Value
+        }
+        
+        set {
+            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
+        }
+    }
+    
     var dfts:[DownloadFileTracker] {
         if let downloads = downloads, let result = Array(downloads) as?  [DownloadFileTracker] {
             return result
@@ -52,13 +63,21 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
     }
     
     // If a DownloadContentGroup exists with this fileGroupUUID, adds this dft to it. Otherwise, creates one and adds it. The case were fileGroupUUID is nil is to deal with not having a fileGroupUUID for a file-- to enable consistency with downloads.
-    class func addDownloadFileTracker(_ dft: DownloadFileTracker, to fileGroupUUID:String?) {
+    class func addDownloadFileTracker(_ dft: DownloadFileTracker, to fileGroupUUID:String?) throws {
+        if dft.sharingGroupId == nil {
+            throw SyncServerError.noSharingGroupId
+        }
+
         var group:DownloadContentGroup!
         if let fileGroupUUID = fileGroupUUID, let dcg = DownloadContentGroup.fetchObjectWithUUID(fileGroupUUID: fileGroupUUID) {
+            if dcg.sharingGroupId != dft.sharingGroupId {
+                throw SyncServerError.sharingGroupIdInconsistent
+            }
             group = dcg
         }
         else {
             group = DownloadContentGroup.newObject() as! DownloadContentGroup
+            group.sharingGroupId = dft.sharingGroupId
             group.fileGroupUUID = fileGroupUUID
         }
         

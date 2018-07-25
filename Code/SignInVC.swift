@@ -19,7 +19,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     static private var rawSharingPermission:SMPersistItemString = SMPersistItemString(name: "SignInVC.rawSharingPermission", initialStringValue: "", persistType: .userDefaults)
     
     // If user is signed in as a sharing user, this persistently gives their permissions.
-    var sharingPermission:SharingPermission? {
+    var sharingPermission:Permission? {
         set {
             SignInVC.rawSharingPermission.stringValue = newValue == nil ? "" : newValue!.rawValue
             setSharingButtonState()
@@ -29,8 +29,8 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         }
     }
     
-    static var sharingPermission:SharingPermission? {
-        return SignInVC.rawSharingPermission.stringValue == "" ? nil : SharingPermission(rawValue: SignInVC.rawSharingPermission.stringValue)
+    static var sharingPermission:Permission? {
+        return SignInVC.rawSharingPermission.stringValue == "" ? nil : Permission(rawValue: SignInVC.rawSharingPermission.stringValue)
     }
     
     var googleSignInButton: TappableButton!
@@ -97,7 +97,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         if SignInManager.session.userIsSignedIn {
             alert = UIAlertController(title: "Share your images with a Google or Facebook user?", message: nil, preferredStyle: .actionSheet)
 
-            func addAlertAction(_ permission:SharingPermission) {
+            func addAlertAction(_ permission:Permission) {
                 alert.addAction(UIAlertAction(title: permission.userFriendlyText(), style: .default){alert in
                     self.completeSharing(permission: permission)
                 })
@@ -121,8 +121,12 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         present(alert, animated: true, completion: nil)
     }
     
-    private func completeSharing(permission:SharingPermission) {
-        SyncServerUser.session.createSharingInvitation(withPermission: permission) { invitationCode, error in
+    private func completeSharing(permission:Permission) {
+        guard let sharingGroupId = SyncController.getSharingGroupId() else {
+            return
+        }
+        
+        SyncServerUser.session.createSharingInvitation(withPermission: permission, sharingGroupId: sharingGroupId) { invitationCode, error in
             if error == nil {
                 let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
                 if let email = SMEmail(parentViewController: self) {
@@ -205,9 +209,7 @@ extension SignInVC : GenericSignInDelegate {
         }
         else if invite != nil && acceptSharingInvitation {
             acceptSharingInvitation = false
-            if signIn.signInTypesAllowed.contains(.sharingUser) {
-                result = .createSharingUser(invitationCode: invite!.sharingInvitationCode)
-            }
+            result = .createSharingUser(invitationCode: invite!.sharingInvitationCode)
         }
         else {
             switch SignIn.userInterfaceState {

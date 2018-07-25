@@ -258,12 +258,16 @@ class ImagesVC: UIViewController {
     }
     
     @objc private func consistencyCheckAction(gesture : UILongPressGestureRecognizer!) {
+        guard let sharingGroupId = SyncController.getSharingGroupId() else {
+            return
+        }
+        
         if gesture.state != .ended {
             return
         }
         
         let uuids = Image.fetchAll().map { $0.uuid! }
-        SyncServer.session.consistencyCheck(localFiles: uuids, repair: false) { error in }
+        SyncServer.session.consistencyCheck(sharingGroupId: sharingGroupId, localFiles: uuids, repair: false) { error in }
     }
     
     @objc private func refresh() {
@@ -659,6 +663,10 @@ extension ImagesVC : SyncControllerDelegate {
     }
     
     func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
+        guard let sharingGroupId = SyncController.getSharingGroupId() else {
+            return
+        }
+        
         guard let discussion = Discussion.fetchObjectWithUUID(attr.fileUUID) else {
             Log.error("Cannot find discussion for attempted image re-upload.")
             return
@@ -669,7 +677,7 @@ extension ImagesVC : SyncControllerDelegate {
             return
         }
         
-        let attr = SyncAttributes(fileUUID: imageUUID, mimeType: .jpeg)
+        let attr = SyncAttributes(fileUUID: imageUUID, sharingGroupId: sharingGroupId, mimeType: .jpeg)
         do {
             try SyncServer.session.uploadImmutable(localFile: imageURL, withAttributes: attr)
         }
@@ -678,7 +686,7 @@ extension ImagesVC : SyncControllerDelegate {
             return
         }
         
-        SyncServer.session.sync()
+        SyncServer.session.sync(sharingGroupId: sharingGroupId)
     }
 }
 

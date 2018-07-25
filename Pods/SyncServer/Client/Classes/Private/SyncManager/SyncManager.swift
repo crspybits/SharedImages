@@ -57,7 +57,7 @@ class SyncManager {
     }
     
     // TODO: *1* If we get an app restart when we call this method, and an upload was previously in progress, and we now have download(s) available, we need to reset those uploads prior to doing the downloads.
-    func start(first: Bool = false, _ callback:((SyncServerError?)->())? = nil) {
+    func start(sharingGroupId: SharingGroupId, first: Bool = false, _ callback:((SyncServerError?)->())? = nil) {
         self.callback = callback
         
         // TODO: *1* This is probably the level at which we should ensure that multiple download operations are not taking place concurrently. E.g., some locking mechanism?
@@ -71,6 +71,7 @@ class SyncManager {
             switch nextCompletionResult {
             case .fileDownloaded(let dft):
                 var dcg: DownloadContentGroup!
+                
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     dcg = dft.group!
                 }
@@ -85,7 +86,7 @@ class SyncManager {
 
             case .masterVersionUpdate:
                 // Need to start all over again.
-                self?.start(callback)
+                self?.start(sharingGroupId: sharingGroupId, callback)
                 
             case .error(let error):
                 callback?(error)
@@ -97,7 +98,7 @@ class SyncManager {
             downloadCompleted(dcg: dcg, callback:callback)
             
         case .noDownloadsOrDeletions:
-            checkForDownloads()
+            checkForDownloads(sharingGroupId: sharingGroupId)
 
         case .error(let error):
             callback?(SyncServerError.otherError(error))
@@ -107,13 +108,16 @@ class SyncManager {
             return
             
         case .allDownloadsCompleted:
-            checkForPendingUploads(first: true)
+            checkForPendingUploads(sharingGroupId: sharingGroupId, first: true)
         }
     }
     
     private func downloadCompleted(dcg: DownloadContentGroup, callback:((SyncServerError?)->())? = nil) {
         var allCompleted:Bool!
+        var sharingGroupId:SharingGroupId!
+        
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            sharingGroupId = dcg.sharingGroupId
             allCompleted = dcg.allDftsCompleted()
             if allCompleted {
                 dcg.status = .downloaded
@@ -123,17 +127,17 @@ class SyncManager {
         
         if allCompleted {
             // All downloads completed for this group. Wrap it up.
-            completeGroup(dcg: dcg)
+            completeGroup(sharingGroupId: sharingGroupId, dcg: dcg)
         }
         else {
             // Downloads are not completed for this group. Recursively check for any next downloads (i.e., other groups). Using `async` so we don't consume extra space on the stack.
             DispatchQueue.global().async {
-                self.start(callback)
+                self.start(sharingGroupId: sharingGroupId, callback)
             }
         }
     }
     
-    private func completeGroup(dcg:DownloadContentGroup) {
+    private func completeGroup(sharingGroupId: SharingGroupId, dcg:DownloadContentGroup) {
         var contentDownloads:[DownloadFileTracker]!
         var downloadDeletions:[DownloadFileTracker]!
         
@@ -183,23 +187,23 @@ class SyncManager {
                 }
             }
 
-            // Downloads are completed for this group, but we may have other groups to download.
+            // Downloads are completed for this file group, but we may have other file groups to download.
             DispatchQueue.global().async {
-                self.start(self.callback)
+                self.start(sharingGroupId: sharingGroupId, self.callback)
             }
         }
     }
 
     // No DownloadFileTracker's queued up. Check the FileIndex to see if there are pending downloads on the server.
-    private func checkForDownloads() {
+    private func checkForDownloads(sharingGroupId: SharingGroupId) {
         if self.needToStop() {
             return
         }
         
-        Download.session.check() { checkCompletion in
+        Download.session.check(sharingGroupId: sharingGroupId) { checkCompletion in
             switch checkCompletion {
             case .noDownloadsOrDeletionsAvailable:
-                self.checkForPendingUploads(first: true)
+                self.checkForPendingUploads(sharingGroupId: sharingGroupId, first: true)
             
             case .downloadsAvailable(numberOfContentDownloads:let numberContentDownloads, numberOfDownloadDeletions:let numberDownloadDeletions):
                 // This is not redundant with the `willStartDownloads` reporting in `Download.session.next` because we're calling start with first=false (implicitly), so willStartDownloads will not get reported twice.
@@ -208,7 +212,7 @@ class SyncManager {
                     mask: self.desiredEvents, delegate: self.delegate)
                 
                 // We've got DownloadFileTracker's queued up now. Go deal with them!
-                self.start(self.callback)
+                self.start(sharingGroupId: sharingGroupId, self.callback)
                 
             case .error(let error):
                 self.callback?(error)
@@ -216,12 +220,12 @@ class SyncManager {
         }
     }
     
-    private func checkForPendingUploads(first: Bool = false) {
+    private func checkForPendingUploads(sharingGroupId: SharingGroupId, first: Bool = false) {
         if self.needToStop() {
             return
         }
         
-        let nextResult = Upload.session.next(first: first) {[weak self] nextCompletion in
+        let nextResult = Upload.session.next(sharingGroupId: sharingGroupId, first: first) {[weak self] nextCompletion in
             switch nextCompletion {
             case .fileUploaded(let attr, let uft):
                 self?.contentWasUploaded(attr: attr, uft: uft)
@@ -233,12 +237,12 @@ class SyncManager {
                 if let selfObj = self {
                     EventDesired.reportEvent(.singleUploadDeletionComplete(fileUUID: fileUUID), mask: selfObj.desiredEvents, delegate: selfObj.delegate)
                     // Recursively see if there is a next upload to do.
-                    selfObj.checkForPendingUploads()
+                    selfObj.checkForPendingUploads(sharingGroupId: sharingGroupId)
                 }
                 
             case .masterVersionUpdate:
                 // Things have changed on the server. Check for downloads again. Don't go all the way back to `start` because we know that we don't have queued downloads.
-                self?.checkForDownloads()
+                self?.checkForDownloads(sharingGroupId: sharingGroupId)
                 
             case .error(let error):
                 self?.callback?(error)
@@ -255,7 +259,7 @@ class SyncManager {
             callback?(nil)
             
         case .allUploadsCompleted:
-            self.doneUploads()
+            self.doneUploads(sharingGroupId: sharingGroupId)
             
         case .error(let error):
             callback?(error)
@@ -265,10 +269,12 @@ class SyncManager {
     private func contentWasUploaded(attr:SyncAttributes?, uft: UploadFileTracker) {
         var operation: FileTracker.Operation!
         var fileUUID:String!
+        var sharingGroupId: SharingGroupId!
         
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
             operation = uft.operation
             fileUUID = uft.fileUUID
+            sharingGroupId = uft.sharingGroupId
         }
         
         switch operation! {
@@ -283,15 +289,15 @@ class SyncManager {
         
         // Recursively see if there is a next upload to do.
         DispatchQueue.global().async {
-            self.checkForPendingUploads()
+            self.checkForPendingUploads(sharingGroupId: sharingGroupId)
         }
     }
     
-    private func doneUploads() {
-        Upload.session.doneUploads { completionResult in
+    private func doneUploads(sharingGroupId: SharingGroupId) {
+        Upload.session.doneUploads(sharingGroupId: sharingGroupId) { completionResult in
             switch completionResult {
             case .masterVersionUpdate:
-                self.checkForDownloads()
+                self.checkForDownloads(sharingGroupId: sharingGroupId)
                 
             case .error(let error):
                 self.callback?(error)
@@ -305,7 +311,7 @@ class SyncManager {
 
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // 4/18/18; Got a crash here during testing because `Upload.getHeadSyncQueue()` returned nil. How is that possible? An earlier test failed-- wonder if it could have "leaked" into a later test?
-                    uploadQueue = Upload.getHeadSyncQueue()
+                    uploadQueue = Upload.getHeadSyncQueue(forSharingGroupId: sharingGroupId)
                     if uploadQueue == nil {
                         errorResult = .generic("Nil result from getHeadSyncQueue.")
                         return

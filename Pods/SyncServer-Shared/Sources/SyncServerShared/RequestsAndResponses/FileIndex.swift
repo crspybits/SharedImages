@@ -14,7 +14,7 @@ import Kitura
 import PerfectLib
 #endif
 
-// Request an index of all files that have been uploaded with UploadFile and committed using DoneUploads by the user-- queries the meta data on the sync server.
+// Request an index of all files that have been uploaded with UploadFile and committed using DoneUploads for the sharing group -- queries the meta data on the sync server.
 
 public class FileIndexRequest : NSObject, RequestMessage {
 #if DEBUG
@@ -22,12 +22,15 @@ public class FileIndexRequest : NSObject, RequestMessage {
     public static let testServerSleepKey = "testServerSleep"
     public var testServerSleep:Int32?
 #endif
+
+    public var sharingGroupId: SharingGroupId!
  
     public required init?(json: JSON) {
         super.init()
 #if DEBUG
         self.testServerSleep = Decoder.decode(int32ForKey: FileIndexRequest.testServerSleepKey)(json)
 #endif
+        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
 
 #if SERVER
         Log.info(message: "FileIndexRequest.testServerSleep: \(String(describing: testServerSleep))")
@@ -47,6 +50,7 @@ public class FileIndexRequest : NSObject, RequestMessage {
 #if DEBUG
         result += [FileIndexRequest.testServerSleepKey ~~> self.testServerSleep]
 #endif
+        result += [ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId]
         
         return jsonify(result)
     }
@@ -65,7 +69,9 @@ public class FileIndexRequest : NSObject, RequestMessage {
 #endif
     }
     
-    public func nonNilKeys() -> [String] { return [] }
+    public func nonNilKeys() -> [String] { return [
+        ServerEndpoint.sharingGroupIdKey]
+    }
 }
 
 public class FileIndexResponse : ResponseMessage {

@@ -58,6 +58,26 @@ public extension Gloss.Decoder {
         }
     }
     
+    public static func decode(int64ArrayForKey key: String, keyPathDelimiter: String = GlossKeyPathDelimiter) -> (JSON) -> [Int64]? {
+        return {
+            json in
+            
+            if let array = json.valueForKeyPath(keyPath: key, withDelimiter: keyPathDelimiter) as? [Int64] {
+                return array
+            }
+            
+            if let array = json.valueForKeyPath(keyPath: key, withDelimiter: keyPathDelimiter) as? [Int32] {
+                return array.map{Int64($0)}
+            }
+            
+            if let array = json.valueForKeyPath(keyPath: key, withDelimiter: keyPathDelimiter) as? [Int] {
+                return array.map{Int64($0)}
+            }
+            
+            return nil
+        }
+    }
+    
     public static func decode(floatForKey key: String, keyPathDelimiter: String = GlossKeyPathDelimiter) -> (JSON) -> Float? {
         return {
             json in

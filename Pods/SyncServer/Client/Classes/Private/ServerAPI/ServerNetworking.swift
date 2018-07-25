@@ -130,7 +130,10 @@ class ServerNetworking : NSObject {
     private func sendRequestTo(_ serverURL: URL, method: ServerHTTPMethod, dataToUpload:Data? = nil, timeoutIntervalForRequest:TimeInterval, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
     
         let sessionConfiguration = URLSessionConfiguration.default
+        // This really seems to be the critical timeout parameter for my usage. See also https://github.com/Alamofire/Alamofire/issues/1266 and https://stackoverflow.com/questions/19688175/nsurlsessionconfiguration-timeoutintervalforrequest-vs-nsurlsession-timeoutinter
         sessionConfiguration.timeoutIntervalForRequest = timeoutIntervalForRequest
+
+        sessionConfiguration.timeoutIntervalForResource = timeoutIntervalForRequest
         
         if #available(iOS 11, *) {
             // https://useyourloaf.com/blog/urlsession-waiting-for-connectivity/

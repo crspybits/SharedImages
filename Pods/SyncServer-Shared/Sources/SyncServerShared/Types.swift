@@ -13,6 +13,7 @@ public typealias FileVersionInt = Int32
 public typealias AppMetaDataVersionInt = Int32
 public typealias UserId = Int64
 public typealias SharingInvitationId = Int64
+public typealias SharingGroupId = Int64
 
 public enum ServerHTTPMethod : String {
     case get
@@ -23,6 +24,7 @@ public enum ServerHTTPMethod : String {
 public enum HTTPStatus : Int {
     case ok = 200
     case unauthorized = 401
+    case gone = 410
 }
 
 public enum AuthenticationLevel {
@@ -31,16 +33,16 @@ public enum AuthenticationLevel {
     case secondary // must also have a record of user in our database tables
 }
 
-public enum SharingPermission : String {
+public enum Permission : String {
     case read // aka download
     case write // aka upload; includes read
     case admin // read, write, and invite
 
     public static func maxStringLength() -> Int {
-        return max(SharingPermission.read.rawValue.count, SharingPermission.write.rawValue.count, SharingPermission.admin.rawValue.count)
+        return max(Permission.read.rawValue.count, Permission.write.rawValue.count, Permission.admin.rawValue.count)
     }
     
-    public func hasMinimumPermission(_ min:SharingPermission) -> Bool {
+    public func hasMinimumPermission(_ min:Permission) -> Bool {
         switch self {
         case .read:
             // Users with read permission can do only read operations.
@@ -68,20 +70,9 @@ public enum SharingPermission : String {
     }
 }
 
-public struct SignInType: OptionSet {
-    public let rawValue: Int
-    
-    public init(rawValue: Int) { self.rawValue = rawValue }
-    
-    public static let owningUser = SignInType(rawValue: 1 << 0)
-    public static let sharingUser = SignInType(rawValue: 1 << 1)
-    public static let both:SignInType = [.owningUser, .sharingUser]
-}
-
-// Both SignInType and UserType because UserType disallows `both`.
 public enum UserType : String {
-    case sharing // user is sharing data
-    case owning // user owns the data
+    case sharing // user doesn't own cloud storage (e.g., Facebook user)
+    case owning // user owns cloud storage (e.g., Google user)
 
     public static func maxStringLength() -> Int {
         return max(UserType.sharing.rawValue.count, UserType.owning.rawValue.count)

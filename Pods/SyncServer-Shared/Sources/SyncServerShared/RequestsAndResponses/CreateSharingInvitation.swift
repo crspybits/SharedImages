@@ -14,14 +14,17 @@ import Kitura
 #endif
 
 public class CreateSharingInvitationRequest : NSObject, RequestMessage {
-    public static let sharingPermissionKey = "sharingPermission"
-    public var sharingPermission:SharingPermission!
+    public static let permissionKey = "permission"
+    public var permission:Permission!
+    
+    public var sharingGroupId: SharingGroupId!
 
-    // You can give either SharingPermission valued keys or string valued keys.
+    // You can give either Permission valued keys or string valued keys.
     public required init?(json: JSON) {
         super.init()
         
-        self.sharingPermission = Decoder.decodeSharingPermission(key: CreateSharingInvitationRequest.sharingPermissionKey, json: json)
+        self.permission = Decoder.decodePermission(key: CreateSharingInvitationRequest.permissionKey, json: json)
+        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
         
 #if SERVER
         if !nonNilKeysHaveValues(in: json) {
@@ -37,7 +40,8 @@ public class CreateSharingInvitationRequest : NSObject, RequestMessage {
 #endif
     
     public func nonNilKeys() -> [String] {
-        return [CreateSharingInvitationRequest.sharingPermissionKey]
+        return [CreateSharingInvitationRequest.permissionKey,
+            ServerEndpoint.sharingGroupIdKey]
     }
     
     public func allKeys() -> [String] {
@@ -46,13 +50,14 @@ public class CreateSharingInvitationRequest : NSObject, RequestMessage {
     
     public func toJSON() -> JSON? {
         return jsonify([
-            Encoder.encodeSharingPermission(key: CreateSharingInvitationRequest.sharingPermissionKey, value: self.sharingPermission)
+            Encoder.encodePermission(key: CreateSharingInvitationRequest.permissionKey, value: self.permission),
+            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
         ])
     }
 }
 
 public extension Gloss.Encoder {
-    public static func encodeSharingPermission(key: String, value: SharingPermission?) -> JSON? {
+    public static func encodePermission(key: String, value: Permission?) -> JSON? {
             
         if let value = value {
             return [key : value.rawValue]
@@ -63,15 +68,14 @@ public extension Gloss.Encoder {
 }
 
 public extension Gloss.Decoder {
-    // The sharing permission in the json can be a string or SharingPermission.
-    public static func decodeSharingPermission(key: String, json: JSON) -> SharingPermission? {
-            
-        if let sharingPermissionString = json.valueForKeyPath(keyPath: key) as? String {
-            return SharingPermission(rawValue: sharingPermissionString)
+    // The permission in the json can be a string or a Permission.
+    public static func decodePermission(key: String, json: JSON) -> Permission? {
+        if let permissionString = json.valueForKeyPath(keyPath: key) as? String {
+            return Permission(rawValue: permissionString)
         }
         
-        if let sharingPermission = json[key] as? SharingPermission? {
-            return sharingPermission
+        if let permission = json[key] as? Permission? {
+            return permission
         }
         
         return nil

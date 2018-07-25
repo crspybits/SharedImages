@@ -113,7 +113,7 @@ public class GoogleSyncServerSignIn : NSObject, GenericSignIn {
         signInOutButton.signIn = self
     }
     
-    public var signInTypesAllowed:SignInType = .both
+    public var userType:UserType = .owning
     
     public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
     
@@ -268,11 +268,10 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
                             // 10/22/17; It seems legit to sign the user out. The server told us the user was not on the system.
                             self.signUserOut()
                             Log.msg("signUserOut: GoogleSignIn: noUser")
-                        case .owningUser:
-                            self.delegate?.userActionOccurred(action: .existingUserSignedIn(nil), signIn: self)
-                            self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
-                        case .sharingUser(sharingPermission: let permission, _):
-                            self.delegate?.userActionOccurred(action: .existingUserSignedIn(permission), signIn: self)
+
+                        case .user(permission: let permission, _):
+                            self.delegate?.userActionOccurred(action:
+                                .existingUserSignedIn(permission), signIn: self)
                             self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
                         }
                     }
@@ -291,11 +290,11 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
                         }
                     }
                 }
-                
+
             case .createOwningUser:
-                SyncServerUser.session.addUser(creds: creds) {[unowned self] error in
-                    if error == nil {
-                        self.successCreatingOwningUser()
+                SyncServerUser.session.addUser(creds: creds) {[unowned self] sharingGroupId, error in
+                    if error == nil, let sharingGroupId = sharingGroupId {
+                        self.successCreatingOwningUser(sharingGroupId: sharingGroupId)
                     }
                     else {
                         SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating owning user: \(error!)")
@@ -306,9 +305,9 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
                 }
                 
             case .createSharingUser(invitationCode: let invitationCode):
-                SyncServerUser.session.redeemSharingInvitation(creds: creds, invitationCode: invitationCode) {[unowned self] accessToken, error in
-                    if error == nil {
-                        self.successCreatingSharingUser()
+                SyncServerUser.session.redeemSharingInvitation(creds: creds, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] accessToken, sharingGroupId, error in
+                    if error == nil, let sharingGroupId = sharingGroupId {
+                        self.successCreatingSharingUser(sharingGroupId: sharingGroupId)
                     }
                     else {
                         SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating sharing user: \(error!)")

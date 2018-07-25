@@ -22,7 +22,7 @@ public enum SignInUIState {
 }
 
 enum ShowSignIns {
-    case signInType(SignInType)
+    case userType(UserType)
     case signedIn
 }
 
@@ -53,31 +53,31 @@ public class SignIn : UIView {
         let signInAccounts:SignInAccounts = SignInAccounts.createFromXib()!
         signInAccounts.delegate = self
         
-        var signInType: SignInType
+        var userType: UserType?
 
         switch account {
         case .existingAccount:
             SignIn.userInterfaceState = .existingAccount
             // Sign into an existing account-- which could be a either sharing or owning account type.
-            signInType = .both
+            userType = nil
             
         case .newAccount:
             SignIn.userInterfaceState = .createNewAccount
             // Overt creation of a new account is only allowed for owning users. To create a sharing user, you need an invitation.
-            signInType = .owningUser
+            userType = .owning
             
         case .sharingAccount:
-            // Allowing the user to sign in as a new sharing user. This is used only through an invitation.
+            // Allowing the user to sign in as a new sharing user. This is used only through an invitation. Could sign in as sharing or owning.
             SignIn.userInterfaceState = .createNewAccount
-            signInType = .sharingUser
+            userType = nil
             
         case .signedIn:
             // The user is already signed-in
             SignIn.userInterfaceState = .existingAccount
-            signInType = .both // will filter this below.
+            userType = nil
         }
         
-        var signIns = SignInManager.session.getSignIns(for: signInType)
+        var signIns = SignInManager.session.getSignIns(for: userType)
         if account == .signedIn {
             signIns = signIns.filter({$0.userIsSignedIn})
         }

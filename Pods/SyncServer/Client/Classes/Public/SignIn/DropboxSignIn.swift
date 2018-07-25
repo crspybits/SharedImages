@@ -139,7 +139,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
         DropboxClientsManager.setupWithAppKey(appKey)
     }
     
-    public var signInTypesAllowed:SignInType = .owningUser
+    public var userType:UserType = .owning
     
     public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
 
@@ -289,16 +289,11 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                         // 10/22/17; It seems legit to sign the user out. The server told us the user was not on the system.
                         self.signUserOut()
                         Log.msg("signUserOut: DropboxSignIn: noUser in checkForExistingUser")
-                        
-                    case .owningUser:
+                    
+                    case .user:
                         self.delegate?.userActionOccurred(action: .existingUserSignedIn(nil), signIn: self)
                         self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
                         self.signInOutButton?.buttonShowing = .signOut
-                        
-                    case .sharingUser:
-                        // This should never happen.
-                        Log.error("Can't have Dropbox sharing users.")
-                        self.signUserOut()
                     }
                 }
                 else {
@@ -327,9 +322,9 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                 return
             }
             
-            SyncServerUser.session.addUser(creds: creds) {[unowned self] error in
-                if error == nil {
-                    self.successCreatingOwningUser()
+            SyncServerUser.session.addUser(creds: creds) {[unowned self] sharingGroupId, error  in
+                if error == nil, let sharingGroupId = sharingGroupId {
+                    self.successCreatingOwningUser(sharingGroupId: sharingGroupId)
                 }
                 else {
                     SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating owning user: \(error!)")
@@ -339,10 +334,20 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                 }
             }
             
-        case .createSharingUser:
-            // Dropbox doesn't want to be an identity provider.
-            Log.error("Can't have Dropbox sharing users.")
-            self.signUserOut()
+        case .createSharingUser(invitationCode: let invitationCode):
+            // 7/23/18; Now allowing Dropbox users to redeem sharing invitations-- that's because they'll have their own cloud storage now.
+            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] longLivedAccessToken, sharingGroupId, error in
+                if error == nil, let sharingGroupId = sharingGroupId {
+                    self.successCreatingSharingUser(sharingGroupId: sharingGroupId)
+                }
+                else {
+                    Log.error("Error: \(error!)")
+                    Alert.show(withTitle: "Alert!", message: "Error creating sharing user: \(error!)")
+                    // 10/22/17; The common situation here seems to be the user is signing up via a sharing invitation. They are not on the system yet in that case. Seems safe to sign them out.
+                    self.signUserOut()
+                    Log.msg("signUserOut: FacebookSignIn: error in redeemSharingInvitation in")
+                }
+            }
             
         case .error:
             // 10/22/17; Error situation.

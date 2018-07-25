@@ -19,7 +19,7 @@ public class SharingInvitation {
         public let sharingInvitationCode:String
         
         /// It seems odd to have this coming in as a URL parameter, but it has no effect on the permissions granted. Rather, it's here for the UI-- to tell the invited person what kind of permissions they would get if they accept the invitation. (The alternative would be to have a dedicated backend call which would return the sharing permission given the invitation code).
-        public let sharingInvitationPermission:SharingPermission
+        public let sharingInvitationPermission:Permission
     }
     
     private var invitation:Invitation?
@@ -55,7 +55,7 @@ public class SharingInvitation {
           <BundleId>.invitation://?code=<InvitationCode>&permission=<permission>
           where <BundleId> is something like biz.SpasticMuffin.SharedImages
     */
-    public static func createSharingURL(invitationCode:String, permission:SharingPermission) -> String {
+    public static func createSharingURL(invitationCode:String, permission:Permission) -> String {
         let urlString = self.urlScheme + "://?\(queryItemAuthorizationCode)=" + invitationCode + "&\(queryItemPermission)=" + permission.rawValue
         return urlString
     }
@@ -77,7 +77,7 @@ public class SharingInvitation {
                 
                 if components.queryItems != nil && components.queryItems!.count == 2 {
                     var code:String?
-                    var permission:SharingPermission?
+                    var permission:Permission?
                     
                     let queryItemCode = components.queryItems![0]
                     if queryItemCode.name == SharingInvitation.queryItemAuthorizationCode && queryItemCode.value != nil  {
@@ -88,7 +88,7 @@ public class SharingInvitation {
                     let queryItemPermission = components.queryItems![1]
                     if queryItemPermission.name == SharingInvitation.queryItemPermission && queryItemPermission.value != nil  {
                         Log.msg("queryItemPermission.value: \(queryItemPermission.value!)")
-                        permission = SharingPermission(rawValue: queryItemPermission.value!)
+                        permission = Permission(rawValue: queryItemPermission.value!)
                     }
                     
 #if false

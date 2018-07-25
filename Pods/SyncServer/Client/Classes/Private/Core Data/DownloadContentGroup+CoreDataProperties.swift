@@ -2,7 +2,7 @@
 //  DownloadContentGroup+CoreDataProperties.swift
 //  SyncServer
 //
-//  Created by Christopher G Prince on 4/21/18.
+//  Created by Christopher G Prince on 7/22/18.
 //
 //
 
@@ -17,6 +17,7 @@ extension DownloadContentGroup {
     }
 
     @NSManaged public var fileGroupUUID: String?
+    @NSManaged public var sharingGroupIdInternal: NSNumber?
     @NSManaged public var statusRaw: String?
     @NSManaged public var downloads: NSSet?
 

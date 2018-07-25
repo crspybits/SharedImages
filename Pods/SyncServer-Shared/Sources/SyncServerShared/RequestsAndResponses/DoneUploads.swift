@@ -22,6 +22,8 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
     // Overall version for files for the specific user; assigned by the server.
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
+
+    public var sharingGroupId: SharingGroupId!
     
 #if DEBUG
     // Give a time value in seconds -- after the lock is obtained, the server for sleep for this lock to test locking operation.
@@ -30,7 +32,8 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
 #endif
     
     public func nonNilKeys() -> [String] {
-        return [DoneUploadsRequest.masterVersionKey]
+        return [DoneUploadsRequest.masterVersionKey,
+            ServerEndpoint.sharingGroupIdKey]
     }
     
     public func allKeys() -> [String] {
@@ -45,6 +48,7 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
         super.init()
         
         self.masterVersion = Decoder.decode(int64ForKey: DoneUploadsRequest.masterVersionKey)(json)
+        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
         
 #if DEBUG
         self.testLockSync = DoneUploadsRequest.testLockSyncKey <~~ json
@@ -66,7 +70,8 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
     
     public func toJSON() -> JSON? {
         var result = [
-            DoneUploadsRequest.masterVersionKey ~~> self.masterVersion
+            DoneUploadsRequest.masterVersionKey ~~> self.masterVersion,
+            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
         ]
         
 #if DEBUG

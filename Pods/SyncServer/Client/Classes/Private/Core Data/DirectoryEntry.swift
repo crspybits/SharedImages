@@ -38,6 +38,16 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         }
     }
     
+    public var sharingGroupId: SharingGroupId? {
+        get {
+            return sharingGroupIdInternal?.int64Value
+        }
+        
+        set {
+            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
+        }
+    }
+    
     // Setting this assumes the file has also been deleted on the server.
     public var deletedLocally:Bool {
         get {
@@ -73,7 +83,7 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
             mimeType = .unknown
         }
         
-        var attr = SyncAttributes(fileUUID: fileUUID!, mimeType: mimeType)
+        var attr = SyncAttributes(fileUUID: fileUUID!, sharingGroupId: sharingGroupId!, mimeType: mimeType)
         attr.appMetaData = appMetaData
         attr.fileGroupUUID = fileGroupUUID
         return attr

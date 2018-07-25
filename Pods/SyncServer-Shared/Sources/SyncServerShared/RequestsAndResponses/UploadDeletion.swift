@@ -31,6 +31,8 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
     // Overall version for files for the specific user; assigned by the server.
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
+    
+    public var sharingGroupId: SharingGroupId!
 
 #if DEBUG
     // Enable the client to actually delete files-- for testing purposes. The UploadDeletionRequest will not queue the request, but instead deletes from both the FileIndex and from cloud storage.
@@ -39,7 +41,8 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
 #endif
     
     public func nonNilKeys() -> [String] {
-        return [UploadDeletionRequest.fileUUIDKey, UploadDeletionRequest.fileVersionKey, UploadDeletionRequest.masterVersionKey]
+        return [UploadDeletionRequest.fileUUIDKey, UploadDeletionRequest.fileVersionKey, UploadDeletionRequest.masterVersionKey,
+            ServerEndpoint.sharingGroupIdKey]
     }
     
     public func allKeys() -> [String] {
@@ -58,6 +61,7 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
         
         self.masterVersion = Decoder.decode(int64ForKey: UploadDeletionRequest.masterVersionKey)(json)
         self.fileVersion = Decoder.decode(int32ForKey: UploadDeletionRequest.fileVersionKey)(json)
+        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
         
 #if DEBUG
         self.actualDeletion = Decoder.decode(int32ForKey:  UploadDeletionRequest.actualDeletionKey)(json)
@@ -84,7 +88,8 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
         param += [
             UploadDeletionRequest.fileUUIDKey ~~> self.fileUUID,
             UploadDeletionRequest.masterVersionKey ~~> self.masterVersion,
-            UploadDeletionRequest.fileVersionKey ~~> self.fileVersion
+            UploadDeletionRequest.fileVersionKey ~~> self.fileVersion,
+            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
         ]
         
 #if DEBUG

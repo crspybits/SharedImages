@@ -45,6 +45,16 @@ public class FileTracker: NSManagedObject, Filenaming, FileUUID, LocalURLData {
         }
     }
     
+    public var sharingGroupId: SharingGroupId? {
+        get {
+            return sharingGroupIdInternal?.int64Value
+        }
+        
+        set {
+            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
+        }
+    }
+    
     public enum Operation: String {
         case file // File upload or download
         case appMetaData // appMetaData upload or download.
