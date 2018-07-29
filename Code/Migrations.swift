@@ -15,7 +15,25 @@ class Migrations {
     
     private static let migration1 = SMPersistItemInt(name:"Migrations.migration1", initialIntValue:0,  persistType: .userDefaults)
 
+    private static let coreDataMigration_v0_16_3 = SMPersistItemBool(name: "Migrations.coreDataMigration_v0_16_3", initialBoolValue: false, persistType: .userDefaults)
+    private static let signOutMigration_v0_16_3 = SMPersistItemBool(name: "Migrations.signOutMigration_v0_16_3", initialBoolValue: false, persistType: .userDefaults)
+    
     private init() {
+    }
+    
+    // Run this near or at the very end of the launch sequence in the app delegate-- so all of the setup is done.
+    func launch() {
+        if !Migrations.signOutMigration_v0_16_3.boolValue {
+            Migrations.signOutMigration_v0_16_3.boolValue = true
+            signoutMigration_v0_16_3()
+        }
+    }
+    
+    func runAfterHaveSharingGroupId() {
+        if !Migrations.coreDataMigration_v0_16_3.boolValue {
+            Migrations.coreDataMigration_v0_16_3.boolValue = true
+            serverv0_16_3()
+        }
     }
     
     // We've added file group UUID's to some images-- need to update those locally.
@@ -51,5 +69,32 @@ class Migrations {
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
             completion()
         }
+    }
+    
+    // 7/28/18; Added sharing group ids.
+    private func serverv0_16_3() {
+        guard let sharingGroupId = SyncController.getSharingGroupId() else {
+            SMCoreLib.Alert.show(withTitle: "Migration Error!", message: "Could not get sharing group id-- please contact crspybits")
+            return
+        }
+        
+        let images = Image.fetchAll()
+        images.forEach { image in
+            image.sharingGroupId = sharingGroupId
+        }
+    
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        
+        let discussions = Discussion.fetchAll()
+        
+        discussions.forEach { discussion in
+            discussion.sharingGroupId = sharingGroupId
+        }
+    
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+    }
+    
+    private func signoutMigration_v0_16_3() {
+        SignInManager.session.currentSignIn?.signUserOut()
     }
 }

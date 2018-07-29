@@ -29,6 +29,7 @@ public class SyncServer {
             ServerAPI.session.desiredEvents = newValue
             Download.session.desiredEvents = newValue
             Upload.session.desiredEvents = newValue
+            SyncServerUser.session.desiredEvents = newValue
         }
         
         get {
@@ -43,8 +44,9 @@ public class SyncServer {
             ServerAPI.session.syncServerDelegate = newValue
             ServerNetworking.session.syncServerDelegate = newValue
             Download.session.delegate = newValue
-            Upload.session.delegate = delegate
-            Directory.session.delegate = delegate
+            Upload.session.delegate = newValue
+            Directory.session.delegate = newValue
+            SyncServerUser.session.delegate = newValue
         }
         
         get {

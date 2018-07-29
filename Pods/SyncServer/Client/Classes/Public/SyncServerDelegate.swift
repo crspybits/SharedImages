@@ -33,6 +33,9 @@ public enum SyncEvent {
     case syncDone
     
     case refreshingCredentials
+    
+    /// Occurs when we have sharing group id(s) reported from the server for the user. e.g., will happen after user sign in.
+    case haveSharingGroupIds
 }
 
 public struct EventDesired: OptionSet {
@@ -55,11 +58,12 @@ public struct EventDesired: OptionSet {
     public static let syncStopping = EventDesired(rawValue: 1 << 10)
 
     public static let refreshingCredentials = EventDesired(rawValue: 1 << 11)
-
+    public static let haveSharingGroupIds = EventDesired(rawValue: 1 << 12)
+    
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.haveSharingGroupIds])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -101,6 +105,9 @@ public struct EventDesired: OptionSet {
         
         case .refreshingCredentials:
             eventIsDesired = .refreshingCredentials
+            
+        case .haveSharingGroupIds:
+            eventIsDesired = .haveSharingGroupIds
         }
         
         if mask.contains(eventIsDesired) {

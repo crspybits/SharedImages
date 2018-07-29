@@ -133,6 +133,7 @@
 		83D0BE2820B3B81C00555B73 /* UnreadCountBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnreadCountBadge.swift; sourceTree = "<group>"; };
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83D49C971F49468200409B0F /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
+		83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages5.xcdatamodel; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
 		83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageExtras.swift; sourceTree = "<group>"; };
 		83E13B2420318366005A0A18 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
@@ -481,7 +482,7 @@
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = BH68R29JBE;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 1;
@@ -917,18 +918,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = BH68R29JBE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2a27fe4e-fd98-4b2d-9f84-996e6799180b";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -941,18 +942,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = BH68R29JBE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2a27fe4e-fd98-4b2d-9f84-996e6799180b";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -995,12 +996,13 @@
 		83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */,
 				8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */,
 				83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */,
 				83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */,
 				83F882441E711FC6008F644A /* SharedImages.xcdatamodel */,
 			);
-			currentVersion = 8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */;
+			currentVersion = 83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */;
 			name = SharedImages.xcdatamodeld;
 			path = Resources/SharedImages.xcdatamodeld;
 			sourceTree = "<group>";

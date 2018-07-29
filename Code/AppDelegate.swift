@@ -52,8 +52,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Call this as soon as possible in your launch sequence.
-        // Version 0.14.1 of the server is the first with fileGroupUUID.
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.14.1"))
+        // Version 0.16.3 of the server is the first with sharing group id changes (i.e., now using a single sharing group for each group of users).
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.16.3"))
     
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Shared Images"
@@ -101,6 +101,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         UnreadCountBadge.update()
+        
+        Migrations.session.launch()
 
         return true
     }

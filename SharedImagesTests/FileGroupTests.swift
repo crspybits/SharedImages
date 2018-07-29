@@ -23,11 +23,18 @@ class FileGroupTests: XCTestCase {
     }
     
     func testGroupUUID() {
+        guard let sharingGroupId = SyncController.getSharingGroupId() else {
+            XCTFail()
+            return
+        }
+        
         let fileGroupUUID = UUID.make()!
         let newDiscussion = Discussion.newObjectAndMakeUUID(makeUUID: true) as! Discussion
         newDiscussion.fileGroupUUID = fileGroupUUID
+        newDiscussion.sharingGroupId = sharingGroupId
         let newImage = Image.newObjectAndMakeUUID(makeUUID: true) as! Image
         newImage.fileGroupUUID = fileGroupUUID
+        newImage.sharingGroupId = sharingGroupId
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
 
         guard let discussion = Discussion.fetchObjectWithFileGroupUUID(fileGroupUUID), discussion.uuid == newDiscussion.uuid else {

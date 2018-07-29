@@ -95,7 +95,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         var alert:UIAlertController
         
         if SignInManager.session.userIsSignedIn {
-            alert = UIAlertController(title: "Share your images with a Google or Facebook user?", message: nil, preferredStyle: .actionSheet)
+            alert = UIAlertController(title: "Share images with a Dropbox, Facebook, or Google user?", message: nil, preferredStyle: .actionSheet)
 
             func addAlertAction(_ permission:Permission) {
                 alert.addAction(UIAlertAction(title: permission.userFriendlyText(), style: .default){alert in
@@ -130,15 +130,15 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
             if error == nil {
                 let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
                 if let email = SMEmail(parentViewController: self) {
-                    let message = "I'd like to share my images with you through the SharedImages app and your Google or Facebook account. To share my images, you need to:\n" +
+                    let message = "I'd like to share images with you through the SharedImages app and your Dropbox, Facebook, or Google account. To share images, you need to:\n" +
                         "1) download the SharedImages iOS app onto your iPhone or iPad,\n" +
                         "2) tap the link below in the Apple Mail app, and\n" +
-                        "3) follow the instructions within the app to sign in to your Google or Facebook account to access my images.\n" +
-                        "You will have " + permission.userFriendlyText() + " access to my images.\n\n" +
+                        "3) follow the instructions within the app to sign in to your Dropbox, Facebook, or Google account.\n" +
+                        "You will have " + permission.userFriendlyText() + " access to images.\n\n" +
                             sharingURLString
                     
                     email.setMessageBody(message, isHTML: false)
-                    email.setSubject("Share my images using the SharedImages app")
+                    email.setSubject("Share images using the SharedImages app")
                     email.show()
                 }
             }

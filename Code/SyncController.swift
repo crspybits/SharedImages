@@ -33,6 +33,8 @@ struct FileData {
     
     // This will be non-nil when we have an assigned UUID being downloaded from the server.
     let uuid:String?
+    
+    let sharingGroupId:SharingGroupId
 }
 
 protocol SyncControllerDelegate : class {
@@ -62,7 +64,7 @@ class SyncController {
     init() {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
-                .singleFileUploadComplete, .singleUploadDeletionComplete]
+                .singleFileUploadComplete, .singleUploadDeletionComplete, .haveSharingGroupIds]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -392,7 +394,7 @@ extension SyncController : SyncServerDelegate {
             discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
         }
 
-        let imageFileData = FileData(url: newImageURL, mimeType: attr.mimeType, uuid: attr.fileUUID)
+        let imageFileData = FileData(url: newImageURL, mimeType: attr.mimeType, uuid: attr.fileUUID, sharingGroupId: attr.sharingGroupId)
         let imageData = ImageData(file: imageFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
 
         delegate.addLocalImage(syncController: self, imageData: imageData, attr: attr)
@@ -410,7 +412,7 @@ extension SyncController : SyncServerDelegate {
             Log.error("An error occurred moving a file: \(error)")
         }
         
-        let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, uuid: attr.fileUUID)
+        let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, uuid: attr.fileUUID, sharingGroupId: attr.sharingGroupId)
         delegate.addToLocalDiscussion(syncController: self, discussionData: discussionFileData, attr: attr)
         
         Progress.session.next()
@@ -546,6 +548,9 @@ extension SyncController : SyncServerDelegate {
             syncDone?()
             syncDone = nil
             Progress.session.finish()
+            
+        case .haveSharingGroupIds:
+            Migrations.session.runAfterHaveSharingGroupId()
         
         default:
             Log.error("Unexpected event received: \(event)")

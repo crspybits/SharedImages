@@ -303,6 +303,7 @@ class ImagesVC: UIViewController {
         newImage.title = newImageData.title
         newImage.discussionUUID = newImageData.discussionUUID
         newImage.fileGroupUUID = fileGroupUUID
+        newImage.sharingGroupId = newImageData.file.sharingGroupId
         
         let imageFileName = newImageData.file.url.lastPathComponent
         let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
@@ -357,7 +358,8 @@ class ImagesVC: UIViewController {
             // 1)
             localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
             localDiscussion.uuid = discussionData.uuid
-            
+            localDiscussion.sharingGroupId = discussionData.sharingGroupId
+
         case .fromServer:
             if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(discussionData.uuid!) {
                 // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
@@ -388,6 +390,7 @@ class ImagesVC: UIViewController {
                 // 3) New discussion downloaded from server.
                 localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
                 localDiscussion.uuid = discussionData.uuid
+                localDiscussion.sharingGroupId = discussionData.sharingGroupId
                 
                 // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
                 if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
@@ -403,7 +406,7 @@ class ImagesVC: UIViewController {
         localDiscussion.mimeType = discussionData.mimeType.rawValue
         localDiscussion.url = discussionData.url
         localDiscussion.fileGroupUUID = fileGroupUUID
-        
+
         // Look up and connect the Image if we have one.
         var image:Image?
         
@@ -436,7 +439,7 @@ class ImagesVC: UIViewController {
         ImageExtras.removeLocalImages(uuids:uuids)
     }
     
-    private func createEmptyDiscussion(image:Image, discussionUUID: String, imageTitle: String?) -> FileData? {
+    private func createEmptyDiscussion(image:Image, discussionUUID: String, sharingGroupId: SharingGroupId, imageTitle: String?) -> FileData? {
         let newDiscussionFileURL = ImageExtras.newJSONFile()
         var fixedObjects = FixedObjects()
         
@@ -455,7 +458,7 @@ class ImagesVC: UIViewController {
             return nil
         }
         
-        return FileData(url: newDiscussionFileURL, mimeType: .text, uuid: discussionUUID)
+        return FileData(url: newDiscussionFileURL, mimeType: .text, uuid: discussionUUID, sharingGroupId: sharingGroupId)
     }
 }
 
@@ -521,13 +524,18 @@ extension ImagesVC : SMAcquireImageDelegate {
             return
         }
         
-        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, uuid: nil)
+        guard let sharingGroupId = SyncController.getSharingGroupId() else {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not get sharing group id!")
+            return
+        }
+        
+        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, uuid: nil, sharingGroupId: sharingGroupId)
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = addLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
         
-        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, imageTitle: userName) else {
+        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupId: sharingGroupId, imageTitle: userName) else {
             return
         }
         

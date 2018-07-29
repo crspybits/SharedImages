@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import SMCoreLib
+import SyncServer_Shared
 
 // 5/13/18-- The discussionUUID is old as of today. The fileGroupUUID property is the new way to connect discussion and image.
 
@@ -19,6 +20,16 @@ public class Image: NSManagedObject {
     static let DISCUSSION_UUID_KEY = "discussionUUID"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     static let UNREAD_COUNT = "discussion.unreadCount"
+    
+    public var sharingGroupId: SharingGroupId? {
+        get {
+            return sharingGroupIdInternal?.int64Value
+        }
+        
+        set {
+            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
+        }
+    }
     
     var originalSize:CGSize {
         var originalImageSize = CGSize()

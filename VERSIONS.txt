@@ -1,5 +1,11 @@
 SharedImages
 
+Version 0.19.0
+	* Updates for sharing group ids and server version 0.16.3 -- owning users now storing data into their own cloud storage.
+	* Migration: 
+		- Need to sign the users out-- this should reupload people's tokens to get them into the database.
+		- Need to add sharingGroupId to image and discussion Core Data objects.
+
 Version 0.18.1 (6/20/18)
 	* Updated to changed SyncServer iOS client pod-- which reflects update to server. Server updated to using new libraries and new Swift version.
 	

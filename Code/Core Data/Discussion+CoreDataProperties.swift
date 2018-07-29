@@ -2,7 +2,7 @@
 //  Discussion+CoreDataProperties.swift
 //  SharedImages
 //
-//  Created by Christopher G Prince on 5/13/18.
+//  Created by Christopher G Prince on 7/28/18.
 //  Copyright © 2018 Spastic Muffin, LLC. All rights reserved.
 //
 //
@@ -17,11 +17,12 @@ extension Discussion {
         return NSFetchRequest<Discussion>(entityName: "Discussion")
     }
 
+    @NSManaged public var fileGroupUUID: String?
     @NSManaged public var mimeType: String?
     @NSManaged public var unreadCount: Int32
     @NSManaged public var urlInternal: NSData?
     @NSManaged public var uuid: String?
-    @NSManaged public var fileGroupUUID: String?
+    @NSManaged public var sharingGroupIdInternal: NSNumber?
     @NSManaged public var image: Image?
 
 }
