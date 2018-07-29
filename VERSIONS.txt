@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.19.0
+Version 0.19.0 (7/28/18)
 	* Updates for sharing group ids and server version 0.16.3 -- owning users now storing data into their own cloud storage.
 	* Migration: 
 		- Need to sign the users out-- this should reupload people's tokens to get them into the database.
