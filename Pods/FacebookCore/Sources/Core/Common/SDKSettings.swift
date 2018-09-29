@@ -16,8 +16,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import UIKit
 import FBSDKCoreKit.FBSDKSettings
+import UIKit
 
 //--------------------------------------
 // MARK: - SDK Version
@@ -33,7 +33,7 @@ public let SDKVersion = FBSDKSettings.sdkVersion()
 /**
  Provides access to settings and configuration used by the entire SDK.
  */
-public struct SDKSettings {
+public enum SDKSettings {
   /**
    Facebook App ID used by the SDK.
    Default value is read from the application's Info.plist under `FacebookAppId` key.
@@ -129,13 +129,11 @@ public struct SDKSettings {
       FBSDKSettings.setLimitEventAndDataUsage(newValue)
     }
   }
-}
 
-//--------------------------------------
-// MARK: - SDKSettings + Logging Behavior
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - SDKSettings + Logging Behavior
+  //--------------------------------------
 
-extension SDKSettings {
   /**
    Current logging behaviors of Facebook SDK.
    The default enabled behavior is `.DeveloperErrors` only.
@@ -149,16 +147,16 @@ extension SDKSettings {
         return nil
       }
 
-#if swift(>=4.1)
-      let behaviors = FBSDKSettings.loggingBehavior().compactMap(createBehavior)
-#else
-      let behaviors = FBSDKSettings.loggingBehavior().flatMap(createBehavior)
-#endif
+      #if swift(>=4.1)
+      let behaviors: [SDKLoggingBehavior] = FBSDKSettings.loggingBehavior().compactMap(createBehavior)
+      #else
+      let behaviors: [SDKLoggingBehavior] = FBSDKSettings.loggingBehavior().flatMap(createBehavior)
+      #endif
 
       return Set(behaviors)
     }
     set {
-      let behaviors = newValue.map({ $0.sdkStringValue })
+      let behaviors = newValue.map { $0.sdkStringValue }
       FBSDKSettings.setLoggingBehavior(Set(behaviors))
     }
   }

@@ -33,7 +33,7 @@ public class DownloadFileTracker: FileTracker, AllOperations {
     
     var attr: SyncAttributes {
         let mimeType = MimeType(rawValue: self.mimeType!)!
-        var attr = SyncAttributes(fileUUID: fileUUID, sharingGroupId: sharingGroupId!, mimeType: mimeType, creationDate: creationDate! as Date, updateDate: updateDate! as Date)
+        var attr = SyncAttributes(fileUUID: fileUUID, sharingGroupUUID: sharingGroupUUID!, mimeType: mimeType, creationDate: creationDate! as Date, updateDate: updateDate! as Date)
         attr.appMetaData = appMetaData
         attr.fileGroupUUID = fileGroupUUID
         return attr

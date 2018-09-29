@@ -11,10 +11,19 @@ import SMCoreLib
 import SyncServer_Shared
 
 class Consistency {
-    static func check(sharingGroupId: SharingGroupId, localFiles:[UUIDString], repair:Bool = false, callback:((Error?)->())?) {
-        ServerAPI.session.fileIndex(sharingGroupId: sharingGroupId) { (fileInfo, masterVersion, error) in
-            guard error == nil else {
+    static func check(sharingGroupUUID: String, localFiles:[UUIDString], repair:Bool = false, callback:((Error?)->())?) {
+        ServerAPI.session.index(sharingGroupUUID: sharingGroupUUID) { response in
+            var indexResult:ServerAPI.IndexResult!
+            switch response {
+            case .success(let result):
+                indexResult = result
+            case .error(let error):
                 callback?(error)
+                return
+            }
+            
+            guard let fileInfo = indexResult.fileIndex else {
+                callback?(SyncServerError.generic("No file info in index result."))
                 return
             }
             
@@ -27,7 +36,7 @@ class Consistency {
             // var deletedServerFilesButPresentLocally = [UUIDString]()
 
             // First, check server files.
-            for file in fileInfo! {
+            for file in fileInfo {
                 // Check against local files.
                 if file.deleted! {
                     if localFiles.contains(file.fileUUID) {
@@ -55,7 +64,7 @@ class Consistency {
             
             for localFile in localFiles {
                 // All local files should be non-deleted on server
-                let result = fileInfo!.filter {$0.fileUUID == localFile}
+                let result = fileInfo.filter {$0.fileUUID == localFile}
                 if result.count == 0 {
                     messageResult += "Local file: \(localFile) not on server\n"
                 }
@@ -80,13 +89,13 @@ class Consistency {
             CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 // All the local data should be on the server.
                 entries = DirectoryEntry.fetchAll()
-                if entries.count != fileInfo!.count {
-                    messageResult += "DirectoryEntry meta data different size than on server: \(entries.count) versus \(fileInfo!.count)\n"
+                if entries.count != fileInfo.count {
+                    messageResult += "DirectoryEntry meta data different size than on server: \(entries.count) versus \(fileInfo.count)\n"
                 }
             }
 
             if messageResult.count > 0 {
-                messageResult = "\nConsistency check: Results through \(localFiles.count) local files, \(fileInfo!.count) server files, and \(entries.count) DirectoryEntry meta data entries:\n\(messageResult)"
+                messageResult = "\nConsistency check: Results through \(localFiles.count) local files, \(fileInfo.count) server files, and \(entries.count) DirectoryEntry meta data entries:\n\(messageResult)"
                 Log.warning(messageResult)
             }
             else {
@@ -96,7 +105,7 @@ class Consistency {
             
             if repair {
                 do {
-                    try repairServerFilesNotPresentLocally(fileUUIDs: serverFilesNotPresentLocally, sharingGroupId: sharingGroupId) {
+                    try repairServerFilesNotPresentLocally(fileUUIDs: serverFilesNotPresentLocally, sharingGroupUUID: sharingGroupUUID) {
                         callback?(nil)
                     }
                 } catch (let error) {
@@ -109,7 +118,7 @@ class Consistency {
         }
     }
     
-    static func repairServerFilesNotPresentLocally(fileUUIDs:[UUIDString], sharingGroupId: SharingGroupId, completion:@escaping ()->()) throws {
+    static func repairServerFilesNotPresentLocally(fileUUIDs:[UUIDString], sharingGroupUUID: String, completion:@escaping ()->()) throws {
         if fileUUIDs.count == 0 {
             completion()
         }
@@ -134,9 +143,9 @@ class Consistency {
             throw resultError!
         }
 
-        // A bit odd calling back up to the SyncServer, but sync will not call back down to us.
+        // A bit odd calling back up to the SyncServer, but sync will not call back down to us.s
         // TODO: *3* Should use delegation here or a callback. Cleaner.
-        SyncServer.session.sync(sharingGroupId: sharingGroupId) {
+        try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID) {
             completion()
         }
     }

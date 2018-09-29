@@ -75,11 +75,11 @@ public class UploadAppMetaDataRequest : NSObject, RequestMessage {
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
     
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID:String!
     
     public func nonNilKeys() -> [String] {
         return [UploadAppMetaDataRequest.fileUUIDKey, UploadAppMetaDataRequest.masterVersionKey,
-            ServerEndpoint.sharingGroupIdKey]
+            ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
@@ -100,7 +100,7 @@ public class UploadAppMetaDataRequest : NSObject, RequestMessage {
         self.appMetaData = AppMetaData(json: json)
         
         self.masterVersion = Decoder.decode(int64ForKey: UploadAppMetaDataRequest.masterVersionKey)(json)
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
 #if SERVER
         if !nonNilKeysHaveValues(in: json) {
@@ -128,7 +128,7 @@ public class UploadAppMetaDataRequest : NSObject, RequestMessage {
         var result = [
             UploadAppMetaDataRequest.fileUUIDKey ~~> self.fileUUID,
             UploadAppMetaDataRequest.masterVersionKey ~~> self.masterVersion,
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ]
         
         if let appMetaData = self.appMetaData?.toJSON() {

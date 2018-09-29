@@ -19,7 +19,7 @@ public class Discussion: NSManagedObject {
     static let UUID_KEY = "uuid"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     
-    public var sharingGroupId: SharingGroupId? {
+    public var sharingGroupId: Int64? {
         get {
             return sharingGroupIdInternal?.int64Value
         }

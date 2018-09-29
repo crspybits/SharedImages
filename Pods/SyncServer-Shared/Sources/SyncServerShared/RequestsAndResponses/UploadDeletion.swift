@@ -28,11 +28,11 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
     public static let fileVersionKey = "fileVersion"
     public var fileVersion:FileVersionInt!
     
-    // Overall version for files for the specific user; assigned by the server.
+    // Overall version for files for the sharing group; assigned by the server.
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
     
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID: String!
 
 #if DEBUG
     // Enable the client to actually delete files-- for testing purposes. The UploadDeletionRequest will not queue the request, but instead deletes from both the FileIndex and from cloud storage.
@@ -42,7 +42,7 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
     
     public func nonNilKeys() -> [String] {
         return [UploadDeletionRequest.fileUUIDKey, UploadDeletionRequest.fileVersionKey, UploadDeletionRequest.masterVersionKey,
-            ServerEndpoint.sharingGroupIdKey]
+            ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
@@ -61,7 +61,7 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
         
         self.masterVersion = Decoder.decode(int64ForKey: UploadDeletionRequest.masterVersionKey)(json)
         self.fileVersion = Decoder.decode(int32ForKey: UploadDeletionRequest.fileVersionKey)(json)
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
 #if DEBUG
         self.actualDeletion = Decoder.decode(int32ForKey:  UploadDeletionRequest.actualDeletionKey)(json)
@@ -89,7 +89,7 @@ public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
             UploadDeletionRequest.fileUUIDKey ~~> self.fileUUID,
             UploadDeletionRequest.masterVersionKey ~~> self.masterVersion,
             UploadDeletionRequest.fileVersionKey ~~> self.fileVersion,
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ]
         
 #if DEBUG

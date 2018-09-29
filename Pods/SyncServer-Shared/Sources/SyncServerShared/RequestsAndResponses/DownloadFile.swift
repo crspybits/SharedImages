@@ -23,7 +23,7 @@ public class DownloadFileRequest : NSObject, RequestMessage {
     public static let fileVersionKey = "fileVersion"
     public var fileVersion:FileVersionInt!
     
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID:String!
     
     // This must indicate the current version of the app meta data for the file in the FileIndex (or nil if there is none yet).
     public static let appMetaDataVersionKey = "appMetaDataVersion"
@@ -35,7 +35,7 @@ public class DownloadFileRequest : NSObject, RequestMessage {
     
     public func nonNilKeys() -> [String] {
         return [DownloadFileRequest.fileUUIDKey, DownloadFileRequest.fileVersionKey, DownloadFileRequest.masterVersionKey,
-            ServerEndpoint.sharingGroupIdKey]
+            ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
@@ -50,7 +50,7 @@ public class DownloadFileRequest : NSObject, RequestMessage {
         self.masterVersion = Decoder.decode(int64ForKey: DownloadFileRequest.masterVersionKey)(json)
         self.fileVersion = Decoder.decode(int32ForKey: DownloadFileRequest.fileVersionKey)(json)
         self.appMetaDataVersion = Decoder.decode(int32ForKey: DownloadFileRequest.appMetaDataVersionKey)(json)
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
         if !self.nonNilKeysHaveValues(in: json) {
             return nil
@@ -73,7 +73,7 @@ public class DownloadFileRequest : NSObject, RequestMessage {
             DownloadFileRequest.masterVersionKey ~~> self.masterVersion,
             DownloadFileRequest.fileVersionKey ~~> self.fileVersion,
             DownloadFileRequest.appMetaDataVersionKey ~~> self.appMetaDataVersion,
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ])
     }
 }

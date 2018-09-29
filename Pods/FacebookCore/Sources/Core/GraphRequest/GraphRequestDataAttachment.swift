@@ -16,11 +16,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Foundation
 import FBSDKCoreKit
+import Foundation
 
 /**
- A container for data attachments so that additional metadata can be provided about the attachment (like content type or filename).
+ A container for data attachments so that additional metadata can be provided about the attachment
+ (like content type or filename).
  */
 public class GraphRequestDataAttachment {
 
@@ -36,8 +37,8 @@ public class GraphRequestDataAttachment {
   /**
    Initializes a data attachment
 
-   - parameter data:        The attachment data (retained, not copied).
-   - parameter filename:    Optional filename for the attachment. Default: `nil`.
+   - parameter data: The attachment data (retained, not copied).
+   - parameter filename: Optional filename for the attachment. Default: `nil`.
    - parameter contentType: Optional content type for the attachment. Default: `nil`.
    */
   public init(data: Data, filename: String? = nil, contentType: String? = nil) {
@@ -45,13 +46,11 @@ public class GraphRequestDataAttachment {
     self.filename = filename
     self.contentType = contentType
   }
-}
 
-//--------------------------------------
-// MARK: - Bridging
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Bridging
+  //--------------------------------------
 
-extension GraphRequestDataAttachment {
   internal var sdkDataAttachment: FBSDKGraphRequestDataAttachment {
     return FBSDKGraphRequestDataAttachment(data: data, filename: filename, contentType: contentType)
   }

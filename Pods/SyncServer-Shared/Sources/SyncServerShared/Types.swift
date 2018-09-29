@@ -13,12 +13,12 @@ public typealias FileVersionInt = Int32
 public typealias AppMetaDataVersionInt = Int32
 public typealias UserId = Int64
 public typealias SharingInvitationId = Int64
-public typealias SharingGroupId = Int64
 
 public enum ServerHTTPMethod : String {
     case get
     case post
     case delete
+    case patch
 }
 
 public enum HTTPStatus : Int {

@@ -32,8 +32,8 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
             statusRaw = newValue.rawValue
         }
     }
-    
-    public var sharingGroupId: SharingGroupId? {
+
+    public var sharingGroupId: Int64? {
         get {
             return sharingGroupIdInternal?.int64Value
         }
@@ -64,20 +64,22 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
     
     // If a DownloadContentGroup exists with this fileGroupUUID, adds this dft to it. Otherwise, creates one and adds it. The case were fileGroupUUID is nil is to deal with not having a fileGroupUUID for a file-- to enable consistency with downloads.
     class func addDownloadFileTracker(_ dft: DownloadFileTracker, to fileGroupUUID:String?) throws {
-        if dft.sharingGroupId == nil {
-            throw SyncServerError.noSharingGroupId
+        if dft.sharingGroupUUID == nil {
+            throw SyncServerError.noSharingGroupUUID
         }
 
         var group:DownloadContentGroup!
-        if let fileGroupUUID = fileGroupUUID, let dcg = DownloadContentGroup.fetchObjectWithUUID(fileGroupUUID: fileGroupUUID) {
-            if dcg.sharingGroupId != dft.sharingGroupId {
-                throw SyncServerError.sharingGroupIdInconsistent
+        if let fileGroupUUID = fileGroupUUID,
+            let dcg = DownloadContentGroup.fetchObjectWithUUID(fileGroupUUID: fileGroupUUID) {
+            if dcg.sharingGroupUUID != dft.sharingGroupUUID {
+                throw SyncServerError.sharingGroupUUIDInconsistent
             }
             group = dcg
         }
         else {
             group = DownloadContentGroup.newObject() as! DownloadContentGroup
             group.sharingGroupId = dft.sharingGroupId
+            group.sharingGroupUUID = dft.sharingGroupUUID
             group.fileGroupUUID = fileGroupUUID
         }
         

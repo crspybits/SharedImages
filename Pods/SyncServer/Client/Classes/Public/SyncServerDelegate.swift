@@ -7,13 +7,14 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer_Shared
 
 /// Most of the information provided by SyncEvent's is for testing purposes and for UI (e.g., for displaying download progress). Some of it, however, can be necessary for app operations.
 public enum SyncEvent {
     /// This can repeat if there is a change to the files on the server (a master version update), and downloads restart.
     case willStartDownloads(numberContentDownloads:UInt, numberDownloadDeletions:UInt)
     
-    case willStartUploads(numberContentUploads:UInt, numberUploadDeletions:UInt)
+    case willStartUploads(numberContentUploads:UInt, numberUploadDeletions:UInt, numberSharingGroupOperatioms: UInt)
     
     /// The attributes report the actual creation and update dates of the file-- as established by the server.
     case singleFileUploadComplete(attr:SyncAttributes)
@@ -34,8 +35,10 @@ public enum SyncEvent {
     
     case refreshingCredentials
     
-    /// Occurs when we have sharing group id(s) reported from the server for the user. e.g., will happen after user sign in.
-    case haveSharingGroupIds
+    // Called when sharing groups operations occur because of downloads (i.e., changes by other users).
+    case sharingGroups(created: [SharingGroup], updated: [SharingGroup], deleted: [SharingGroup])
+    
+    case sharingGroupUploadOperationCompleted
 }
 
 public struct EventDesired: OptionSet {
@@ -58,12 +61,14 @@ public struct EventDesired: OptionSet {
     public static let syncStopping = EventDesired(rawValue: 1 << 10)
 
     public static let refreshingCredentials = EventDesired(rawValue: 1 << 11)
-    public static let haveSharingGroupIds = EventDesired(rawValue: 1 << 12)
+    public static let sharingGroups = EventDesired(rawValue: 1 << 12)
+    
+    public static let sharingGroupUploadOperationCompleted = EventDesired(rawValue: 1 << 13)
     
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.haveSharingGroupIds])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroups, EventDesired.sharingGroupUploadOperationCompleted])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -106,8 +111,11 @@ public struct EventDesired: OptionSet {
         case .refreshingCredentials:
             eventIsDesired = .refreshingCredentials
             
-        case .haveSharingGroupIds:
-            eventIsDesired = .haveSharingGroupIds
+        case .sharingGroups:
+            eventIsDesired = .sharingGroups
+            
+        case .sharingGroupUploadOperationCompleted:
+            eventIsDesired = .sharingGroupUploadOperationCompleted
         }
         
         if mask.contains(eventIsDesired) {

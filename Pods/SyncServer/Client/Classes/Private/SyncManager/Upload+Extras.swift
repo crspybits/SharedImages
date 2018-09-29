@@ -25,12 +25,22 @@ extension Upload {
     }
     
     // Must have uploads in `pendingSync`. This does a `saveContext`.
-    class func movePendingSyncToSynced() throws {
-        assert(Singleton.get().pendingSync != nil)
-        assert(Singleton.get().pendingSync!.uploads!.count > 0)
+    // The pending queue must have uploads for the sharingGroupId (only).
+    class func movePendingSyncToSynced(sharingGroupUUID: String) throws {
+        guard let pendingQueue = Singleton.get().pendingSync else {
+            assert(false)
+            return
+        }
+
+        assert(pendingQueue.uploads!.count > 0)
+        
+        let filtered = pendingQueue.uploadTrackers.filter {$0.sharingGroupUUID == sharingGroupUUID}
+        guard filtered.count == pendingQueue.uploadTrackers.count else {
+            throw SyncServerError.sharingGroupUUIDInconsistent
+        }
         
         let uploadQueues = synced()
-        uploadQueues.addToQueuesOverride(Singleton.get().pendingSync!)
+        uploadQueues.addToQueues(pendingQueue)
         
         // This does a `saveContext`, so don't need to do that again.
         try createNewPendingSync()
@@ -40,8 +50,8 @@ extension Upload {
         return UploadQueues.get()
     }
     
-    class func haveSyncQueue(forSharingGroupId sharingGroupId: SharingGroupId) -> Bool {
-        if let queues = queues(forSharingGroupId: sharingGroupId),
+    class func haveSyncQueue(forSharingGroupUUID sharingGroupUUID: String) -> Bool {
+        if let queues = queues(forSharingGroupUUID: sharingGroupUUID),
             queues.count > 0 {
             return true
         }
@@ -50,18 +60,18 @@ extension Upload {
         }
     }
     
-    private class func queues(forSharingGroupId sharingGroupId: SharingGroupId) -> [UploadQueue]? {
+    private class func queues(forSharingGroupUUID sharingGroupUUID: String) -> [UploadQueue]? {
         guard let queues = Array(synced().queues!) as? [UploadQueue] else {
             return nil
         }
         
         return queues.filter {
-            $0.uploadFileTrackers.count > 0 && $0.uploadFileTrackers[0].sharingGroupId == sharingGroupId
+            $0.uploadTrackers.count > 0 && $0.uploadTrackers[0].sharingGroupUUID == sharingGroupUUID
         }
     }
     
-    class func getHeadSyncQueue(forSharingGroupId sharingGroupId: SharingGroupId) -> UploadQueue? {
-        guard let queues = queues(forSharingGroupId: sharingGroupId),
+    class func getHeadSyncQueue(forSharingGroupUUID sharingGroupUUID: String) -> UploadQueue? {
+        guard let queues = queues(forSharingGroupUUID: sharingGroupUUID),
             queues.count > 0 else {
             return nil
         }
@@ -70,8 +80,8 @@ extension Upload {
     }
     
     // There must be a head sync queue.
-    class func removeHeadSyncQueue(sharingGroupId: SharingGroupId) {
-        let head = getHeadSyncQueue(forSharingGroupId: sharingGroupId)
+    class func removeHeadSyncQueue(sharingGroupUUID: String) {
+        let head = getHeadSyncQueue(forSharingGroupUUID: sharingGroupUUID)
         assert(head != nil)
         CoreData.sessionNamed(Constants.coreDataName).remove(head!)
     }

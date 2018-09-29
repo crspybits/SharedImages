@@ -47,7 +47,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
     
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID: String!
     
     // MARK: Properties NOT used in the request message.
     
@@ -55,7 +55,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
     public var sizeOfDataInBytes:Int!
     
     public func nonNilKeys() -> [String] {
-        return [UploadFileRequest.fileUUIDKey, UploadFileRequest.mimeTypeKey, UploadFileRequest.fileVersionKey, UploadFileRequest.masterVersionKey, ServerEndpoint.sharingGroupIdKey]
+        return [UploadFileRequest.fileUUIDKey, UploadFileRequest.mimeTypeKey, UploadFileRequest.fileVersionKey, UploadFileRequest.masterVersionKey, ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
@@ -76,7 +76,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
         
         self.undeleteServerFile = Decoder.decode(int32ForKey:  UploadFileRequest.undeleteServerFileKey)(json)
 
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
 #if SERVER
         if !nonNilKeysHaveValues(in: json) {
@@ -110,7 +110,7 @@ public class UploadFileRequest : NSObject, RequestMessage, Filenaming {
             UploadFileRequest.fileVersionKey ~~> self.fileVersion,
             UploadFileRequest.masterVersionKey ~~> self.masterVersion,
             UploadFileRequest.undeleteServerFileKey ~~> self.undeleteServerFile,
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ]
         
         if let appMetaData = self.appMetaData?.toJSON() {

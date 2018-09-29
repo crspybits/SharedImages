@@ -136,6 +136,7 @@
 		83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages5.xcdatamodel; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
 		83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageExtras.swift; sourceTree = "<group>"; };
+		83DD1B8B215C88D10054932C /* SharedImages6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages6.xcdatamodel; sourceTree = "<group>"; };
 		83E13B2420318366005A0A18 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		83E13B262031836A005A0A18 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		83E4F9A31EFA194A006BE0F0 /* SharedImages.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SharedImages.entitlements; sourceTree = "<group>"; };
@@ -468,13 +469,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Spastic Muffin, LLC";
 				TargetAttributes = {
 					830B1DF51EFCC03E0022FCC7 = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = BH68R29JBE;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 83F8821E1E711600008F644A;
 					};
@@ -784,7 +785,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImagesTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SharedImages.app/SharedImages";
 			};
 			name = Debug;
@@ -802,7 +803,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImagesTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SharedImages.app/SharedImages";
 			};
 			name = Release;
@@ -820,6 +821,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -827,6 +829,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -859,6 +862,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -876,6 +880,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -883,6 +888,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -907,6 +913,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -932,7 +939,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -956,7 +963,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -996,13 +1003,14 @@
 		83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				83DD1B8B215C88D10054932C /* SharedImages6.xcdatamodel */,
 				83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */,
 				8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */,
 				83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */,
 				83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */,
 				83F882441E711FC6008F644A /* SharedImages.xcdatamodel */,
 			);
-			currentVersion = 83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */;
+			currentVersion = 83DD1B8B215C88D10054932C /* SharedImages6.xcdatamodel */;
 			name = SharedImages.xcdatamodeld;
 			path = Resources/SharedImages.xcdatamodeld;
 			sourceTree = "<group>";

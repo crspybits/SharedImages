@@ -14,10 +14,12 @@ import Kitura
 #endif
 
 public class RedeemSharingInvitationRequest : NSObject, RequestMessage {
+    // No master version here: The client doesn't yet have information about relevant sharing group that it needs to keep up to date. So, why bother?
+    
     public static let sharingInvitationUUIDKey = "sharingInvitationUUID"
     public var sharingInvitationUUID:String!
 
-    // This must be present when redeeming an invitation: a) using an owning account, b) that owning account type needs a cloud storage folder (e.g., Google Drive), and c) with permissions of >= write.
+    // This must be present when redeeming an invitation: a) using an owning account, and b) that owning account type needs a cloud storage folder (e.g., Google Drive).
     public var cloudFolderName:String?
 
     public required init?(json: JSON) {
@@ -58,7 +60,7 @@ public class RedeemSharingInvitationResponse : ResponseMessage {
     public static let userIdKey = "userId"
     public var userId:UserId!
     
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID: String!
     
     public var responseType: ResponseType {
         return .json
@@ -66,7 +68,7 @@ public class RedeemSharingInvitationResponse : ResponseMessage {
     
     public required init?(json: JSON) {
         userId = Decoder.decode(int64ForKey: RedeemSharingInvitationResponse.userIdKey)(json)
-        sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
     }
     
     public convenience init?() {
@@ -77,7 +79,7 @@ public class RedeemSharingInvitationResponse : ResponseMessage {
     public func toJSON() -> JSON? {
         return jsonify([
             RedeemSharingInvitationResponse.userIdKey ~~> userId,
-            ServerEndpoint.sharingGroupIdKey ~~> sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> sharingGroupUUID
         ])
     }
 }

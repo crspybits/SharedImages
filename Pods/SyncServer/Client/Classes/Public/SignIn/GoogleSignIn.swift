@@ -137,6 +137,7 @@ public class GoogleSyncServerSignIn : NSObject, GenericSignIn {
         
         // "Per-file access to files created or opened by the app"
         // GIDSignIn.sharedInstance().scopes.append("https://www.googleapis.com/auth/drive.file")
+        // I've also considered the Application Data Folder scope, but users cannot access the files in that-- which is against the goals in SyncServer.
         
         // "Full, permissive scope to access all of a user's files."
         GIDSignIn.sharedInstance().scopes.append("https://www.googleapis.com/auth/drive")
@@ -269,9 +270,9 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
                             self.signUserOut()
                             Log.msg("signUserOut: GoogleSignIn: noUser")
 
-                        case .user(permission: let permission, _):
+                        case .user(_):
                             self.delegate?.userActionOccurred(action:
-                                .existingUserSignedIn(permission), signIn: self)
+                                .existingUserSignedIn, signIn: self)
                             self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
                         }
                     }
@@ -292,9 +293,10 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
                 }
 
             case .createOwningUser:
-                SyncServerUser.session.addUser(creds: creds) {[unowned self] sharingGroupId, error in
-                    if error == nil, let sharingGroupId = sharingGroupId {
-                        self.successCreatingOwningUser(sharingGroupId: sharingGroupId)
+                let sharingGroupUUID = UUID().uuidString
+                SyncServerUser.session.addUser(creds: creds, sharingGroupUUID: sharingGroupUUID, sharingGroupName: nil) {[unowned self] error in
+                    if error == nil {
+                        self.successCreatingOwningUser(sharingGroupUUID: sharingGroupUUID)
                     }
                     else {
                         SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating owning user: \(error!)")
@@ -305,9 +307,9 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
                 }
                 
             case .createSharingUser(invitationCode: let invitationCode):
-                SyncServerUser.session.redeemSharingInvitation(creds: creds, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] accessToken, sharingGroupId, error in
-                    if error == nil, let sharingGroupId = sharingGroupId {
-                        self.successCreatingSharingUser(sharingGroupId: sharingGroupId)
+                SyncServerUser.session.redeemSharingInvitation(creds: creds, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] accessToken, sharingGroupUUID, error in
+                    if error == nil, let sharingGroupUUID = sharingGroupUUID {
+                        self.successCreatingSharingUser(sharingGroupUUID: sharingGroupUUID)
                     }
                     else {
                         SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating sharing user: \(error!)")

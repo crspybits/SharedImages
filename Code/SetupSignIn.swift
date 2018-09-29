@@ -20,7 +20,7 @@ class SetupSignIn {
     private init() {
     }
     
-    func appLaunch(options: [UIApplicationLaunchOptionsKey: Any]?) {
+    func appLaunch(options: [UIApplication.LaunchOptionsKey: Any]?) {
         var serverClientId:String!
         var appClientId:String!
         var dropboxAppKey:String!

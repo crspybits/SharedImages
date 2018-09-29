@@ -13,7 +13,10 @@ import ODRefreshControl
 import LottiesBottom
 import SyncServer_Shared
 
-class ImagesVC: UIViewController {    
+class ImagesVC: UIViewController {
+    // TODO: Need to provide this!!
+    var sharingGroupUUID: String!
+    
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
     var addImageBarButton:UIBarButtonItem!
@@ -95,7 +98,11 @@ class ImagesVC: UIViewController {
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: {
-            self.syncController.sync()
+            do {
+                try self.syncController.sync(sharingGroupUUID: self.sharingGroupUUID)
+            } catch (let error) {
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
+            }
         })
     }
     
@@ -127,7 +134,7 @@ class ImagesVC: UIViewController {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
         
         // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
-        if !syncController.remove(images: images) {
+        if !syncController.remove(images: images, sharingGroupUUID: sharingGroupUUID) {
             var message = "Image"
             if images.count > 1 {
                 message += "s"
@@ -169,7 +176,7 @@ class ImagesVC: UIViewController {
             return
         }
         
-        var position:UICollectionViewScrollPosition
+        var position:UICollectionView.ScrollPosition
         var indexPath:IndexPath
         
         if Parameters.sortingOrderIsAscending {
@@ -258,21 +265,26 @@ class ImagesVC: UIViewController {
     }
     
     @objc private func consistencyCheckAction(gesture : UILongPressGestureRecognizer!) {
-        guard let sharingGroupId = SyncController.getSharingGroupId() else {
-            return
-        }
-        
         if gesture.state != .ended {
             return
         }
         
         let uuids = Image.fetchAll().map { $0.uuid! }
-        SyncServer.session.consistencyCheck(sharingGroupId: sharingGroupId, localFiles: uuids, repair: false) { error in }
+        do {
+            try SyncServer.session.consistencyCheck(sharingGroupUUID: sharingGroupUUID, localFiles: uuids, repair: false) { error in }
+        } catch (let error) {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Problem in consistency check", message: "\(error)")
+        }
     }
     
     @objc private func refresh() {
         self.refreshControl.endRefreshing()
-        syncController.sync()
+        
+        do {
+            try syncController.sync(sharingGroupUUID: sharingGroupUUID)
+        } catch (let error) {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
+        }
     }
     
     // Enable a reset from error when needed.
@@ -289,13 +301,13 @@ class ImagesVC: UIViewController {
     func addLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
         var newImage:Image!
         
-        if newImageData.file.uuid == nil {
+        if newImageData.file.fileUUID == nil {
             // We're creating a new image at the user's request.
-            newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as! Image
+            newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? Image
         }
         else {
-            newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as! Image
-            newImage.uuid = newImageData.file.uuid
+            newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? Image
+            newImage.uuid = newImageData.file.fileUUID
         }
 
         newImage.url = newImageData.file.url
@@ -303,7 +315,7 @@ class ImagesVC: UIViewController {
         newImage.title = newImageData.title
         newImage.discussionUUID = newImageData.discussionUUID
         newImage.fileGroupUUID = fileGroupUUID
-        newImage.sharingGroupId = newImageData.file.sharingGroupId
+        newImage.sharingGroupUUID = newImageData.file.sharingGroupUUID
         
         let imageFileName = newImageData.file.url.lastPathComponent
         let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
@@ -357,11 +369,11 @@ class ImagesVC: UIViewController {
         case .newLocalDiscussion:
             // 1)
             localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
-            localDiscussion.uuid = discussionData.uuid
-            localDiscussion.sharingGroupId = discussionData.sharingGroupId
+            localDiscussion.uuid = discussionData.fileUUID
+            localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
 
         case .fromServer:
-            if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(discussionData.uuid!) {
+            if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(discussionData.fileUUID!) {
                 // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
                 
                 localDiscussion = existingLocalDiscussion
@@ -389,8 +401,8 @@ class ImagesVC: UIViewController {
             else {
                 // 3) New discussion downloaded from server.
                 localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
-                localDiscussion.uuid = discussionData.uuid
-                localDiscussion.sharingGroupId = discussionData.sharingGroupId
+                localDiscussion.uuid = discussionData.fileUUID
+                localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
                 
                 // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
                 if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
@@ -439,7 +451,7 @@ class ImagesVC: UIViewController {
         ImageExtras.removeLocalImages(uuids:uuids)
     }
     
-    private func createEmptyDiscussion(image:Image, discussionUUID: String, sharingGroupId: SharingGroupId, imageTitle: String?) -> FileData? {
+    private func createEmptyDiscussion(image:Image, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
         let newDiscussionFileURL = ImageExtras.newJSONFile()
         var fixedObjects = FixedObjects()
         
@@ -458,7 +470,7 @@ class ImagesVC: UIViewController {
             return nil
         }
         
-        return FileData(url: newDiscussionFileURL, mimeType: .text, uuid: discussionUUID, sharingGroupId: sharingGroupId)
+        return FileData(url: newDiscussionFileURL, mimeType: .text, fileUUID: discussionUUID, sharingGroupUUID: sharingGroupUUID)
     }
 }
 
@@ -524,22 +536,19 @@ extension ImagesVC : SMAcquireImageDelegate {
             return
         }
         
-        guard let sharingGroupId = SyncController.getSharingGroupId() else {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not get sharing group id!")
-            return
-        }
-        
-        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, uuid: nil, sharingGroupId: sharingGroupId)
+        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroupUUID)
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = addLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
+        newImage.sharingGroupUUID = sharingGroupUUID
         
-        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupId: sharingGroupId, imageTitle: userName) else {
+        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroupUUID, imageTitle: userName) else {
             return
         }
         
         let newDiscussion = addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
+        newDiscussion.sharingGroupUUID = sharingGroupUUID
         
         scrollIfNeeded(animated:true)
         
@@ -578,7 +587,7 @@ extension ImagesVC : CoreDataSourceDelegate {
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasDeleted indexPathOfDeletedObject: IndexPath!) {
-        Log.msg("objectWasDeleted: indexPathOfDeletedObject: \(indexPathOfDeletedObject)")
+        Log.msg("objectWasDeleted: indexPathOfDeletedObject: \(String(describing: indexPathOfDeletedObject))")
         deletedImages?.append(indexPathOfDeletedObject)
     }
     
@@ -655,11 +664,6 @@ extension ImagesVC : SyncControllerDelegate {
                 }
             }
             
-            // 5/19/18; Can remove this once my three test users have upgraded to 0.15.0.
-            Migrations.session.v0_15_0() {
-                self.collectionView.reloadData()
-            }
-            
         case .syncError(let message):
             self.bottomRefresh.hide()
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: message)
@@ -671,10 +675,6 @@ extension ImagesVC : SyncControllerDelegate {
     }
     
     func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
-        guard let sharingGroupId = SyncController.getSharingGroupId() else {
-            return
-        }
-        
         guard let discussion = Discussion.fetchObjectWithUUID(attr.fileUUID) else {
             Log.error("Cannot find discussion for attempted image re-upload.")
             return
@@ -685,16 +685,15 @@ extension ImagesVC : SyncControllerDelegate {
             return
         }
         
-        let attr = SyncAttributes(fileUUID: imageUUID, sharingGroupId: sharingGroupId, mimeType: .jpeg)
+        let attr = SyncAttributes(fileUUID: imageUUID, sharingGroupUUID: sharingGroupUUID, mimeType: .jpeg)
         do {
             try SyncServer.session.uploadImmutable(localFile: imageURL, withAttributes: attr)
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
         }
         catch (let error) {
             Log.error("Could not do uploadImmutable for image re-upload: \(error)")
             return
         }
-        
-        SyncServer.session.sync(sharingGroupId: sharingGroupId)
     }
 }
 

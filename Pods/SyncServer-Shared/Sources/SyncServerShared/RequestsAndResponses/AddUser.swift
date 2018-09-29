@@ -19,6 +19,12 @@ public class AddUserRequest : NSObject, RequestMessage {
     public var cloudFolderName:String?
     public static let maxCloudFolderNameLength = 256
     
+    // You can optionally give the initial sharing group, created for the user, a name.
+    public static let sharingGroupNameKey = "sharingGroupName"
+    public var sharingGroupName: String?
+    
+    public var sharingGroupUUID:String!
+    
 #if SERVER
     public required convenience init?(request: RouterRequest) {
         self.init(json: request.queryParameters)
@@ -29,16 +35,28 @@ public class AddUserRequest : NSObject, RequestMessage {
         super.init()
         
         self.cloudFolderName = AddUserRequest.cloudFolderNameKey <~~ json
+        self.sharingGroupName = AddUserRequest.sharingGroupNameKey <~~ json
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
+        
+        if !nonNilKeysHaveValues(in: json) {
+            return nil
+        }
     }
     
     public func toJSON() -> JSON? {
         return jsonify([
-            AddUserRequest.cloudFolderNameKey ~~> self.cloudFolderName
+            AddUserRequest.cloudFolderNameKey ~~> self.cloudFolderName,
+            AddUserRequest.sharingGroupNameKey ~~> self.sharingGroupName,
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ])
+    }
+
+    public func nonNilKeys() -> [String] {
+        return [ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
-        return [AddUserRequest.cloudFolderNameKey]
+        return [AddUserRequest.cloudFolderNameKey, AddUserRequest.sharingGroupNameKey] + nonNilKeys()
     }
 }
 
@@ -47,15 +65,12 @@ public class AddUserResponse : ResponseMessage {
     public static let userIdKey = "userId"
     public var userId:UserId!
     
-    public var sharingGroupId: SharingGroupId!
-    
     public var responseType: ResponseType {
         return .json
     }
     
     public required init?(json: JSON) {
         userId = Decoder.decode(int64ForKey: AddUserResponse.userIdKey)(json)
-        sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
     }
     
     public convenience init?() {
@@ -65,8 +80,7 @@ public class AddUserResponse : ResponseMessage {
     // MARK: - Serialization
     public func toJSON() -> JSON? {
         return jsonify([
-            AddUserResponse.userIdKey ~~> userId,
-            ServerEndpoint.sharingGroupIdKey ~~> sharingGroupId
+            AddUserResponse.userIdKey ~~> userId
         ])
     }
 }

@@ -16,8 +16,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Foundation
 import FBSDKCoreKit
+import Foundation
 
 //--------------------------------------
 // MARK: - Access Token
@@ -52,12 +52,12 @@ public struct AccessToken {
   /**
    Creates a new access token instance.
 
-   - parameter appId:               Optional application id for this token. Default: `SDKSettings.appId`.
+   - parameter appId: Optional application id for this token. Default: `SDKSettings.appId`.
    - parameter authenticationToken: An opaque authentication token.
-   - parameter userId:              Optional logged in user identifier.
-   - parameter refreshDate:         Optional date the token was last refreshed (defaults to current date).
-   - parameter expirationDate:      Optional expiration date (defaults to `NSDate.distantFuture()`).
-   - parameter grantedPermissions:  Set of known granted permissions.
+   - parameter userId: Optional logged in user identifier.
+   - parameter refreshDate: Optional date the token was last refreshed (defaults to current date).
+   - parameter expirationDate: Optional expiration date (defaults to `NSDate.distantFuture()`).
+   - parameter grantedPermissions: Set of known granted permissions.
    - parameter declinedPermissions: Set of known declined permissions.
    */
   public init(appId: String = SDKSettings.appId,
@@ -75,13 +75,11 @@ public struct AccessToken {
     self.grantedPermissions = grantedPermissions
     self.declinedPermissions = declinedPermissions
   }
-}
 
-//--------------------------------------
-// MARK: - Current Token
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Current Token
+  //--------------------------------------
 
-extension AccessToken {
   /**
    A convenient representation of the authentication token of the current user
    that is used by other SDK components (like `LoginManager` or `AppEventsLogger`).
@@ -109,13 +107,11 @@ extension AccessToken {
       completion?(self.current, error)
     }
   }
-}
 
-//--------------------------------------
-// MARK: - Internal
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Internal
+  //--------------------------------------
 
-extension AccessToken {
   internal init(sdkAccessToken: FBSDKAccessToken) {
     self.init(appId: sdkAccessToken.appID,
               authenticationToken: sdkAccessToken.tokenString,
@@ -128,8 +124,8 @@ extension AccessToken {
 
   internal var sdkAccessTokenRepresentation: FBSDKAccessToken {
     return FBSDKAccessToken(tokenString: authenticationToken,
-                            permissions: grantedPermissions?.map({ $0.name }),
-                            declinedPermissions: declinedPermissions?.map({ $0.name }),
+                            permissions: grantedPermissions?.map { $0.name },
+                            declinedPermissions: declinedPermissions?.map { $0.name },
                             appID: appId,
                             userID: userId,
                             expirationDate: expirationDate,
@@ -139,10 +135,10 @@ extension AccessToken {
 
 private extension FBSDKAccessToken {
   var grantedSwiftPermissions: Set<Permission>? {
-    return (permissions?.flatMap({ $0 as? String }).map({ Permission(name: $0) })).map(Set.init)
+    return (permissions?.compactMap { $0 as? String }.map { Permission(name: $0) }).map(Set.init)
   }
 
   var declinedSwiftPermissions: Set<Permission>? {
-    return (declinedPermissions?.flatMap({ $0 as? String }).map({ Permission(name: $0) })).map(Set.init)
+    return (declinedPermissions?.compactMap { $0 as? String }.map { Permission(name: $0) }).map(Set.init)
   }
 }

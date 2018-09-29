@@ -17,14 +17,15 @@ public class CreateSharingInvitationRequest : NSObject, RequestMessage {
     public static let permissionKey = "permission"
     public var permission:Permission!
     
-    public var sharingGroupId: SharingGroupId!
+    // The sharing group to which a user is being invited. The inviting user must have admin permissions in this group.
+    public var sharingGroupUUID:String!
 
     // You can give either Permission valued keys or string valued keys.
     public required init?(json: JSON) {
         super.init()
         
         self.permission = Decoder.decodePermission(key: CreateSharingInvitationRequest.permissionKey, json: json)
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
 #if SERVER
         if !nonNilKeysHaveValues(in: json) {
@@ -41,7 +42,7 @@ public class CreateSharingInvitationRequest : NSObject, RequestMessage {
     
     public func nonNilKeys() -> [String] {
         return [CreateSharingInvitationRequest.permissionKey,
-            ServerEndpoint.sharingGroupIdKey]
+            ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
@@ -51,7 +52,7 @@ public class CreateSharingInvitationRequest : NSObject, RequestMessage {
     public func toJSON() -> JSON? {
         return jsonify([
             Encoder.encodePermission(key: CreateSharingInvitationRequest.permissionKey, value: self.permission),
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ])
     }
 }

@@ -54,7 +54,7 @@ class SMDefaultItemBool : SMDefaultItem {
 
 open class SMDefaultItemInt : SMDefaultItem {
     init(name:String!, initialIntValue:Int!) {
-        super.init(name: name, initialValue:initialIntValue as AnyObject!)
+        super.init(name: name, initialValue:initialIntValue as AnyObject)
     }
     
     // Current Int value
@@ -63,10 +63,10 @@ open class SMDefaultItemInt : SMDefaultItem {
             let defsStoredValue: AnyObject? = UserDefaults.standard.object(forKey: self.name) as AnyObject?
             if (nil == defsStoredValue) {
                 // No value in NSUserDefaults; return the initial value.
-                return self.initialValue!.intValue
+                return self.initialValue! as! Int
             }
             else {
-                return defsStoredValue!.intValue
+                return defsStoredValue! as! Int
             }
         }
         

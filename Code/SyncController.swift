@@ -32,9 +32,9 @@ struct FileData {
     let mimeType:MimeType
     
     // This will be non-nil when we have an assigned UUID being downloaded from the server.
-    let uuid:String?
+    let fileUUID:String?
     
-    let sharingGroupId:SharingGroupId
+    let sharingGroupUUID:String
 }
 
 protocol SyncControllerDelegate : class {
@@ -64,34 +64,15 @@ class SyncController {
     init() {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
-                .singleFileUploadComplete, .singleUploadDeletionComplete, .haveSharingGroupIds]
+                .singleFileUploadComplete, .singleUploadDeletionComplete, .sharingGroups]
     }
     
     weak var delegate:SyncControllerDelegate!
     private var numberOperations = 0
     
-    static func getSharingGroupId(showAlertOnError: Bool = true) -> SharingGroupId? {
-        guard let sharingGroupIds = SyncServerUser.session.sharingGroupIds, sharingGroupIds.count > 0 else {
-            if showAlertOnError {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "Could not get sharing group id!")
-            }
-            return nil
-        }
-        
-        return sharingGroupIds[0]
-    }
-    
-    func getSharingGroupId(showAlertOnError: Bool = true) -> SharingGroupId? {
-        return SyncController.getSharingGroupId(showAlertOnError: showAlertOnError)
-    }
-    
-    func sync(completion: (()->())? = nil) {
-        guard let sharingGroupId = getSharingGroupId() else {
-            return
-        }
-        
+    func sync(sharingGroupUUID: String, completion: (()->())? = nil) throws {
         syncDone = completion
-        SyncServer.session.sync(sharingGroupId: sharingGroupId)
+        try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
     }
     
     private func dictToJSONString(_ dict: [String: Any]) -> String? {
@@ -129,12 +110,8 @@ class SyncController {
             return
         }
         
-        guard let sharingGroupId = getSharingGroupId() else {
-            return
-        }
-        
         // 12/27/17; Not sending dates to the server-- it establishes the dates.
-        var imageAttr = SyncAttributes(fileUUID:image.uuid!, sharingGroupId: sharingGroupId, mimeType:imageMimeTypeEnum)
+        var imageAttr = SyncAttributes(fileUUID:image.uuid!, sharingGroupUUID: image.sharingGroupUUID!, mimeType:imageMimeTypeEnum)
         
         imageAttr.fileGroupUUID = image.fileGroupUUID
         
@@ -151,7 +128,7 @@ class SyncController {
         imageAttr.appMetaData = dictToJSONString(imageAppMetaData)
         assert(imageAttr.appMetaData != nil)
         
-        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupId: sharingGroupId, mimeType:discussionMimeTypeEnum)
+        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupUUID: image.sharingGroupUUID!, mimeType:discussionMimeTypeEnum)
         discussionAttr.fileGroupUUID = discussion.fileGroupUUID
         
         var discussionAppMetaData = [String: Any]()
@@ -167,7 +144,7 @@ class SyncController {
             // Using uploadCopy for discussions in case the discussion gets updated locally before we complete this sync operation. i.e., discussions are mutable.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
 
-            SyncServer.session.sync(sharingGroupId: sharingGroupId)
+            try SyncServer.session.sync(sharingGroupUUID: image.sharingGroupUUID!)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
         }
@@ -179,27 +156,20 @@ class SyncController {
             return
         }
         
-        guard let sharingGroupId = getSharingGroupId() else {
-            return
-        }
-        
-        let discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupId: sharingGroupId, mimeType:discussionMimeTypeEnum)
+        let discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupUUID: discussion.sharingGroupUUID!, mimeType:discussionMimeTypeEnum)
         
         do {
             // Like before, since discussions are mutable, use uploadCopy.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
-            SyncServer.session.sync(sharingGroupId: sharingGroupId)
+            
+            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
         }
     }
     
-    // Also removes associated discussions, on the server.
-    func remove(images:[Image]) -> Bool {
-        guard let sharingGroupId = getSharingGroupId() else {
-            return false
-        }
-        
+    // Also removes associated discussions, on the server. The images must be in the same sharing group.
+    func remove(images:[Image], sharingGroupUUID: String) -> Bool {
         let imageUuids = images.map({$0.uuid!})
         let imagesWithDiscussions = images.filter({$0.discussion != nil && $0.discussion!.uuid != nil})
         let discussionUuids = imagesWithDiscussions.map({$0.discussion!.uuid!})
@@ -207,12 +177,12 @@ class SyncController {
         // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
         do {
             try SyncServer.session.delete(filesWithUUIDs: imageUuids + discussionUuids)
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
             return false
         }
         
-        SyncServer.session.sync(sharingGroupId: sharingGroupId)
         return true
     }
 }
@@ -243,10 +213,6 @@ extension SyncController : SyncServerDelegate {
                 uploadConflict.resolveConflict(resolution: errorResolution)
                 
             case .file(let downloadedFile):
-                guard let sharingGroupId = getSharingGroupId() else {
-                    return
-                }
-        
                 // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
                 guard let discussion = Discussion.fetchObjectWithUUID(downloadedContentAttributes.fileUUID),
                     let discussionURL = discussion.url as URL?,
@@ -258,7 +224,7 @@ extension SyncController : SyncServerDelegate {
                 }
 
                 let (mergedDiscussion, unreadCount) = localDiscussion.merge(with: serverDiscussion)
-                let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, sharingGroupId: sharingGroupId, mimeType: downloadedContentAttributes.mimeType)
+                let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, sharingGroupUUID: discussion.sharingGroupUUID!, mimeType: downloadedContentAttributes.mimeType)
                 
                 // I'm going to use a new file, just in case we have an error writing.
                 let mergeURL = ImageExtras.newJSONFile()
@@ -274,14 +240,14 @@ extension SyncController : SyncServerDelegate {
 
                     // As before, discussion are mutable-- upload a copy.
                     try SyncServer.session.uploadCopy(localFile: mergeURL, withAttributes: attr)
+                    
+                    try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!)
                 } catch (let error) {
                     Log.error("Problems writing merged discussion or uploading: \(error)")
                     uploadConflict.resolveConflict(resolution: errorResolution)
                     return
                 }
-                
-                SyncServer.session.sync(sharingGroupId: sharingGroupId)
-                
+
                 uploadConflict.resolveConflict(resolution: .rejectContentDownload(.removeAll))
             }
             
@@ -394,7 +360,7 @@ extension SyncController : SyncServerDelegate {
             discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
         }
 
-        let imageFileData = FileData(url: newImageURL, mimeType: attr.mimeType, uuid: attr.fileUUID, sharingGroupId: attr.sharingGroupId)
+        let imageFileData = FileData(url: newImageURL, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID)
         let imageData = ImageData(file: imageFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
 
         delegate.addLocalImage(syncController: self, imageData: imageData, attr: attr)
@@ -412,7 +378,7 @@ extension SyncController : SyncServerDelegate {
             Log.error("An error occurred moving a file: \(error)")
         }
         
-        let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, uuid: attr.fileUUID, sharingGroupId: attr.sharingGroupId)
+        let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID)
         delegate.addToLocalDiscussion(syncController: self, discussionData: discussionFileData, attr: attr)
         
         Progress.session.next()
@@ -518,7 +484,7 @@ extension SyncController : SyncServerDelegate {
             // })
             // TESTING
 
-        case .willStartUploads(numberContentUploads: let numberContentUploads, numberUploadDeletions: let numberUploadDeletions):
+        case .willStartUploads(numberContentUploads: let numberContentUploads, numberUploadDeletions: let numberUploadDeletions, numberSharingGroupOperatioms: _):
         
             numberOperations += Int(numberContentUploads + numberUploadDeletions)
 
@@ -548,9 +514,9 @@ extension SyncController : SyncServerDelegate {
             syncDone?()
             syncDone = nil
             Progress.session.finish()
-            
-        case .haveSharingGroupIds:
-            Migrations.session.runAfterHaveSharingGroupId()
+        
+        case .sharingGroups:
+            break
         
         default:
             Log.error("Unexpected event received: \(event)")

@@ -101,7 +101,7 @@ class Directory {
                     entry.deletedLocally = true
                     entry.fileUUID = serverFile.fileUUID
                     entry.fileVersion = serverFile.fileVersion
-                    entry.sharingGroupId = serverFile.sharingGroupId
+                    entry.sharingGroupUUID = serverFile.sharingGroupUUID
                     try CoreData.sessionNamed(Constants.coreDataName).context.save()
                 }
                 else {
@@ -181,7 +181,7 @@ class Directory {
                 newEntry.appMetaData = dft.appMetaData
                 newEntry.appMetaDataVersion = dft.appMetaDataVersion
                 newEntry.fileGroupUUID = dft.fileGroupUUID
-                newEntry.sharingGroupId = dft.sharingGroupId
+                newEntry.sharingGroupUUID = dft.sharingGroupUUID
             }
         }
     }

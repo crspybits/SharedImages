@@ -16,12 +16,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Foundation
 import FBSDKCoreKit.FBSDKGraphRequestConnection
+import Foundation
 
-internal class GraphRequestConnectionDelegateBridge: NSObject {
-  var networkFailureHandler: GraphRequestConnection.NetworkFailureHandler? = nil
-  var networkProgressHandler: GraphRequestConnection.NetworkProgressHandler? = nil
+internal class GraphRequestConnectionDelegateBridge: NSObject, FBSDKGraphRequestConnectionDelegate {
+  var networkFailureHandler: GraphRequestConnection.NetworkFailureHandler?
+  var networkProgressHandler: GraphRequestConnection.NetworkProgressHandler?
 
   func setupAsDelegateFor(_ connection: FBSDKGraphRequestConnection) {
     // We need for the connection to retain us,
@@ -30,21 +30,19 @@ internal class GraphRequestConnectionDelegateBridge: NSObject {
     objc_setAssociatedObject(connection, Unmanaged.passUnretained(self).toOpaque(), self, .OBJC_ASSOCIATION_RETAIN)
     connection.delegate = self
   }
-}
 
-extension GraphRequestConnectionDelegateBridge: FBSDKGraphRequestConnectionDelegate {
+  // MARK: FBSDKGraphRequestConnectionDelegate
+
+  // swiftlint:disable:next implicitly_unwrapped_optional
   func requestConnection(_ connection: FBSDKGraphRequestConnection!,
-                         didSendBodyData bytesWritten: Int, totalBytesWritten: Int, totalBytesExpectedToWrite: Int) {
-    if let handler = networkProgressHandler {
-      handler(Int64(bytesWritten),
-              Int64(totalBytesWritten),
-              Int64(totalBytesExpectedToWrite))
-    }
+                         didSendBodyData bytesWritten: Int,
+                         totalBytesWritten: Int,
+                         totalBytesExpectedToWrite: Int) {
+    networkProgressHandler?(Int64(bytesWritten), Int64(totalBytesWritten), Int64(totalBytesExpectedToWrite))
   }
 
+  // swiftlint:disable:next implicitly_unwrapped_optional
   func requestConnection(_ connection: FBSDKGraphRequestConnection!, didFailWithError error: Error!) {
-    if let handler = networkFailureHandler {
-      handler(error)
-    }
+    networkFailureHandler?(error)
   }
 }

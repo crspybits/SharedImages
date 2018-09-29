@@ -35,35 +35,35 @@ import FBSDKLoginKit
  */
 public class LoginButton: UIView {
 
-  fileprivate var sdkLoginButton: FBSDKLoginButton
+  private var sdkLoginButton: FBSDKLoginButton
 
   /// Delegate of the login button that can handle the result, logout events.
-  public var delegate: LoginButtonDelegate?
-  fileprivate var delegateBridge: LoginButtonDelegateBridge
+  public weak var delegate: LoginButtonDelegate?
+  private var delegateBridge: LoginButtonDelegateBridge
 
   /// The login behavior that is going to be used. Default: `.Native`.
-  public var loginBehavior = LoginBehavior.native {
+  public var loginBehavior: LoginBehavior = .native {
     didSet {
       sdkLoginButton.loginBehavior = loginBehavior.sdkBehavior
     }
   }
 
   /// The default audience. Default: `.Friends`.
-  public var defaultAudience = LoginDefaultAudience.friends {
+  public var defaultAudience: LoginDefaultAudience = .friends {
     didSet {
       sdkLoginButton.defaultAudience = defaultAudience.sdkAudience
     }
   }
 
   /// The desired tooltip behavior. Default: `.Automatic`.
-  public var tooltipBehavior = TooltipBehavior.automatic {
+  public var tooltipBehavior: TooltipBehavior = .automatic {
     didSet {
       sdkLoginButton.tooltipBehavior = tooltipBehavior.sdkBehavior
     }
   }
 
   /// The desired tooltip color style. Default: `.FriendlyBlue`.
-  public var tooltipColorStyle = TooltipColorStyle.friendlyBlue {
+  public var tooltipColorStyle: TooltipColorStyle = .friendlyBlue {
     didSet {
       sdkLoginButton.tooltipColorStyle = tooltipColorStyle.sdkColorStyle
     }
@@ -72,12 +72,12 @@ public class LoginButton: UIView {
   /**
    Create a new `LoginButton` with a given optional frame and read permissions.
 
-   - parameter frame:              Optional frame to initialize with. Default: `nil`, which uses a default size for the button.
+   - parameter frame: Optional frame to initialize with. Default: `nil`, which uses a default size for the button.
    - parameter readPermissions: Array of read permissions to request when logging in.
    */
   public init(frame: CGRect? = nil, readPermissions: [ReadPermission]) {
     let sdkLoginButton = FBSDKLoginButton()
-    sdkLoginButton.readPermissions = readPermissions.map({ $0.permissionValue.name })
+    sdkLoginButton.readPermissions = readPermissions.map { $0.permissionValue.name }
 
     self.sdkLoginButton = sdkLoginButton
     delegateBridge = LoginButtonDelegateBridge()
@@ -92,12 +92,12 @@ public class LoginButton: UIView {
   /**
    Create a new `LoginButton` with a given optional frame and publish permissions.
 
-   - parameter frame:              Optional frame to initialize with. Default: `nil`, which uses a default size for the button.
+   - parameter frame: Optional frame to initialize with. Default: `nil`, which uses a default size for the button.
    - parameter publishPermissions: Array of publish permissions to request when logging in.
    */
   public init(frame: CGRect? = nil, publishPermissions: [PublishPermission]) {
     let sdkLoginButton = FBSDKLoginButton()
-    sdkLoginButton.publishPermissions = publishPermissions.map({ $0.permissionValue.name })
+    sdkLoginButton.publishPermissions = publishPermissions.map { $0.permissionValue.name }
 
     self.sdkLoginButton = sdkLoginButton
     delegateBridge = LoginButtonDelegateBridge()
@@ -123,24 +123,22 @@ public class LoginButton: UIView {
     delegateBridge.setupAsDelegateFor(sdkLoginButton, loginButton: self)
     addSubview(sdkLoginButton)
   }
-}
 
-extension LoginButton {
-  public override func layoutSubviews() {
+  override public func layoutSubviews() {
     super.layoutSubviews()
 
     sdkLoginButton.frame = CGRect(origin: .zero, size: bounds.size)
   }
 
-  public override func sizeToFit() {
+  override public func sizeToFit() {
     bounds.size = sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
   }
 
-  public override func sizeThatFits(_ size: CGSize) -> CGSize {
+  override public func sizeThatFits(_ size: CGSize) -> CGSize {
     return sdkLoginButton.sizeThatFits(size)
   }
 
-  public override var intrinsicContentSize: CGSize {
+  override public var intrinsicContentSize: CGSize {
     return sdkLoginButton.intrinsicContentSize
   }
 }

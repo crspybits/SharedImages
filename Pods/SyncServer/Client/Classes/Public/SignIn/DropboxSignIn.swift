@@ -291,7 +291,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                         Log.msg("signUserOut: DropboxSignIn: noUser in checkForExistingUser")
                     
                     case .user:
-                        self.delegate?.userActionOccurred(action: .existingUserSignedIn(nil), signIn: self)
+                        self.delegate?.userActionOccurred(action: .existingUserSignedIn, signIn: self)
                         self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
                         self.signInOutButton?.buttonShowing = .signOut
                     }
@@ -322,9 +322,10 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                 return
             }
             
-            SyncServerUser.session.addUser(creds: creds) {[unowned self] sharingGroupId, error  in
-                if error == nil, let sharingGroupId = sharingGroupId {
-                    self.successCreatingOwningUser(sharingGroupId: sharingGroupId)
+            let sharingGroupUUID = UUID().uuidString
+            SyncServerUser.session.addUser(creds: creds, sharingGroupUUID: sharingGroupUUID, sharingGroupName: nil) {[unowned self] error  in
+                if error == nil {
+                    self.successCreatingOwningUser(sharingGroupUUID: sharingGroupUUID)
                 }
                 else {
                     SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating owning user: \(error!)")
@@ -336,9 +337,9 @@ public class DropboxSyncServerSignIn : GenericSignIn {
             
         case .createSharingUser(invitationCode: let invitationCode):
             // 7/23/18; Now allowing Dropbox users to redeem sharing invitations-- that's because they'll have their own cloud storage now.
-            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] longLivedAccessToken, sharingGroupId, error in
-                if error == nil, let sharingGroupId = sharingGroupId {
-                    self.successCreatingSharingUser(sharingGroupId: sharingGroupId)
+            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] longLivedAccessToken, sharingGroupUUID, error in
+                if error == nil, let sharingGroupUUID = sharingGroupUUID {
+                    self.successCreatingSharingUser(sharingGroupUUID: sharingGroupUUID)
                 }
                 else {
                     Log.error("Error: \(error!)")

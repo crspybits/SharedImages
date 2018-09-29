@@ -55,6 +55,10 @@ class AppBadge {
     }
     
     static func setBadge(completionHandler: ((UIBackgroundFetchResult) -> Void)?=nil) {
+        completionHandler?(.noData)
+        
+        // Not quite sure what to do with this now given that we have multiple sharing groups.
+        /*
         guard let sharingGroupId = SyncController.getSharingGroupId(showAlertOnError: false) else {
             return
         }
@@ -80,6 +84,7 @@ class AppBadge {
         else {
             completionHandler?(.noData)
         }
+        */
     }
     
     // Set to 0 to hide badge.

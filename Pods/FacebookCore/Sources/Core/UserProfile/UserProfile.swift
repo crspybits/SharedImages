@@ -16,9 +16,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import FBSDKCoreKit.FBSDKProfile
 import Foundation
 import UIKit
-import FBSDKCoreKit.FBSDKProfile
 
 //--------------------------------------
 // MARK: - UserProfile
@@ -28,7 +28,8 @@ import FBSDKCoreKit.FBSDKProfile
  Represents an immutable Facebook profile.
 
  This class provides a global `current` instance to more easily add social context to your application.
- When the profile changes, a notification is posted so that you can update relevant parts of your UI and is persisted to `NSUserDefaults`.
+ When the profile changes, a notification is posted so that you can update relevant parts of your UI
+ and is persisted to `NSUserDefaults`.
 
  Typically, you will want to call `Profile.updatesOnAccessTokenChange = true`,
  so that it automatically observes changes to the `AccessToken.current`.
@@ -60,12 +61,12 @@ public struct UserProfile {
   /**
    Creates a new instance of `Profile`.
 
-   - parameter userId:      The user id.
-   - parameter firstName:   Optional user's first name.
-   - parameter middleName:  Optional user's middle name.
-   - parameter lastName:    Optional user's last name.
-   - parameter fullName:    Optional user's full name.
-   - parameter profileURL:  Optional user's profile URL.
+   - parameter userId: The user id.
+   - parameter firstName: Optional user's first name.
+   - parameter middleName: Optional user's middle name.
+   - parameter lastName: Optional user's last name.
+   - parameter fullName: Optional user's full name.
+   - parameter profileURL: Optional user's profile URL.
    - parameter refreshDate: Optional user's last refresh date. Default: `NSDate()` aka current date/time.
    */
   public init(userId: String,
@@ -83,13 +84,10 @@ public struct UserProfile {
     self.profileURL = profileURL
     self.refreshDate = refreshDate
   }
-}
 
-//--------------------------------------
-// MARK: - Loading Profile
-//--------------------------------------
-
-extension UserProfile {
+  //--------------------------------------
+  // MARK: - Loading Profile
+  //--------------------------------------
 
   /// Convenience alias for type of closure that is used as a completion for fetching `UserProfile`.
   public typealias Completion = (FetchResult) -> Void
@@ -100,25 +98,25 @@ extension UserProfile {
    If the `current` profile is set, and it has the same `userId`,
    calling method will reset the current profile with the newly fetched one.
 
-   - parameter userId:     Facebook user id of the profile to fetch.
+   - parameter userId: Facebook user id of the profile to fetch.
    - parameter completion: The closure to be executed once the profile is refreshed.
    */
   public static func fetch(userId: String, completion: @escaping Completion) {
     let request = GraphRequest(graphPath: userId,
-                               parameters: ["fields" : "first_name,middle_name,last_name,name,link"],
+                               parameters: ["fields": "first_name,middle_name,last_name,name,link"],
                                httpMethod: .GET)
-    request.start { (httpResponse, result) in
+    request.start { _, result in
       switch result {
       case .success(let response):
         let responseDictionary = response.dictionaryValue
 
         let profile = UserProfile(userId: userId,
-          firstName: responseDictionary?["first_name"] as? String,
-          middleName: responseDictionary?["middle_name"] as? String,
-          lastName: responseDictionary?["last_name"] as? String,
-          fullName: responseDictionary?["name"] as? String,
-          profileURL: (responseDictionary?["link"] as? String).flatMap({ URL(string: $0) }),
-          refreshDate: Date())
+                                  firstName: responseDictionary?["first_name"] as? String,
+                                  middleName: responseDictionary?["middle_name"] as? String,
+                                  lastName: responseDictionary?["last_name"] as? String,
+                                  fullName: responseDictionary?["name"] as? String,
+                                  profileURL: (responseDictionary?["link"] as? String).flatMap({ URL(string: $0) }),
+                                  refreshDate: Date())
 
         // Reset the current profile if userId matches
         if AccessToken.current?.userId == userId {
@@ -145,13 +143,11 @@ extension UserProfile {
       completion?(result)
     }
   }
-}
 
-//--------------------------------------
-// MARK: - Current Profile
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Current Profile
+  //--------------------------------------
 
-extension UserProfile {
   /**
    Current instance of `Profile` that represents the currently logged in user's profile.
    */
@@ -169,7 +165,8 @@ extension UserProfile {
    Loads the current profile and passes it to the completion closure.
 
    If the `current` profile is already loaded, this method will call the completion block synchronously,
-   otherwise it will begin a graph request to update `current` profile and the call the completion closure when finished.
+   otherwise it will begin a graph request to update `current` profile
+   and the call the completion closure when finished.
 
    - parameter completion: The closure to be executed once the profile is loaded.
    */
@@ -193,13 +190,11 @@ extension UserProfile {
       FBSDKProfile.enableUpdates(onAccessTokenChange: updatesOnAccessTokenChange)
     }
   }
-}
 
-//--------------------------------------
-// MARK: - Profile Picture
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Profile Picture
+  //--------------------------------------
 
-extension UserProfile {
   /**
    Defines the aspect ratio for the source image of the profile picture.
    */
@@ -221,18 +216,16 @@ extension UserProfile {
    Returns a complete `NSURL` for retrieving the user's profile image.
 
    - parameter aspectRatio: Apsect ratio of the source image to use.
-   - parameter size:        Requested height and width of the image. Will be rounded to integer precision.
+   - parameter size: Requested height and width of the image. Will be rounded to integer precision.
    */
   public func imageURLWith(_ aspectRatio: PictureAspectRatio, size: CGSize) -> URL {
     return sdkProfileRepresentation.imageURL(for: aspectRatio.sdkPictureMode, size: size)
   }
-}
 
-//--------------------------------------
-// MARK: - Internal
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Internal
+  //--------------------------------------
 
-extension UserProfile {
   internal init(sdkProfile: FBSDKProfile) {
     self.init(userId: sdkProfile.userID,
               firstName: sdkProfile.firstName,

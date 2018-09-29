@@ -155,6 +155,17 @@ class ServerNetworkingLoading : NSObject {
         var result:(HTTPURLResponse, SMRelativeLocalURL?)?
         
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            // DEBUG-- list NetworkCached objects
+            let cached = NetworkCached.fetchAll()
+            Log.msg("Cached: count: \(cached.count); \(cached)")
+            
+            cached.forEach {cache in
+                Log.msg("Cached object: \(cache)")
+                Log.msg("uuid: \(String(describing: cache.fileUUID)); version: \(cache.fileVersion); download: \(String(describing: cache.downloadURL))")
+            }
+            
+            Log.msg("lookupAndRemoveCache: uuid: \(file.fileUUID); version: \(file.fileVersion); download: \(download)")
+            
             guard let fetchedCache = NetworkCached.fetchObjectWithUUID(file.fileUUID, andVersion: file.fileVersion, download: download) else {
                 return
             }

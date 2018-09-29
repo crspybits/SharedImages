@@ -16,9 +16,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Foundation
 @testable import FacebookCore
 import FBSDKLoginKit
+import Foundation
 
 /**
  Describes the result of a login attempt.
@@ -30,9 +30,7 @@ public enum LoginResult {
   case cancelled
   /// Login attempt failed.
   case failed(Error)
-}
 
-extension LoginResult {
   internal init(sdkResult: FBSDKLoginManagerLoginResult?, error: Error?) {
     if let error = error {
       self = .failed(error)
@@ -47,8 +45,12 @@ extension LoginResult {
     if sdkResult.isCancelled {
       self = .cancelled
     } else {
-      let grantedPermissions = (sdkResult.grantedPermissions?.flatMap({ $0 as? String }).map({ Permission(name: $0) })).map(Set.init)
-      let declinedPermissions = (sdkResult.declinedPermissions?.flatMap({ $0 as? String }).map({ Permission(name: $0) })).map(Set.init)
+      let grantedPermissions = (sdkResult.grantedPermissions?.compactMap { $0 as? String }
+        .map { Permission(name: $0) })
+        .map(Set.init)
+      let declinedPermissions = (sdkResult.declinedPermissions?.compactMap { $0 as? String }
+        .map { Permission(name: $0) })
+        .map(Set.init)
       self = .success(grantedPermissions: grantedPermissions ?? [],
                       declinedPermissions: declinedPermissions ?? [],
                       token: AccessToken(sdkAccessToken: sdkResult.token))

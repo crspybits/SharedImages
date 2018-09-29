@@ -21,12 +21,12 @@ import Foundation
 /**
  A delegate for `LoginButton`.
  */
-public protocol LoginButtonDelegate {
+public protocol LoginButtonDelegate: class {
   /**
    Called when the button was used to login and the process finished.
 
    - parameter loginButton: Button that was used to login.
-   - parameter result:      The result of the login.
+   - parameter result: The result of the login.
    */
   func loginButtonDidCompleteLogin(_ loginButton: LoginButton, result: LoginResult)
 

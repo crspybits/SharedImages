@@ -20,7 +20,6 @@ public class Singleton: NSManagedObject, CoreDataSingleton, AllOperations {
     
     public class func newObject() -> NSManagedObject {
         let singleton = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! Singleton
-        singleton.masterVersion = 0
         singleton.nextFileTrackerAge = 0
         return singleton
     }

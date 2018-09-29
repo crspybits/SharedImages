@@ -18,10 +18,10 @@ import Kitura
 public class GetUploadsRequest : NSObject, RequestMessage {
     // MARK: Properties for use in request message.
 
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID: String!
 
     public func nonNilKeys() -> [String] {
-        return [ServerEndpoint.sharingGroupIdKey]
+        return [ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
@@ -31,7 +31,7 @@ public class GetUploadsRequest : NSObject, RequestMessage {
     public required init?(json: JSON) {
         super.init()
         
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
 #if SERVER
         if !nonNilKeysHaveValues(in: json) {
@@ -48,7 +48,7 @@ public class GetUploadsRequest : NSObject, RequestMessage {
 
     public func toJSON() -> JSON? {
         return jsonify([
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
         ])
     }
 }

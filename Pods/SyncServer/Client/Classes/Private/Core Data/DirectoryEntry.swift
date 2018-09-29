@@ -37,8 +37,8 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
             appMetaDataVersionInternal = newValue == nil ? nil : NSNumber(value: newValue!)
         }
     }
-    
-    public var sharingGroupId: SharingGroupId? {
+
+    public var sharingGroupId: Int64? {
         get {
             return sharingGroupIdInternal?.int64Value
         }
@@ -83,7 +83,7 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
             mimeType = .unknown
         }
         
-        var attr = SyncAttributes(fileUUID: fileUUID!, sharingGroupId: sharingGroupId!, mimeType: mimeType)
+        var attr = SyncAttributes(fileUUID: fileUUID!, sharingGroupUUID: sharingGroupUUID!, mimeType: mimeType)
         attr.appMetaData = appMetaData
         attr.fileGroupUUID = fileGroupUUID
         return attr

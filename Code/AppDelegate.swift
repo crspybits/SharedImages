@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var tabBarDelegate = TabControllerDelegate()
     var tabBarController:UITabBarController!
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
 #if DEBUG
         Log.minLevel = .verbose
@@ -52,8 +52,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Call this as soon as possible in your launch sequence.
-        // Version 0.16.3 of the server is the first with sharing group id changes (i.e., now using a single sharing group for each group of users).
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.16.3"))
+        // Version 0.17.4 of the server is the first with full multiple sharing group changes, including client generated sharing group UUID's.
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.17.4"))
     
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Shared Images"
@@ -67,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         CoreData.registerSession(coreDataSession, forName: CoreDataExtras.sessionName)
         
-        tabBarController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TabBarController") as! UITabBarController
+        tabBarController = (UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TabBarController") as! UITabBarController)
         tabBarController.delegate = tabBarDelegate
         window = UIWindow(frame: UIScreen.main.bounds)
         window!.rootViewController = tabBarController
@@ -122,7 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return tabBarController.tabBar.items![tab.rawValue]
     }
     
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         return SignInManager.session.application(app, open: url, options: options) ||
         SharingInvitation.session.application(app, open: url, options: options)
     }
@@ -145,7 +145,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         func endBgTask() {
             application.endBackgroundTask(bgTaskId)
-            bgTaskId = UIBackgroundTaskInvalid
+            bgTaskId = UIBackgroundTaskIdentifier.invalid
         }
         
         bgTaskId = application.beginBackgroundTask() {
@@ -184,7 +184,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 #if DEBUG
 extension UIWindow {
-    override open func motionBegan(_ motion: UIEventSubtype, with event: UIEvent?) {
+    override open func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake {
             if let rootVC = UIApplication.shared.keyWindow?.rootViewController {
                 RosterDevVC.show(fromViewController: rootVC, rowContents:DebugDashboardData.session.sections(), options: .all)

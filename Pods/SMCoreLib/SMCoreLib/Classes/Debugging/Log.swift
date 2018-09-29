@@ -51,6 +51,9 @@ open class Log {
     
     fileprivate init() {
         Log.file.logFileURL = Log.logFileURL
+        
+        // Probably slows things down a bit, but we should be certain that each log write makes it to the file before returning.
+        Log.file.syncAfterEachWrite = true
     }
     
     open class func redirectConsoleLogToDocumentFolder(clearRedirectLog:Bool) {

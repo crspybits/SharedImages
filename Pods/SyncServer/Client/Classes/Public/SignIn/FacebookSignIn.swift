@@ -172,9 +172,9 @@ public class FacebookSyncServerSignIn : GenericSignIn {
                         self.signUserOut()
                         Log.msg("signUserOut: FacebookSignIn: noUser in checkForExistingUser")
                     
-                    case .user(permission: let permission, accessToken: let accessToken):
+                    case .user(accessToken: let accessToken):
                         Log.msg("Sharing user signed in: access token: \(String(describing: accessToken))")
-                        self.delegate?.userActionOccurred(action: .existingUserSignedIn(permission), signIn: self)
+                        self.delegate?.userActionOccurred(action: .existingUserSignedIn, signIn: self)
                         self.managerDelegate?.signInStateChanged(to: .signedIn, for: self)
                     }
                 }
@@ -203,10 +203,10 @@ public class FacebookSyncServerSignIn : GenericSignIn {
             Log.msg("signUserOut: FacebookSignIn: tried to create an owning user!")
             
         case .createSharingUser(invitationCode: let invitationCode):
-            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] longLivedAccessToken, sharingGroupId, error in
-                if error == nil, let sharingGroupId = sharingGroupId {
+            SyncServerUser.session.redeemSharingInvitation(creds: credentials!, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) {[unowned self] longLivedAccessToken, sharingGroupUUID, error in
+                if error == nil, let sharingGroupUUID = sharingGroupUUID {
                     Log.msg("Facebook long-lived access token: \(String(describing: longLivedAccessToken))")
-                    self.successCreatingSharingUser(sharingGroupId: sharingGroupId)
+                    self.successCreatingSharingUser(sharingGroupUUID: sharingGroupUUID)
                 }
                 else {
                     Log.error("Error: \(error!)")

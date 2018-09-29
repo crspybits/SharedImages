@@ -16,104 +16,64 @@ class Migrations {
     // 7/28/18; Migration to sharing group ids-- server version 0.16.3
     private static let migration_0_16_3 = SMPersistItemBool(name:
         "biz.SpasticMuffin.SyncServer.Migrations.migration_0_16_3", initialBoolValue:false,  persistType: .userDefaults)
+    
+    private static let migration_0_17_3 = SMPersistItemBool(name:
+        "biz.SpasticMuffin.SyncServer.Migrations.migration_0_17_3", initialBoolValue:false,  persistType: .userDefaults)
 
     private init() {
     }
     
     func run() {
-        // 5/15/18; Remove this migration after it is used by my three users :).
+        return
         
-        if !Migrations.migration2.boolValue {
-            Migrations.migration2.boolValue = true
-            v0_15_2()
+        if !Migrations.migration_0_17_3.boolValue {
+            Migrations.migration_0_17_3.boolValue = true
+            migrationToSharingGroupUUIDs()
         }
     }
     
-    func runAfterSharingGroupSetup() {
-        // 7/28/18; Remove this migration after it is used by my three users :).
+    // Map from sharing group id's to sharing group UUID's.
+    func migrationToSharingGroupUUIDs() {
+        var numErrors = 0
         
-        if !Migrations.migration_0_16_3.boolValue {
-            Migrations.migration_0_16_3.boolValue = true
-            serverv0_16_3()
+        // This needs to be populated with data we setup for the migration. Sharing group ids -> Sharing group UUID's.
+        var lookup: [Int64: String]!
+        
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            let dirEntries = DirectoryEntry.fetchAll()
+            for dirEntry in dirEntries {
+                guard let sharingGroupId = dirEntry.sharingGroupId else {
+                    numErrors += 1
+                    Log.error("Directory entry didn't have a sharing group id!")
+                    continue
+                }
+                
+                guard let sharingGroupUUID = lookup[sharingGroupId] else {
+                    numErrors += 1
+                    Log.error("Couldn't get uuid for sharingGroupId: \(sharingGroupId)")
+                    continue
+                }
+                
+                dirEntry.sharingGroupUUID = sharingGroupUUID
+            }
+            
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                numErrors += 1
+                Log.error("\(error)")
+            }
         }
-    }
-    
-    private func v0_15_2() {
-        /*
-        DownloadFileTrackers now have url's-- used to be only in UploadFileTracker's -- but generalized this to put in FileTracker's.
-        Remove any existing DownloadFileTrackers. This is because I'm now moving to groups of DownloadFileTrackers.
-        deletedLocally is now what deletedOnServer used to be. Need to create my own migration.
-        */
-
+        
         do {
             try SyncServer.session.reset(type: .tracking)
         } catch (let error) {
-            Log.error("Problem resetting trackers: \(error)")
+            numErrors += 1
+            Log.error("\(error)")
         }
         
-        CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            let entries = DirectoryEntry.fetchAll()
-            entries.forEach { entry in
-                entry.deletedLocally = entry.deletedOnServer
-            }
-            
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
-        }
-    }
-    
-    private func serverv0_16_3() {
-        /*
-        A) Give all of the Directory Entry's a sharingGroupId.
-        B) Give any pending uploads or downloads a sharingGroupId: Download content groups, Upload trackers, Download trackers.
-        
-         Only have a single sharing group id right now per user, so this simple strategy will work.
-        */
-        
-        guard let sharingGroupIds = SyncServerUser.session.sharingGroupIds, sharingGroupIds.count > 0 else {
-            Alert.show(withTitle: "Migration Error!", message: "No sharing group ids-- please contact crspybits.")
-            Log.error("No sharing group ids!")
-            return
-        }
-        
-        let sharingGroupId = sharingGroupIds[0]
-        
-        // A)
-        CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            let entries = DirectoryEntry.fetchAll()
-            entries.forEach { entry in
-                entry.sharingGroupId = sharingGroupId
-            }
-            
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
-        }
-        
-        // B)
-        
-        CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            let dcgs = DownloadContentGroup.fetchAll()
-            dcgs.forEach { dcg in
-                dcg.sharingGroupId = sharingGroupId
-            }
-            
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
-        }
-        
-        CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            let dfts = DownloadFileTracker.fetchAll()
-            dfts.forEach { dft in
-                dft.sharingGroupId = sharingGroupId
-            }
-            
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
-        }
-        
-        CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            let ufts = UploadFileTracker.fetchAll()
-            ufts.forEach { uft in
-                uft.sharingGroupId = sharingGroupId
-            }
-            
-            CoreData.sessionNamed(Constants.coreDataName).saveContext()
+        if numErrors > 0 {
+            Alert.show(withTitle: "Error doing migration", message: "From sharing group id's to UUIDs: Errors: \(numErrors)")
         }
     }
 }

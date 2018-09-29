@@ -12,7 +12,7 @@ import SMCoreLib
 import SyncServer_Shared
 
 @objc(FileTracker)
-public class FileTracker: NSManagedObject, Filenaming, FileUUID, LocalURLData {
+public class FileTracker: Tracker, Filenaming, FileUUID, LocalURLData {
     // FileTracker age keeps track of relative age -- larger numbers mean they were created later in time.
     
     public var fileUUID:String! {
@@ -44,38 +44,14 @@ public class FileTracker: NSManagedObject, Filenaming, FileUUID, LocalURLData {
             appMetaDataVersionInternal = newValue == nil ? nil : NSNumber(value: newValue!)
         }
     }
-    
-    public var sharingGroupId: SharingGroupId? {
+
+    public var sharingGroupId: Int64? {
         get {
             return sharingGroupIdInternal?.int64Value
         }
         
         set {
             sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
-        }
-    }
-    
-    public enum Operation: String {
-        case file // File upload or download
-        case appMetaData // appMetaData upload or download.
-        case deletion // Upload or download deletion
-        
-        var isContents: Bool {
-            return self == .file || self == .appMetaData
-        }
-        
-        var isDeletion: Bool {
-            return self == .deletion
-        }
-    }
-    
-    public var operation: Operation! {
-        get {
-            return operationInternal == nil ? nil : Operation(rawValue: operationInternal!)
-        }
-        
-        set {
-            operationInternal = newValue.rawValue
         }
     }
     

@@ -305,13 +305,17 @@ extension LargeImages : DiscussionVCDelegate {
     }
     
     func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?) {
-        syncController?.sync() {
-            // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
-            discussion.unreadCount = 0
-            discussion.save()
-            UnreadCountBadge.update()
-            
-            refreshWithCompletion?()
+        do {
+            try syncController?.sync(sharingGroupUUID: discussion.sharingGroupUUID!) {
+                // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
+                discussion.unreadCount = 0
+                discussion.save()
+                UnreadCountBadge.update()
+                
+                refreshWithCompletion?()
+            }
+        } catch (let error) {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
         }
     }
 }

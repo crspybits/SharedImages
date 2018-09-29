@@ -1,8 +1,8 @@
 //
 //  UploadQueue+CoreDataProperties.swift
-//  Pods
+//  SyncServer
 //
-//  Created by Christopher Prince on 3/2/17.
+//  Created by Christopher G Prince on 9/3/18.
 //
 //
 
@@ -13,7 +13,7 @@ import CoreData
 extension UploadQueue {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<UploadQueue> {
-        return NSFetchRequest<UploadQueue>(entityName: "UploadQueue");
+        return NSFetchRequest<UploadQueue>(entityName: "UploadQueue")
     }
 
     @NSManaged public var pendingSync: Singleton?
@@ -26,28 +26,28 @@ extension UploadQueue {
 extension UploadQueue {
 
     @objc(insertObject:inUploadsAtIndex:)
-    @NSManaged public func insertIntoUploads(_ value: UploadFileTracker, at idx: Int)
+    @NSManaged public func insertIntoUploads(_ value: Tracker, at idx: Int)
 
     @objc(removeObjectFromUploadsAtIndex:)
     @NSManaged public func removeFromUploads(at idx: Int)
 
     @objc(insertUploads:atIndexes:)
-    @NSManaged public func insertIntoUploads(_ values: [UploadFileTracker], at indexes: NSIndexSet)
+    @NSManaged public func insertIntoUploads(_ values: [Tracker], at indexes: NSIndexSet)
 
     @objc(removeUploadsAtIndexes:)
     @NSManaged public func removeFromUploads(at indexes: NSIndexSet)
 
     @objc(replaceObjectInUploadsAtIndex:withObject:)
-    @NSManaged public func replaceUploads(at idx: Int, with value: UploadFileTracker)
+    @NSManaged public func replaceUploads(at idx: Int, with value: Tracker)
 
     @objc(replaceUploadsAtIndexes:withUploads:)
-    @NSManaged public func replaceUploads(at indexes: NSIndexSet, with values: [UploadFileTracker])
+    @NSManaged public func replaceUploads(at indexes: NSIndexSet, with values: [Tracker])
 
     @objc(addUploadsObject:)
-    @NSManaged public func addToUploads(_ value: UploadFileTracker)
+    @NSManaged public func addToUploads(_ value: Tracker)
 
     @objc(removeUploadsObject:)
-    @NSManaged public func removeFromUploads(_ value: UploadFileTracker)
+    @NSManaged public func removeFromUploads(_ value: Tracker)
 
     @objc(addUploads:)
     @NSManaged public func addToUploads(_ values: NSOrderedSet)

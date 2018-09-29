@@ -21,7 +21,9 @@ import FBSDKCoreKit.FBSDKAppEvents
 /**
  Represents a parameter name of the Facebook Analytics application event.
  */
-public enum AppEventParameterName {
+public enum AppEventParameterName: Hashable, RawRepresentable, ExpressibleByStringLiteral, CustomStringConvertible {
+  /// Data for the one or more pieces of content being logged about.
+  case content
   /// Identifier for the specific piece of content.
   case contentId
   /// Type of the content, e.g. "music"/"photo"/"video".
@@ -29,7 +31,7 @@ public enum AppEventParameterName {
   /// Currency. E.g. "USD"/"EUR"/"GBP". See ISO-4217 for specific values.
   case currency
   /// Appropriate description for the event.
-  case Description
+  case description
   /// Current level or level achieved.
   case level
   /// Maximum rating available. E.g. "5"/"10".
@@ -55,9 +57,9 @@ public enum AppEventParameterName {
   public init(_ string: String) {
     self = .custom(string)
   }
-}
 
-extension AppEventParameterName: RawRepresentable {
+  // MARK: RawRepresentable
+
   /**
    Create an `AppEventParameterName` from `String`.
 
@@ -70,10 +72,11 @@ extension AppEventParameterName: RawRepresentable {
   /// The corresponding `String` value.
   public var rawValue: String {
     switch self {
+    case .content: return FBSDKAppEventParameterNameContent
     case .contentId: return FBSDKAppEventParameterNameContentID
     case .contentType: return FBSDKAppEventParameterNameContentType
     case .currency: return FBSDKAppEventParameterNameCurrency
-    case .Description: return FBSDKAppEventParameterNameDescription
+    case .description: return FBSDKAppEventParameterNameDescription
     case .level: return FBSDKAppEventNameAchievedLevel
     case .maxRatingValue: return FBSDKAppEventParameterNameMaxRatingValue
     case .itemCount: return FBSDKAppEventParameterNameNumItems
@@ -84,9 +87,9 @@ extension AppEventParameterName: RawRepresentable {
     case .custom(let string): return string
     }
   }
-}
 
-extension AppEventParameterName: ExpressibleByStringLiteral {
+  // MARK: ExpressibleByStringLiteral
+
   /**
    Create an `AppEventParameterName` from a string literal.
 
@@ -113,9 +116,9 @@ extension AppEventParameterName: ExpressibleByStringLiteral {
   public init(extendedGraphemeClusterLiteral value: String) {
     self.init(stringLiteral: value)
   }
-}
 
-extension AppEventParameterName: Hashable {
+  // MARK: Hashable
+
   /// The hash value.
   public var hashValue: Int {
     return self.rawValue.hashValue
@@ -132,9 +135,9 @@ extension AppEventParameterName: Hashable {
   public static func == (lhs: AppEventParameterName, rhs: AppEventParameterName) -> Bool {
     return lhs.rawValue == rhs.rawValue
   }
-}
 
-extension AppEventParameterName: CustomStringConvertible {
+  // MARK: CustomStringConvertible
+
   /// Textual representation of an app event parameter name.
   public var description: String {
     return rawValue

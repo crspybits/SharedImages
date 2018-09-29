@@ -14,45 +14,53 @@ import Kitura
 import PerfectLib
 #endif
 
-// As part of normal processing, increments the current master version for the user. Calling DoneUploads a second time (immediately after the first) results in 0 files being transferred. i.e., `numberUploadsTransferred` will be 0 for the result of the second operation. This is not considered an error, and the masterVersion is still incremented in this case.
+// As part of normal processing, increments the current master version for the sharing group. Calling DoneUploads a second time (immediately after the first) results in 0 files being transferred. i.e., `numberUploadsTransferred` will be 0 for the result of the second operation. This is not considered an error, and the masterVersion is still incremented in this case.
+// This operation optionally enables a sharing group update. This provides a means for the sharing group update to not to be queued on the server.
 
-public class DoneUploadsRequest : NSObject, RequestMessage {
+public class DoneUploadsRequest : NSObject, RequestMessage, MasterVersionUpdateRequest {
     // MARK: Properties for use in request message.
     
-    // Overall version for files for the specific user; assigned by the server.
-    public static let masterVersionKey = "masterVersion"
+    // Overall version for files for the specific sharing group; assigned by the server.
     public var masterVersion:MasterVersionInt!
 
-    public var sharingGroupId: SharingGroupId!
+    public var sharingGroupUUID: String!
     
 #if DEBUG
     // Give a time value in seconds -- after the lock is obtained, the server for sleep for this lock to test locking operation.
     public static let testLockSyncKey = "testLockSync"
     public var testLockSync:Int32?
 #endif
+
+    // Optionally perform a sharing group update-- i.e., change the sharing group's name as part of DoneUploads.
+    public static let sharingGroupNameKey = "sharingGroupName"
+    public var sharingGroupName: String?
     
     public func nonNilKeys() -> [String] {
-        return [DoneUploadsRequest.masterVersionKey,
-            ServerEndpoint.sharingGroupIdKey]
+        return [ServerEndpoint.masterVersionKey,
+            ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
+        let keys = [DoneUploadsRequest.sharingGroupNameKey]
+        
 #if DEBUG
-        return self.nonNilKeys() + [DoneUploadsRequest.testLockSyncKey]
+        return self.nonNilKeys() + [DoneUploadsRequest.testLockSyncKey] + keys
 #else
-        return self.nonNilKeys()
+        return self.nonNilKeys() + keys
 #endif
     }
     
     public required init?(json: JSON) {
         super.init()
         
-        self.masterVersion = Decoder.decode(int64ForKey: DoneUploadsRequest.masterVersionKey)(json)
-        self.sharingGroupId = Decoder.decode(int64ForKey: ServerEndpoint.sharingGroupIdKey)(json)
+        self.masterVersion = Decoder.decode(int64ForKey: ServerEndpoint.masterVersionKey)(json)
+        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
         
 #if DEBUG
         self.testLockSync = DoneUploadsRequest.testLockSyncKey <~~ json
 #endif
+
+        self.sharingGroupName = DoneUploadsRequest.sharingGroupNameKey <~~ json
 
         if !self.nonNilKeysHaveValues(in: json) {
 #if SERVER
@@ -70,8 +78,9 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
     
     public func toJSON() -> JSON? {
         var result = [
-            DoneUploadsRequest.masterVersionKey ~~> self.masterVersion,
-            ServerEndpoint.sharingGroupIdKey ~~> self.sharingGroupId
+            ServerEndpoint.masterVersionKey ~~> self.masterVersion,
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID,
+            DoneUploadsRequest.sharingGroupNameKey ~~> self.sharingGroupName
         ]
         
 #if DEBUG
@@ -82,7 +91,7 @@ public class DoneUploadsRequest : NSObject, RequestMessage {
     }
 }
 
-public class DoneUploadsResponse : ResponseMessage {
+public class DoneUploadsResponse : ResponseMessage, MasterVersionUpdateResponse {
     public var responseType: ResponseType {
         return .json
     }
@@ -93,8 +102,7 @@ public class DoneUploadsResponse : ResponseMessage {
     public static let numberUploadsTransferredKey = "numberUploadsTransferred"
     public var numberUploadsTransferred:Int32?
     
-    // 2) If the master version for the user on the server had been previously incremented to a value different than the masterVersion value in the request, this key will be present in the response-- with the new value of the master version. The doneUploads operation was not attempted in this case.
-    public static let masterVersionUpdateKey = "masterVersionUpdate"
+    // 2) If the master version for the sharing group on the server had been previously incremented to a value different than the masterVersion value in the request, this key will be present in the response-- with the new value of the master version. The doneUploads operation was not attempted in this case.
     public var masterVersionUpdate:MasterVersionInt?
     
     // TODO: *1* Make sure we're using this on the client.
@@ -104,7 +112,7 @@ public class DoneUploadsResponse : ResponseMessage {
     
     public required init?(json: JSON) {
         self.numberUploadsTransferred = Decoder.decode(int32ForKey: DoneUploadsResponse.numberUploadsTransferredKey)(json)
-        self.masterVersionUpdate = Decoder.decode(int64ForKey: DoneUploadsResponse.masterVersionUpdateKey)(json)
+        self.masterVersionUpdate = Decoder.decode(int64ForKey: ServerEndpoint.masterVersionUpdateKey)(json)
         self.numberDeletionErrors = Decoder.decode(int32ForKey: DoneUploadsResponse.numberDeletionErrorsKey)(json)
     }
     
@@ -115,7 +123,7 @@ public class DoneUploadsResponse : ResponseMessage {
     // MARK: - Serialization
     public func toJSON() -> JSON? {
         return jsonify([
-            DoneUploadsResponse.masterVersionUpdateKey ~~> self.masterVersionUpdate,
+            ServerEndpoint.masterVersionUpdateKey ~~> self.masterVersionUpdate,
             DoneUploadsResponse.numberUploadsTransferredKey ~~> self.numberUploadsTransferred,
             DoneUploadsResponse.numberDeletionErrorsKey ~~> self.numberDeletionErrors
         ])

@@ -22,6 +22,10 @@ public class CheckPrimaryCredsRequest : NSObject, RequestMessage {
     
     public required init?(json: JSON) {
         super.init()
+        
+        if !nonNilKeysHaveValues(in: json) {
+            return nil
+        }
     }
     
     public func toJSON() -> JSON? {

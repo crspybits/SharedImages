@@ -16,8 +16,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Foundation
 import FBSDKCoreKit.FBSDKGraphRequestConnection
+import Foundation
 
 //--------------------------------------
 // MARK: - GraphRequestConnection
@@ -26,11 +26,13 @@ import FBSDKCoreKit.FBSDKGraphRequestConnection
  Represents a single connection to Facebook to service a single or multiple requests.
 
  The request settings and properties are encapsulated in a reusable `GraphRequest` or a custom `GraphRequestProtocol`.
- This object encapsulates the concerns of a single communication e.g. starting a connection, canceling a connection, or batching requests.
+ This object encapsulates the concerns of a single communication
+ e.g. starting a connection, canceling a connection, or batching requests.
  */
 public class GraphRequestConnection {
   /// A type of the closure that could be used to track network progress of a specific connection.
-  public typealias NetworkProgressHandler = (_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalExpectedBytes: Int64) -> Void
+  public typealias NetworkProgressHandler =
+    (_ bytesSent: Int64, _ totalBytesSent: Int64, _ totalExpectedBytes: Int64) -> Void
 
   /// A type of the closure that could be used to track network errors of a specific connection.
   public typealias NetworkFailureHandler = (Error) -> Void
@@ -59,8 +61,8 @@ public class GraphRequestConnection {
     }
   }
 
-  fileprivate var sdkConnection = FBSDKGraphRequestConnection()
-  fileprivate var sdkDelegateBridge = GraphRequestConnectionDelegateBridge()
+  private var sdkConnection: FBSDKGraphRequestConnection = FBSDKGraphRequestConnection()
+  private var sdkDelegateBridge: GraphRequestConnectionDelegateBridge = GraphRequestConnectionDelegateBridge()
 
   /**
    Initializes a connection.
@@ -68,43 +70,43 @@ public class GraphRequestConnection {
   public init() {
     sdkDelegateBridge.setupAsDelegateFor(sdkConnection)
   }
-}
 
-//--------------------------------------
-// MARK: - Requests
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Requests
+  //--------------------------------------
 
-extension GraphRequestConnection {
-  public typealias Completion<T: GraphRequestProtocol> = (_ httpResponse: HTTPURLResponse?, _ result: GraphRequestResult<T>) -> Void
+  public typealias Completion<T: GraphRequestProtocol> =
+    (_ httpResponse: HTTPURLResponse?, _ result: GraphRequestResult<T>) -> Void
 
   /**
    Adds a request object to this connection.
 
-   - parameter request:        Request to be included in this connection.
+   - parameter request: Request to be included in this connection.
    - parameter batchEntryName: Optional name for this request.
-   This can be used to feed the results of one request to the input of another, as long as they are in the same `GraphRequestConnection`
+   This can be used to feed the results of one request to the input of another,
+   as long as they are in the same `GraphRequestConnection`
    As described in [Graph API Batch Requests](https://developers.facebook.com/docs/reference/api/batch/).
-   - parameter completion:     Optional completion closure that is going to be called when the connection finishes or fails.
+   - parameter completion: Optional completion closure that is going to be called when the connection finishes or fails.
    */
   public func add<T>(_ request: T,
-                  batchEntryName: String? = nil,
-                  completion: Completion<T>? = nil) {
-    let batchParameters = batchEntryName.map({ ["name" : $0] })
-    add(request, batchParameters: batchParameters as [String : Any]?, completion: completion)
+                     batchEntryName: String? = nil,
+                     completion: Completion<T>? = nil) {
+    let batchParameters = batchEntryName.map { ["name": $0] }
+    add(request, batchParameters: batchParameters as [String: Any]?, completion: completion)
   }
 
   /**
    Adds a request object to this connection.
 
-   - parameter request:         Request to be included in this connection.
+   - parameter request: Request to be included in this connection.
    - parameter batchParameters: Optional dictionary of parameters to include for this request
    as described in [Graph API Batch Requests](https://developers.facebook.com/docs/reference/api/batch/).
    Examples include "depends_on", "name", or "omit_response_on_success".
-   - parameter completion:      Optional completion closure that is going to be called when the connection finishes or fails.
+   - parameter completion: Optional completion closure that is going to be called when the connection finishes or fails.
    */
   public func add<T>(_ request: T,
-                  batchParameters: [String : Any]?,
-                  completion: Completion<T>? = nil) {
+                     batchParameters: [String: Any]?,
+                     completion: Completion<T>? = nil) {
     sdkConnection.add(request.sdkRequest,
                       completionHandler: completion.map(type(of: self).sdkRequestCompletion),
                       batchParameters: batchParameters)
@@ -129,15 +131,14 @@ extension GraphRequestConnection {
   public func cancel() {
     sdkConnection.cancel()
   }
-}
 
-//--------------------------------------
-// MARK: - Private
-//--------------------------------------
+  //--------------------------------------
+  // MARK: - Private
+  //--------------------------------------
 
-extension GraphRequestConnection {
   /// Custom typealias that is the same as FBSDKGraphRequestHandler, but without implicitly unwrapped optionals.
-  internal typealias SDKRequestCompletion = (_ connection: FBSDKGraphRequestConnection?, _ rawResponse: Any?, _ error: Error?) -> Void
+  internal typealias SDKRequestCompletion =
+    (_ connection: FBSDKGraphRequestConnection?, _ rawResponse: Any?, _ error: Error?) -> Void
 
   internal static func sdkRequestCompletion<T>(from completion: @escaping Completion<T>) -> SDKRequestCompletion {
     return { connection, rawResponse, error in

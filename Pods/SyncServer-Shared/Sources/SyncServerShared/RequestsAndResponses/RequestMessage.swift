@@ -38,6 +38,9 @@ public extension RequestMessage {
     func nonNilKeysHaveValues(in dictionary: [String: Any]) -> Bool {
         for key in self.nonNilKeys() {
             if dictionary[key] == nil {
+#if SERVER
+                Log.error(message: "Key '\(key)' did not have value!")
+#endif
                 return false
             }
         }

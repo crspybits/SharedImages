@@ -16,18 +16,18 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import Foundation
 import FBSDKCoreKit.FBSDKGraphRequest
+import Foundation
 
 extension GraphRequestProtocol {
   internal var sdkRequest: FBSDKGraphRequest {
-     // TODO: (nlutsenko) Consider constraining `parameters` for specific types aka create `GraphRequestParameterValue` protocol.
-    let sdkParameters: [String : Any]? = parameters?.keyValueMap({ key, value in
+    // TODO: (nlutsenko) Consider constraining `parameters` for specific types aka create `GraphRequestParameterValue`
+    let sdkParameters: [String: Any]? = parameters?.keyValueMap { key, value in
       if let value = value as? GraphRequestDataAttachment {
         return (key, value.sdkDataAttachment)
       }
       return (key, value)
-    })
+    }
 
     // ObjC SDK requires `v` as a prefix for the Graph API Version.
     let apiVersion = "v" + self.apiVersion.stringValue

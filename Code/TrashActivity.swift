@@ -21,8 +21,8 @@ class TrashActivity : UIActivity {
     }
     
     // default returns nil. subclass may override to return custom activity type that is reported to completion handler
-    override var activityType: UIActivityType? {
-        return UIActivityType(rawValue: "\(type(of: self))")
+    override var activityType: UIActivity.ActivityType? {
+        return UIActivity.ActivityType(rawValue: "\(type(of: self))")
     }
 
     // default returns nil. subclass must override and must return non-nil value
@@ -49,7 +49,7 @@ class TrashActivity : UIActivity {
             return false
         }
 
-        images = imageObjs as! [Image]
+        images = imageObjs as? [Image]
 
         return true
     }

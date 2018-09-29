@@ -21,7 +21,7 @@ public class Image: NSManagedObject {
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     static let UNREAD_COUNT = "discussion.unreadCount"
     
-    public var sharingGroupId: SharingGroupId? {
+    public var sharingGroupId: Int64? {
         get {
             return sharingGroupIdInternal?.int64Value
         }

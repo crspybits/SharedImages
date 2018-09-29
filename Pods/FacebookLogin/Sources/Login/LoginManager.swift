@@ -16,10 +16,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+@testable import FacebookCore
+import FBSDKLoginKit
 import Foundation
 import UIKit
-import FBSDKLoginKit
-@testable import FacebookCore
 
 /**
  This class provides methods for logging the user in and out.
@@ -33,7 +33,7 @@ import FBSDKLoginKit
  `current` before calling `logIn()` to authorize further permissions on your tokens.
  */
 public final class LoginManager {
-  fileprivate let sdkManager = FBSDKLoginManager()
+  private let sdkManager: FBSDKLoginManager = FBSDKLoginManager()
 
   /// The login behavior that is going to be used. Default: `.Native`.
   public var loginBehavior: LoginBehavior {
@@ -52,7 +52,7 @@ public final class LoginManager {
   /**
    Initialize an instance of `LoginManager.`
 
-   - parameter loginBehavior:   Optional login behavior to use. Default: `.Native`.
+   - parameter loginBehavior: Optional login behavior to use. Default: `.Native`.
    - parameter defaultAudience: Optional default audience to use. Default: `.Friends`.
    */
   public init(loginBehavior: LoginBehavior = .native,
@@ -73,14 +73,14 @@ public final class LoginManager {
    This method will present UI the user. You typically should check if `AccessToken.current` already
    contains the permissions you need before asking to reduce unnecessary app switching.
 
-   - parameter permissions:    Array of read permissions. Default: `[.PublicProfile]`
+   - parameter permissions: Array of read permissions. Default: `[.PublicProfile]`
    - parameter viewController: Optional view controller to present from. Default: topmost view controller.
-   - parameter completion:     Optional callback.
+   - parameter completion: Optional callback.
    */
   public func logIn(readPermissions: [ReadPermission] = [.publicProfile],
                     viewController: UIViewController? = nil,
                     completion: ((LoginResult) -> Void)? = nil) {
-    let sdkPermissions = readPermissions.map({ $0.permissionValue.name })
+    let sdkPermissions = readPermissions.map { $0.permissionValue.name }
     sdkManager.logIn(withReadPermissions: sdkPermissions,
                      from: viewController,
                      handler: LoginManager.sdkCompletionFor(completion))
@@ -96,14 +96,14 @@ public final class LoginManager {
    This method will present UI the user. You typically should check if `AccessToken.current` already
    contains the permissions you need before asking to reduce unnecessary app switching.
 
-   - parameter permissions:    Array of publish permissions. Default: `[.PublishActions]`
+   - parameter permissions: Array of publish permissions. Default: `[.PublishActions]`
    - parameter viewController: Optional view controller to present from. Default: topmost view controller.
-   - parameter completion:     Optional callback.
+   - parameter completion: Optional callback.
    */
   public func logIn(publishPermissions: [PublishPermission] = [.publishActions],
                     viewController: UIViewController? = nil,
                     completion: ((LoginResult) -> Void)? = nil) {
-    let sdkPermissions = publishPermissions.map({ $0.permissionValue.name })
+    let sdkPermissions = publishPermissions.map { $0.permissionValue.name }
     sdkManager.logIn(withPublishPermissions: sdkPermissions,
                      from: viewController,
                      handler: LoginManager.sdkCompletionFor(completion))
@@ -116,11 +116,10 @@ public final class LoginManager {
   public func logOut() {
     AccessToken.current = nil
     UserProfile.current = nil
-  }
-}
 
-private extension LoginManager {
-  class func sdkCompletionFor(_ completion: ((LoginResult) -> Void)?) -> FBSDKLoginManagerRequestTokenHandler? {
+  }
+
+  private class func sdkCompletionFor(_ completion: ((LoginResult) -> Void)?) -> FBSDKLoginManagerRequestTokenHandler? {
     guard let completion = completion else {
       return nil
     }

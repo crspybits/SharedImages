@@ -2,7 +2,7 @@
 //  Singleton+CoreDataProperties.swift
 //  SyncServer
 //
-//  Created by Christopher G Prince on 1/17/18.
+//  Created by Christopher G Prince on 9/4/18.
 //
 //
 
@@ -16,7 +16,6 @@ extension Singleton {
         return NSFetchRequest<Singleton>(entityName: "Singleton")
     }
 
-    @NSManaged public var masterVersion: Int64
     @NSManaged public var nextFileTrackerAge: Int64
     @NSManaged public var pendingSync: UploadQueue?
 

@@ -122,11 +122,12 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     }
     
     private func completeSharing(permission:Permission) {
-        guard let sharingGroupId = SyncController.getSharingGroupId() else {
-            return
-        }
+        assert(false)
         
-        SyncServerUser.session.createSharingInvitation(withPermission: permission, sharingGroupId: sharingGroupId) { invitationCode, error in
+        // This needs to come from album context.
+        var sharingGroupUUID: String!
+        
+        SyncServerUser.session.createSharingInvitation(withPermission: permission, sharingGroupUUID: sharingGroupUUID) { invitationCode, error in
             if error == nil {
                 let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
                 if let email = SMEmail(parentViewController: self) {
@@ -251,8 +252,7 @@ extension SignInVC : GenericSignInDelegate {
             SMCoreLib.Alert.show(withTitle: "Alert!", message: "User not found on system.")
             // Don't need to sign the user out-- already signed out when delegate called.
             
-        case .existingUserSignedIn(let sharingPermission):
-            self.sharingPermission = sharingPermission
+        case .existingUserSignedIn:
             successfulSignIn(switchToImagesTab: true)
             
         case .owningUserCreated:
