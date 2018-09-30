@@ -14,7 +14,7 @@ import SMCoreLib
 class LargeImages : UIViewController {
     // Set these two when creating an instance of this class.
     var startItem: Int = 0
-    weak var syncController:SyncController?
+    weak var imagesHandler:ImagesHandler?
     
     private var seekToIndexPath:IndexPath?
     let IMAGE_WIDTH_PADDING:CGFloat = 20.0
@@ -217,7 +217,7 @@ extension LargeImages : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
         
-        if let syncController = syncController,
+        if let syncController = imagesHandler?.syncController,
             let image = self.coreDataSource.object(at: indexPath) as? Image {
             cell.setProperties(image: image, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
                 self.showDiscussionIfPresent(image: image)
@@ -297,7 +297,7 @@ extension LargeImages : DiscussionVCDelegate {
     }
     
     func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
-        syncController?.update(discussion: changedDiscussion)
+        imagesHandler?.syncController.update(discussion: changedDiscussion)
     }
     
     func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion) {
@@ -306,7 +306,7 @@ extension LargeImages : DiscussionVCDelegate {
     
     func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?) {
         do {
-            try syncController?.sync(sharingGroupUUID: discussion.sharingGroupUUID!) {
+            try imagesHandler?.syncController.sync(sharingGroupUUID: discussion.sharingGroupUUID!) {
                 // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
                 discussion.unreadCount = 0
                 discussion.save()

@@ -2,27 +2,25 @@
 
 # A badge control for iOS and tvOS written in Swift
 
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)][carthage]
-[![CocoaPods Version](https://img.shields.io/cocoapods/v/BadgeSwift.svg?style=flat)][cocoadocs]
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![CocoaPods Version](https://img.shields.io/cocoapods/v/BadgeSwift.svg?style=flat)](http://cocoadocs.org/docsets/BadgeSwift)
 [![License](https://img.shields.io/cocoapods/l/BadgeSwift.svg?style=flat)](/LICENSE)
-[![Platform](https://img.shields.io/cocoapods/p/BadgeSwift.svg?style=flat)][cocoadocs]
-[cocoadocs]: http://cocoadocs.org/docsets/BadgeSwift
-[carthage]: https://github.com/Carthage/Carthage
+[![Platform](https://img.shields.io/cocoapods/p/BadgeSwift.svg?style=flat)](http://cocoadocs.org/docsets/BadgeSwift)
 
 * The badge is a subclass of UILabel view.
 * It can be created and customized from the Storyboard or from the code.
 
-## Setup (Swift 3.0)
+## Setup
 
 There are three ways you can add BadgeSwift to your Xcode project.
 
 **Add source (iOS 7+)**
 
-Simply add [BadgeSwift.swift](https://github.com/marketplacer/swift-badge/blob/master/BadgeSwift/BadgeSwift.swift) file to your project.
+Simply add [BadgeSwift.swift](https://github.com/evgenyneu/swift-badge/blob/master/BadgeSwift/BadgeSwift.swift) file to your project.
 
 #### Setup with Carthage (iOS 8+)
 
-Alternatively, add `github "marketplacer/swift-badge" ~> 5.0` to your Cartfile and run `carthage update`.
+Alternatively, add `github "evgenyneu/swift-badge" ~> 6.0` to your Cartfile and run `carthage update`.
 
 #### Setup with CocoaPods (iOS 8+)
 
@@ -30,11 +28,11 @@ If you are using CocoaPods add this text to your Podfile and run `pod install`.
 
     use_frameworks!
     target 'Your target name'
-    pod 'BadgeSwift', '~> 5.0'
+    pod 'BadgeSwift', '~> 6.0'
 
 ### Legacy Swift versions
 
-Setup a [previous version](https://github.com/marketplacer/swift-badge/wiki/Legacy-Swift-versions) of the library if you use an older version of Swift.
+Setup a [previous version](https://github.com/evgenyneu/swift-badge/wiki/Legacy-Swift-versions) of the library if you use an older version of Swift.
 
 ## Usage
 
@@ -44,12 +42,12 @@ Setup a [previous version](https://github.com/marketplacer/swift-badge/wiki/Lega
 * Set its `class` to `BadgeSwift` in identity inspector.
 * Set the `module` property to `BadgeSwift` if you used Carthage or CocoaPods setup methods.
 
-<img src='https://raw.githubusercontent.com/marketplacer/swift-badge/master/graphics/swift_badge_class_name_3.png' width='258' alt='Add badge to storyboard'>
+<img src='https://raw.githubusercontent.com/evgenyneu/swift-badge/master/graphics/swift_badge_class_name_3.png' width='258' alt='Add badge to storyboard'>
 
 * Customize the badge properties in the attributes inspector (text, color and other).
 * If storyboard does not show the badge correctly click **Refresh All Views** from the **Editor** menu.
 
-<img src='https://github.com/marketplacer/swift-badge/blob/master/graphics/swift_badge_attributes_inspector_2.png' width='374' alt='Change badge properties in attribute inspector'>
+<img src='https://github.com/evgenyneu/swift-badge/blob/master/graphics/swift_badge_attributes_inspector_2.png' width='374' alt='Change badge properties in attribute inspector'>
 
 *Note*: Carthage setup method does not allow to customize Cosmos view from the storyboard, please do it from code instead.
 
@@ -64,7 +62,7 @@ view.addSubview(badge)
 // Position the badge ...
 ```
 
-[See example](https://github.com/marketplacer/swift-badge/blob/master/Demo-iOS/ViewControllers/CreateBadgeFromCodeViewController.swift) of how to create and position the badge from code in the demo app.
+[See example](https://github.com/evgenyneu/swift-badge/blob/master/Demo-iOS/ViewControllers/CreateBadgeFromCodeViewController.swift) of how to create and position the badge from code in the demo app.
 
 #### Customization
 
@@ -120,6 +118,7 @@ Here are some alternative badges for iOS.
 * [mustafaibrahim989/MIBadgeButton-Swift](https://github.com/mustafaibrahim989/MIBadgeButton-Swift)
 * [soffes/SAMBadgeView](https://github.com/soffes/SAMBadgeView)
 * [tmdvs/TDBadgedCell](https://github.com/tmdvs/TDBadgedCell)
+* [EddyBorja/MLPAccessoryBadge](https://github.com/EddyBorja/MLPAccessoryBadge)
 
 ## Thanks to 👍
 

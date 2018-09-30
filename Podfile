@@ -11,15 +11,15 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 17.0'
-	pod 'SyncServer/Facebook', '~> 17.0'
-	pod 'SyncServer/Dropbox', '~> 17.0'
-	pod 'SyncServer/Google', '~> 17.0'
+# 	pod 'SyncServer', '~> 17.0'
+# 	pod 'SyncServer/Facebook', '~> 17.0'
+# 	pod 'SyncServer/Dropbox', '~> 17.0'
+# 	pod 'SyncServer/Google', '~> 17.0'
 
-# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Google', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Google', :path => '../SyncServer-iOSClient'
 
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 	
@@ -27,6 +27,7 @@ target 'SharedImages' do
 	pod 'SMCoreLib', '~> 1.3'
 	
 	# For a discussion thread on images
+	# Lots of breaking changes going to v1.0.0 of MessageKit. I'm avoiding this for now.
 	pod 'MessageKit', '~> 0.13'
 
 	# Using my fork because of changes I made
@@ -43,7 +44,7 @@ target 'SharedImages' do
     pod 'rosterdev', '~> 0.1'
     
     # for badges for updates to discussion threads
-    pod 'BadgeSwift', '~> 5.0'
+    pod 'BadgeSwift', '~> 6.0'
     
     # Improved presentation of smaller modals
     pod 'Presentr', '~> 1.3'

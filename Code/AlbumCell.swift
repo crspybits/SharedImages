@@ -13,6 +13,10 @@ import SMCoreLib
 class AlbumCell: UIView, XibBasics {
     typealias ViewType = AlbumCell
     var tapAction:(()->())?
+    var saveAction:((_ newSharingGroupName: String)->())?
+    var startEditing:(()->())?
+    var endEditing:(()->())?
+
     @IBOutlet weak var albumName: UITextField!
     private var sharingGroup: SyncServer.SharingGroup!
     
@@ -33,6 +37,7 @@ class AlbumCell: UIView, XibBasics {
     
     func setup(sharingGroup: SyncServer.SharingGroup) {
         self.sharingGroup = sharingGroup
+        setAlbumName()
     }
     
     @IBAction func tapAction(_ sender: Any) {
@@ -47,13 +52,7 @@ class AlbumCell: UIView, XibBasics {
             newName = name
         }
         
-        do {
-            try SyncServer.session.updateSharingGroup(sharingGroupUUID: sharingGroup.sharingGroupUUID, newSharingGroupName: newName)
-            try SyncServer.session.sync(sharingGroupUUID: sharingGroup.sharingGroupUUID)
-        } catch (let error) {
-            Log.msg("\(error)")
-            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Could not change album name. Please try again later.")
-        }
+        saveAction?(newName)
     }
 
     @objc private func cancel() {
@@ -85,10 +84,12 @@ class AlbumCell: UIView, XibBasics {
 
 extension AlbumCell: UITextFieldDelegate {
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        startEditing?()
         return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        endEditing?()
     }
 }

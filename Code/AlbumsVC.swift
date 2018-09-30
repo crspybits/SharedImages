@@ -15,6 +15,12 @@ class AlbumsVC: UIViewController {
     let reuseIdentifier = "CollectionViewCell"
     let numberOfItemsPerRow = 2
     private var sharingGroups:[SyncServer.SharingGroup]!
+
+    // Sets up delegate for SyncServer also.
+    private var imagesHandler = ImagesHandler()
+    private var shouldLayoutSubviews = true
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    private var addAlbum:UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +32,75 @@ class AlbumsVC: UIViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
         sharingGroups = SyncServer.session.sharingGroups
+        sortSharingGroups()
+        imagesHandler.syncEventAction = syncEvent
+        
+        addAlbum = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbumAction))
+        navigationItem.rightBarButtonItem = addAlbum
+    }
+    
+    private func sortSharingGroups() {
+        sharingGroups.sort { sg1, sg2 in
+            if let name1 = sg1.sharingGroupName, let name2 = sg2.sharingGroupName {
+                return name1 < name2
+            }
+            return true
+        }
+    }
+    
+    @objc private func addAlbumAction() {
+        let newSharingGroupUUID = UUID().uuidString
+        do {
+            try SyncServer.session.createSharingGroup(sharingGroupUUID: newSharingGroupUUID)
+            try SyncServer.session.sync(sharingGroupUUID: newSharingGroupUUID)
+        } catch (let error) {
+            Log.msg("\(error)")
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not add album. Please try again later.")
+        }
+    }
+    
+    private func syncEvent(event: SyncControllerEvent) {
+        switch event {
+        case .syncDelayed:
+            activityIndicator.stopAnimating()
+        case .syncDone(numberOperations: _):
+            activityIndicator.stopAnimating()
+            sharingGroups = SyncServer.session.sharingGroups
+            sortSharingGroups()
+            
+            // Can't seem to do this with `performBatchUpdates` to get animations. It crashes.
+            collectionView.reloadData()
+        case .syncError(message: _):
+            activityIndicator.stopAnimating()
+        case .syncStarted:
+            activityIndicator.startAnimating()
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if shouldLayoutSubviews {
+            shouldLayoutSubviews = false
+            layoutSubviews()
+        }
+    }
+    
+    private func layoutSubviews() {
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+    
+    private func saveNewSharingGroupName(sharingGroupUUID: String, newName: String) {
+        do {
+            try SyncServer.session.updateSharingGroup(sharingGroupUUID: sharingGroupUUID, newSharingGroupName: newName)
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
+        } catch (let error) {
+            Log.msg("\(error)")
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not change album name. Please try again later.")
+        }
     }
 }
 
@@ -63,7 +138,16 @@ extension AlbumsVC : UICollectionViewDataSource {
         albumCell.tapAction = {
             Log.msg("Tap!")
         }
-
+        albumCell.saveAction = { newName in
+            self.saveNewSharingGroupName(sharingGroupUUID: sharingGroup.sharingGroupUUID, newName: newName)
+        }
+        albumCell.startEditing = {
+            self.addAlbum.isEnabled = false
+        }
+        albumCell.endEditing = {
+            self.addAlbum.isEnabled = true
+        }
+        
         return cell
     }
 }

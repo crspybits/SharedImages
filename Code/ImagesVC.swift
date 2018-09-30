@@ -14,15 +14,15 @@ import LottiesBottom
 import SyncServer_Shared
 
 class ImagesVC: UIViewController {
-    // TODO: Need to provide this!!
+    // TODO: Need to provide these!!
     var sharingGroupUUID: String!
+    var imagesHandler: ImagesHandler!
     
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
     var addImageBarButton:UIBarButtonItem!
     var actionButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
-    var syncController = SyncController()
     
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
     var refreshControl:ODRefreshControl!
@@ -46,6 +46,10 @@ class ImagesVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        imagesHandler.syncEventAction = syncEvent
+        imagesHandler.completedAddingLocalImagesAction = completedAddingLocalImages
+        
         collectionView.dataSource = self
         collectionView.delegate = self
 
@@ -53,7 +57,6 @@ class ImagesVC: UIViewController {
         acquireImage.delegate = self
         
         coreDataSource = CoreDataSource(delegate: self)
-        syncController.delegate = self
         
         // To manually refresh-- pull down on collection view.
         refreshControl = ODRefreshControl(in: collectionView)
@@ -99,11 +102,16 @@ class ImagesVC: UIViewController {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: {
             do {
-                try self.syncController.sync(sharingGroupUUID: self.sharingGroupUUID)
+                try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroupUUID)
             } catch (let error) {
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
             }
         })
+    }
+    
+    deinit {
+        imagesHandler.syncEventAction = nil
+        imagesHandler.completedAddingLocalImagesAction = nil
     }
     
     private func setupRightBarButtonItems() {
@@ -134,7 +142,7 @@ class ImagesVC: UIViewController {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
         
         // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
-        if !syncController.remove(images: images, sharingGroupUUID: sharingGroupUUID) {
+        if !imagesHandler.syncController.remove(images: images, sharingGroupUUID: sharingGroupUUID) {
             var message = "Image"
             if images.count > 1 {
                 message += "s"
@@ -281,7 +289,7 @@ class ImagesVC: UIViewController {
         self.refreshControl.endRefreshing()
         
         do {
-            try syncController.sync(sharingGroupUUID: sharingGroupUUID)
+            try imagesHandler.syncController.sync(sharingGroupUUID: sharingGroupUUID)
         } catch (let error) {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
         }
@@ -295,160 +303,6 @@ class ImagesVC: UIViewController {
     
     @objc func addImageAction() {
         self.acquireImage.showAlert(fromBarButton: addImageBarButton)
-    }
-    
-    @discardableResult
-    func addLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
-        var newImage:Image!
-        
-        if newImageData.file.fileUUID == nil {
-            // We're creating a new image at the user's request.
-            newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? Image
-        }
-        else {
-            newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? Image
-            newImage.uuid = newImageData.file.fileUUID
-        }
-
-        newImage.url = newImageData.file.url
-        newImage.mimeType = newImageData.file.mimeType.rawValue
-        newImage.title = newImageData.title
-        newImage.discussionUUID = newImageData.discussionUUID
-        newImage.fileGroupUUID = fileGroupUUID
-        newImage.sharingGroupUUID = newImageData.file.sharingGroupUUID
-        
-        let imageFileName = newImageData.file.url.lastPathComponent
-        let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
-        newImage.originalHeight = Float(size.height)
-        newImage.originalWidth = Float(size.width)
-        
-        // Lookup the Discussion and connect it if we have it.
-        
-        var discussion:Discussion?
-        
-        if let discussionUUID = newImageData.discussionUUID {
-            discussion = Discussion.fetchObjectWithUUID(discussionUUID)
-        }
-        
-        if discussion == nil, let fileGroupUUID = newImageData.fileGroupUUID {
-            discussion = Discussion.fetchObjectWithFileGroupUUID(fileGroupUUID)
-        }
-        
-        newImage.discussion = discussion
-        
-        if discussion != nil {
-            // 4/17/18; If that discussion has the image title, get that too.
-            if newImageData.title == nil {
-                if let url = discussion!.url,
-                    let fixedObjects = FixedObjects(withFile: url as URL) {
-                    newImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
-                }
-                else {
-                    Log.error("Could not load discussion!")
-                }
-            }
-        }
-
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        
-        return newImage
-    }
-    
-    enum AddToDiscussion {
-        case newLocalDiscussion
-        case fromServer
-    }
-    
-    // Three cases: 1) new discussion added locally (uuid of the FileData will be nil), 2) update to existing local discussion (with data from server), and 3) new discussion from server.
-    @discardableResult
-    func addToLocalDiscussion(discussionData: FileData, type: AddToDiscussion, fileGroupUUID: String?) -> Discussion {
-        var localDiscussion: Discussion!
-        var imageTitle: String?
-        
-        switch type {
-        case .newLocalDiscussion:
-            // 1)
-            localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
-            localDiscussion.uuid = discussionData.fileUUID
-            localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
-
-        case .fromServer:
-            if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(discussionData.fileUUID!) {
-                // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
-                
-                localDiscussion = existingLocalDiscussion
-                
-                // Since we didn't have a conflict, `newFixedObjects` will be a superset of the existing objects.
-                if let newFixedObjects = FixedObjects(withFile: discussionData.url as URL),
-                    let existingDiscussionURL = existingLocalDiscussion.url,
-                    let oldFixedObjects = FixedObjects(withFile: existingDiscussionURL as URL) {
-                    
-                    // We still want to know how many new messages there are.
-                    let (_, newCount) = oldFixedObjects.merge(with: newFixedObjects)
-                    // Use `+=1` here because there may already be unread messages.
-                    existingLocalDiscussion.unreadCount += Int32(newCount)
-                    
-                    // Remove the existing discussion file
-                    do {
-                        try FileManager.default.removeItem(at: existingDiscussionURL as URL)
-                    } catch (let error) {
-                        Log.error("Error removing old discussion file: \(error)")
-                    }
-                    
-                    imageTitle = newFixedObjects[DiscussionKeys.imageTitleKey] as? String
-                }
-            }
-            else {
-                // 3) New discussion downloaded from server.
-                localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
-                localDiscussion.uuid = discussionData.fileUUID
-                localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
-                
-                // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
-                if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
-                    localDiscussion.unreadCount = Int32(fixedObjects.count)
-                    imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
-                }
-                else {
-                    Log.error("Could not load discussion!")
-                }
-            }
-        }
-        
-        localDiscussion.mimeType = discussionData.mimeType.rawValue
-        localDiscussion.url = discussionData.url
-        localDiscussion.fileGroupUUID = fileGroupUUID
-
-        // Look up and connect the Image if we have one.
-        var image:Image?
-        
-        // The two means of getting the image reflect different strategies for doing this over time in SharedImages/SyncServer development.
-        
-        // See if the image has an asssociated discussionUUID
-        image = Image.fetchObjectWithDiscussionUUID(localDiscussion.uuid!)
-
-        // If not, see if a fileGroupUUID connects the discussion and image.
-        if image == nil, let fileGroupUUID = localDiscussion.fileGroupUUID {
-            image = Image.fetchObjectWithFileGroupUUID(fileGroupUUID)
-        }
-        
-        if image != nil {
-            localDiscussion.image = image
-            
-            // 4/17/18; If this discussion has the image title, set the image title from that.
-            if let imageTitle = imageTitle {
-                image!.title = imageTitle
-            }
-        }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        UnreadCountBadge.update()
-        
-        return localDiscussion
-    }
-    
-    func removeLocalImages(uuids:[String]) {
-        ImageExtras.removeLocalImages(uuids:uuids)
     }
     
     private func createEmptyDiscussion(image:Image, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
@@ -478,7 +332,7 @@ extension ImagesVC : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
         largeImages.startItem = indexPath.item
-        largeImages.syncController = syncController
+        largeImages.imagesHandler = imagesHandler
         navigatedToLargeImages = true
         navigationController!.pushViewController(largeImages, animated: true)
     }
@@ -503,7 +357,7 @@ extension ImagesVC : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
         let imageObj = self.coreDataSource.object(at: indexPath) as! Image
-        cell.setProperties(image: imageObj, syncController: syncController, cache: imageCache)
+        cell.setProperties(image: imageObj, syncController: imagesHandler.syncController, cache: imageCache)
         
         showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
 
@@ -540,20 +394,20 @@ extension ImagesVC : SMAcquireImageDelegate {
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
-        let newImage = addLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
+        let newImage = imagesHandler.addLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
         newImage.sharingGroupUUID = sharingGroupUUID
         
         guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroupUUID, imageTitle: userName) else {
             return
         }
         
-        let newDiscussion = addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
+        let newDiscussion = imagesHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
         newDiscussion.sharingGroupUUID = sharingGroupUUID
         
         scrollIfNeeded(animated:true)
         
         // Sync this new image & discussion with the server.
-        syncController.add(image: newImage, discussion: newDiscussion)
+        imagesHandler.syncController.add(image: newImage, discussion: newDiscussion)
     }
 }
 
@@ -605,32 +459,8 @@ extension ImagesVC : CoreDataSourceDelegate {
     }
 }
 
-extension ImagesVC : SyncControllerDelegate {
-    func addLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes) {
-        // We're making an image for which there is already a UUID on the server.
-        addLocalImage(newImageData: imageData, fileGroupUUID: attr.fileGroupUUID)
-    }
-    
-    func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes) {
-        addToLocalDiscussion(discussionData: discussionData, type: .fromServer, fileGroupUUID: attr.fileGroupUUID)
-    }
-    
-    func updateUploadedImageDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
-        // We provided the content for the image, but the server establishes its date of creation. So, update our local image date/time with the creation date from the server.
-        if let image = Image.fetchObjectWithUUID(uuid) {
-            image.creationDate = creationDate as NSDate
-            image.save()
-        }
-        else {
-            Log.error("Could not find image for UUID: \(uuid)")
-        }
-    }
-
-    func removeLocalImages(syncController: SyncController, uuids: [String]) {
-        removeLocalImages(uuids: uuids)
-    }
-    
-    func syncEvent(syncController:SyncController, event:SyncControllerEvent) {
+extension ImagesVC /* ImagesHandler */ {
+    func syncEvent(event:SyncControllerEvent) {
         switch event {
         case .syncDelayed:
             // Trying to deal with https://github.com/crspybits/SharedImages/issues/126
@@ -670,30 +500,8 @@ extension ImagesVC : SyncControllerDelegate {
         }
     }
     
-    func completedAddingLocalImages(syncController:SyncController) {
+    func completedAddingLocalImages() {
         scrollIfNeeded(animated: true)
-    }
-    
-    func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
-        guard let discussion = Discussion.fetchObjectWithUUID(attr.fileUUID) else {
-            Log.error("Cannot find discussion for attempted image re-upload.")
-            return
-        }
-        
-        guard let image = discussion.image, let imageURL = image.url, let imageUUID = image.uuid else {
-            Log.error("Cannot find image for attempted image re-upload.")
-            return
-        }
-        
-        let attr = SyncAttributes(fileUUID: imageUUID, sharingGroupUUID: sharingGroupUUID, mimeType: .jpeg)
-        do {
-            try SyncServer.session.uploadImmutable(localFile: imageURL, withAttributes: attr)
-            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
-        }
-        catch (let error) {
-            Log.error("Could not do uploadImmutable for image re-upload: \(error)")
-            return
-        }
     }
 }
 

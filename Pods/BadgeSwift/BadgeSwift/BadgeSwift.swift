@@ -4,7 +4,7 @@ import UIKit
  
  Badge view control for iOS and tvOS.
  
- Project home: https://github.com/marketplacer/swift-badge
+ Project home: https://github.com/evgenyneu/swift-badge
  
  */
 @IBDesignable open class BadgeSwift: UILabel {
@@ -131,7 +131,7 @@ import UIKit
       bottom: insetsWithBorder.height,
       right: insetsWithBorder.width)
     
-    let rectWithoutInsets = UIEdgeInsetsInsetRect(rect, insets)
+    let rectWithoutInsets = rect.inset(by: insets)
     
     super.drawText(in: rectWithoutInsets)
   }

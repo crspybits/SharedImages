@@ -541,18 +541,28 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="kBd-pl-DuW">
+                                <rect key="frame" x="172.5" y="262" width="30" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="M0I-On-dza"/>
+                                    <constraint firstAttribute="height" constant="30" id="nGg-bc-6Id"/>
+                                </constraints>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="kBd-pl-DuW" firstAttribute="centerY" secondItem="K1r-1j-4rA" secondAttribute="centerY" id="8WK-Yv-6sL"/>
                             <constraint firstItem="d60-bl-9ut" firstAttribute="top" secondItem="ksA-ch-QSI" secondAttribute="bottom" id="DrF-Gi-Rc9"/>
                             <constraint firstItem="ksA-ch-QSI" firstAttribute="leading" secondItem="K1r-1j-4rA" secondAttribute="leading" id="bV7-Rg-zMo"/>
                             <constraint firstItem="ksA-ch-QSI" firstAttribute="top" secondItem="Q1V-oZ-d0p" secondAttribute="bottom" id="tMD-6a-bAa"/>
+                            <constraint firstItem="kBd-pl-DuW" firstAttribute="centerX" secondItem="K1r-1j-4rA" secondAttribute="centerX" id="tYb-bN-jRH"/>
                             <constraint firstAttribute="trailing" secondItem="ksA-ch-QSI" secondAttribute="trailing" id="x8j-eP-F0N"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Albums" image="albums" id="ByY-n9-D1v"/>
                     <navigationItem key="navigationItem" id="z1F-nc-F9C"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="kBd-pl-DuW" id="2Yd-20-MCZ"/>
                         <outlet property="collectionView" destination="ksA-ch-QSI" id="gHu-En-0Ei"/>
                     </connections>
                 </viewController>
