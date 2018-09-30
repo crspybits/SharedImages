@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="AlbumCell" customModule="SharedImages" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="201" height="169"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HXN-Ws-zUd">
+                    <rect key="frame" x="0.0" y="0.0" width="201" height="139"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jso-OR-DWd">
+                    <rect key="frame" x="0.0" y="0.0" width="201" height="144"/>
+                    <connections>
+                        <action selector="tapAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="tHm-AL-Nh8"/>
+                    </connections>
+                </button>
+                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" text="Album" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="nyd-vk-Npg">
+                    <rect key="frame" x="10" y="144" width="181" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="epg-XC-Z05"/>
+                    </constraints>
+                    <nil key="textColor"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textField>
+            </subviews>
+            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="nyd-vk-Npg" secondAttribute="bottom" constant="5" id="3Oq-zW-eQr"/>
+                <constraint firstItem="HXN-Ws-zUd" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="499-6h-Vfz"/>
+                <constraint firstItem="Jso-OR-DWd" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="4jr-MB-d5G"/>
+                <constraint firstItem="Jso-OR-DWd" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="76l-X6-3xu"/>
+                <constraint firstItem="HXN-Ws-zUd" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="Buq-pj-SrC"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="nyd-vk-Npg" secondAttribute="trailing" constant="10" id="CL2-rI-sag"/>
+                <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="HXN-Ws-zUd" secondAttribute="bottom" constant="5" id="COj-o5-EJE"/>
+                <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="Jso-OR-DWd" secondAttribute="bottom" id="FYu-KV-9TJ"/>
+                <constraint firstItem="Jso-OR-DWd" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="JM8-va-sRJ"/>
+                <constraint firstItem="nyd-vk-Npg" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="a3m-et-QC8"/>
+                <constraint firstItem="HXN-Ws-zUd" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="p44-UB-2LV"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="albumName" destination="nyd-vk-Npg" id="396-BD-zeW"/>
+            </connections>
+            <point key="canvasLocation" x="-66.400000000000006" y="-92.203898050974516"/>
+        </view>
+    </objects>
+</document>

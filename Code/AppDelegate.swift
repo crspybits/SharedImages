@@ -35,6 +35,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         let plist = try! PlistDictLoader(plistFileNameInBundle: Consts.serverPlistFile)
         
+        Environment.setup()
+        
         var serverURL:URL
         var cloudFolderName:String
         
@@ -49,6 +51,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let urlString = try! plist.getString(varName: "StagingServerURL")
             serverURL = URL(string: urlString)!
             cloudFolderName = try! plist.getString(varName: "StagingCloudFolderName")
+            
+        case .local:
+            let urlString = try! plist.getString(varName: "LocalServerURL")
+            serverURL = URL(string: urlString)!
+            cloudFolderName = try! plist.getString(varName: "LocalCloudFolderName")
         }
         
         // Call this as soon as possible in your launch sequence.

@@ -14,9 +14,9 @@ class TabControllerDelegate : NSObject, UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
 
         // Only allow a transition to the Images screen if the user is signed in.
-        if viewController.restorationIdentifier == "ImagesNavController" {
-            return SignInManager.session.userIsSignedIn
-        }
+//        if viewController.restorationIdentifier == "ImagesNavController" {
+//            return SignInManager.session.userIsSignedIn
+//        }
         
         return true
     }

@@ -14,6 +14,7 @@ import SMCoreLib
 enum EnvironmentServer : String {
     case production
     case staging
+    case local
 }
 
 struct Environment {
@@ -26,6 +27,10 @@ struct Environment {
         get {
             return EnvironmentServer(rawValue: rawEnvironmentServer.stringValue)!
         }
+    }
+    
+    static func setup() {
+        current = .local
     }
 }
 

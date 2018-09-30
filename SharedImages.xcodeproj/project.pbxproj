@@ -55,6 +55,9 @@
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
 		83E13B2520318366005A0A18 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E13B2420318366005A0A18 /* GameKit.framework */; };
 		83E13B272031836A005A0A18 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E13B262031836A005A0A18 /* StoreKit.framework */; };
+		83E51880215FEDF4005C2374 /* AlbumsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E5187F215FEDF4005C2374 /* AlbumsVC.swift */; };
+		83E51882215FFD7F005C2374 /* AlbumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E51881215FFD7E005C2374 /* AlbumCell.swift */; };
+		83E51884215FFD92005C2374 /* AlbumCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83E51883215FFD92005C2374 /* AlbumCell.xib */; };
 		83EACE772087083000C40AA3 /* DiscussionKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EACE762087083000C40AA3 /* DiscussionKeys.swift */; };
 		83F882451E711FC6008F644A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823D1E711FC6008F644A /* Assets.xcassets */; };
 		83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */; };
@@ -140,6 +143,9 @@
 		83E13B2420318366005A0A18 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		83E13B262031836A005A0A18 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		83E4F9A31EFA194A006BE0F0 /* SharedImages.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SharedImages.entitlements; sourceTree = "<group>"; };
+		83E5187F215FEDF4005C2374 /* AlbumsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsVC.swift; sourceTree = "<group>"; };
+		83E51881215FFD7E005C2374 /* AlbumCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCell.swift; sourceTree = "<group>"; };
+		83E51883215FFD92005C2374 /* AlbumCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumCell.xib; sourceTree = "<group>"; };
 		83EACE762087083000C40AA3 /* DiscussionKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscussionKeys.swift; sourceTree = "<group>"; };
 		83F8821F1E711600008F644A /* SharedImages.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedImages.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83F8823D1E711FC6008F644A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
@@ -244,6 +250,7 @@
 				83D0BE1920B37D0D00555B73 /* Sorting and Filtering */,
 				83FAF3A01F45549E0009111B /* Sharing Activity */,
 				83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */,
+				83E5188521600334005C2374 /* Albums */,
 				83F8824C1E712004008F644A /* ImagesVC.swift */,
 				83D1FE331EAB074A00DD468F /* LargeImages.swift */,
 				83F8824F1E73A6F6008F644A /* ImageCollectionVC.swift */,
@@ -339,6 +346,16 @@
 				83D49C971F49468200409B0F /* SettingsVC.swift */,
 			);
 			name = Settings;
+			sourceTree = "<group>";
+		};
+		83E5188521600334005C2374 /* Albums */ = {
+			isa = PBXGroup;
+			children = (
+				83E5187F215FEDF4005C2374 /* AlbumsVC.swift */,
+				83E51881215FFD7E005C2374 /* AlbumCell.swift */,
+				83E51883215FFD92005C2374 /* AlbumCell.xib */,
+			);
+			name = Albums;
 			sourceTree = "<group>";
 		};
 		83F882161E711600008F644A = {
@@ -537,6 +554,7 @@
 				83A2E6AE1F76F84500A2E303 /* R.json in Resources */,
 				83A2E6AD1F76F84500A2E303 /* N.json in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
+				83E51884215FFD92005C2374 /* AlbumCell.xib in Resources */,
 				83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
@@ -698,6 +716,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
+				83E51880215FEDF4005C2374 /* AlbumsVC.swift in Sources */,
 				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
 				834A7E802037858800969B18 /* Types.swift in Sources */,
 				837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */,
@@ -727,6 +746,7 @@
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,
 				83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
+				83E51882215FFD7F005C2374 /* AlbumCell.swift in Sources */,
 				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
 				834A7E792037858800969B18 /* Alert.swift in Sources */,

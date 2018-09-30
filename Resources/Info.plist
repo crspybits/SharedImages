@@ -77,6 +77,8 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>syncserver.cprince.com</key>
