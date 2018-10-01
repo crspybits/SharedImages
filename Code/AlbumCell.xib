@@ -16,7 +16,7 @@
             <rect key="frame" x="0.0" y="0.0" width="201" height="169"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HXN-Ws-zUd">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HXN-Ws-zUd">
                     <rect key="frame" x="0.0" y="0.0" width="201" height="139"/>
                 </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jso-OR-DWd">
@@ -53,6 +53,7 @@
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="albumName" destination="nyd-vk-Npg" id="396-BD-zeW"/>
+                <outlet property="image" destination="HXN-Ws-zUd" id="XyY-8F-m6V"/>
             </connections>
             <point key="canvasLocation" x="-66.400000000000006" y="-92.203898050974516"/>
         </view>

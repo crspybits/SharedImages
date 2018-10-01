@@ -20,6 +20,7 @@ public class Image: NSManagedObject {
     static let DISCUSSION_UUID_KEY = "discussionUUID"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     static let UNREAD_COUNT = "discussion.unreadCount"
+    static let SHARING_GROUP_UUID = "sharingGroupUUID"
     
     public var sharingGroupId: Int64? {
         get {
@@ -93,6 +94,7 @@ public class Image: NSManagedObject {
         let sortingOrder: Parameters.SortOrder
         let isAscending: Bool
         let unreadCounts: Parameters.UnreadCounts
+        let sharingGroupUUID: String
     }
     
     class func fetchRequestForAllObjects(params:SortFilterParams) -> NSFetchRequest<NSFetchRequestResult>? {
@@ -108,6 +110,8 @@ public class Image: NSManagedObject {
             case .unread:
                 subpredicates += [NSPredicate(format: "(%K > 0)", UNREAD_COUNT)]
             }
+            
+            subpredicates += [NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID, params.sharingGroupUUID)]
             
             if subpredicates.count > 0 {
                 let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subpredicates)
@@ -127,6 +131,21 @@ public class Image: NSManagedObject {
         }
         
         return fetchRequest
+    }
+    
+    class func fetchObjectsWithSharingGroupUUID(_ sharingGroupUUID:String) -> [Image]? {
+        var result:[Image]?
+        do {
+            result = try CoreData.sessionNamed(CoreDataExtras.sessionName).fetchObjects(withEntityName: self.entityName(), modifyingFetchRequestWith: { fetchRequest in
+                fetchRequest.predicate = NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID, sharingGroupUUID)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: CREATION_DATE_KEY, ascending: true)]
+            }) as? [Image]
+        } catch (let error) {
+            Log.error("\(error)")
+            return nil
+        }
+
+        return result
     }
     
     class func fetchObjectWithUUID(_ uuid:String) -> Image? {

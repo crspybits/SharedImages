@@ -21,6 +21,8 @@ class AlbumsVC: UIViewController {
     private var shouldLayoutSubviews = true
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     private var addAlbum:UIBarButtonItem!
+    @IBOutlet weak var collectionViewBottom: NSLayoutConstraint!
+    private var originalCollectionViewBottom: CGFloat!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,14 +33,39 @@ class AlbumsVC: UIViewController {
         collectionView.collectionViewLayout = layout
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
-        sharingGroups = SyncServer.session.sharingGroups
-        sortSharingGroups()
-        imagesHandler.syncEventAction = syncEvent
-        
         addAlbum = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbumAction))
         navigationItem.rightBarButtonItem = addAlbum
+        
+        originalCollectionViewBottom = collectionViewBottom.constant
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardChangeFrameAction), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
+    @objc private func keyboardChangeFrameAction(notification:NSNotification) {
+        guard let windowView = view.window else {
+            return
+        }
+        
+        let kbFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as! CGRect
+        let kbWindowIntersectionFrame = windowView.bounds.intersection(kbFrame)
+        let showingKeyboard = windowView.bounds.intersects(kbFrame)
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as! Double
+        
+        if showingKeyboard && originalCollectionViewBottom == collectionViewBottom.constant || !showingKeyboard {
+            // If the bottom of the scroll view will be above the keyboard, then we don't need this adjustment. This can happen in certain rotations on iPad.
+            // Need to figure out the bottom coordinates of the scrollView in terms of the view.
+            let convertedScrollViewOrigin = collectionView.superview!.convert(collectionView.frame.origin, to: view.window!)
+            let convertedScrollViewBottom = convertedScrollViewOrigin.y + collectionView.frame.height
+            let distanceFromBottomForScrollView = windowView.bounds.height - convertedScrollViewBottom
+            
+            let adjustedIntersectionHeight = max(kbWindowIntersectionFrame.size.height - distanceFromBottomForScrollView, 0)
+            collectionViewBottom.constant = adjustedIntersectionHeight
+            
+            UIView.animate(withDuration: duration) {
+                self.collectionView.superview!.layoutIfNeeded()
+            }
+        }
+    }
+
     private func sortSharingGroups() {
         sharingGroups.sort { sg1, sg2 in
             if let name1 = sg1.sharingGroupName, let name2 = sg2.sharingGroupName {
@@ -79,6 +106,17 @@ class AlbumsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        // Put these here because the ImagesVC changes them.
+        imagesHandler.syncEventAction = syncEvent
+        imagesHandler.completedAddingLocalImagesAction = nil
+        
+        // Putting this in `viewWillAppear` to deal with the first time the Albums are displayed and to deal with removal of an album in ImagesVC.
+        sharingGroups = SyncServer.session.sharingGroups
+        sortSharingGroups()
+        
+        // For removal, and for adding an image to an empty album
+        collectionView.reloadData()
         
         if shouldLayoutSubviews {
             shouldLayoutSubviews = false
@@ -135,8 +173,11 @@ extension AlbumsVC : UICollectionViewDataSource {
         }
 
         albumCell.setup(sharingGroup: sharingGroup)
-        albumCell.tapAction = {
-            Log.msg("Tap!")
+        albumCell.tapAction = { [unowned self] in
+            let vc = ImagesVC.create()
+            vc.sharingGroup = sharingGroup
+            vc.imagesHandler = self.imagesHandler
+            self.navigationController?.pushViewController(vc, animated: true)
         }
         albumCell.saveAction = { newName in
             self.saveNewSharingGroupName(sharingGroupUUID: sharingGroup.sharingGroupUUID, newName: newName)

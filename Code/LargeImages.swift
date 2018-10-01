@@ -8,13 +8,15 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer
 
 // http://stackoverflow.com/questions/18087073/start-uicollectionview-at-a-specific-indexpath
 
 class LargeImages : UIViewController {
-    // Set these two when creating an instance of this class.
+    // Set these when creating an instance of this class.
     var startItem: Int = 0
     weak var imagesHandler:ImagesHandler?
+    var sharingGroup: SyncServer.SharingGroup!
     
     private var seekToIndexPath:IndexPath?
     let IMAGE_WIDTH_PADDING:CGFloat = 20.0
@@ -154,7 +156,7 @@ class LargeImages : UIViewController {
 extension LargeImages : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts)
+        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID)
         return Image.fetchRequestForAllObjects(params: params)
     }
     

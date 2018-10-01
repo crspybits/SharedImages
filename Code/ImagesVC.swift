@@ -12,16 +12,15 @@ import SyncServer
 import ODRefreshControl
 import LottiesBottom
 import SyncServer_Shared
+import DropDown
 
 class ImagesVC: UIViewController {
-    // TODO: Need to provide these!!
-    var sharingGroupUUID: String!
+    var sharingGroup: SyncServer.SharingGroup!
     var imagesHandler: ImagesHandler!
     
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
-    var addImageBarButton:UIBarButtonItem!
-    var actionButton:UIBarButtonItem!
+    var otherActionBarButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
     
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
@@ -43,6 +42,12 @@ class ImagesVC: UIViewController {
     
     private var deletedImages:[IndexPath]?
     private var noDownloadImageView:UIImageView!
+    private let otherActions = DropDown()
+    private var dropDownMenuItems:[DropDownMenuItem]!
+    
+    static func create() -> ImagesVC {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ImagesVC") as! ImagesVC
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,7 +82,7 @@ class ImagesVC: UIViewController {
         
         // A label and a means to do a consistency check.
         let titleLabel = UILabel()
-        titleLabel.text = "Images"
+        titleLabel.text = sharingGroup.sharingGroupName ?? "Album Images"
         titleLabel.sizeToFit()
         navigationItem.titleView = titleLabel
         let lp = UILongPressGestureRecognizer(target: self, action: #selector(consistencyCheckAction(gesture:)))
@@ -85,33 +90,116 @@ class ImagesVC: UIViewController {
         titleLabel.isUserInteractionEnabled = true
         
         // Right nav button
-        addImageBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addImageAction))
-        setAddButtonState()
+        let otherActionButton = UIButton(type: .system)
+        otherActionButton.setImage(#imageLiteral(resourceName: "otherDetails"), for: .normal)
+        otherActionButton.addTarget(self, action: #selector(otherActionButtonAction), for: .touchUpInside)
+        otherActionBarButton = UIBarButtonItem(customView: otherActionButton)
+        setupDropdown(anchorView: otherActionButton)
+        
         setupRightBarButtonItems()
         
-        // For sharing images via email, text messages, and for deleting images.
-        actionButton = UIBarButtonItem(image: #imageLiteral(resourceName: "Action"), style: .plain, target: self, action: #selector(actionButtonAction))
+        let backButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back"), style: .plain, target: self, action: #selector(backAction))
         
         let noDownloadImage = #imageLiteral(resourceName: "noDownloads").withRenderingMode(.alwaysTemplate)
         noDownloadImageView = UIImageView(image: noDownloadImage)
+        
         let noDownloadsButton = UIBarButtonItem(customView: noDownloadImageView)
-        navigationItem.leftBarButtonItems = [actionButton, noDownloadsButton]
+        navigationItem.leftBarButtonItems = [backButton, noDownloadsButton]
         noDownloadImageView.alpha = 0
         noDownloadImageView.tintColor = .lightGray
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: {
+        bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: { [unowned self] in
             do {
-                try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroupUUID)
+                try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
             } catch (let error) {
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
             }
         })
     }
     
-    deinit {
-        imagesHandler.syncEventAction = nil
-        imagesHandler.completedAddingLocalImagesAction = nil
+    @objc private func otherActionButtonAction() {
+        otherActions.clearSelection()
+        otherActions.show()
+    }
+    
+    private struct DropDownMenuItem {
+        let name: String
+        let action: (()->())
+    }
+    
+    private func setupDropdown(anchorView: UIButton) {
+        otherActions.anchorView = anchorView
+        otherActions.dismissMode = .automatic
+        otherActions.direction = .any
+        
+        dropDownMenuItems = []
+
+        switch SignInVC.sharingPermission {
+        case .some(.admin), .some(.write), .none: // .none means this is not a sharing user.
+            dropDownMenuItems += [DropDownMenuItem(name: "Add Image", action: {
+                self.acquireImage.showAlert(fromBarButton: self.otherActionBarButton)
+            })]
+        case .some(.read):
+            // Can't add images.
+            break
+        }
+        
+        switch SignInVC.sharingPermission {
+        case .some(.admin), .none:
+            dropDownMenuItems += [
+                DropDownMenuItem(name: "Share", action: {[unowned self] in
+                    self.shareAction()
+                })
+            ]
+        default:
+            break
+        }
+        
+        dropDownMenuItems += [
+            DropDownMenuItem(name: "Other Actions", action: {[unowned self] in
+                self.actionButtonAction()
+            }),
+            DropDownMenuItem(name: "Remove album", action: {[unowned self] in
+                self.removeUserFromAlbum()
+            })
+        ]
+        
+        otherActions.selectionAction = { [unowned self] (index, item) in
+            if index < self.dropDownMenuItems.count {
+                let action = self.dropDownMenuItems[index].action
+                action()
+            }
+            
+            self.otherActions.hide()
+        }
+
+        let menuNames = dropDownMenuItems.map {$0.name}
+        otherActions.dataSource = menuNames
+    }
+    
+    private func removeUserFromAlbum() {
+        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove the current album?", message: "This will permanently remove the album from the SharedImages app on your device. If images have been stored in your cloud storage, they will not be removed from your cloud storage.", allowCancel: true, okCompletion: {
+        
+            // TODO: Don't have any kind of spinner for this yet...
+            
+            do {
+                try SyncServer.session.removeFromSharingGroup(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
+                try SyncServer.session.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
+            } catch (let error) {
+                Log.error("\(error)")
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not remove the current album! Please try again later.")
+                return
+            }
+            
+            // TODO: Really would like a callback to positively indicate that removal was completed before returning.
+            // TODO: Also: What about removing references/files to the images/discussions?
+            self.navigationController?.popViewController(animated: true)
+        })
+    }
+    
+    @objc private func backAction() {
+        navigationController?.popViewController(animated: true)
     }
     
     private func setupRightBarButtonItems() {
@@ -131,7 +219,7 @@ class ImagesVC: UIViewController {
             sortFilter.tintColor = .lightGray
         }
         
-        navigationItem.rightBarButtonItems = [addImageBarButton!, sortFilter]
+        navigationItem.rightBarButtonItems = [otherActionBarButton!, sortFilter]
     }
     
     @objc private func sortFilterAction() {
@@ -142,7 +230,7 @@ class ImagesVC: UIViewController {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
         
         // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
-        if !imagesHandler.syncController.remove(images: images, sharingGroupUUID: sharingGroupUUID) {
+        if !imagesHandler.syncController.remove(images: images, sharingGroupUUID: sharingGroup.sharingGroupUUID) {
             var message = "Image"
             if images.count > 1 {
                 message += "s"
@@ -252,7 +340,6 @@ class ImagesVC: UIViewController {
         }
 
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
-        setAddButtonState()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -260,16 +347,6 @@ class ImagesVC: UIViewController {
         
         // https://github.com/crspybits/SharedImages/issues/121 (a)
         bottomRefresh.hide()
-    }
-
-    func setAddButtonState() {
-        switch SignInVC.sharingPermission {
-        case .some(.admin), .some(.write), .none: // .none means this is not a sharing user.
-            addImageBarButton?.isEnabled = true
-            
-        case .some(.read):
-            addImageBarButton?.isEnabled = false
-        }
     }
     
     @objc private func consistencyCheckAction(gesture : UILongPressGestureRecognizer!) {
@@ -279,7 +356,7 @@ class ImagesVC: UIViewController {
         
         let uuids = Image.fetchAll().map { $0.uuid! }
         do {
-            try SyncServer.session.consistencyCheck(sharingGroupUUID: sharingGroupUUID, localFiles: uuids, repair: false) { error in }
+            try SyncServer.session.consistencyCheck(sharingGroupUUID: sharingGroup.sharingGroupUUID, localFiles: uuids, repair: false) { error in }
         } catch (let error) {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Problem in consistency check", message: "\(error)")
         }
@@ -289,7 +366,7 @@ class ImagesVC: UIViewController {
         self.refreshControl.endRefreshing()
         
         do {
-            try imagesHandler.syncController.sync(sharingGroupUUID: sharingGroupUUID)
+            try imagesHandler.syncController.sync(sharingGroupUUID: sharingGroup.sharingGroupUUID)
         } catch (let error) {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
         }
@@ -299,10 +376,6 @@ class ImagesVC: UIViewController {
     @objc private func spinnerTapGestureAction() {
         Log.msg("spinner tapped")
         refresh()
-    }
-    
-    @objc func addImageAction() {
-        self.acquireImage.showAlert(fromBarButton: addImageBarButton)
     }
     
     private func createEmptyDiscussion(image:Image, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
@@ -326,6 +399,65 @@ class ImagesVC: UIViewController {
         
         return FileData(url: newDiscussionFileURL, mimeType: .text, fileUUID: discussionUUID, sharingGroupUUID: sharingGroupUUID)
     }
+    
+    private func shareAction() {
+        var alert:UIAlertController
+        
+        if SignInManager.session.userIsSignedIn {
+            alert = UIAlertController(title: "Share album images with a Dropbox, Facebook, or Google user?", message: nil, preferredStyle: .actionSheet)
+
+            func addAlertAction(_ permission:Permission) {
+                alert.addAction(UIAlertAction(title: permission.userFriendlyText(), style: .default){alert in
+                    self.completeSharing(permission: permission)
+                })
+            }
+            
+            addAlertAction(.read)
+            addAlertAction(.write)
+            addAlertAction(.admin)
+
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel){alert in
+            })
+        }
+        else {
+            alert = UIAlertController(title: "Please sign in first!", message: "There is no signed in user.", preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel){alert in
+            })
+        }
+        
+        Alert.styleForIPad(alert)
+        alert.popoverPresentationController?.barButtonItem = otherActionBarButton
+        present(alert, animated: true, completion: nil)
+    }
+    
+    private func completeSharing(permission:Permission) {
+        SyncServerUser.session.createSharingInvitation(withPermission: permission, sharingGroupUUID: sharingGroup.sharingGroupUUID) { invitationCode, error in
+            if error == nil {
+                let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
+                if let email = SMEmail(parentViewController: self) {
+                    let message = "I'd like to share an album of images with you through the SharedImages app and your Dropbox, Facebook, or Google account. To share images, you need to:\n" +
+                        "1) download the SharedImages iOS app onto your iPhone or iPad,\n" +
+                        "2) tap the link below in the Apple Mail app, and\n" +
+                        "3) follow the instructions within the app to sign in to your Dropbox, Facebook, or Google account.\n" +
+                        "You will have " + permission.userFriendlyText() + " access to images.\n\n" +
+                            sharingURLString
+                    
+                    email.setMessageBody(message, isHTML: false)
+                    email.setSubject("Share images using the SharedImages app")
+                    email.show()
+                }
+            }
+            else {
+                let alert = UIAlertController(title: "Error creating sharing invitation!", message: "\(error!)", preferredStyle: .actionSheet)
+                alert.popoverPresentationController?.barButtonItem = self.otherActionBarButton
+                Alert.styleForIPad(alert)
+
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel) {alert in
+                })
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
 }
 
 extension ImagesVC : UICollectionViewDelegate {
@@ -333,6 +465,7 @@ extension ImagesVC : UICollectionViewDelegate {
         let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
         largeImages.startItem = indexPath.item
         largeImages.imagesHandler = imagesHandler
+        largeImages.sharingGroup = sharingGroup
         navigatedToLargeImages = true
         navigationController!.pushViewController(largeImages, animated: true)
     }
@@ -390,19 +523,19 @@ extension ImagesVC : SMAcquireImageDelegate {
             return
         }
         
-        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroupUUID)
+        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID)
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = imagesHandler.addLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
-        newImage.sharingGroupUUID = sharingGroupUUID
+        newImage.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
-        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroupUUID, imageTitle: userName) else {
+        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
             return
         }
         
         let newDiscussion = imagesHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
-        newDiscussion.sharingGroupUUID = sharingGroupUUID
+        newDiscussion.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
         scrollIfNeeded(animated:true)
         
@@ -414,7 +547,7 @@ extension ImagesVC : SMAcquireImageDelegate {
 extension ImagesVC : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts)
+        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID)
         return Image.fetchRequestForAllObjects(params: params)
     }
     
@@ -529,6 +662,7 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
 
 // MARK: Sharing and deletion activity.
 extension ImagesVC {
+    // For sharing images via email, text messages, and for deleting images.
     @objc fileprivate func actionButtonAction() {
         // Create an array containing both UIImage's and Image's. The UIActivityViewController will use the UIImage's. The TrashActivity will use the Image's.
         var images = [Any]()

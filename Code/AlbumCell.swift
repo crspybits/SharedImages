@@ -9,6 +9,7 @@
 import UIKit
 import SyncServer
 import SMCoreLib
+import BadgeSwift
 
 class AlbumCell: UIView, XibBasics {
     typealias ViewType = AlbumCell
@@ -16,7 +17,8 @@ class AlbumCell: UIView, XibBasics {
     var saveAction:((_ newSharingGroupName: String)->())?
     var startEditing:(()->())?
     var endEditing:(()->())?
-
+    @IBOutlet weak var image: UIImageView!
+    private let badge = BadgeSwift()
     @IBOutlet weak var albumName: UITextField!
     private var sharingGroup: SyncServer.SharingGroup!
     
@@ -38,6 +40,44 @@ class AlbumCell: UIView, XibBasics {
     func setup(sharingGroup: SyncServer.SharingGroup) {
         self.sharingGroup = sharingGroup
         setAlbumName()
+        
+        self.image.image = nil
+        badge.removeFromSuperview()
+        DispatchQueue.main.async {
+            if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
+                self.getImageForCell(images: images)
+                self.setUnreadCount(images: images)
+            }
+        }
+    }
+    
+    private func getImageForCell(images: [Image]) {
+        if let imageURL = images[0].url {
+            var image: UIImage!
+            do {
+                let imageData = try Data(contentsOf: imageURL as URL)
+                image = UIImage(data: imageData)
+            } catch {
+                print("Error loading image : \(error)")
+                return
+            }
+            
+            self.image.image = image
+        }
+    }
+    
+    private func setUnreadCount(images: [Image]) {
+        var unreadCount = 0
+        images.forEach { image in
+            if let discussion = image.discussion {
+                unreadCount += Int(discussion.unreadCount)
+            }
+        }
+        
+        if unreadCount > 0 {
+            badge.format(withUnreadCount: unreadCount)
+            image.addSubview(badge)
+        }
     }
     
     @IBAction func tapAction(_ sender: Any) {
@@ -85,11 +125,15 @@ class AlbumCell: UIView, XibBasics {
 extension AlbumCell: UITextFieldDelegate {
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         startEditing?()
+        albumName.borderStyle = .roundedRect
+        albumName.backgroundColor = .white
         return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        albumName.borderStyle = .none
+        albumName.backgroundColor = .clear
         endEditing?()
     }
 }

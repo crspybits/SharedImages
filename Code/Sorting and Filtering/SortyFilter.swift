@@ -67,7 +67,6 @@ class SortyFilter: UIViewController {
         segmentedControl.delegate = self
         sortingControls.addSubview(segmentedControl)
 
-
         onlyUnreadButton.setTitle(Parameters.unreadCounts.rawValue, for: .normal)
         
         setupDropdowns()

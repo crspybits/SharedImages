@@ -342,7 +342,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" reuseIdentifier="largeImage" id="jFk-xt-pcJ" customClass="ImageCollectionVC" customModule="SharedImages" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="79" width="375" height="446"/>
+                                        <rect key="frame" x="0.0" y="78.5" width="375" height="446"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="446"/>
@@ -564,6 +564,7 @@
                     <connections>
                         <outlet property="activityIndicator" destination="kBd-pl-DuW" id="2Yd-20-MCZ"/>
                         <outlet property="collectionView" destination="ksA-ch-QSI" id="gHu-En-0Ei"/>
+                        <outlet property="collectionViewBottom" destination="DrF-Gi-Rc9" id="zN7-uS-cMY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="onM-8V-SvV" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -590,7 +591,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Settings" width="32" height="32"/>
+        <image name="Settings" width="25.600000381469727" height="25.600000381469727"/>
         <image name="albums" width="35" height="30"/>
         <image name="lock" width="35" height="35"/>
     </resources>
