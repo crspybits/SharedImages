@@ -231,6 +231,7 @@ extension DiscussionVC: MessagesLayoutDelegate {
         }
     }
 
+    // The following two delegate methods fail with v1.0.0: See https://stackoverflow.com/questions/52583843/migration-to-1-0-0-messagekit-cocoapod-with-messageslayoutdelegate
     func cellTopLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
         if isFromCurrentSender(message: message) {
             return .messageTrailing(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10))
