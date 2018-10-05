@@ -18,7 +18,8 @@ class AlbumCell: UIView, XibBasics {
     var startEditing:(()->())?
     var endEditing:(()->())?
     @IBOutlet weak var image: UIImageView!
-    private let badge = BadgeSwift()
+    private let unreadCountBadge = BadgeSwift()
+    private let needsSyncBadge = BadgeSwift()
     @IBOutlet weak var albumName: UITextField!
     private var sharingGroup: SyncServer.SharingGroup!
     
@@ -26,6 +27,9 @@ class AlbumCell: UIView, XibBasics {
         super.awakeFromNib()
         albumName.delegate = self
         albumName.inputAccessoryView = AlbumCell.makeToolBar(doneAction: Action(target: self, selector: #selector(save)), cancelAction: Action(target: self, selector: #selector(cancel)))
+        needsSyncBadge.badgeColor = .blue
+        
+        debugBlackBorder = true
     }
     
     private func setAlbumName() {
@@ -42,13 +46,17 @@ class AlbumCell: UIView, XibBasics {
         setAlbumName()
         
         self.image.image = nil
-        badge.removeFromSuperview()
-        DispatchQueue.main.async {
+        unreadCountBadge.removeFromSuperview()
+        needsSyncBadge.removeFromSuperview()
+        
+        //DispatchQueue.main.async {
             if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
                 self.getImageForCell(images: images)
                 self.setUnreadCount(images: images)
             }
-        }
+        //}
+        
+        setSyncNeededBadge()
     }
     
     private func getImageForCell(images: [Image]) {
@@ -75,8 +83,26 @@ class AlbumCell: UIView, XibBasics {
         }
         
         if unreadCount > 0 {
-            badge.format(withUnreadCount: unreadCount)
-            image.addSubview(badge)
+            unreadCountBadge.format(withUnreadCount: unreadCount)
+            image.addSubview(unreadCountBadge)
+        }
+    }
+    
+    private func setSyncNeededBadge() {
+        let padding:CGFloat = 3
+        needsSyncBadge.frame.origin = CGPoint(x: frame.width - needsSyncBadge.frame.width - padding, y: padding)
+        needsSyncBadge.sizeToFit()
+        
+        let sharingGroups = SyncServer.session.sharingGroups
+        let filtered = sharingGroups.filter {$0.sharingGroupUUID == self.sharingGroup.sharingGroupUUID}
+        guard filtered.count == 1 else {
+            return
+        }
+        
+        let sharingGroup = filtered[0]
+        
+        if sharingGroup.syncNeeded {
+            image.addSubview(needsSyncBadge)
         }
     }
     

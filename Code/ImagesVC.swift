@@ -64,15 +64,7 @@ class ImagesVC: UIViewController {
         coreDataSource = CoreDataSource(delegate: self)
         
         // To manually refresh-- pull down on collection view.
-        refreshControl = ODRefreshControl(in: collectionView)
-        
-        // A bit of a hack because the refresh control was appearing too high
-        refreshControl.yOffset = -(navigationController!.navigationBar.frameHeight + UIApplication.shared.statusBarFrame.height)
-        
-        // I like the "tear drop" pull down, but don't want the activity indicator.
-        refreshControl.activityIndicatorViewColor = UIColor.clear
-        
-        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        refreshControl = ODRefreshControl.create(scrollView: collectionView, nav: navigationController!, target: self, selector: #selector(refresh))
         
         // Long press on image to select.
         collectionView.alwaysBounceVertical = true

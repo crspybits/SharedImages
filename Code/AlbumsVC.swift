@@ -9,6 +9,7 @@
 import UIKit
 import SMCoreLib
 import SyncServer
+import ODRefreshControl
 
 class AlbumsVC: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
@@ -24,8 +25,14 @@ class AlbumsVC: UIViewController {
     @IBOutlet weak var collectionViewBottom: NSLayoutConstraint!
     private var originalCollectionViewBottom: CGFloat!
     
+    // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
+    var refreshControl:ODRefreshControl!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        title = "Albums"
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         let layout = UICollectionViewFlowLayout()
@@ -38,6 +45,22 @@ class AlbumsVC: UIViewController {
         
         originalCollectionViewBottom = collectionViewBottom.constant
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardChangeFrameAction), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        
+        // To manually refresh-- pull down on collection view.
+        refreshControl = ODRefreshControl.create(scrollView: collectionView, nav: navigationController!, target: self, selector: #selector(refresh))
+        
+        // We need this for the refresh.
+        collectionView.alwaysBounceVertical = true
+    }
+    
+    @objc private func refresh() {
+        self.refreshControl.endRefreshing()
+        
+        do {
+            try SyncServer.session.sync()
+        } catch (let error) {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
+        }
     }
     
     @objc private func keyboardChangeFrameAction(notification:NSNotification) {
@@ -124,11 +147,24 @@ class AlbumsVC: UIViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+    
     private func layoutSubviews() {
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
+        
+        // To resize cells when we rotate the device.
+        if let flowLayout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+                flowLayout.invalidateLayout()
+        }
     }
     
     private func saveNewSharingGroupName(sharingGroupUUID: String, newName: String) {
@@ -170,6 +206,9 @@ extension AlbumsVC : UICollectionViewDataSource {
             albumCell = AlbumCell.create()!
             cell.contentView.addSubview(albumCell)
             albumCell.frameSize = cell.contentView.frameSize
+            
+            // This is critical or we get really odd cell-sizing behavior in rotation of the device.
+            albumCell.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         }
 
         albumCell.setup(sharingGroup: sharingGroup)
@@ -204,6 +243,7 @@ extension AlbumsVC: UICollectionViewDelegateFlowLayout {
                 + flowLayout.sectionInset.right
                 + (flowLayout.minimumInteritemSpacing * CGFloat(numberOfItemsPerRow - 1))
         let size = (collectionView.bounds.width - totalSpace) / CGFloat(numberOfItemsPerRow)
+        
         return CGSize(width: size, height: size)
     }
 }

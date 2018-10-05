@@ -18,6 +18,7 @@
 		8324EE301E75EC62000656AF /* SignInVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE2F1E75EC62000656AF /* SignInVC.swift */; };
 		8324EE331E764907000656AF /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE321E764907000656AF /* SyncController.swift */; };
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
+		8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */; };
 		834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6E2037858800969B18 /* TabControllerDelegate.swift */; };
 		834A7E792037858800969B18 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6F2037858800969B18 /* Alert.swift */; };
 		834A7E7A2037858800969B18 /* XibBasics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E702037858800969B18 /* XibBasics.swift */; };
@@ -102,6 +103,7 @@
 		8324EE431E7781AD000656AF /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BridgingHeader.h; path = Code/BridgingHeader.h; sourceTree = "<group>"; };
 		8324EE461E778623000656AF /* CALayer+MBAnimationPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MBAnimationPersistence.h"; sourceTree = "<group>"; };
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
+		8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ODRefreshControl+Extras.swift"; sourceTree = "<group>"; };
 		834A7E6E2037858800969B18 /* TabControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabControllerDelegate.swift; sourceTree = "<group>"; };
 		834A7E6F2037858800969B18 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		834A7E702037858800969B18 /* XibBasics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XibBasics.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 				83D0BE2820B3B81C00555B73 /* UnreadCountBadge.swift */,
 				834E3E9220B3FF90006AC504 /* BottomRefresh.swift */,
 				8380D2672161A6DC008D6231 /* Badge+Extras.swift */,
+				8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -743,6 +746,7 @@
 				83D0BE2120B3817800555B73 /* Parameters.swift in Sources */,
 				831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */,
 				831EEC4E2002D76B001821B9 /* TestCases.swift in Sources */,
+				8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */,
 				83D49C981F49468200409B0F /* SettingsVC.swift in Sources */,
 				83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */,
 				834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */,
