@@ -20,6 +20,13 @@ class AppBadge {
         badgesAuthorized.boolValue = notificationSettings.types.contains(.badge)
     }
     
+    private var priorEventsDesired: EventDesired!
+    private var priorDelegate: SyncServerDelegate!
+    private var completionHandler: ((UIBackgroundFetchResult) -> Void)?
+    
+    private init() {}
+    static let session = AppBadge()
+    
     static func checkForBadgeAuthorization(usingViewController viewController:UIViewController) {
         func badgeAuthorization() {
             if #available(iOS 10.0, *) {
@@ -54,37 +61,30 @@ class AppBadge {
         }
     }
     
-    static func setBadge(completionHandler: ((UIBackgroundFetchResult) -> Void)?=nil) {
-        completionHandler?(.noData)
-        
-        // Not quite sure what to do with this now given that we have multiple sharing groups.
-        /*
-        guard let sharingGroupId = SyncController.getSharingGroupId(showAlertOnError: false) else {
-            return
-        }
-        
-        // 10/31/17; Don't want to call `getStats` if a user is not signed in because (a) it makes no sense-- how can we interact with the server without a user signed in? and (b) because with the Facebook sign-in, the sign-in process itself causes the app to go into the background and we have badge setting itself operating if the app goes into the background-- and this all messes up the signin.
+    func setBadge(completionHandler: ((UIBackgroundFetchResult) -> Void)?=nil) {
+        // 10/31/17; Don't want to call server interface if a user is not signed in because (a) it makes no sense-- how can we interact with the server without a user signed in? and (b) because with the Facebook sign-in, the sign-in process itself causes the app to go into the background and we have badge setting itself operating if the app goes into the background-- and this all messes up the signin.
         if AppBadge.badgesAuthorized.boolValue && SignInManager.session.userIsSignedIn {
-            SyncServer.session.getStats(sharingGroupId: sharingGroupId) { stats in
-                if let stats = stats {
-                    let total = stats.downloadDeletionsAvailable + stats.contentDownloadsAvailable
-                    setBadge(number: total)
-                    if total > 0 {
-                        completionHandler?(.newData)
-                    }
-                    else {
-                        completionHandler?(.noData)
-                    }
-                }
-                else {
-                    completionHandler?(.failed)
-                }
+            priorDelegate = SyncServer.session.delegate
+            priorEventsDesired = SyncServer.session.eventsDesired
+            
+            SyncServer.session.delegate = self
+            SyncServer.session.eventsDesired = [.syncDone]
+            self.completionHandler = completionHandler
+            
+            do {
+                try SyncServer.session.sync()
+            } catch (let error) {
+                Log.error("\(error)")
+                SyncServer.session.delegate = priorDelegate
+                SyncServer.session.eventsDesired = priorEventsDesired
+                completionHandler?(.failed)
+                self.completionHandler = nil
+                return
             }
         }
         else {
             completionHandler?(.noData)
         }
-        */
     }
     
     // Set to 0 to hide badge.
@@ -96,3 +96,34 @@ class AppBadge {
         }
     }
 }
+
+extension AppBadge: SyncServerDelegate {
+    func syncServerMustResolveContentDownloadConflict(_ downloadContent: ServerContentType, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>) {
+    }
+    
+    func syncServerMustResolveDownloadDeletionConflicts(conflicts: [DownloadDeletionConflict]) {
+    }
+    
+    func syncServerFileGroupDownloadComplete(group: [DownloadOperation]) {
+    }
+    
+    func syncServerErrorOccurred(error: SyncServerError) {
+    }
+    
+    func syncServerEventOccurred(event: SyncEvent) {
+        switch event {
+        case .syncDone:
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded}
+            AppBadge.setBadge(number: syncNeeded.count)
+            
+            SyncServer.session.delegate = priorDelegate
+            SyncServer.session.eventsDesired = priorEventsDesired
+            completionHandler?(.noData)
+            completionHandler = nil
+            
+        default:
+            break
+        }
+    }
+}
+

@@ -99,14 +99,24 @@ class AlbumsVC: UIViewController {
     }
     
     @objc private func addAlbumAction() {
-        let newSharingGroupUUID = UUID().uuidString
-        do {
-            try SyncServer.session.createSharingGroup(sharingGroupUUID: newSharingGroupUUID)
-            try SyncServer.session.sync(sharingGroupUUID: newSharingGroupUUID)
-        } catch (let error) {
-            Log.msg("\(error)")
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not add album. Please try again later.")
-        }
+        let alert = UIAlertController(title: "Confirmation", message: "Do you want to create a new album?", preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.barButtonItem = addAlbum
+    
+        alert.addAction(UIAlertAction(title: "Create", style: .default) { alert in
+            let newSharingGroupUUID = UUID().uuidString
+            do {
+                try SyncServer.session.createSharingGroup(sharingGroupUUID: newSharingGroupUUID)
+                try SyncServer.session.sync(sharingGroupUUID: newSharingGroupUUID)
+            } catch (let error) {
+                Log.msg("\(error)")
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not add album. Please try again later.")
+            }
+        })
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { alert in
+        })
+        
+        present(alert, animated: true, completion: nil)
     }
     
     private func syncEvent(event: SyncControllerEvent) {
@@ -120,6 +130,10 @@ class AlbumsVC: UIViewController {
             
             // Can't seem to do this with `performBatchUpdates` to get animations. It crashes.
             collectionView.reloadData()
+            
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded}
+            AppBadge.setBadge(number: syncNeeded.count)
+            
         case .syncError(message: _):
             activityIndicator.stopAnimating()
         case .syncStarted:
@@ -149,6 +163,8 @@ class AlbumsVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        AppBadge.checkForBadgeAuthorization(usingViewController: self)
     }
     
     private func layoutSubviews() {

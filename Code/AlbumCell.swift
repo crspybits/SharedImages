@@ -19,17 +19,14 @@ class AlbumCell: UIView, XibBasics {
     var endEditing:(()->())?
     @IBOutlet weak var image: UIImageView!
     private let unreadCountBadge = BadgeSwift()
-    private let needsSyncBadge = BadgeSwift()
     @IBOutlet weak var albumName: UITextField!
     private var sharingGroup: SyncServer.SharingGroup!
+    @IBOutlet weak var albumSyncNeeded: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         albumName.delegate = self
         albumName.inputAccessoryView = AlbumCell.makeToolBar(doneAction: Action(target: self, selector: #selector(save)), cancelAction: Action(target: self, selector: #selector(cancel)))
-        needsSyncBadge.badgeColor = .blue
-        
-        debugBlackBorder = true
     }
     
     private func setAlbumName() {
@@ -47,7 +44,6 @@ class AlbumCell: UIView, XibBasics {
         
         self.image.image = nil
         unreadCountBadge.removeFromSuperview()
-        needsSyncBadge.removeFromSuperview()
         
         //DispatchQueue.main.async {
             if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
@@ -56,7 +52,18 @@ class AlbumCell: UIView, XibBasics {
             }
         //}
         
-        setSyncNeededBadge()
+        setSyncNeeded()
+    }
+    
+    private func setSyncNeeded() {
+        let sharingGroups = SyncServer.session.sharingGroups
+        let filtered = sharingGroups.filter {$0.sharingGroupUUID == self.sharingGroup.sharingGroupUUID}
+        guard filtered.count == 1 else {
+            return
+        }
+        
+        let sharingGroup = filtered[0]
+        albumSyncNeeded.isHidden = !sharingGroup.syncNeeded
     }
     
     private func getImageForCell(images: [Image]) {
@@ -85,24 +92,6 @@ class AlbumCell: UIView, XibBasics {
         if unreadCount > 0 {
             unreadCountBadge.format(withUnreadCount: unreadCount)
             image.addSubview(unreadCountBadge)
-        }
-    }
-    
-    private func setSyncNeededBadge() {
-        let padding:CGFloat = 3
-        needsSyncBadge.frame.origin = CGPoint(x: frame.width - needsSyncBadge.frame.width - padding, y: padding)
-        needsSyncBadge.sizeToFit()
-        
-        let sharingGroups = SyncServer.session.sharingGroups
-        let filtered = sharingGroups.filter {$0.sharingGroupUUID == self.sharingGroup.sharingGroupUUID}
-        guard filtered.count == 1 else {
-            return
-        }
-        
-        let sharingGroup = filtered[0]
-        
-        if sharingGroup.syncNeeded {
-            image.addSubview(needsSyncBadge)
         }
     }
     
@@ -161,5 +150,11 @@ extension AlbumCell: UITextFieldDelegate {
         albumName.borderStyle = .none
         albumName.backgroundColor = .clear
         endEditing?()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        save()
+        return true
     }
 }

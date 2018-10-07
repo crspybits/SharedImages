@@ -19,6 +19,21 @@
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HXN-Ws-zUd">
                     <rect key="frame" x="0.0" y="0.0" width="201" height="139"/>
                 </imageView>
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Ad-1S-XSx" userLabel="Album Sync Needed">
+                    <rect key="frame" x="161" y="0.0" width="40" height="35"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="download" translatesAutoresizingMaskIntoConstraints="NO" id="aRG-QA-bsW">
+                            <rect key="frame" x="3" y="9" width="30" height="23"/>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="0.57692101883561642" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="aRG-QA-bsW" firstAttribute="leading" secondItem="9Ad-1S-XSx" secondAttribute="leading" constant="3" id="3et-CC-bdS"/>
+                        <constraint firstAttribute="bottom" secondItem="aRG-QA-bsW" secondAttribute="bottom" constant="3" id="7Qg-f2-BXb"/>
+                        <constraint firstAttribute="width" constant="40" id="GMw-gf-avF"/>
+                        <constraint firstAttribute="height" constant="35" id="Tty-B4-p7M"/>
+                    </constraints>
+                </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jso-OR-DWd">
                     <rect key="frame" x="0.0" y="0.0" width="201" height="144"/>
                     <connections>
@@ -45,17 +60,23 @@
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="nyd-vk-Npg" secondAttribute="trailing" constant="10" id="CL2-rI-sag"/>
                 <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="HXN-Ws-zUd" secondAttribute="bottom" constant="5" id="COj-o5-EJE"/>
                 <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="Jso-OR-DWd" secondAttribute="bottom" id="FYu-KV-9TJ"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="9Ad-1S-XSx" secondAttribute="trailing" id="HCX-vK-BIe"/>
                 <constraint firstItem="Jso-OR-DWd" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="JM8-va-sRJ"/>
                 <constraint firstItem="nyd-vk-Npg" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="a3m-et-QC8"/>
                 <constraint firstItem="HXN-Ws-zUd" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="p44-UB-2LV"/>
+                <constraint firstItem="9Ad-1S-XSx" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="pLp-ez-4VN"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="albumName" destination="nyd-vk-Npg" id="396-BD-zeW"/>
+                <outlet property="albumSyncNeeded" destination="9Ad-1S-XSx" id="bvf-lM-zeQ"/>
                 <outlet property="image" destination="HXN-Ws-zUd" id="XyY-8F-m6V"/>
             </connections>
             <point key="canvasLocation" x="-66.400000000000006" y="-92.203898050974516"/>
         </view>
     </objects>
+    <resources>
+        <image name="download" width="30" height="23"/>
+    </resources>
 </document>

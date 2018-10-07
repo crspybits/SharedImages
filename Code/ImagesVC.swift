@@ -171,7 +171,7 @@ class ImagesVC: UIViewController {
     }
     
     private func removeUserFromAlbum() {
-        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove the current album?", message: "This will permanently remove the album from the SharedImages app on your device. If images have been stored in your cloud storage, they will not be removed from your cloud storage.", allowCancel: true, okCompletion: {
+        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove the current album?", message: "This will permanently remove the album from the SharedImages app on your device. If images have been stored in your cloud storage, they will still be in your cloud storage.", allowCancel: true, okCompletion: {
         
             // TODO: Don't have any kind of spinner for this yet...
             
@@ -330,8 +330,6 @@ class ImagesVC: UIViewController {
         else {
             scrollIfNeeded(animated: true)
         }
-
-        AppBadge.checkForBadgeAuthorization(usingViewController: self)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -597,7 +595,8 @@ extension ImagesVC /* ImagesHandler */ {
             
         case .syncDone (let numberOperations):
             // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
-            AppBadge.setBadge(number: 0)
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded}
+            AppBadge.setBadge(number: syncNeeded.count)
             
             Progress.session.finish()
                         
