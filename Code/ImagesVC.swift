@@ -127,18 +127,17 @@ class ImagesVC: UIViewController {
         
         dropDownMenuItems = []
 
-        switch SignInVC.sharingPermission {
-        case .some(.admin), .some(.write), .none: // .none means this is not a sharing user.
+        switch sharingGroup.permission {
+        case .admin, .write:
             dropDownMenuItems += [DropDownMenuItem(name: "Add Image", action: {
                 self.acquireImage.showAlert(fromBarButton: self.otherActionBarButton)
             })]
-        case .some(.read):
-            // Can't add images.
+        case .read:
             break
         }
         
-        switch SignInVC.sharingPermission {
-        case .some(.admin), .none:
+        switch sharingGroup.permission {
+        case .admin:
             dropDownMenuItems += [
                 DropDownMenuItem(name: "Share", action: {[unowned self] in
                     self.shareAction()

@@ -16,21 +16,8 @@ import SyncServer_Shared
 
 class SignInVC : UIViewController, GoogleSignInUIProtocol {
     @IBOutlet weak var signInContainer: UIView!
-    static private var rawSharingPermission:SMPersistItemString = SMPersistItemString(name: "SignInVC.rawSharingPermission", initialStringValue: "", persistType: .userDefaults)
     
-    // If user is signed in as a sharing user, this persistently gives their permissions.
-    var sharingPermission:Permission? {
-        set {
-            SignInVC.rawSharingPermission.stringValue = newValue == nil ? "" : newValue!.rawValue
-        }
-        get {
-            return SignInVC.sharingPermission
-        }
-    }
-    
-    static var sharingPermission:Permission? {
-        return SignInVC.rawSharingPermission.stringValue == "" ? nil : Permission(rawValue: SignInVC.rawSharingPermission.stringValue)
-    }
+    // static private var rawSharingPermission:SMPersistItemString = SMPersistItemString(name: "SignInVC.rawSharingPermission", initialStringValue: "", persistType: .userDefaults)
     
     var googleSignInButton: TappableButton!
     var facebookSignInButton: TappableButton!
@@ -175,13 +162,10 @@ extension SignInVC : GenericSignInDelegate {
             successfulSignIn(switchToImagesTab: true)
             
         case .owningUserCreated:
-            sharingPermission = nil
-            
             // 12/26/17;  https://github.com/crspybits/SharedImages/issues/54
             successfulSignIn(switchToImagesTab: true)
             
         case .sharingUserCreated:
-            self.sharingPermission = invite?.sharingInvitationPermission
             invite = nil
             
             // 12/26/17; https://github.com/crspybits/SharedImages/issues/54

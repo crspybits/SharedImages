@@ -99,6 +99,11 @@ class AlbumsVC: UIViewController {
     }
     
     @objc private func addAlbumAction() {
+        if SignInManager.session.currentSignIn?.userType == .sharing {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Users without cloud storage cannot create sharing groups.")
+            return
+        }
+        
         let alert = UIAlertController(title: "Confirmation", message: "Do you want to create a new album?", preferredStyle: .actionSheet)
         alert.popoverPresentationController?.barButtonItem = addAlbum
     
@@ -136,6 +141,8 @@ class AlbumsVC: UIViewController {
             
         case .syncError(message: _):
             activityIndicator.stopAnimating()
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "An error occurred!")
+            
         case .syncStarted:
             activityIndicator.startAnimating()
         }
