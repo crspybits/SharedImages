@@ -126,25 +126,18 @@ class ImagesVC: UIViewController {
         otherActions.direction = .any
         
         dropDownMenuItems = []
-
-        switch sharingGroup.permission {
-        case .admin, .write:
+        
+        if sharingGroup.permission.hasMinimumPermission(.write) {
             dropDownMenuItems += [DropDownMenuItem(name: "Add Image", action: {
                 self.acquireImage.showAlert(fromBarButton: self.otherActionBarButton)
             })]
-        case .read:
-            break
         }
         
-        switch sharingGroup.permission {
-        case .admin:
-            dropDownMenuItems += [
-                DropDownMenuItem(name: "Share", action: {[unowned self] in
-                    self.shareAction()
-                })
-            ]
-        default:
-            break
+        if sharingGroup.permission.hasMinimumPermission(.admin) {
+            dropDownMenuItems += [DropDownMenuItem(name: "Share", action: {
+                [unowned self] in
+                self.shareAction()
+            })]
         }
         
         dropDownMenuItems += [
@@ -170,7 +163,7 @@ class ImagesVC: UIViewController {
     }
     
     private func removeUserFromAlbum() {
-        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove the current album?", message: "This will permanently remove the album from the SharedImages app on your device. If images have been stored in your cloud storage, they will still be in your cloud storage.", allowCancel: true, okCompletion: {
+        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove the current album?", message: "This will permanently remove the album from the SharedImages app on your device(s). If images have been stored in your cloud storage, they will still be in your cloud storage.", allowCancel: true, okCompletion: {
         
             // TODO: Don't have any kind of spinner for this yet...
             
@@ -183,8 +176,7 @@ class ImagesVC: UIViewController {
                 return
             }
             
-            // TODO: Really would like a callback to positively indicate that removal was completed before returning.
-            // TODO: Also: What about removing references/files to the images/discussions?
+            // The delegate removes references/files to the images/discussions.
             self.navigationController?.popViewController(animated: true)
         })
     }
@@ -594,7 +586,7 @@ extension ImagesVC /* ImagesHandler */ {
             
         case .syncDone (let numberOperations):
             // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
-            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded}
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
             AppBadge.setBadge(number: syncNeeded.count)
             
             Progress.session.finish()

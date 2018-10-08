@@ -473,7 +473,7 @@
         <!--Albums-->
         <scene sceneID="ShN-vM-flT">
             <objects>
-                <navigationController storyboardIdentifier="ImagesNavController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="VMm-4I-Aav" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="AbumsNavController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="VMm-4I-Aav" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Albums" image="albums" selectedImage="albums" id="Zwn-MX-8e3"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="eEP-EW-VdI">

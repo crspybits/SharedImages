@@ -38,6 +38,8 @@ struct FileData {
 }
 
 protocol SyncControllerDelegate : class {
+    func userRemovedFromAlbum(syncController:SyncController, sharingGroupUUID: String)
+    
     // Adding a new image-- since images are immutable, this always results from downloading a new image.
     func addLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes)
     
@@ -64,7 +66,8 @@ class SyncController {
     init() {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
-                .singleFileUploadComplete, .singleUploadDeletionComplete, .sharingGroups]
+                .singleFileUploadComplete, .singleUploadDeletionComplete,
+                .sharingGroupUploadOperationCompleted]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -188,6 +191,12 @@ class SyncController {
 }
 
 extension SyncController : SyncServerDelegate {
+    func syncServerSharingGroupsDownloaded(created: [SyncServer.SharingGroup], updated: [SyncServer.SharingGroup], deleted: [SyncServer.SharingGroup]) {
+        deleted.forEach { album in
+            delegate.userRemovedFromAlbum(syncController: self, sharingGroupUUID: album.sharingGroupUUID)
+        }
+    }
+    
     func syncServerMustResolveContentDownloadConflict(_ downloadContent: ServerContentType, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>) {
 
         let errorResolution: ContentDownloadResolution = .acceptContentDownload
@@ -508,15 +517,20 @@ extension SyncController : SyncServerDelegate {
             
         case .singleUploadDeletionComplete:
             Progress.session.next()
+
+        case .sharingGroupUploadOperationCompleted(sharingGroupUUID: let sharingGroupUUID, operation: let operation):
+            switch operation {
+            case .userRemoval:
+                delegate.userRemovedFromAlbum(syncController: self, sharingGroupUUID: sharingGroupUUID)
+            case .creation, .update:
+                break
+            }
             
         case .syncDone:
             delegate.syncEvent(syncController: self, event: .syncDone(numberOperations: numberOperations))
             syncDone?()
             syncDone = nil
             Progress.session.finish()
-        
-        case .sharingGroups:
-            break
         
         default:
             Log.error("Unexpected event received: \(event)")

@@ -136,7 +136,7 @@ class AlbumsVC: UIViewController {
             // Can't seem to do this with `performBatchUpdates` to get animations. It crashes.
             collectionView.reloadData()
             
-            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded}
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
             AppBadge.setBadge(number: syncNeeded.count)
             
         case .syncError(message: _):

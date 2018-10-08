@@ -13,10 +13,10 @@ import SyncServer
 class TabControllerDelegate : NSObject, UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
 
-        // Only allow a transition to the Images screen if the user is signed in.
-//        if viewController.restorationIdentifier == "ImagesNavController" {
-//            return SignInManager.session.userIsSignedIn
-//        }
+        // Only allow a transition to the Albums screen if the user is signed in.
+        if viewController.restorationIdentifier == "AlbumsNavController" {
+            return SignInManager.session.userIsSignedIn
+        }
         
         return true
     }

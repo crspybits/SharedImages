@@ -98,6 +98,9 @@ class AppBadge {
 }
 
 extension AppBadge: SyncServerDelegate {
+    func syncServerSharingGroupsDownloaded(created: [SyncServer.SharingGroup], updated: [SyncServer.SharingGroup], deleted: [SyncServer.SharingGroup]) {
+    }
+    
     func syncServerMustResolveContentDownloadConflict(_ downloadContent: ServerContentType, downloadedContentAttributes: SyncAttributes, uploadConflict: SyncServerConflict<ContentDownloadResolution>) {
     }
     
@@ -113,7 +116,7 @@ extension AppBadge: SyncServerDelegate {
     func syncServerEventOccurred(event: SyncEvent) {
         switch event {
         case .syncDone:
-            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded}
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
             AppBadge.setBadge(number: syncNeeded.count)
             
             SyncServer.session.delegate = priorDelegate

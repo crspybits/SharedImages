@@ -176,6 +176,19 @@ class ImagesHandler {
 }
 
 extension ImagesHandler: SyncControllerDelegate {
+    func userRemovedFromAlbum(syncController: SyncController, sharingGroupUUID: String) {
+        if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroupUUID) {
+            for image in images {
+                do {
+                    // This also removes the associated discussion and image file.
+                    try image.remove()
+                } catch (let error) {
+                    Log.error("\(error)")
+                }
+            }
+        }
+    }
+    
     func addLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes) {
         // We're making an image for which there is already a UUID on the server.
         addLocalImage(newImageData: imageData, fileGroupUUID: attr.fileGroupUUID)

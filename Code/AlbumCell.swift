@@ -63,7 +63,7 @@ class AlbumCell: UIView, XibBasics {
         }
         
         let sharingGroup = filtered[0]
-        albumSyncNeeded.isHidden = !sharingGroup.syncNeeded
+        albumSyncNeeded.isHidden = !sharingGroup.syncNeeded!
     }
     
     private func getImageForCell(images: [Image]) {
