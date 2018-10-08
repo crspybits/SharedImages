@@ -177,15 +177,45 @@ class ImagesHandler {
 
 extension ImagesHandler: SyncControllerDelegate {
     func userRemovedFromAlbum(syncController: SyncController, sharingGroupUUID: String) {
+        var numberErrors = 0
+        var numberDeletions = 0
+        
         if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroupUUID) {
             for image in images {
                 do {
                     // This also removes the associated discussion and image file.
                     try image.remove()
+                    numberDeletions += 1
                 } catch (let error) {
                     Log.error("\(error)")
+                    numberErrors += 1
                 }
             }
+            
+            var message = ""
+            if numberDeletions > 0 {
+                if numberDeletions == 1 {
+                    message = "\(numberDeletions) image deleted"
+                }
+                else {
+                    message = "\(numberDeletions) images deleted"
+                }
+            }
+            
+            if numberErrors > 0 {
+                if message.count > 0 {
+                    message += " and "
+                }
+                
+                if numberErrors == 1 {
+                    message += "\(numberErrors) error"
+                }
+                else {
+                    message += "\(numberDeletions) errors"
+                }
+            }
+
+            SMCoreLib.Alert.show(withTitle: "Album Removed", message: message)
         }
     }
     
