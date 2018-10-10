@@ -38,7 +38,7 @@ struct FileData {
 }
 
 protocol SyncControllerDelegate : class {
-    func userRemovedFromAlbum(syncController:SyncController, sharingGroupUUID: String)
+    func userRemovedFromAlbum(syncController:SyncController, sharingGroup: SyncServer.SharingGroup)
     
     // Adding a new image-- since images are immutable, this always results from downloading a new image.
     func addLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes)
@@ -193,7 +193,7 @@ class SyncController {
 extension SyncController : SyncServerDelegate {
     func syncServerSharingGroupsDownloaded(created: [SyncServer.SharingGroup], updated: [SyncServer.SharingGroup], deleted: [SyncServer.SharingGroup]) {
         deleted.forEach { album in
-            delegate.userRemovedFromAlbum(syncController: self, sharingGroupUUID: album.sharingGroupUUID)
+            delegate.userRemovedFromAlbum(syncController: self, sharingGroup: album)
         }
     }
     
@@ -518,10 +518,10 @@ extension SyncController : SyncServerDelegate {
         case .singleUploadDeletionComplete:
             Progress.session.next()
 
-        case .sharingGroupUploadOperationCompleted(sharingGroupUUID: let sharingGroupUUID, operation: let operation):
+        case .sharingGroupUploadOperationCompleted(sharingGroup: let sharingGroup, operation: let operation):
             switch operation {
             case .userRemoval:
-                delegate.userRemovedFromAlbum(syncController: self, sharingGroupUUID: sharingGroupUUID)
+                delegate.userRemovedFromAlbum(syncController: self, sharingGroup: sharingGroup)
             case .creation, .update:
                 break
             }

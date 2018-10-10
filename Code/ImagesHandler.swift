@@ -176,11 +176,11 @@ class ImagesHandler {
 }
 
 extension ImagesHandler: SyncControllerDelegate {
-    func userRemovedFromAlbum(syncController: SyncController, sharingGroupUUID: String) {
+    func userRemovedFromAlbum(syncController: SyncController, sharingGroup: SyncServer.SharingGroup) {
         var numberErrors = 0
         var numberDeletions = 0
         
-        if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroupUUID) {
+        if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID) {
             for image in images {
                 do {
                     // This also removes the associated discussion and image file.
@@ -215,7 +215,12 @@ extension ImagesHandler: SyncControllerDelegate {
                 }
             }
 
-            SMCoreLib.Alert.show(withTitle: "Album Removed", message: message)
+            var albumName = " "
+            if let sharingGroupName = sharingGroup.sharingGroupName {
+                albumName = " '\(sharingGroupName)' "
+            }
+            
+            SMCoreLib.Alert.show(withTitle: "Album\(albumName)Removed", message: message)
         }
     }
     

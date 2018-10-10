@@ -17,6 +17,7 @@ class AlbumCell: UIView, XibBasics {
     var saveAction:((_ newSharingGroupName: String)->())?
     var startEditing:(()->())?
     var endEditing:(()->())?
+    var albumSyncAction:(()->())?
     @IBOutlet weak var image: UIImageView!
     private let unreadCountBadge = BadgeSwift()
     @IBOutlet weak var albumName: UITextField!
@@ -113,6 +114,10 @@ class AlbumCell: UIView, XibBasics {
     @objc private func cancel() {
         albumName.resignFirstResponder()
         setAlbumName()
+    }
+    
+    @IBAction func albumSyncAction(_ sender: Any) {
+        albumSyncAction?()
     }
     
     struct Action {

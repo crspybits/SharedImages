@@ -7,10 +7,10 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Crashlytics (3.10.8):
-    - Fabric (~> 1.7.12)
-  - DropDown (2.3.6)
-  - Fabric (1.7.12)
+  - Crashlytics (3.10.9):
+    - Fabric (~> 1.7.13)
+  - DropDown (2.3.9)
+  - Fabric (1.7.13)
   - FacebookCore (0.4.0):
     - Bolts (~> 1.9)
     - FBSDKCoreKit (~> 4.36)
@@ -42,30 +42,30 @@ PODS:
   - SwiftyBeaver (1.6.1)
   - SwiftyDropbox (4.6.0):
     - Alamofire (~> 4.5.0)
-  - SyncServer (17.0.1):
+  - SyncServer (17.1.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 9.2)
-    - SyncServer/Lite (= 17.0.1)
+    - SyncServer/Lite (= 17.1.0)
   - SyncServer-Shared (9.2.1):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (17.0.1):
+  - SyncServer/Dropbox (17.1.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SwiftyDropbox (~> 4.6)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Facebook (17.0.1):
+  - SyncServer/Facebook (17.1.0):
     - FacebookCore
     - FacebookLogin
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Google (17.0.1):
+  - SyncServer/Google (17.1.0):
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Lite (17.0.1):
+  - SyncServer/Lite (17.1.0):
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.2)
     - SyncServer-Shared (~> 9.2)
@@ -73,7 +73,7 @@ PODS:
 DEPENDENCIES:
   - BadgeSwift (~> 6.0)
   - Crashlytics
-  - DropDown (from `https://github.com/crspybits/DropDown.git`)
+  - DropDown (~> 2.3)
   - Fabric
   - LottiesBottom (~> 0.5)
   - MessageKit (~> 0.13)
@@ -82,10 +82,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.3)
-  - SyncServer (from `../SyncServer-iOSClient`)
-  - SyncServer/Dropbox (from `../SyncServer-iOSClient`)
-  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
-  - SyncServer/Google (from `../SyncServer-iOSClient`)
+  - SyncServer (~> 17.1)
+  - SyncServer/Dropbox (~> 17.1)
+  - SyncServer/Facebook (~> 17.1)
+  - SyncServer/Google (~> 17.1)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -93,6 +93,7 @@ SPEC REPOS:
     - BadgeSwift
     - Bolts
     - Crashlytics
+    - DropDown
     - Fabric
     - FacebookCore
     - FacebookLogin
@@ -112,20 +113,14 @@ SPEC REPOS:
   https://github.com/crspybits/Specs.git:
     - GoogleSignIn
     - SMCoreLib
+    - SyncServer
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
-  DropDown:
-    :git: https://github.com/crspybits/DropDown.git
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
-  SyncServer:
-    :path: "../SyncServer-iOSClient"
 
 CHECKOUT OPTIONS:
-  DropDown:
-    :commit: a2e8345bad3e20affe006704c11972fafdd4ae01
-    :git: https://github.com/crspybits/DropDown.git
   ODRefreshControl:
     :commit: ffaaf9d7d44306d36c9959a26a0132f62851bcfb
     :git: https://github.com/crspybits/ODRefreshControl.git
@@ -134,9 +129,9 @@ SPEC CHECKSUMS:
   Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
   BadgeSwift: 69080f6776cb812b905d46effe8263600da1bdbd
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Crashlytics: 058dc1ba579f6c100bc60a6878703779bff383c4
-  DropDown: c6940b3401c34c4d08ea4e982643eee396aa9202
-  Fabric: d7387db9a31aadff63b147a4b91d982c53afaa4f
+  Crashlytics: 55e24fc23989680285a21cb1146578d9d18e432c
+  DropDown: d187d4abdfa708a2990aff0f4fcfab77c6b161df
+  Fabric: 25d0963b691fc97be566392243ff0ecef5a68338
   FacebookCore: 770e57cfe250a4de4458b682191c0ff062dee247
   FacebookLogin: eb0f2251aca835a94d70a5f7e580edc46d1e1603
   FBSDKCoreKit: fe5f3474499a81963e11e3f3a5c753d0a95ca2b4
@@ -155,9 +150,9 @@ SPEC CHECKSUMS:
   SMCoreLib: ab21fe40ff76b2cc5e873122a96b1ad22ebe02bc
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 8af645e744de6f17b4e9fdeba21365b8dc55a542
-  SyncServer: faa1402c19e773285810c250439c6c263a95e9be
+  SyncServer: 7dc4374bb815edec07841f72b86a80d51682b916
   SyncServer-Shared: 30f5896bcdc4aa4d2c5d4a8b233f45e5cd29d6e5
 
-PODFILE CHECKSUM: e7f93641b62271b255b9ecd4aeef30d538d3ff7c
+PODFILE CHECKSUM: 6488a5d4dba087e9393d5fa818e2185f4ce1ce12
 
 COCOAPODS: 1.5.3

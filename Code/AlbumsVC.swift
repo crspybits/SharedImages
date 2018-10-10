@@ -236,10 +236,10 @@ extension AlbumsVC : UICollectionViewDataSource {
 
         albumCell.setup(sharingGroup: sharingGroup)
         albumCell.tapAction = { [unowned self] in
-            let vc = ImagesVC.create()
-            vc.sharingGroup = sharingGroup
-            vc.imagesHandler = self.imagesHandler
-            self.navigationController?.pushViewController(vc, animated: true)
+            self.gotoAlbum(sharingGroup: sharingGroup)
+        }
+        albumCell.albumSyncAction = { [unowned self] in
+            self.gotoAlbum(sharingGroup: sharingGroup, initialSync: true)
         }
         albumCell.saveAction = { newName in
             self.saveNewSharingGroupName(sharingGroupUUID: sharingGroup.sharingGroupUUID, newName: newName)
@@ -252,6 +252,14 @@ extension AlbumsVC : UICollectionViewDataSource {
         }
         
         return cell
+    }
+    
+    private func gotoAlbum(sharingGroup: SyncServer.SharingGroup, initialSync: Bool=false) {
+        let vc = ImagesVC.create()
+        vc.sharingGroup = sharingGroup
+        vc.imagesHandler = self.imagesHandler
+        vc.initialSync = initialSync
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

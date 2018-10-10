@@ -15,8 +15,10 @@ import SyncServer_Shared
 import DropDown
 
 class ImagesVC: UIViewController {
+    // Set these before showing screen.
     var sharingGroup: SyncServer.SharingGroup!
     var imagesHandler: ImagesHandler!
+    var initialSync = false
     
     let reuseIdentifier = "ImageIcon"
     var acquireImage:SMAcquireImage!
@@ -320,6 +322,11 @@ class ImagesVC: UIViewController {
         }
         else {
             scrollIfNeeded(animated: true)
+        }
+        
+        if initialSync {
+            initialSync = false
+            refresh()
         }
     }
     

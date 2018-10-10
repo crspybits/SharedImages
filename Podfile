@@ -11,15 +11,15 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-# 	pod 'SyncServer', '~> 17.0'
-# 	pod 'SyncServer/Facebook', '~> 17.0'
-# 	pod 'SyncServer/Dropbox', '~> 17.0'
-# 	pod 'SyncServer/Google', '~> 17.0'
+	pod 'SyncServer', '~> 17.1'
+	pod 'SyncServer/Facebook', '~> 17.1'
+	pod 'SyncServer/Dropbox', '~> 17.1'
+	pod 'SyncServer/Google', '~> 17.1'
 
-	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
-	pod 'SyncServer/Google', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
+# 	pod 'SyncServer/Google', :path => '../SyncServer-iOSClient'
 
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 	
@@ -50,9 +50,9 @@ target 'SharedImages' do
     pod 'Presentr', '~> 1.3'
     
     # For sorting/filter modal.
-    # pod 'DropDown', '~> 2.3'
+    pod 'DropDown', '~> 2.3'
 	# pod 'DropDown', :path => '../DropDown'
-	pod 'DropDown', :git => 'https://github.com/crspybits/DropDown.git'
+	# pod 'DropDown', :git => 'https://github.com/crspybits/DropDown.git'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

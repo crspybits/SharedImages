@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14133" systemVersion="17D47" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="DirectoryEntry" representedClassName="DirectoryEntry" syncable="YES">
+        <attribute name="appMetaData" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="appMetaDataVersionInternal" optional="YES" attributeType="Integer 32" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="deletedOnServer" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="fileUUID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fileVersionInternal" optional="YES" attributeType="Integer 32" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="mimeType" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="DownloadFileTracker" representedClassName="DownloadFileTracker" parentEntity="FileTracker" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="updateDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+    </entity>
+    <entity name="FileTracker" representedClassName="FileTracker" isAbstract="YES" syncable="YES">
+        <attribute name="age" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="appMetaData" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="appMetaDataVersionInternal" optional="YES" attributeType="Integer 32" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="fileUUIDInternal" attributeType="String" syncable="YES"/>
+        <attribute name="fileVersionInternal" optional="YES" attributeType="Integer 32" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="mimeType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="operationInternal" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="statusRaw" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="NetworkCached" representedClassName="NetworkCached" syncable="YES">
+        <attribute name="dateTimeCached" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="fileUUID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fileVersion" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="httpResponseData" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="localDownloadURLData" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="serverURLKey" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Singleton" representedClassName="Singleton" syncable="YES">
+        <attribute name="masterVersion" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="nextFileTrackerAge" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="pendingSync" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UploadQueue" inverseName="pendingSync" inverseEntity="UploadQueue" syncable="YES"/>
+    </entity>
+    <entity name="UploadFileTracker" representedClassName="UploadFileTracker" parentEntity="FileTracker" syncable="YES">
+        <attribute name="fileSizeBytes" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="localURLData" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="uploadCopy" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="uploadUndeletion" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="queue" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UploadQueue" inverseName="uploads" inverseEntity="UploadQueue" syncable="YES"/>
+    </entity>
+    <entity name="UploadQueue" representedClassName="UploadQueue" syncable="YES">
+        <relationship name="pendingSync" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Singleton" inverseName="pendingSync" inverseEntity="Singleton" syncable="YES"/>
+        <relationship name="synced" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UploadQueues" inverseName="queues" inverseEntity="UploadQueues" syncable="YES"/>
+        <relationship name="uploads" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="UploadFileTracker" inverseName="queue" inverseEntity="UploadFileTracker" syncable="YES"/>
+    </entity>
+    <entity name="UploadQueues" representedClassName="UploadQueues" syncable="YES">
+        <relationship name="queues" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="UploadQueue" inverseName="synced" inverseEntity="UploadQueue" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="DirectoryEntry" positionX="-63" positionY="-18" width="128" height="135"/>
+        <element name="DownloadFileTracker" positionX="-36" positionY="27" width="128" height="75"/>
+        <element name="FileTracker" positionX="-18" positionY="117" width="128" height="165"/>
+        <element name="NetworkCached" positionX="-45" positionY="81" width="128" height="135"/>
+        <element name="Singleton" positionX="-54" positionY="18" width="128" height="90"/>
+        <element name="UploadFileTracker" positionX="-45" positionY="54" width="128" height="120"/>
+        <element name="UploadQueue" positionX="-45" positionY="72" width="128" height="90"/>
+        <element name="UploadQueues" positionX="-36" positionY="99" width="128" height="60"/>
+    </elements>
+</model>
