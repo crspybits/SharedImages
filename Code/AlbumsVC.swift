@@ -235,7 +235,7 @@ extension AlbumsVC : UICollectionViewDataSource {
             albumCell.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         }
 
-        albumCell.setup(sharingGroup: sharingGroup)
+        albumCell.setup(sharingGroup: sharingGroup, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write))
         albumCell.tapAction = { [unowned self] in
             self.gotoAlbum(sharingGroup: sharingGroup)
         }

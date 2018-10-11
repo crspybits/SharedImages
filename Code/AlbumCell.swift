@@ -39,19 +39,19 @@ class AlbumCell: UIView, XibBasics {
         }
     }
     
-    func setup(sharingGroup: SyncServer.SharingGroup) {
+    func setup(sharingGroup: SyncServer.SharingGroup, enableGroupNameEditing: Bool) {
         self.sharingGroup = sharingGroup
         setAlbumName()
+        
+        albumName.isEnabled = enableGroupNameEditing
         
         self.image.image = nil
         unreadCountBadge.removeFromSuperview()
         
-        //DispatchQueue.main.async {
-            if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
-                self.getImageForCell(images: images)
-                self.setUnreadCount(images: images)
-            }
-        //}
+        if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
+            self.getImageForCell(images: images)
+            self.setUnreadCount(images: images)
+        }
         
         setSyncNeeded()
     }
