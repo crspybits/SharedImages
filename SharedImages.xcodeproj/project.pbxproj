@@ -62,6 +62,8 @@
 		83E51884215FFD92005C2374 /* AlbumCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83E51883215FFD92005C2374 /* AlbumCell.xib */; };
 		83E518872160710D005C2374 /* ImagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E518862160710D005C2374 /* ImagesHandler.swift */; };
 		83EACE772087083000C40AA3 /* DiscussionKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EACE762087083000C40AA3 /* DiscussionKeys.swift */; };
+		83EFC096216EDE7300D7A3C4 /* SharingInviteDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */; };
+		83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */; };
 		83F882451E711FC6008F644A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823D1E711FC6008F644A /* Assets.xcassets */; };
 		83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */; };
 		83F882471E711FC6008F644A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F882401E711FC6008F644A /* Main.storyboard */; };
@@ -153,6 +155,8 @@
 		83E51883215FFD92005C2374 /* AlbumCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumCell.xib; sourceTree = "<group>"; };
 		83E518862160710D005C2374 /* ImagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesHandler.swift; sourceTree = "<group>"; };
 		83EACE762087083000C40AA3 /* DiscussionKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscussionKeys.swift; sourceTree = "<group>"; };
+		83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingInviteDelegate.swift; sourceTree = "<group>"; };
+		83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extras.swift"; sourceTree = "<group>"; };
 		83F8821F1E711600008F644A /* SharedImages.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SharedImages.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83F8823D1E711FC6008F644A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		83F8823F1E711FC6008F644A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Resources/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -268,6 +272,8 @@
 				834E3E9220B3FF90006AC504 /* BottomRefresh.swift */,
 				8380D2672161A6DC008D6231 /* Badge+Extras.swift */,
 				8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */,
+				83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */,
+				83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -736,6 +742,7 @@
 				834A7E7D2037858800969B18 /* Progress.swift in Sources */,
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83F8824D1E712004008F644A /* AppDelegate.swift in Sources */,
+				83EFC096216EDE7300D7A3C4 /* SharingInviteDelegate.swift in Sources */,
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
 				83D0BE2920B3B81C00555B73 /* UnreadCountBadge.swift in Sources */,
 				83D0BE2620B39C7000555B73 /* SegmentedControl.swift in Sources */,
@@ -752,6 +759,7 @@
 				834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */,
 				834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */,
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
+				83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */,
 				83D0BE1820B0C56200555B73 /* Migrations.swift in Sources */,
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,

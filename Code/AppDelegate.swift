@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     var tabBarDelegate = TabControllerDelegate()
     var tabBarController:UITabBarController!
+    var sharingDelegate:SharingInviteDelegate?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     
@@ -84,6 +85,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // The default UI displayed tab is .signIn
         if SignInManager.session.userIsSignedIn {
+            // User is signed in. We're by-passing the SignInVC screen. We need a delegate for SharingInvitation to accept sharing invitations in this case.
+            sharingDelegate = SharingInviteDelegate()
+            SharingInvitation.session.delegate = sharingDelegate
+
             selectTabInController(tab: .images)
         }
         

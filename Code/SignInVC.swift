@@ -27,6 +27,8 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     private var acceptSharingInvitation: Bool = false
     private var invite:SharingInvitation.Invitation?
     
+    var sharingDelegate:SharingInviteDelegate!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -48,7 +50,13 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         signIn = SignIn.createFromXib()!
         signInContainer.addSubview(signIn)
         
-        SharingInvitation.session.delegate = self
+        sharingDelegate = SharingInviteDelegate(withNotSignedInCallback: {[unowned self] invite in
+            self.acceptSharingInvitation = true
+            self.invite = invite
+            self.signIn.showSignIns(for: .sharingAccount)
+        })
+        
+        SharingInvitation.session.delegate = sharingDelegate
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -57,33 +65,7 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         // 12/29/17; Because of https://github.com/crspybits/SharedImages/issues/42
         if let invite = SharingInvitation.session.receive() {
             self.invite = invite
-            sharingInvitationReceived(invite)
-        }
-    }
-}
-
-// TODO: *1* Need a delegate callback from the signin, to let us hide the user type button when the user is signed in.
-
-extension SignInVC : SharingInvitationDelegate {
-    func sharingInvitationReceived(_ invite:SharingInvitation.Invitation) {
-#if false
-        SMCoreLib.Alert.show(withTitle: "SharingInvitation", message: "code: \(invite.sharingInvitationCode)")
-#endif
-
-        if !SignInManager.session.userIsSignedIn {
-            let userFriendlyText = invite.sharingInvitationPermission.userFriendlyText()
-            let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: .actionSheet)
-            Alert.styleForIPad(alert)
-            alert.popoverPresentationController?.sourceView = navigationController?.navigationBar
-
-            alert.addAction(UIAlertAction(title: "Not now", style: .cancel) {alert in
-            })
-            alert.addAction(UIAlertAction(title: "Share", style: .default) {[unowned self] alert in
-                self.acceptSharingInvitation = true
-                self.invite = invite
-                self.signIn.showSignIns(for: .sharingAccount)
-            })
-            self.present(alert, animated: true, completion: nil)
+            sharingDelegate.sharingInvitationReceived(invite)
         }
     }
 }

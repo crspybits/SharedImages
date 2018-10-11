@@ -185,7 +185,8 @@ class AlbumsVC: UIViewController {
         super.viewWillTransition(to: size, with: coordinator)
         
         // To resize cells when we rotate the device.
-        if let flowLayout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+        // 9/10/18; Got a crash here on accepting an invitation because self.collectionView was nil.
+        if let flowLayout = self.collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
                 flowLayout.invalidateLayout()
         }
     }
