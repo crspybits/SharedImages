@@ -24,8 +24,6 @@ class Migrations {
     }
     
     func run() {
-        return
-        
         if !Migrations.migration_0_17_3.boolValue {
             Migrations.migration_0_17_3.boolValue = true
             migrationToSharingGroupUUIDs()
@@ -36,8 +34,11 @@ class Migrations {
     func migrationToSharingGroupUUIDs() {
         var numErrors = 0
         
-        // This needs to be populated with data we setup for the migration. Sharing group ids -> Sharing group UUID's.
-        var lookup: [Int64: String]!
+        let lookup:[Int64: String] = [
+            1: "DB1DECB5-F2D6-441E-8D6A-4A6AF93216DB",
+            2: "61944E02-E76E-4937-8FE6-8BDF6F2D983E",
+            3: "1D12B154-A9EB-4B63-AC85-E4BB83DD680D"
+        ]
         
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let dirEntries = DirectoryEntry.fetchAll()

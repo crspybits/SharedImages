@@ -31,7 +31,11 @@ class Migrations {
     }
 
     private func toSharingGroupUUIDs() {
-        var fromIds:[Int64: String] = [:]
+        let fromIds:[Int64: String] = [
+            1: "DB1DECB5-F2D6-441E-8D6A-4A6AF93216DB",
+            2: "61944E02-E76E-4937-8FE6-8BDF6F2D983E",
+            3: "1D12B154-A9EB-4B63-AC85-E4BB83DD680D"
+        ]
         
         let images = Image.fetchAll()
         var numberImagesWithoutIds = 0
