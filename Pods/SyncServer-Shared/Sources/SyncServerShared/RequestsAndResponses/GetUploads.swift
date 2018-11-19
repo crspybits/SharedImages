@@ -58,6 +58,7 @@ public class GetUploadsResponse : ResponseMessage {
         return .json
     }
     
+    // FileInfo objects don't contain `cloudStorageType`.
     public static let uploadsKey = "uploads"
     public var uploads:[FileInfo]?
     

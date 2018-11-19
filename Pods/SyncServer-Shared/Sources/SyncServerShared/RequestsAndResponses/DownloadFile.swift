@@ -88,8 +88,17 @@ public class DownloadFileResponse : ResponseMessage {
     
     public var data:Data?
     
-    public static let fileSizeBytesKey = "fileSizeBytes"
-    public var fileSizeBytes:Int64?
+    // This can be used by a client to know how to compute the checksum if they upload another version of this file.
+    public static let cloudStorageTypeKey = "cloudStorageType"
+    public var cloudStorageType: String!
+
+    // The check sum for the file currently stored in cloud storage. The specific meaning of this value depends on the specific cloud storage system. See `cloudStorageType`. This can be used by clients to assess if there was an error in transmitting the file contents across the network. i.e., does this checksum match what is computed by the client after the file is downloaded?
+    public static let checkSumKey = "checkSum"
+    public var checkSum:String!
+    
+    // Did the contents of the file change while it was "at rest" in cloud storage? e.g., a user changed their file directly?
+    public static let contentsChangedKey = "contentsChanged"
+    public var contentsChanged:Bool!
     
     // If the master version for the user on the server has been incremented, this key will be present in the response-- with the new value of the master version. The download was not attempted in this case.
     public static let masterVersionUpdateKey = "masterVersionUpdate"
@@ -98,7 +107,9 @@ public class DownloadFileResponse : ResponseMessage {
     public required init?(json: JSON) {
         self.masterVersionUpdate = Decoder.decode(int64ForKey: DownloadFileResponse.masterVersionUpdateKey)(json)
         self.appMetaData = DownloadFileResponse.appMetaDataKey <~~ json
-        self.fileSizeBytes = Decoder.decode(int64ForKey: DownloadFileResponse.fileSizeBytesKey)(json)
+        self.cloudStorageType = DownloadFileResponse.cloudStorageTypeKey <~~ json
+        self.checkSum = DownloadFileResponse.checkSumKey <~~ json
+        self.contentsChanged = DownloadFileResponse.contentsChangedKey <~~ json
     }
     
     public convenience init?() {
@@ -110,7 +121,9 @@ public class DownloadFileResponse : ResponseMessage {
         return jsonify([
             DownloadFileResponse.masterVersionUpdateKey ~~> self.masterVersionUpdate,
             DownloadFileResponse.appMetaDataKey ~~> self.appMetaData,
-            DownloadFileResponse.fileSizeBytesKey ~~> self.fileSizeBytes
+            DownloadFileResponse.checkSumKey ~~> self.checkSum,
+            DownloadFileResponse.cloudStorageTypeKey ~~> self.cloudStorageType,
+            DownloadFileResponse.contentsChangedKey ~~> self.contentsChanged
         ])
     }
 }

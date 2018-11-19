@@ -48,6 +48,17 @@ public class ServerConstants {
         case GoogleToken
         case FacebookToken
         case DropboxToken
+        
+        public func toCloudStorageType() -> CloudStorageType? {
+            switch self {
+            case .DropboxToken:
+                return .Dropbox
+            case .GoogleToken:
+                return .Google
+            case .FacebookToken:
+                return nil
+            }
+        }
     }
 }
 

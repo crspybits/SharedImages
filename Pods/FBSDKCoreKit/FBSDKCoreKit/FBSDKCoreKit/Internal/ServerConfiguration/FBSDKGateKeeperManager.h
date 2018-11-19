@@ -18,11 +18,23 @@
 
 #import <Foundation/Foundation.h>
 
-#import "FBSDKCoreKit+Internal.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface FBSDKDeviceLoginError : FBSDKError
+@interface FBSDKGateKeeperManager : NSObject
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ Returns the locally cached configuration.
+ */
++ (BOOL)boolForKey:(NSString *)key
+             appID:(NSString *)appID
+      defaultValue:(BOOL)defaultValue;
+
+/**
+ Load the gate keeper configurations from server
+ */
++ (void)loadGateKeepers;
 
 @end
 

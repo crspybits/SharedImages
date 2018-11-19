@@ -56,15 +56,15 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
     public static let fileVersionKey = "fileVersion"
     public var fileVersion: FileVersionInt!
     
-    public static let fileSizeBytesKey = "fileSizeBytes"
-    public var fileSizeBytes: Int64!
-    
     // OWNER
     public static let owningUserIdKey = "owningUserId"
     public var owningUserId: UserId!
     
+    public static let cloudStorageTypeKey = "cloudStorageType"
+    public var cloudStorageType: String!
+    
     public var description: String {
-        return "fileUUID: \(fileUUID); deviceUUID: \(String(describing: deviceUUID)); creationDate: \(String(describing: creationDate)); updateDate: \(String(describing: updateDate)); mimeTypeKey: \(String(describing: mimeType)); deleted: \(deleted); fileVersion: \(fileVersion); appMetaDataVersion: \(String(describing: appMetaDataVersion)); fileSizeBytes: \(fileSizeBytes)"
+        return "fileUUID: \(String(describing: fileUUID)); deviceUUID: \(String(describing: deviceUUID)); creationDate: \(String(describing: creationDate)); updateDate: \(String(describing: updateDate)); mimeTypeKey: \(String(describing: mimeType)); deleted: \(String(describing: deleted)); fileVersion: \(String(describing: fileVersion)); appMetaDataVersion: \(String(describing: appMetaDataVersion))"
     }
     
     required public init?(json: JSON) {
@@ -77,7 +77,6 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
         self.appMetaDataVersion = Decoder.decode(int32ForKey: FileInfo.appMetaDataVersionKey)(json)
 
         self.fileVersion = Decoder.decode(int32ForKey: FileInfo.fileVersionKey)(json)
-        self.fileSizeBytes = Decoder.decode(int64ForKey: FileInfo.fileSizeBytesKey)(json)
         
         let dateFormatter = DateExtras.getDateFormatter(format: .DATETIME)
         self.creationDate = Decoder.decode(dateForKey: FileInfo.creationDateKey, dateFormatter: dateFormatter)(json)
@@ -85,6 +84,8 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
         
         self.owningUserId = Decoder.decode(int64ForKey: FileInfo.owningUserIdKey)(json)
         self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
+        
+        self.cloudStorageType = FileInfo.cloudStorageTypeKey <~~ json
     }
     
     public convenience init?() {
@@ -102,11 +103,11 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
             FileInfo.appMetaDataVersionKey ~~> self.appMetaDataVersion,
             FileInfo.deletedKey ~~> self.deleted,
             FileInfo.fileVersionKey ~~> self.fileVersion,
-            FileInfo.fileSizeBytesKey ~~> self.fileSizeBytes,
             Encoder.encode(dateForKey: FileInfo.creationDateKey, dateFormatter: dateFormatter)(self.creationDate),
             Encoder.encode(dateForKey: FileInfo.updateDateKey, dateFormatter: dateFormatter)(self.updateDate),
             FileInfo.owningUserIdKey ~~> self.owningUserId,
-            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
+            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID,
+            FileInfo.cloudStorageTypeKey ~~> self.cloudStorageType
         ])
     }
 }

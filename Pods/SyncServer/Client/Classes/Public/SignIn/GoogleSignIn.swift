@@ -113,7 +113,8 @@ public class GoogleSyncServerSignIn : NSObject, GenericSignIn {
         signInOutButton.signIn = self
     }
     
-    public var userType:UserType = .owning
+    public let userType:UserType = .owning
+    public let cloudStorageType: CloudStorageType? = .Google
     
     public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
     
@@ -244,6 +245,12 @@ extension GoogleSyncServerSignIn : GIDSignInDelegate {
     public func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!)
     {
         if (error == nil) {
+            // 11/14/18; I'm getting two calls to this delegate method, in rapid succession, on a sign in, with error == nil. And it's messing things up. Trying to avoid that.
+            guard self.signInOutButton.buttonShowing != .signOut else {
+                Log.msg("GoogleSyncServerSignIn: avoiding 2x sign in issue.")
+                return
+            }
+        
             self.signInOutButton.buttonShowing = .signOut
             let creds = signedInUser(forUser: user)
             stickySignIn = true

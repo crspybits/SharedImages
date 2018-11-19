@@ -37,16 +37,6 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
             appMetaDataVersionInternal = newValue == nil ? nil : NSNumber(value: newValue!)
         }
     }
-
-    public var sharingGroupId: Int64? {
-        get {
-            return sharingGroupIdInternal?.int64Value
-        }
-        
-        set {
-            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
-        }
-    }
     
     // Setting this assumes the file has also been deleted on the server.
     public var deletedLocally:Bool {
@@ -73,6 +63,21 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         }
     }
     
+    var cloudStorageType: CloudStorageType? {
+        get {
+            if let cloudStorageTypeInternal = cloudStorageTypeInternal {
+                return CloudStorageType(rawValue: cloudStorageTypeInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            cloudStorageTypeInternal = newValue?.rawValue
+        }
+    }
+    
     var attr: SyncAttributes {
         // 5/19/18; I don't know why this should happen-- but I was getting a nil mimeType in a DirectoryEntry. The following code is so this doesn't cause an explosion.
         var mimeType:MimeType!
@@ -84,9 +89,26 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         }
         
         var attr = SyncAttributes(fileUUID: fileUUID!, sharingGroupUUID: sharingGroupUUID!, mimeType: mimeType)
+        attr.gone = gone
         attr.appMetaData = appMetaData
         attr.fileGroupUUID = fileGroupUUID
         return attr
+    }
+    
+    // This is in the DirectoryEntry object because we need a way to avoid repeated efforts to download the same gone file. The client app needs to explicitly request a new download attempt for a gone file.
+    var gone:GoneReason? {
+        get {
+            if let goneReasonInternal = goneReasonInternal {
+                return GoneReason(rawValue: goneReasonInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            goneReasonInternal = newValue?.rawValue
+        }
     }
     
     public class func entityName() -> String {

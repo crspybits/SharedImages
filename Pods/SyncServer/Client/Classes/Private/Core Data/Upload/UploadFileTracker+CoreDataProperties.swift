@@ -2,7 +2,7 @@
 //  UploadFileTracker+CoreDataProperties.swift
 //  SyncServer
 //
-//  Created by Christopher G Prince on 9/3/18.
+//  Created by Christopher G Prince on 10/29/18.
 //
 //
 
@@ -19,5 +19,6 @@ extension UploadFileTracker {
     @NSManaged public var fileSizeBytes: Int64
     @NSManaged public var uploadCopy: Bool
     @NSManaged public var uploadUndeletion: Bool
+    @NSManaged public var checkSum: String?
 
 }

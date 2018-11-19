@@ -33,10 +33,16 @@ class Directory {
         }
     }
     
-    // Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. The directory is not changed as a result of this call, except for the case where the file isn't in the directory already, but has been deleted on the server. 5/19/18; And in a case of migration to using file groups.
-    // Does not do `CoreDataSync.perform(sessionName: Constants.coreDataName)`
-    // 1/25/18; Now dealing with the case where a file is marked as deleted locally, but was undeleted on the server-- we need to download the file again.
-    // 3/23/18; Now dealing with appMetaData versioning.
+    /* Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. The directory is not changed as a result of this call, except for:
+        a) the case where the file isn't in the directory already, but has been deleted on the server. 5/19/18;
+        b) a case of migration to using file groups
+        c) a case of migration to having a cloudStorageType attribute
+        d) a bug with mime types.
+     
+        Does not do `CoreDataSync.perform(sessionName: Constants.coreDataName)`
+        1/25/18; Now dealing with the case where a file is marked as deleted locally, but was undeleted on the server-- we need to download the file again.
+        3/23/18; Now dealing with appMetaData versioning.
+    */
     func checkFileIndex(serverFileIndex:[FileInfo]) throws -> DownloadSet {
     
         var downloadFiles = Set<FileInfo>()
@@ -56,7 +62,10 @@ class Directory {
 
             if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: serverFile.fileUUID) {
                 // Have the file in client directory.
-
+                if let _ = entry.gone {
+                    continue
+                }
+                
                 if entry.deletedOnServer {
                     /* If we have the file marked as deleted:
                         a) File (still) deleted on the server: Don't need to do anything.
@@ -91,6 +100,15 @@ class Directory {
                 if entry.mimeType == nil && serverFile.mimeType != nil {
                     entry.mimeType = serverFile.mimeType
                 }
+                
+                // 10/30/18; Again, this is more of a migration. If we already know about the file, we ought to know about its cloudStorageType. i.e., if we uploaded v0 of the file, we will know it's cloud storage type, or if it was unknown before we would have obtained its cloud storage type-- when we downloaded the file.
+                if entry.cloudStorageType == nil {
+                    guard let serverCloudStorageType = serverFile.cloudStorageType else {
+                        throw SyncServerError.generic("Server didn't have cloud storage type for fileUUID: \(String(describing: serverFile.fileGroupUUID))")
+                    }
+                    
+                    entry.cloudStorageType = CloudStorageType(rawValue: serverCloudStorageType)
+                }
             }
             else { // File is unknown to the client.
                 // Will never do just an appMetaData download in this case because an initial download of a file will also download any appMetaData for the file.
@@ -102,6 +120,11 @@ class Directory {
                     entry.fileUUID = serverFile.fileUUID
                     entry.fileVersion = serverFile.fileVersion
                     entry.sharingGroupUUID = serverFile.sharingGroupUUID
+                    
+                    if let serverCloudStorageType = serverFile.cloudStorageType {
+                        entry.cloudStorageType = CloudStorageType(rawValue: serverCloudStorageType)
+                    }
+                    
                     try CoreData.sessionNamed(Constants.coreDataName).context.save()
                 }
                 else {
@@ -136,8 +159,14 @@ class Directory {
     // Does not do `CoreDataSync.perform(sessionName: Constants.coreDataName)`
     // This for file and appMetaData downloads (not download deletions).
     func updateAfterDownloading(downloads:[DownloadFileTracker]) {
-        downloads.forEach { dft in
+        for dft in downloads {
             if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: dft.fileUUID) {
+                // So we don't repeatedly try to download the same file.
+                if let goneReason = dft.gone {
+                    entry.gone = goneReason
+                    continue
+                }
+                
                 // This will really only ever happen in testing: A situation where the DirectoryEntry has been created for the file uuid, but we don't have a fileVersion assigned. e.g., The file gets uploaded (not using the sync system), then uploaded by the sync system, and then we get the download that was created not using the sync system.
 #if !DEBUG
                 if entry.fileVersion! < dft.fileVersion {
@@ -176,12 +205,19 @@ class Directory {
             else {
                 let newEntry = DirectoryEntry.newObject() as! DirectoryEntry
                 newEntry.fileUUID = dft.fileUUID
-                newEntry.fileVersion = dft.fileVersion
                 newEntry.mimeType = dft.mimeType
-                newEntry.appMetaData = dft.appMetaData
-                newEntry.appMetaDataVersion = dft.appMetaDataVersion
                 newEntry.fileGroupUUID = dft.fileGroupUUID
                 newEntry.sharingGroupUUID = dft.sharingGroupUUID
+                newEntry.cloudStorageType = dft.cloudStorageType
+                
+                if let goneReason = dft.gone {
+                    newEntry.gone = goneReason
+                    continue
+                }
+                
+                newEntry.fileVersion = dft.fileVersion
+                newEntry.appMetaData = dft.appMetaData
+                newEntry.appMetaDataVersion = dft.appMetaDataVersion
             }
         }
     }

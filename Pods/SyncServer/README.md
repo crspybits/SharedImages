@@ -4,6 +4,8 @@ For documentation on the overall project see: https://crspybits.github.io/SyncSe
 
 [Client code](https://github.com/crspybits/SyncServer-iOSClient/tree/dev/Client): The iOS client interface to the SyncServer server.
 
+This project must be built with at least Xcode 10.
+
 [Jazzy documentation on this iOS SyncServer client interface](https://crspybits.github.io/iOS-Client-Docs/)
 	
 [Example code](https://github.com/crspybits/SyncServer-iOSClient/tree/dev/Example): An example of using this iOS client, along with tests for the Client interface.

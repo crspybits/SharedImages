@@ -21,6 +21,8 @@ public class SharingGroupUploadTracker: Tracker, CoreDataModel, AllOperations {
         case delayed
         
         case uploading
+        
+        // This is for both successfully uploaded files and files that cannot be uploaded due to a gone response.
         case uploaded
     }
     

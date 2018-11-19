@@ -368,6 +368,51 @@ class Upload {
         return .started
     }
     
+    private func uploadFileCompletion(nextToUpload: UploadFileTracker, creationDate: Date? = nil, updateDate: Date? = nil, gone: GoneReason? = nil) -> NextCompletion {
+        var completionResult:NextCompletion!
+
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            nextToUpload.status = .uploaded
+            nextToUpload.gone = gone
+
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let error) {
+                completionResult = .error(.coreDataError(error))
+                return
+            }
+    
+            let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
+            
+            if nextToUpload.sharingGroupUUID == nil {
+                completionResult = .error(.noSharingGroupUUID)
+                return
+            }
+
+            // 1/27/18; See [2] below.
+            var attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, sharingGroupUUID: nextToUpload.sharingGroupUUID!, mimeType:mimeType, creationDate: creationDate, updateDate: updateDate)
+            
+            attr.gone = gone
+            
+            // `nextToUpload.appMetaData` may be nil because the client isn't making a change to the appMetaData.
+            var appMetaData:String?
+            if let amd = nextToUpload.appMetaData {
+                appMetaData = amd
+            }
+            else {
+                // See if the directory entry has any appMetaData
+                if let dirEnt = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID), let amd = dirEnt.appMetaData {
+                    appMetaData = amd
+                }
+            }
+            
+            attr.appMetaData = appMetaData
+            completionResult = .fileUploaded(attr, uft: nextToUpload)
+        } // end perform
+        
+        return completionResult
+    }
+    
     private func uploadFile(nextToUpload:UploadFileTracker, uploadQueue:UploadQueue, masterVersion:MasterVersionInt) -> NextResult {
         
         var file:ServerAPI.File!
@@ -409,7 +454,7 @@ class Upload {
             let appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
             
             let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
-            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, fileGroupUUID: nextToUpload.fileGroupUUID, sharingGroupUUID: nextToUpload.sharingGroupUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion)
+            file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, fileGroupUUID: nextToUpload.fileGroupUUID, sharingGroupUUID: nextToUpload.sharingGroupUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion, checkSum: nextToUpload.checkSum!)
             
             undelete = nextToUpload.uploadUndeletion
             sharingGroupUUID = nextToUpload.sharingGroupUUID
@@ -427,48 +472,22 @@ class Upload {
             }
  
             switch uploadResult! {
-            case .success(sizeInBytes: _, creationDate: let creationDate, updateDate: let updateDate):
+            case .success(creationDate: let creationDate, updateDate: let updateDate):
                 var completionResult:NextCompletion?
-                CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                    nextToUpload.status = .uploaded
-                    
-                    do {
-                        try CoreData.sessionNamed(Constants.coreDataName).context.save()
-                    } catch (let error) {
-                        completionResult = .error(.coreDataError(error))
-                        return
-                    }
-            
-                    let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
-                    
-                    if nextToUpload.sharingGroupUUID == nil {
-                        completionResult = .error(.noSharingGroupUUID)
-                        return
-                    }
-
-                    // 1/27/18; See [2] below.
-                    var attr = SyncAttributes(fileUUID: nextToUpload.fileUUID, sharingGroupUUID: nextToUpload.sharingGroupUUID!, mimeType:mimeType, creationDate: creationDate, updateDate: updateDate)
-                    
-                    // `nextToUpload.appMetaData` may be nil because the client isn't making a change to the appMetaData.
-                    var appMetaData:String?
-                    if let amd = nextToUpload.appMetaData {
-                        appMetaData = amd
-                    }
-                    else {
-                        // See if the directory entry has any appMetaData
-                        if let dirEnt = DirectoryEntry.fetchObjectWithUUID(uuid: nextToUpload.fileUUID), let amd = dirEnt.appMetaData {
-                            appMetaData = amd
-                        }
-                    }
-                    
-                    attr.appMetaData = appMetaData
-                    completionResult = .fileUploaded(attr, uft: nextToUpload)
-                } // end perform
-                
+                completionResult = self?.uploadFileCompletion(nextToUpload: nextToUpload, creationDate: creationDate, updateDate: updateDate)
                 self?.completion?(completionResult!)
 
             case .serverMasterVersionUpdate(let masterVersionUpdate):
                 self?.masterVersionUpdate(uploadQueue: uploadQueue, masterVersionUpdate: masterVersionUpdate, sharingGroupUUID: sharingGroupUUID)
+            case .gone (let goneReason):
+                if goneReason != .authTokenExpiredOrRevoked {
+                    Log.error("Received `gone` for a file upload, but the reason was not authTokenExpiredOrRevoked.")
+                }
+                
+                // We're not treating "gone" as an error-- because I want to push up "gone" to the client app, and not retain an UploadFileTracker in the SyncServer client. The client app needs to decide what to do when a file is "gone" on the server.
+                var completionResult:NextCompletion!
+                completionResult = self?.uploadFileCompletion(nextToUpload: nextToUpload, gone: goneReason)
+                self?.completion?(completionResult)
             }
         }
         
@@ -623,7 +642,7 @@ class Upload {
                 var completionResult:DoneUploadsCompletion?
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {
                     // Master version was incremented on the server as part of normal doneUploads operation. Update ours locally.
-                    sharingEntry.masterVersion += 1
+                    sharingEntry.masterVersion += MasterVersionInt(1)
                     
                     // If we did a sharing group name update on the server, apply it locally so we're in sync on sharing group names. (And don't have to do another sync() to apply the update.
                     if let sharingGroupNameUpdate = sharingGroupNameUpdate {

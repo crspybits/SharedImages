@@ -59,12 +59,12 @@ class ServerNetworking : NSObject {
         }
     }
 
-    func upload(file:ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion: ((HTTPURLResponse?, _ statusCode:Int?, SyncServerError?)->())?) {
+    func upload(file:ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion: ((HTTPURLResponse?, _ statusCode:Int?, SyncServerError?, _ uploadResponseBody: [String: Any]?)->())?) {
     
         // 5/21/18; I'm going to attempt to fix https://github.com/crspybits/SharedImages/issues/110 by just taking this out. I'm wondering if I'm getting false indications of a lack of a network. Use it as a diagnostic after an error instead.
         // 5/27/18; That experiment didn't work out so well. I got a large number of network errors: https://github.com/crspybits/SharedImages/issues/120 I'm going to try using a different reachability method.
         // 6/15/18; And that experiment didn't work out so well either. It turns out that apparently the background sessions I'm using for upload/download wait for network availability. So, I'm going to rely on that for upload/download.
-        ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) {[unowned self] (serverResponse, statusCode, error) in
+        ServerNetworkingLoading.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) {[unowned self] (serverResponse, statusCode, error, uploadResponseBody) in
         
             if let headers = serverResponse?.allHeaderFields, !self.serverVersionIsOK(headerFields: headers) {
                 return
@@ -72,11 +72,11 @@ class ServerNetworking : NSObject {
             
             guard error == nil else {
                 self.checkForNetworkAndReport()
-                completion?(nil, nil, error)
+                completion?(nil, nil, error, nil)
                 return
             }
             
-            completion?(serverResponse, statusCode, error)
+            completion?(serverResponse, statusCode, error, uploadResponseBody)
         }
     }
     

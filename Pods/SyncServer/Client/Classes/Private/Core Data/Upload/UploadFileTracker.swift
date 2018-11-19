@@ -18,6 +18,8 @@ public class UploadFileTracker: FileTracker, AllOperations {
     enum Status : String {
     case notStarted
     case uploading
+    
+    // This is for both successfully uploaded files and files that cannot be uploaded due to a gone response.
     case uploaded
     }
     

@@ -58,7 +58,8 @@ public class FacebookSyncServerSignIn : GenericSignIn {
         signInOutButton.signIn = self
     }
     
-    public var userType:UserType = .sharing
+    public let userType:UserType = .sharing
+    public let cloudStorageType: CloudStorageType? = nil // not owning; must be nil.
     
     public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
     

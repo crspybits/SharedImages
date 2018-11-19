@@ -209,7 +209,7 @@ public class SyncServerUser {
         
         ServerAPI.session.creds = creds
         
-        ServerAPI.session.redeemSharingInvitation(sharingInvitationUUID: invitationCode, cloudFolderName: cloudFolderName) { accessToken, sharingGroupId, error in
+        ServerAPI.session.redeemSharingInvitation(sharingInvitationUUID: invitationCode, cloudFolderName: cloudFolderName) { accessToken, sharingGroupUUID, error in
             if error == nil {
                 self.creds = creds
             }
@@ -218,7 +218,7 @@ public class SyncServerUser {
             }
             
             Thread.runSync(onMainThread: {
-                completion?(accessToken, sharingGroupId, error)
+                completion?(accessToken, sharingGroupUUID, error)
             })
         }
     }

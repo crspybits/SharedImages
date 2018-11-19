@@ -162,16 +162,16 @@ extension ServerAPI {
         rwr.start()
     }
     
-    func upload(file: ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion:((_ urlResponse: HTTPURLResponse?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
+    func upload(file: ServerNetworkingLoadingFile, fromLocalURL localURL: URL, toServerURL serverURL: URL, method: ServerHTTPMethod, completion:((_ urlResponse: HTTPURLResponse?, _ uploadResponseBody: [String: Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         
         let rwr = RequestWithRetries(creds:creds, desiredEvents:desiredEvents, delegate:syncServerDelegate, updateCreds: updateCreds, checkForError:checkForError, userUnauthorized: userUnauthorized)
         
         // I get rid of the circular references in the completion handler. These references are being used to retain the rwr object.
         rwr.request = {
-            ServerNetworking.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) { (serverResponse, statusCode, error) in
+            ServerNetworking.session.upload(file: file, fromLocalURL: localURL, toServerURL: serverURL, method: method) { (serverResponse, statusCode, error, uploadResponseBody) in
                 
                 rwr.completionHandler = { error in
-                    completion?(serverResponse, statusCode, error)
+                    completion?(serverResponse, uploadResponseBody, statusCode, error)
                 }
                 rwr.retryCheck(statusCode: statusCode, error: error)
             }

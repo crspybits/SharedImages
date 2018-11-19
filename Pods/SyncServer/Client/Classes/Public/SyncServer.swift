@@ -24,6 +24,7 @@ public class SyncServer {
         }
         
         let syncType: SyncType
+        let reAttemptGoneDownloads: Bool
         let completion:(()->())?
     }
     
@@ -185,14 +186,17 @@ public class SyncServer {
                 return
             }
             
-            guard self.knownSharingGroupUUID(attr.sharingGroupUUID) else {
+            guard let sharingEntry = self.knownSharingGroupUUID(attr.sharingGroupUUID) else {
                 errorToThrow = SyncServerError.generic("Unknown sharing group UUID")
                 return
             }
-            
+                        
             var entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID)
             
             var fileGroupUUID:String?
+            
+            // Will remain nil if the entry is new, up until when we compute the checksum.
+            var cloudStorageType: CloudStorageType?
             
             if nil == entry {
                 entry = (DirectoryEntry.newObject() as! DirectoryEntry)
@@ -203,6 +207,12 @@ public class SyncServer {
                 fileGroupUUID = attr.fileGroupUUID
             }
             else {
+                if let _ = entry!.gone {
+                    errorToThrow = SyncServerError.generic("Attempt to upload a file that is gone.")
+                    return
+                }
+                
+                cloudStorageType = entry!.cloudStorageType!
                 guard let entryMimeTypeString = entry!.mimeType,
                     let entryMimeType = MimeType(rawValue: entryMimeTypeString) else {
                     errorToThrow = SyncServerError.noMimeType
@@ -245,6 +255,16 @@ public class SyncServer {
             newUft.operation = .file
             newUft.fileGroupUUID = fileGroupUUID
             
+            do {
+                newUft.checkSum = try self.makeCheckSum(cloudStorageType: &cloudStorageType, url: fileURL as URL, sharingEntry: sharingEntry)
+            }
+            catch (let error) {
+                errorToThrow = error
+                return
+            }
+            
+            entry!.cloudStorageType = cloudStorageType!
+
             if copy {
                 // Make a copy of the file
                 guard let copyOfFileURL = FilesMisc.newTempFileURL() else {
@@ -268,12 +288,40 @@ public class SyncServer {
             // The file version to upload will be determined immediately before the upload so not assigning the fileVersion property of `newUft` yet. See https://github.com/crspybits/SyncServerII/issues/12
             // Similarly, the appMetaData version will be determined immediately before the upload.
             
+            // This does a Core Data save.
             errorToThrow = self.tryToAddUploadFileTracker(attr: attr, newUft: newUft)
         } // end perform
         
         guard errorToThrow == nil else {
             throw errorToThrow!
         }
+    }
+    
+    // cloudStorageType is passed nil when we are creating a new file. It only changes if passed nil.
+    // Call this from within a Core Data perform block.
+    private func makeCheckSum(cloudStorageType: inout CloudStorageType?, url: URL, sharingEntry: SharingEntry) throws -> String {
+    
+        guard let signIn = SignInManager.session.currentSignIn else {
+            throw SyncServerError.generic("No current signed in user when trying to compute checksum!")
+        }
+
+        if cloudStorageType == nil {
+            switch signIn.userType {
+            case .owning:
+                // An owning user is creating a new file; v0 file's have the cloud storage type of this, the owning user.
+                cloudStorageType = signIn.cloudStorageType!
+            case .sharing:
+                // A sharing user is creating a new file; v0 files have the cloud storage type of the "parent" owning user-- for the particular sharing group.
+                cloudStorageType = sharingEntry.cloudStorageType!
+            }
+        }
+        // Else: v1 or greater of file; it already has a cloud storage type.
+
+        guard let checkSum = Hashing.hashOf(url: url, for: cloudStorageType!) else {
+            throw SyncServerError.couldNotComputeHash
+        }
+        
+        return checkSum
     }
     
     /**
@@ -301,7 +349,7 @@ public class SyncServer {
         var errorToThrow:Error?
 
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            guard self.knownSharingGroupUUID(attr.sharingGroupUUID) else {
+            guard let _ = self.knownSharingGroupUUID(attr.sharingGroupUUID) else {
                 errorToThrow = SyncServerError.generic("Unknown sharing group UUID")
                 return
             }
@@ -319,6 +367,11 @@ public class SyncServer {
             // In part, this ensures you can't do an appMetaData upload as v0 of a file.
             guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID) else {
                 errorToThrow = SyncServerError.couldNotFindFileUUID(attr.fileUUID)
+                return
+            }
+            
+            if let _ = entry.gone {
+                errorToThrow = SyncServerError.generic("Attempt to upload a file that is gone.")
                 return
             }
             
@@ -370,16 +423,16 @@ public class SyncServer {
     }
     
     // Do this in a Core Data perform block.
-    private func knownSharingGroupUUID(_ sharingGroupUUID: String) -> Bool {
+    private func knownSharingGroupUUID(_ sharingGroupUUID: String) -> SharingEntry? {
         guard let sharingEntry = SharingEntry.fetchObjectWithUUID(uuid: sharingGroupUUID) else {
-            return false
+            return nil
         }
         
         if sharingEntry.removedFromGroup {
-            return false
+            return nil
         }
         
-        return true
+        return sharingEntry
     }
     
     // Do this in a Core Data perform block.
@@ -423,6 +476,7 @@ public class SyncServer {
     }
     
     // Do this in a Core Data perform block.
+    // This does a Core Data save.
     private func tryToAddUploadFileTracker(attr:SyncAttributes, newUft: UploadFileTracker) -> Error? {
         var errorToThrow: Error?
         
@@ -514,11 +568,15 @@ public class SyncServer {
             throw SyncServerError.deletingUnknownFile
         }
         
+        if let _ = entry.gone {
+            throw SyncServerError.generic("Attempt to upload a file that is gone.")
+        }
+        
         guard let sharingGroupUUID = entry.sharingGroupUUID else {
             throw SyncServerError.noSharingGroupUUID
         }
         
-        guard self.knownSharingGroupUUID(sharingGroupUUID) else {
+        guard let _ = self.knownSharingGroupUUID(sharingGroupUUID) else {
             throw SyncServerError.generic("Unknown sharing group UUID")
         }
         
@@ -565,7 +623,6 @@ public class SyncServer {
                 let newUft = UploadFileTracker.newObject() as! UploadFileTracker
                 newUft.operation = .deletion
                 newUft.fileUUID = uuid
-                newUft.sharingGroupId = entry.sharingGroupId
                 newUft.sharingGroupUUID = entry.sharingGroupUUID
 
                 /* [1]: `entry.fileVersion` will be nil if we are in the process of uploading a new file. Which causes the following to fail:
@@ -648,7 +705,7 @@ public class SyncServer {
         var errorToThrow: SyncServerError?
         Synchronized.block(self) {
             CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                guard self.knownSharingGroupUUID(sharingGroupUUID) else {
+                guard let _ = self.knownSharingGroupUUID(sharingGroupUUID) else {
                     errorToThrow = SyncServerError.generic("Unknown sharing group UUID")
                     return
                 }
@@ -688,7 +745,7 @@ public class SyncServer {
         var errorToThrow: SyncServerError?
         Synchronized.block(self) {
             CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                guard self.knownSharingGroupUUID(sharingGroupUUID) else {
+                guard let _ = self.knownSharingGroupUUID(sharingGroupUUID) else {
                     errorToThrow = SyncServerError.generic("Unknown sharing group UUID")
                     return
                 }
@@ -758,17 +815,19 @@ public class SyncServer {
      
         1) If you give a non-nil sharingGroupUUID, if no other `sync` is taking place, this will asynchronously do pending downloads, file uploads, and upload deletions for the given sharing group. If there is a `sync` currently taking place (for any sharing group), this closes the collection of uploads/deletions queued (if any) for the sharingGroupUUID, and will wait until after the current sync is done, and try again. Also synchronizes the `sharingGroups` property with the server.
      
-        2) If you give a nil-sharingGroupUUID, only synchronizes the `sharingGroups` property. Doesn't do pending downloads or uploads etc. And doesn't close a collection of queued operations.
+            In this case you can also give reAttemptGoneDownloads = true, which will reattempt downloads for files previously marked as gone. See SyncAttributes.
      
+        2) If you give a nil-sharingGroupUUID, only synchronizes the `sharingGroups` property. Doesn't do pending downloads or uploads etc. And doesn't close a collection of queued operations (reAttemptGoneDownloads ignored in this case).
+
         If a stopSync is currently pending, then this call will be ignored.
      
         Non-blocking in all cases.
     */
-    public func sync(sharingGroupUUID: String? = nil) throws {
-        try sync(sharingGroupUUID:sharingGroupUUID, completion:nil)
+    public func sync(sharingGroupUUID: String? = nil, reAttemptGoneDownloads: Bool = false) throws {
+        try sync(sharingGroupUUID:sharingGroupUUID, reAttemptGoneDownloads: reAttemptGoneDownloads, completion:nil)
     }
     
-    func sync(sharingGroupUUID: String?, completion:(()->())?) throws {
+    func sync(sharingGroupUUID: String?, reAttemptGoneDownloads: Bool = false, completion:(()->())?) throws {
         var doStart = true
         
         var errorToThrow: Error?
@@ -804,7 +863,7 @@ public class SyncServer {
                     }
                     
                     if !haveUploads {
-                        guard self.knownSharingGroupUUID(sharingGroupUUID) else {
+                        guard let _ = self.knownSharingGroupUUID(sharingGroupUUID) else {
                             errorToThrow = SyncServerError.generic("Unknown sharing group UUID")
                             return
                         }
@@ -822,10 +881,10 @@ public class SyncServer {
                 
                 var delayed:DelayedSync
                 if let sharingGroupUUID = sharingGroupUUID {
-                    delayed = DelayedSync(syncType: .regular(sharingGroupUUID: sharingGroupUUID), completion: completion)
+                    delayed = DelayedSync(syncType: .regular(sharingGroupUUID: sharingGroupUUID), reAttemptGoneDownloads: reAttemptGoneDownloads, completion: completion)
                 }
                 else {
-                    delayed = DelayedSync(syncType: .sharingGroupsOnly, completion: completion)
+                    delayed = DelayedSync(syncType: .sharingGroupsOnly, reAttemptGoneDownloads: false, completion: completion)
                 }
                 delayedSync += [delayed]
                 
@@ -841,7 +900,7 @@ public class SyncServer {
         }
         
         if doStart {
-            start(sharingGroupUUID: sharingGroupUUID, completion: completion)
+            start(sharingGroupUUID: sharingGroupUUID, reAttemptGoneDownloads: reAttemptGoneDownloads, completion: completion)
         }
     }
     
@@ -1080,7 +1139,7 @@ public class SyncServer {
         return results
     }
     
-    private func start(sharingGroupUUID: String?, completion:(()->())?) {
+    private func start(sharingGroupUUID: String?, reAttemptGoneDownloads: Bool, completion:(()->())?) {
         EventDesired.reportEvent(.syncStarted, mask: self.eventsDesired, delegate: self.delegate)
         Log.msg("SyncServer.start")
         
@@ -1093,6 +1152,17 @@ public class SyncServer {
 
             Synchronized.block(self) {
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                    if reAttemptGoneDownloads {
+                        let dirEntries = DirectoryEntry.fetchAll()
+                        dirEntries.forEach { dirEntry in
+                            if let _ = dirEntry.gone {
+                                dirEntry.gone = nil
+                            }
+                        }
+                    }
+                    
+                    CoreData.sessionNamed(Constants.coreDataName).saveContext()
+            
                     // Check the head tracker on uploads to see if we're doing a) or b)
                     if let uploadQueue = Upload.getHeadSyncQueue(forSharingGroupUUID: sharingGroupUUID) {
                         let sharingGroupTrackers = uploadQueue.sharingGroupUploadTrackers
@@ -1142,6 +1212,7 @@ public class SyncServer {
 
         var nextSharingGroupUUID: String?
         var nextCompletion:(()->())?
+        var reAttemptGoneDownloads: Bool = false
         
         Synchronized.block(self) { [unowned self] in
             CoreDataSync.perform(sessionName: Constants.coreDataName) {
@@ -1150,7 +1221,8 @@ public class SyncServer {
                 } else if self.delayedSync.count > 0 {
                     let delayed = self.delayedSync.first!
                     nextCompletion = delayed.completion
-                    
+                    reAttemptGoneDownloads = delayed.reAttemptGoneDownloads
+
                     switch delayed.syncType {
                     case .regular(sharingGroupUUID: let sharingGroupUUID):
                         nextSharingGroupUUID = sharingGroupUUID
@@ -1170,7 +1242,7 @@ public class SyncServer {
         EventDesired.reportEvent(.syncDone, mask: self.eventsDesired, delegate: self.delegate)
     
         if nextSharingGroupUUID != nil {
-            self.start(sharingGroupUUID: nextSharingGroupUUID, completion:nextCompletion)
+            self.start(sharingGroupUUID: nextSharingGroupUUID, reAttemptGoneDownloads: reAttemptGoneDownloads, completion:nextCompletion)
         }
     }
     

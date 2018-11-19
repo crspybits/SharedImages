@@ -16,8 +16,11 @@ public enum SyncEvent {
     
     case willStartUploads(numberContentUploads:UInt, numberUploadDeletions:UInt, numberSharingGroupOperatioms: UInt)
     
-    /// The attributes report the actual creation and update dates of the file-- as established by the server.
+    /// The attributes report the actual creation and update dates of the file-- as established by the server. The "gone" field of attr will be nil.
     case singleFileUploadComplete(attr:SyncAttributes)
+    
+    /// The file upload you requested could not be completed because the file was gone on the server. See the non-nil gone field for the reason. In order to determine that a file could *not* be uploaded because the file was gone on the server, you must use this event. It is up to the client app to inform the user of this failed upload and/or queue up another attempt to upload the file (e.g., uploadImmutable).
+    case singleFileUploadGone(attr:SyncAttributes)
     
     case singleAppMetaDataUploadComplete(fileUUID: String)
 
@@ -52,25 +55,26 @@ public struct EventDesired: OptionSet {
     public static let willStartUploads = EventDesired(rawValue: 1 << 1)
 
     public static let singleFileUploadComplete = EventDesired(rawValue: 1 << 2)
-    public static let singleAppMetaDataUploadComplete = EventDesired(rawValue: 1 << 3)
-    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 4)
-    public static let contentUploadsCompleted = EventDesired(rawValue: 1 << 5)
-    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 6)
+    public static let singleFileUploadGone = EventDesired(rawValue: 1 << 3)
+    public static let singleAppMetaDataUploadComplete = EventDesired(rawValue: 1 << 4)
+    public static let singleUploadDeletionComplete = EventDesired(rawValue: 1 << 5)
+    public static let contentUploadsCompleted = EventDesired(rawValue: 1 << 6)
+    public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 7)
     
-    public static let sharingGroupUploadOperationCompleted = EventDesired(rawValue: 1 << 7)
+    public static let sharingGroupUploadOperationCompleted = EventDesired(rawValue: 1 << 8)
 
-    public static let syncDelayed = EventDesired(rawValue: 1 << 8)
-    public static let syncStarted = EventDesired(rawValue: 1 << 9)
-    public static let syncDone = EventDesired(rawValue: 1 << 10)
+    public static let syncDelayed = EventDesired(rawValue: 1 << 9)
+    public static let syncStarted = EventDesired(rawValue: 1 << 10)
+    public static let syncDone = EventDesired(rawValue: 1 << 11)
     
-    public static let syncStopping = EventDesired(rawValue: 1 << 11)
+    public static let syncStopping = EventDesired(rawValue: 1 << 12)
 
-    public static let refreshingCredentials = EventDesired(rawValue: 1 << 12)
+    public static let refreshingCredentials = EventDesired(rawValue: 1 << 13)
     
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -106,6 +110,9 @@ public struct EventDesired: OptionSet {
             
         case .singleFileUploadComplete:
             eventIsDesired = .singleFileUploadComplete
+            
+        case .singleFileUploadGone:
+            eventIsDesired = .singleFileUploadGone
             
         case .singleAppMetaDataUploadComplete:
             eventIsDesired = .singleAppMetaDataUploadComplete
@@ -171,7 +178,11 @@ public struct DownloadOperation {
         case appMetaData
     
         /// May also include an appMetaData update. In the context, see the `SyncAttributes`.
-        case file(SMRelativeLocalURL)
+        /// contentsChanged: Did the contents of the file change while the file was "at rest" in cloud storage? e.g., this would happen if the user directly modified a Google Drive file used by the app. If this is true, you can be certain that the file changed. If this is false, it is possible (though less likely) the file changed. This lack of certainty is due to the use of checksums in making this determination.
+        case file(SMRelativeLocalURL, contentsChanged: Bool)
+        
+        /// Download could not be carried out because the file was gone. See the SyncAttributes in context for the specific GoneReason.
+        case fileGone
         
         case deletion
     }
@@ -218,6 +229,9 @@ public protocol SyncServerDelegate : class {
         For files you upload without file groups, this callback always has a single element in the array passed.
     */
     func syncServerFileGroupDownloadComplete(group: [DownloadOperation])
+    
+    /// Like the above, but at least one of the file downloads could not be completed because the file was gone on the server. See the group info for details. It is up to the client app to inform the user and re-attempt downloads of files that are gone, if wanted. See the `reAttemptGoneDownloads` option of the sync method.
+    func syncServerFileGroupDownloadGone(group: [DownloadOperation])
     
     /// Called when sharing group operations occur because of downloads (i.e., changes by other users). `updated` has the specific meaning that SyncServer `updateSharingGroup` was performed by another app. `syncNeeded` in sharing groups will be nil.
     func syncServerSharingGroupsDownloaded(created: [SyncServer.SharingGroup], updated: [SyncServer.SharingGroup], deleted: [SyncServer.SharingGroup])

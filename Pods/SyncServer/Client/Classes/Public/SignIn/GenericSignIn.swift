@@ -74,6 +74,9 @@ public protocol Tappable {
 public protocol GenericSignIn : class {
     /// Some services, e.g., Facebook, are only suitable for sharing users-- i.e., they don't have cloud storage.
     var userType:UserType {get}
+    
+    /// For owning userType's, this gives the specific cloud storage type. For sharing userType's, this is nil.
+    var cloudStorageType: CloudStorageType? {get}
 
     /// Delegate not dependent on the UI. Typically present through lifespan of app.
     var signOutDelegate:GenericSignOutDelegate? {get set}

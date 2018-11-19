@@ -17,7 +17,7 @@ import SyncServer_Shared
 // 12/31/17; Plus, I want downloading and uploading to work in the background-- see https://github.com/crspybits/SharedImages/issues/36 (See that link for ideas about how to extend current background task operation).
 
 typealias DownloadCompletion = (SMRelativeLocalURL?, HTTPURLResponse?, _ statusCode:Int?, SyncServerError?)->()
-typealias UploadCompletion = (HTTPURLResponse?, _ statusCode:Int?, SyncServerError?)->()
+typealias UploadCompletion = (HTTPURLResponse?, _ statusCode:Int?, SyncServerError?, _ uploadResponseBody: [String: Any]?)->()
 
 private enum CompletionHandler {
     case download(DownloadCompletion)
@@ -37,6 +37,8 @@ class ServerNetworkingLoading : NSObject {
     private var session:URLSession!
     fileprivate var completionHandlers = [URLSessionTask:CompletionHandler]()
     fileprivate var backgroundCompletionHandler:(()->())?
+    
+    fileprivate var uploadBodyResults = [URLSessionUploadTask: [String: Any]]()
 
     private override init() {
         super.init()
@@ -236,7 +238,7 @@ class ServerNetworkingLoading : NSObject {
             let statusCode = response.statusCode
             DebugWriter.session.log("Using cached upload result")
             // We are not caching error results, so set the error to nil.
-            completion(response, statusCode, nil)
+            completion(response, statusCode, nil, nil)
             return
         }
     
@@ -279,7 +281,7 @@ extension ServerNetworkingLoading : URLSessionDelegate, URLSessionTaskDelegate, 
        originalDownloadLocation = convertToCurrentCachesDirectory(originalURL: location)
 #endif
 
-        Log.msg("download completed: location: \(originalDownloadLocation);  status: \(String(describing: (downloadTask.response as? HTTPURLResponse)?.statusCode))")
+        Log.msg("download completed: location: \(String(describing: originalDownloadLocation));  status: \(String(describing: (downloadTask.response as? HTTPURLResponse)?.statusCode))")
 
         let originalRequestURL = downloadTask.originalRequest!.url!
         var returnError:SyncServerError?
@@ -370,11 +372,17 @@ extension ServerNetworkingLoading : URLSessionDelegate, URLSessionTaskDelegate, 
                 completion(nil, response, response?.statusCode, .urlSessionError(error!))
             }
         case .some(.upload(let completion)):
+            var uploadBody: [String: Any]?
+            if let uploadTask = task as? URLSessionUploadTask {
+                uploadBody = uploadBodyResults[uploadTask]
+                uploadBodyResults[uploadTask] = nil
+            }
+            
             removeCache(serverURLKey: originalRequestURL)
 
             // For uploads, since this is called if we get an error or not, we always have to call the completion handler.
             let errorResult = error == nil ? nil : SyncServerError.urlSessionError(error!)
-            completion(response, response?.statusCode, errorResult)
+            completion(response, response?.statusCode, errorResult, uploadBody)
         }
     }
     
@@ -382,6 +390,18 @@ extension ServerNetworkingLoading : URLSessionDelegate, URLSessionTaskDelegate, 
     // But, how do we coordinate the status code and error info, apparently received in didCompleteWithError, with this??
     // 1/2/18; Because of this issue I've just now changed how the server upload response gives it's results-- the values now come back in an HTTP header key, just like the download.
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    
+        // This assumes this delegate method is called *before* the didCompleteWithError method.
+        do {
+            let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: UInt(0)))
+            if let uploadTask = dataTask as? URLSessionUploadTask,
+                let jsonDict = json as? [String: Any] {
+                uploadBodyResults[uploadTask] = jsonDict
+            }
+        } catch (let error) {
+            Log.warning("Could not do JSON conversion: \(error)")
+            return
+        }
     }
     
     // This gets called "When all events have been delivered, the system calls the urlSessionDidFinishEvents(forBackgroundURLSession:) method of URLSessionDelegate. At this point, fetch the backgroundCompletionHandler stored by the app delegate in Listing 3 and execute it. Listing 4 shows this process." (https://developer.apple.com/documentation/foundation/url_loading_system/downloading_files_in_the_background)

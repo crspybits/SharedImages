@@ -25,7 +25,7 @@ extension Upload {
     }
     
     // Must have uploads in `pendingSync`. This does a `saveContext`.
-    // The pending queue must have uploads for the sharingGroupId (only).
+    // The pending queue must have uploads for the sharingGroupUUID (only).
     class func movePendingSyncToSynced(sharingGroupUUID: String) throws {
         guard let pendingQueue = Singleton.get().pendingSync else {
             assert(false)

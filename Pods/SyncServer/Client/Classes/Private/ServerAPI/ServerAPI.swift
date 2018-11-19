@@ -276,26 +276,30 @@ class ServerAPI {
         let deviceUUID:String!
         let appMetaData:AppMetaData?
         let fileVersion:FileVersionInt!
+        let checkSum:String
     }
     
     enum UploadFileResult {
-        case success(sizeInBytes:Int64, creationDate: Date, updateDate: Date)
+        case success(creationDate: Date, updateDate: Date)
         case serverMasterVersionUpdate(Int64)
+        
+        // The GoneReason should never be userRemoved-- because when a user is removed, their files are marked as deleted in the FileIndex, and thus the files are generally not uploadable. It should also never be fileRemovedOrRenamed-- because a new upload would upload the next version, not accessing the current version.
+        case gone(GoneReason)
     }
     
     // Set undelete = true in order to do an upload undeletion. The server file must already have been deleted. The meaning is to upload a new file version for a file that has already been deleted on the server. The use case is for conflict resolution-- when a download deletion and a file upload are taking place at the same time, and the client want's its upload to take priority over the download deletion.
-    // Returns error `SyncServerError.invitingUserRemoved` in the case of a purely sharing user trying to upload a file and their original inviting user has been removed from the system.
     func uploadFile(file:File, serverMasterVersion:MasterVersionInt, undelete:Bool = false, completion:((UploadFileResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.uploadFile
 
-        Log.special("file.fileUUID: \(file.fileUUID)")
+        Log.special("file.fileUUID: \(String(describing: file.fileUUID))")
 
         var params:[String : Any] = [
             UploadFileRequest.fileUUIDKey: file.fileUUID,
             UploadFileRequest.mimeTypeKey: file.mimeType.rawValue,
             UploadFileRequest.fileVersionKey: file.fileVersion,
             UploadFileRequest.masterVersionKey: serverMasterVersion,
-            ServerEndpoint.sharingGroupUUIDKey: file.sharingGroupUUID
+            ServerEndpoint.sharingGroupUUIDKey: file.sharingGroupUUID,
+            UploadFileRequest.checkSumKey: file.checkSum
         ]
         
         if file.fileVersion == 0 {
@@ -319,10 +323,12 @@ class ServerAPI {
         let url = makeURL(forEndpoint: endpoint, parameters: parameters)
         let networkingFile = ServerNetworkingLoadingFile(fileUUID: file.fileUUID, fileVersion: file.fileVersion)
 
-        upload(file: networkingFile, fromLocalURL: file.localURL, toServerURL: url, method: endpoint.method) { (response, httpStatus, error) in
+        upload(file: networkingFile, fromLocalURL: file.localURL, toServerURL: url, method: endpoint.method) { (response, uploadResponseBody, httpStatus, error) in
 
-            if httpStatus == HTTPStatus.gone.rawValue {
-                completion?(nil, .invitingUserRemoved)
+            if httpStatus == HTTPStatus.gone.rawValue,
+                let goneReasonRaw = uploadResponseBody?[GoneReason.goneReasonKey] as? String,
+                let goneReason = GoneReason(rawValue: goneReasonRaw) {
+                completion?(UploadFileResult.gone(goneReason), nil)
                 return
             }
             
@@ -346,12 +352,12 @@ class ServerAPI {
                         return
                     }
                     
-                    guard let size = uploadFileResponse.size, let creationDate = uploadFileResponse.creationDate, let updateDate = uploadFileResponse.updateDate else {
+                    guard let creationDate = uploadFileResponse.creationDate, let updateDate = uploadFileResponse.updateDate else {
                         completion?(nil, .noExpectedResultKey)
                         return
                     }
                     
-                    completion?(UploadFileResult.success(sizeInBytes:size, creationDate: creationDate, updateDate: updateDate), nil)
+                    completion?(UploadFileResult.success(creationDate: creationDate, updateDate: updateDate), nil)
                 }
                 else {
                     completion?(nil, .couldNotObtainHeaderParameters)
@@ -423,13 +429,18 @@ class ServerAPI {
     
     struct DownloadedFile {
         let url: SMRelativeLocalURL
-        let fileSizeBytes:Int64
         let appMetaData:AppMetaData?
+        let checkSum:String // in cloud storage
+        let cloudStorageType:CloudStorageType
+        let contentsChangedOnServer: Bool
     }
     
     enum DownloadFileResult {
         case success(DownloadedFile)
         case serverMasterVersionUpdate(Int64)
+        
+        // the GoneReason should never be userRemoved-- because when a user is removed, their files are marked as deleted in the FileIndex, and thus the files are generally not downloadable.
+        case gone(GoneReason)
     }
     
     func downloadFile(fileNamingObject: FilenamingWithAppMetaDataVersion, serverMasterVersion:MasterVersionInt!, sharingGroupUUID: String, completion:((DownloadFileResult?, SyncServerError?)->(Void))?) {
@@ -452,7 +463,31 @@ class ServerAPI {
         let file = ServerNetworkingLoadingFile(fileUUID: fileNamingObject.fileUUID, fileVersion: fileNamingObject.fileVersion)
         
         download(file: file, fromServerURL: serverURL, method: endpoint.method) { (resultURL, response, statusCode, error) in
-        
+            
+            if statusCode == HTTPStatus.gone.rawValue, let resultURL = resultURL {
+                // Due to the way the download proceeds, the body of the HTTP response, with the details of the `gone` issue, are in the file referenced by the resultURL.
+                
+                var json:Any?
+                do {
+                    let data = try Data(contentsOf: resultURL as URL)
+                    try json = JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: UInt(0)))
+                } catch (let error) {
+                    Log.error("Error in JSON conversion: \(error)")
+                    completion?(nil, .generic("Could not get Gone details."))
+                    return
+                }
+                
+                guard let jsonDict = json as? [String: Any],
+                    let goneReasonRaw = jsonDict[GoneReason.goneReasonKey] as? String,
+                    let goneReason = GoneReason(rawValue: goneReasonRaw) else {
+                    completion?(nil, .generic("Could not convert Gone reason."))
+                    return
+                }
+                
+                completion?(.gone(goneReason), nil)
+                return
+            }
+            
             guard response != nil else {
                 let resultError = error ?? .nilResponse
                 completion?(nil, resultError)
@@ -472,15 +507,30 @@ class ServerAPI {
                         return
                     }
 
-                    if let fileSizeBytes = downloadFileResponse.fileSizeBytes {
+                    if let checkSum = downloadFileResponse.checkSum,
+                        let cloudStorageTypeRaw = downloadFileResponse.cloudStorageType,
+                        let cloudStorageType = CloudStorageType(rawValue: cloudStorageTypeRaw),
+                        let contentsChanged = downloadFileResponse.contentsChanged {
+
                         guard resultURL != nil else {
                             completion?(nil, .resultURLObtainedWasNil)
                             return
                         }
                         
+                        guard let hash = Hashing.hashOf(url: resultURL! as URL, for: cloudStorageType) else {
+                            completion?(nil, .couldNotComputeHash)
+                            return
+                        }
+                        
+                        guard hash == checkSum else {
+                            // Considering this to be a networking error and not something we want to pass up to the client app. This shouldn't happen in normal operation.
+                            completion?(nil, .networkingHashMismatch)
+                            return
+                        }
+
                         let appMetaData = AppMetaData(version: fileNamingObject.appMetaDataVersion, contents: downloadFileResponse.appMetaData)
                         
-                        let downloadedFile = DownloadedFile(url: resultURL!, fileSizeBytes: fileSizeBytes, appMetaData: appMetaData)
+                        let downloadedFile = DownloadedFile(url: resultURL!, appMetaData: appMetaData, checkSum: checkSum, cloudStorageType: cloudStorageType, contentsChangedOnServer: contentsChanged)
                         completion?(.success(downloadedFile), nil)
                     }
                     else if let masterVersionUpdate = jsonDict[DownloadFileResponse.masterVersionUpdateKey] as? Int64 {
@@ -910,3 +960,4 @@ extension ServerAPI : ServerNetworkingDelegate {
         return result
     }
 }
+

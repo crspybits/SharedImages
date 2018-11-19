@@ -139,7 +139,8 @@ public class DropboxSyncServerSignIn : GenericSignIn {
         DropboxClientsManager.setupWithAppKey(appKey)
     }
     
-    public var userType:UserType = .owning
+    public let userType:UserType = .owning
+    public let cloudStorageType: CloudStorageType? = .Dropbox
     
     public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
 

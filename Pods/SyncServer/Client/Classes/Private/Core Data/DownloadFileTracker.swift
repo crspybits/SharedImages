@@ -18,6 +18,8 @@ public class DownloadFileTracker: FileTracker, AllOperations {
     enum Status : String {
     case notStarted
     case downloading
+    
+    // Either the file has been successfully downloaded or the file was "gone".
     case downloaded
     }
     
@@ -31,9 +33,35 @@ public class DownloadFileTracker: FileTracker, AllOperations {
         }
     }
     
+    // Storing the cloudStorageType in the DownloadFileTracker so we can populate the DirectoryEntry's with the cloud storage type on a download.
+    var cloudStorageType: CloudStorageType? {
+        get {
+            if let cloudStorageTypeInternal = cloudStorageTypeInternal {
+                return CloudStorageType(rawValue: cloudStorageTypeInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            cloudStorageTypeInternal = newValue?.rawValue
+        }
+    }
+    
     var attr: SyncAttributes {
         let mimeType = MimeType(rawValue: self.mimeType!)!
-        var attr = SyncAttributes(fileUUID: fileUUID, sharingGroupUUID: sharingGroupUUID!, mimeType: mimeType, creationDate: creationDate! as Date, updateDate: updateDate! as Date)
+        
+        var attr:SyncAttributes
+        
+        if let gone = gone {
+            attr = SyncAttributes(fileUUID: fileUUID, sharingGroupUUID: sharingGroupUUID!, mimeType: mimeType, creationDate: nil, updateDate: nil)
+            attr.gone = gone
+        }
+        else {
+            attr = SyncAttributes(fileUUID: fileUUID, sharingGroupUUID: sharingGroupUUID!, mimeType: mimeType, creationDate: creationDate! as Date, updateDate: updateDate! as Date)
+        }
+
         attr.appMetaData = appMetaData
         attr.fileGroupUUID = fileGroupUUID
         return attr

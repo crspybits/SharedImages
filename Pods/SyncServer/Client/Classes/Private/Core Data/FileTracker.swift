@@ -44,16 +44,6 @@ public class FileTracker: Tracker, Filenaming, FileUUID, LocalURLData {
             appMetaDataVersionInternal = newValue == nil ? nil : NSNumber(value: newValue!)
         }
     }
-
-    public var sharingGroupId: Int64? {
-        get {
-            return sharingGroupIdInternal?.int64Value
-        }
-        
-        set {
-            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
-        }
-    }
     
     var localURL:SMRelativeLocalURL? {
         get {
@@ -62,6 +52,21 @@ public class FileTracker: Tracker, Filenaming, FileUUID, LocalURLData {
         
         set {
             setLocalURLData(newValue: newValue)
+        }
+    }
+    
+    var gone:GoneReason? {
+        get {
+            if let goneReasonInternal = goneReasonInternal {
+                return GoneReason(rawValue: goneReasonInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            goneReasonInternal = newValue?.rawValue
         }
     }
     

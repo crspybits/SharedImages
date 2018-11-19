@@ -32,16 +32,6 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
             statusRaw = newValue.rawValue
         }
     }
-
-    public var sharingGroupId: Int64? {
-        get {
-            return sharingGroupIdInternal?.int64Value
-        }
-        
-        set {
-            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
-        }
-    }
     
     var dfts:[DownloadFileTracker] {
         if let downloads = downloads, let result = Array(downloads) as?  [DownloadFileTracker] {
@@ -77,8 +67,7 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
             group = dcg
         }
         else {
-            group = DownloadContentGroup.newObject() as! DownloadContentGroup
-            group.sharingGroupId = dft.sharingGroupId
+            group = (DownloadContentGroup.newObject() as! DownloadContentGroup)
             group.sharingGroupUUID = dft.sharingGroupUUID
             group.fileGroupUUID = fileGroupUUID
         }

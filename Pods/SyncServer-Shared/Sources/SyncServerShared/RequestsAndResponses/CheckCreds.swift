@@ -56,7 +56,7 @@ public class CheckCredsResponse : ResponseMessage {
     // MARK: - Serialization
     public func toJSON() -> JSON? {
         return jsonify([
-            CheckCredsResponse.userIdKey ~~> userId,
+            CheckCredsResponse.userIdKey ~~> userId
         ])
     }
 }

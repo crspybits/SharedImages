@@ -49,7 +49,6 @@ public enum SyncServerError: Error {
     case urlSessionError(Error)
     case couldNotGetHTTPURLResponse
     case non200StatusCode(Int)
-    case invitingUserRemoved
     case badCheckCreds
     case badAddUser
     case appMetaDataUploadUndeletionAttempt
@@ -60,6 +59,10 @@ public enum SyncServerError: Error {
     case otherError(Error)
     case fileManagerError(Error)
     case generic(String)
+    case couldNotComputeHash
+    
+    // The checksum in cloud storage didn't match what we computed locally after the download.
+    case networkingHashMismatch
     
 #if TEST_REFRESH_FAILURE
     case testRefreshFailure

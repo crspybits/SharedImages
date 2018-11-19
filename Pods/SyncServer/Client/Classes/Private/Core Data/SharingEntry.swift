@@ -23,6 +23,22 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
         return "SharingEntry"
     }
     
+    // This will be nil for owning users.
+    var cloudStorageType: CloudStorageType? {
+        get {
+            if let cloudStorageTypeInternal = cloudStorageTypeInternal {
+                return CloudStorageType(rawValue: cloudStorageTypeInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            cloudStorageTypeInternal = newValue?.rawValue
+        }
+    }
+    
     var permission: Permission! {
         get {
             if let permissionInternal = permissionInternal {
@@ -84,12 +100,12 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
     }
     
     // We're being passed the list of sharing groups in which the user is still a member. (Notably, if a sharing group has been removed from a group, it will not be in this list, so we haven't handle this specially).
-    class func update(serverSharingGroups: [SharingGroup]) -> Updates? {
+    class func update(serverSharingGroups: [SharingGroup]) throws -> Updates? {
         var deletedOnServer = [SharingGroup]()
         var newSharingGroups = [SharingGroup]()
         var updatedSharingGroups = [SharingGroup]()
         
-        serverSharingGroups.forEach { sharingGroup in
+        for sharingGroup in serverSharingGroups {
             if let sharingGroupUUID = sharingGroup.sharingGroupUUID {
                 if let found = fetchObjectWithUUID(uuid: sharingGroupUUID) {
                     if found.sharingGroupName != sharingGroup.sharingGroupName {
@@ -111,15 +127,22 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
                     sharingEntry.masterVersion = sharingGroup.masterVersion!
                     sharingEntry.permission = sharingGroup.permission
                     
+                    // sharingGroup.cloudStorageType will be nil for owning users.
+                    if let cloudStorageTypeRaw = sharingGroup.cloudStorageType,
+                        let cloudStorageType = CloudStorageType(rawValue: cloudStorageTypeRaw) {
+                        sharingEntry.cloudStorageType = cloudStorageType
+                    }
+                    
                     // This is a sharing group we (the client) didn't know about previously: Need to sync with the server to get files etc. for the sharing group.
                     sharingEntry.syncNeeded = true
+                    
                     
                     newSharingGroups += [sharingGroup]
                 }
             }
         }
         
-        // Now, do the opposite and figure out which sharing groups have been removed or we've been remove from.
+        // Now, do the opposite and figure out which sharing groups have been removed or we've been removed from.
         let localSharingGroups = SharingEntry.fetchAll().filter {!$0.removedFromGroup}
         localSharingGroups.forEach { localSharingGroup in
             let filtered = serverSharingGroups.filter {$0.sharingGroupUUID == localSharingGroup.sharingGroupUUID}

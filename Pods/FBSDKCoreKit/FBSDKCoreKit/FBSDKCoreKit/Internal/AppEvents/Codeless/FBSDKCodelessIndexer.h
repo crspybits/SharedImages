@@ -18,7 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+@interface FBSDKCodelessIndexer : NSObject
 
-@interface FBSDKAppEventsUninstall : NSObject
++ (NSString *)extInfo;
 
 @end

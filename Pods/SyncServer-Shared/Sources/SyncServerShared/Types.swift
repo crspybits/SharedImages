@@ -79,3 +79,16 @@ public enum UserType : String {
     }
 }
 
+public enum CloudStorageType : String {
+    case Google
+    case Dropbox
+}
+
+// Reasons for an HTTP status "gone"
+public enum GoneReason: String {
+    public static let goneReasonKey = "goneReason"
+    
+    case userRemoved
+    case fileRemovedOrRenamed
+    case authTokenExpiredOrRevoked
+}
