@@ -95,6 +95,9 @@ class ImageCollectionVC : UICollectionViewCell {
             }
             else if self.image.eitherHasError {
                 showError = true
+                
+                // No url, and thus no image contents on the image view -- it looks odd if there is no color/image on the imageView. Give it some color.
+                imageView.backgroundColor = .lightGray
             }
             
             errorImageView?.isHidden = !showError
@@ -149,6 +152,11 @@ class ImageCollectionVC : UICollectionViewCell {
         imageView.frameSize = size
         
         scrollView?.contentSize = size
+        
+        if image.hasError {
+            originalSize = size
+            return
+        }
         
         let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: size)
         Log.msg("smallerSize: \(smallerSize)")

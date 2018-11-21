@@ -55,7 +55,7 @@ class ImagesVC: UIViewController {
         super.viewDidLoad()
         
         imagesHandler.syncEventAction = syncEvent
-        imagesHandler.completedAddingLocalImagesAction = completedAddingLocalImages
+        imagesHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -574,7 +574,7 @@ extension ImagesVC : SMAcquireImageDelegate {
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
-        let newImage = imagesHandler.addLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
+        let newImage = imagesHandler.addOrUpdateLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
         newImage.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
         guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
@@ -594,7 +594,7 @@ extension ImagesVC : SMAcquireImageDelegate {
 extension ImagesVC : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID)
+        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: true)
         return Image.fetchRequestForAllObjects(params: params)
     }
     
@@ -681,7 +681,7 @@ extension ImagesVC /* ImagesHandler */ {
         }
     }
     
-    func completedAddingLocalImages() {
+    func completedAddingOrUpdatingLocalImages() {
         scrollIfNeeded(animated: true)
     }
 }
@@ -697,6 +697,10 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
         // And then figure out how big the image will be.
         // Seems like the crash Dany was getting was here: https://github.com/crspybits/SharedImages/issues/123
         let image = self.coreDataSource.object(at: indexPath) as! Image
+        
+        if image.hasError {
+            return boundingCellSize
+        }
         
         let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
 

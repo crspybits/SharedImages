@@ -45,14 +45,14 @@ struct FileData {
 protocol SyncControllerDelegate : class {
     func userRemovedFromAlbum(syncController:SyncController, sharingGroup: SyncServer.SharingGroup)
     
-    // Adding a new image-- since images are immutable, this always results from downloading a new image.
-    func addLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes)
+    // Adding or updating a image-- the update part is for errors that occurred on an original image download (read problem or "gone" errors).
+    func addOrUpdateLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes)
     
     // This will either be for a new discussion (corresponding to a new image) or it will be additional data for an existing discussion (with an existing image).
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes)
     
     func updateUploadedImageDate(syncController:SyncController, uuid: String, creationDate: NSDate)
-    func completedAddingLocalImages(syncController:SyncController)
+    func completedAddingOrUpdatingLocalImages(syncController:SyncController)
     
     // fileType is optional ony because in early versions of the app, we didn't have fileType in the appMetaData on the server.
     func fileGoneDuringUpload(syncController:SyncController, uuid: String, fileType: ImageExtras.FileType?, reason: GoneReason)
@@ -344,6 +344,7 @@ extension SyncController : SyncServerDelegate {
         case gone(attr: SyncAttributes)
     }
     
+    // This is for original/first download of a file, and subsequent re-downloads/updates of the same file. Both of these cases can happen for both discussions and images.
     private func singleFileDownloadComplete(_ file: FileDownloadComplete) {
         var attr: SyncAttributes!
         
@@ -377,6 +378,7 @@ extension SyncController : SyncServerDelegate {
         imageDownloadComplete(file)
     }
     
+    // For a) first downloads and b) updates (error cases) of the same image file.
     private func imageDownloadComplete(_ file: FileDownloadComplete) {
         var attr: SyncAttributes!
         var url: SMRelativeLocalURL?
@@ -416,12 +418,13 @@ extension SyncController : SyncServerDelegate {
         let imageFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
         let imageData = ImageData(file: imageFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
 
-        delegate.addLocalImage(syncController: self, imageData: imageData, attr: attr)
+        delegate.addOrUpdateLocalImage(syncController: self, imageData: imageData, attr: attr)
         
-        delegate.completedAddingLocalImages(syncController: self)
+        delegate.completedAddingOrUpdatingLocalImages(syncController: self)
         Progress.session.next()
     }
     
+    // For a) first downloads and b) updates (error cases and new image content) of the same discussion file.
     private func discussionDownloadComplete(_ file: FileDownloadComplete) {
         var attr: SyncAttributes!
         var url: SMRelativeLocalURL?

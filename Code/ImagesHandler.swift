@@ -15,48 +15,55 @@ class ImagesHandler {
     var syncController = SyncController()
 
     var syncEventAction:((SyncControllerEvent)->())?
-    var completedAddingLocalImagesAction:(()->())?
+    var completedAddingOrUpdatingLocalImagesAction:(()->())?
 
     init() {
         syncController.delegate = self
     }
     
     @discardableResult
-    func addLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
-        var newImage:Image!
+    func addOrUpdateLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
+        var theImage:Image!
         
         if newImageData.file.fileUUID == nil {
             // We're creating a new image at the local user's request.
-            newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? Image
+            theImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? Image
         }
         else {
-            // We're creating an image object, downloaded from the server.
-            newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? Image
-            newImage.uuid = newImageData.file.fileUUID
-            
-            // Test the image file we got from the server. Make sure the file is valid and not corrupted in some way.
+            /* This is a download from the server. There are two cases:
+                1) The main download use case: Creating a new image downloaded from the server (also, possibly "gone" or a read problem).
+                2) An error use case: Previously, with "gone" or a read problem, an image was downloaded another time.
+            */
+            theImage = Image.fetchObjectWithUUID(newImageData.file.fileUUID!)
+            if theImage == nil {
+                // No existing local image. Must be a first download case from the server.
+                theImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? Image
+                theImage.uuid = newImageData.file.fileUUID
+            }
+
+            // Test the image file we got from the server, if any. Make sure the file is valid and not corrupted in some way.
             if let imageFilePath = newImageData.file.url?.path {
                 let image = UIImage(contentsOfFile: imageFilePath)
-                if image == nil {
-                    newImage.readProblem = true
-                }
+                theImage.readProblem = image == nil
             }
         }
 
         // url is nil if file is gone, or other error.
-        newImage.url = newImageData.file.url
-        newImage.gone = newImageData.file.gone
+        theImage.url = newImageData.file.url
         
-        newImage.mimeType = newImageData.file.mimeType.rawValue
-        newImage.title = newImageData.title
-        newImage.discussionUUID = newImageData.discussionUUID
-        newImage.fileGroupUUID = fileGroupUUID
-        newImage.sharingGroupUUID = newImageData.file.sharingGroupUUID
+        theImage.gone = newImageData.file.gone
         
-        if let imageFileName = newImageData.file.url?.lastPathComponent {
+        theImage.mimeType = newImageData.file.mimeType.rawValue
+        theImage.title = newImageData.title
+        theImage.discussionUUID = newImageData.discussionUUID
+        theImage.fileGroupUUID = fileGroupUUID
+        theImage.sharingGroupUUID = newImageData.file.sharingGroupUUID
+        
+        if !theImage.readProblem,
+            let imageFileName = newImageData.file.url?.lastPathComponent {
             let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
-            newImage.originalHeight = Float(size.height)
-            newImage.originalWidth = Float(size.width)
+            theImage.originalHeight = Float(size.height)
+            theImage.originalWidth = Float(size.width)
         }
         
         // Lookup the Discussion and connect it if we have it.
@@ -71,14 +78,14 @@ class ImagesHandler {
             discussion = Discussion.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
         
-        newImage.discussion = discussion
+        theImage.discussion = discussion
         
         if let discussion = discussion {
             // 4/17/18; If that discussion has the image title, get that too.
             if newImageData.title == nil {
                 if let url = discussion.url,
                     let fixedObjects = FixedObjects(withFile: url as URL) {
-                    newImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
+                    theImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
                 }
                 else {
                     Log.error("Could not load discussion!")
@@ -88,7 +95,7 @@ class ImagesHandler {
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         
-        return newImage
+        return theImage
     }
     
     enum AddToDiscussion {
@@ -265,9 +272,9 @@ extension ImagesHandler: SyncControllerDelegate {
         }
     }
     
-    func addLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes) {
-        // We're making an image for which there is already a UUID on the server.
-        addLocalImage(newImageData: imageData, fileGroupUUID: attr.fileGroupUUID)
+    func addOrUpdateLocalImage(syncController: SyncController, imageData: ImageData, attr: SyncAttributes) {
+        // We're making an image for which there is already a UUID on the server (initial download case), or updating a local image (error case).
+        addOrUpdateLocalImage(newImageData: imageData, fileGroupUUID: attr.fileGroupUUID)
     }
     
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes) {
@@ -304,6 +311,7 @@ extension ImagesHandler: SyncControllerDelegate {
             }
         }
         else {
+            // Older files from the original server don't have file type appMetaData. They are images.
             doImage = true
         }
 
@@ -326,8 +334,8 @@ extension ImagesHandler: SyncControllerDelegate {
         syncEventAction?(event)
     }
     
-    func completedAddingLocalImages(syncController:SyncController) {
-        completedAddingLocalImagesAction?()
+    func completedAddingOrUpdatingLocalImages(syncController: SyncController) {
+        completedAddingOrUpdatingLocalImagesAction?()
     }
     
     func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {

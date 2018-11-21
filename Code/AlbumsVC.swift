@@ -153,7 +153,7 @@ class AlbumsVC: UIViewController {
         
         // Put these here because the ImagesVC changes them.
         imagesHandler.syncEventAction = syncEvent
-        imagesHandler.completedAddingLocalImagesAction = nil
+        imagesHandler.completedAddingOrUpdatingLocalImagesAction = nil
         
         // Putting this in `viewWillAppear` to deal with the first time the Albums are displayed and to deal with removal of an album in ImagesVC.
         sharingGroups = SyncServer.session.sharingGroups

@@ -135,6 +135,8 @@ class LargeImages : UIViewController {
             DispatchQueue.main.async {[unowned self] in
                 // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
                 if self.seekToIndexPath != nil {
+                    Log.msg("self.seekToIndexPath: \(String(describing: self.seekToIndexPath))")
+                    Log.msg("startItem: \(self.startItem)")
                     self.collectionView?.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
                     self.seekToIndexPath = nil
                 }
@@ -156,7 +158,7 @@ class LargeImages : UIViewController {
 extension LargeImages : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID)
+        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: false)
         return Image.fetchRequestForAllObjects(params: params)
     }
     
@@ -254,6 +256,10 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
         I assume this must have occurred with an unwrapping of `coreDataSource` when it was nil. I'm trying to fix this by using a getter which always sets the coreDataSource if nil.
         */
         let image = self.coreDataSource.object(at: indexPath) as! Image
+        
+        if image.hasError {
+            return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + ImageCollectionVC.largeTitleHeight)
+        }
         
         var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
         

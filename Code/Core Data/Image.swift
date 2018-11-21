@@ -20,7 +20,11 @@ public class Image: NSManagedObject {
     static let DISCUSSION_UUID_KEY = "discussionUUID"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     static let UNREAD_COUNT = "discussion.unreadCount"
-    static let SHARING_GROUP_UUID = "sharingGroupUUID"
+    static let SHARING_GROUP_UUID_KEY = "sharingGroupUUID"
+    static let GONE_KEY = "goneReasonInternal"
+    static let READ_PROBLEM_KEY = "readProblem"
+    static let DISCUSSION_GONE_KEY = "discussion.goneReasonInternal"
+    static let DISCUSSION_READ_PROBLEM_KEY = "discussion.readProblem"
     
     var originalSize:CGSize {
         var originalImageSize = CGSize()
@@ -112,6 +116,9 @@ public class Image: NSManagedObject {
         let isAscending: Bool
         let unreadCounts: Parameters.UnreadCounts
         let sharingGroupUUID: String
+        
+        // Errors include "gone" and read problem images/related discussions.
+        let includeErrors: Bool
     }
     
     class func fetchRequestForAllObjects(params:SortFilterParams) -> NSFetchRequest<NSFetchRequestResult>? {
@@ -128,7 +135,14 @@ public class Image: NSManagedObject {
                 subpredicates += [NSPredicate(format: "(%K > 0)", UNREAD_COUNT)]
             }
             
-            subpredicates += [NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID, params.sharingGroupUUID)]
+            subpredicates += [NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID_KEY, params.sharingGroupUUID)]
+            
+            if !params.includeErrors {
+                subpredicates += [NSPredicate(format: "(%K == nil)", GONE_KEY)]
+                subpredicates += [NSPredicate(format: "(%K == false)", READ_PROBLEM_KEY)]
+                subpredicates += [NSPredicate(format: "(%K == nil)", DISCUSSION_GONE_KEY)]
+                subpredicates += [NSPredicate(format: "(%K == false)", DISCUSSION_READ_PROBLEM_KEY)]
+            }
             
             if subpredicates.count > 0 {
                 let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subpredicates)
@@ -154,7 +168,7 @@ public class Image: NSManagedObject {
         var result:[Image]?
         do {
             result = try CoreData.sessionNamed(CoreDataExtras.sessionName).fetchObjects(withEntityName: self.entityName(), modifyingFetchRequestWith: { fetchRequest in
-                fetchRequest.predicate = NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID, sharingGroupUUID)
+                fetchRequest.predicate = NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID_KEY, sharingGroupUUID)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: CREATION_DATE_KEY, ascending: true)]
             }) as? [Image]
         } catch (let error) {
