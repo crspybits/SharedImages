@@ -28,13 +28,18 @@ struct ImageData {
 }
 
 struct FileData {
-    let url: SMRelativeLocalURL
+    // This will be nil when a file is `gone`.
+    let url: SMRelativeLocalURL?
+    
     let mimeType:MimeType
     
     // This will be non-nil when we have an assigned UUID being downloaded from the server.
     let fileUUID:String?
     
     let sharingGroupUUID:String
+    
+    // If file is gone, this is non-nil.
+    let gone: GoneReason?
 }
 
 protocol SyncControllerDelegate : class {
@@ -49,6 +54,9 @@ protocol SyncControllerDelegate : class {
     func updateUploadedImageDate(syncController:SyncController, uuid: String, creationDate: NSDate)
     func completedAddingLocalImages(syncController:SyncController)
     
+    // fileType is optional ony because in early versions of the app, we didn't have fileType in the appMetaData on the server.
+    func fileGoneDuringUpload(syncController:SyncController, uuid: String, fileType: ImageExtras.FileType?, reason: GoneReason)
+
     // Including removing any discussion thread.
     func removeLocalImages(syncController:SyncController, uuids:[String])
     
@@ -66,7 +74,7 @@ class SyncController {
     init() {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
-                .singleFileUploadComplete, .singleUploadDeletionComplete,
+                .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
                 .sharingGroupUploadOperationCompleted]
     }
     
@@ -266,7 +274,7 @@ extension SyncController : SyncServerDelegate {
         }
     }
     
-    func syncServerFileGroupDownloadComplete(group: [DownloadOperation]) {
+    private func handleGroupDownload(group: [DownloadOperation]) {
         group.forEach { operation in
             switch operation.type {
             case .appMetaData:
@@ -279,10 +287,21 @@ extension SyncController : SyncServerDelegate {
                 }
                 Progress.session.next(count: 1)
 
-            case .file(let url):
-                singleFileDownloadComplete(url:url, attr: operation.attr)
+            case .file(let url, _):
+                singleFileDownloadComplete(.success(url: url, attr: operation.attr))
+            
+            case .fileGone:
+                singleFileDownloadComplete(.gone(attr: operation.attr))
             }
         }
+    }
+    
+    func syncServerFileGroupDownloadComplete(group: [DownloadOperation]) {
+        handleGroupDownload(group: group)
+    }
+    
+    func syncServerFileGroupDownloadGone(group: [DownloadOperation]) {
+        handleGroupDownload(group: group)
     }
     
     func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, ImageExtras.FileType?) {
@@ -320,7 +339,21 @@ extension SyncController : SyncServerDelegate {
         return true
     }
     
-    func singleFileDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
+    enum FileDownloadComplete {
+        case success(url:SMRelativeLocalURL, attr: SyncAttributes)
+        case gone(attr: SyncAttributes)
+    }
+    
+    private func singleFileDownloadComplete(_ file: FileDownloadComplete) {
+        var attr: SyncAttributes!
+        
+        switch file {
+        case .gone(attr: let goneAttr):
+            attr = goneAttr
+        case .success(url: _, attr: let successAttr):
+            attr = successAttr
+        }
+        
         let (fileTypeString, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
         
         if let fileTypeString = fileTypeString {
@@ -331,28 +364,39 @@ extension SyncController : SyncServerDelegate {
             
             switch fileType {
             case .discussion:
-                discussionDownloadComplete(url: url, attr: attr)
+                discussionDownloadComplete(file)
                 
             case .image:
-                imageDownloadComplete(url: url, attr: attr)
+                imageDownloadComplete(file)
             }
             
             return
         }
         
         // We don't have type info in the appMetaData-- too early of a file version. Assume it's an image.
-        imageDownloadComplete(url: url, attr: attr)
+        imageDownloadComplete(file)
     }
     
-    private func imageDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
-        // The files we get back from the SyncServer are in a temporary location. We own them though, so can move them.
-        let newImageURL = FileExtras().newURLForImage()
-        do {
-            try FileManager.default.moveItem(at: url as URL, to: newImageURL as URL)
-        } catch (let error) {
-            Log.error("An error occurred moving a file: \(error)")
+    private func imageDownloadComplete(_ file: FileDownloadComplete) {
+        var attr: SyncAttributes!
+        var url: SMRelativeLocalURL?
+        
+        switch file {
+        case .gone(attr: let goneAttr):
+            attr = goneAttr
+        case .success(url: let successURL, attr: let successAttr):
+            attr = successAttr
+
+            // The files we get back from the SyncServer are in a temporary location. We own them though, so can move them.
+            let newImageURL = FileExtras().newURLForImage()
+            do {
+                try FileManager.default.moveItem(at: successURL as URL, to: newImageURL as URL)
+                url = newImageURL
+            } catch (let error) {
+                Log.error("An error occurred moving a file: \(error)")
+            }
         }
-    
+
         var title:String?
         var discussionUUID:String?
         
@@ -369,7 +413,7 @@ extension SyncController : SyncServerDelegate {
             discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
         }
 
-        let imageFileData = FileData(url: newImageURL, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID)
+        let imageFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
         let imageData = ImageData(file: imageFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
 
         delegate.addLocalImage(syncController: self, imageData: imageData, attr: attr)
@@ -378,16 +422,27 @@ extension SyncController : SyncServerDelegate {
         Progress.session.next()
     }
     
-    private func discussionDownloadComplete(url:SMRelativeLocalURL, attr: SyncAttributes) {
-        // The files we get back from the SyncServer are in a temporary location. We own them though so can move it.
-        let newJSONFileURL = ImageExtras.newJSONFile()
-        do {
-            try FileManager.default.moveItem(at: url as URL, to: newJSONFileURL as URL)
-        } catch (let error) {
-            Log.error("An error occurred moving a file: \(error)")
-        }
+    private func discussionDownloadComplete(_ file: FileDownloadComplete) {
+        var attr: SyncAttributes!
+        var url: SMRelativeLocalURL?
         
-        let discussionFileData = FileData(url: newJSONFileURL, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID)
+        switch file {
+        case .gone(attr: let goneAttr):
+            attr = goneAttr
+        case .success(url: let successURL, attr: let successAttr):
+            attr = successAttr
+            
+            // The files we get back from the SyncServer are in a temporary location. We own them though so can move it.
+            let newJSONFileURL = ImageExtras.newJSONFile()
+            do {
+                try FileManager.default.moveItem(at: successURL as URL, to: newJSONFileURL as URL)
+                url = newJSONFileURL
+            } catch (let error) {
+                Log.error("An error occurred moving a file: \(error)")
+            }
+        }
+
+        let discussionFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
         delegate.addToLocalDiscussion(syncController: self, discussionData: discussionFileData, attr: attr)
         
         Progress.session.next()
@@ -515,6 +570,11 @@ extension SyncController : SyncServerDelegate {
             
             Progress.session.next()
             
+        case .singleFileUploadGone(attr: let attr):
+            let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
+            delegate.fileGoneDuringUpload(syncController: self, uuid: attr.fileUUID, fileType: fileType, reason: attr.gone!)
+            Progress.session.next()
+            
         case .singleUploadDeletionComplete:
             Progress.session.next()
 
@@ -537,10 +597,4 @@ extension SyncController : SyncServerDelegate {
             break
         }
     }
-    
-#if DEBUG
-    public func syncServerSingleFileUploadCompleted(next: @escaping () -> ()) {
-        next()
-    }
-#endif
 }

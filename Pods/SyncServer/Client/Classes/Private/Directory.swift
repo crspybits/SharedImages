@@ -62,10 +62,13 @@ class Directory {
 
             if let entry = DirectoryEntry.fetchObjectWithUUID(uuid: serverFile.fileUUID) {
                 // Have the file in client directory.
+                
                 if let _ = entry.gone {
                     continue
                 }
                 
+                // Going to also check for forced downloads here because (a) if we don't have the file on the server, we can't download it, and (b) we need the FileInfo from the server to do the download. Plus, server requests (e.g., to delete the file) take priority over app requests -- the server is our source of truth.
+
                 if entry.deletedOnServer {
                     /* If we have the file marked as deleted:
                         a) File (still) deleted on the server: Don't need to do anything.
@@ -88,6 +91,9 @@ class Directory {
                     else if entry.appMetaDataVersion != serverFile.appMetaDataVersion {
                         // Not the same appMetaData version locally as on server.
                         action = .needToDownloadAppMetaData
+                    }
+                    else if entry.forceDownload {
+                        action = .needToDownloadFile
                     }
                 }
                 
@@ -147,7 +153,7 @@ class Directory {
             case .none:
                 break
             }
-        }
+        } // End iterating over server files.
 
         let downloadSet = DownloadSet(
                 downloadFiles: downloadFiles,

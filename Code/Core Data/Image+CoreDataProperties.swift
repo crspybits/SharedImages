@@ -2,7 +2,7 @@
 //  Image+CoreDataProperties.swift
 //  SharedImages
 //
-//  Created by Christopher G Prince on 9/26/18.
+//  Created by Christopher G Prince on 11/20/18.
 //  Copyright © 2018 Spastic Muffin, LLC. All rights reserved.
 //
 //
@@ -23,11 +23,12 @@ extension Image {
     @NSManaged public var mimeType: String?
     @NSManaged public var originalHeight: Float
     @NSManaged public var originalWidth: Float
-    @NSManaged public var sharingGroupIdInternal: NSNumber?
+    @NSManaged public var sharingGroupUUID: String?
     @NSManaged public var title: String?
     @NSManaged public var urlInternal: NSData?
     @NSManaged public var uuid: String?
-    @NSManaged public var sharingGroupUUID: String?
+    @NSManaged public var goneReasonInternal: String?
+    @NSManaged public var readProblem: Bool
     @NSManaged public var discussion: Discussion?
 
 }

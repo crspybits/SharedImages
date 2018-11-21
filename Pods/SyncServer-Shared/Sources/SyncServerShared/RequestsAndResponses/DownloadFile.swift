@@ -104,12 +104,17 @@ public class DownloadFileResponse : ResponseMessage {
     public static let masterVersionUpdateKey = "masterVersionUpdate"
     public var masterVersionUpdate:MasterVersionInt?
     
+    // The file was gone and could not be downloaded. The string gives the GoneReason if non-nil, and the data, contentsChanged, and checkSum fields are not given.
+    public static let goneKey = "gone"
+    public var gone: String?
+    
     public required init?(json: JSON) {
         self.masterVersionUpdate = Decoder.decode(int64ForKey: DownloadFileResponse.masterVersionUpdateKey)(json)
         self.appMetaData = DownloadFileResponse.appMetaDataKey <~~ json
         self.cloudStorageType = DownloadFileResponse.cloudStorageTypeKey <~~ json
         self.checkSum = DownloadFileResponse.checkSumKey <~~ json
         self.contentsChanged = DownloadFileResponse.contentsChangedKey <~~ json
+        self.gone = DownloadFileResponse.goneKey <~~ json
     }
     
     public convenience init?() {
@@ -123,7 +128,8 @@ public class DownloadFileResponse : ResponseMessage {
             DownloadFileResponse.appMetaDataKey ~~> self.appMetaData,
             DownloadFileResponse.checkSumKey ~~> self.checkSum,
             DownloadFileResponse.cloudStorageTypeKey ~~> self.cloudStorageType,
-            DownloadFileResponse.contentsChangedKey ~~> self.contentsChanged
+            DownloadFileResponse.contentsChangedKey ~~> self.contentsChanged,
+            DownloadFileResponse.goneKey ~~> self.gone
         ])
     }
 }

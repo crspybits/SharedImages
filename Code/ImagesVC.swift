@@ -385,7 +385,7 @@ class ImagesVC: UIViewController {
             return nil
         }
         
-        return FileData(url: newDiscussionFileURL, mimeType: .text, fileUUID: discussionUUID, sharingGroupUUID: sharingGroupUUID)
+        return FileData(url: newDiscussionFileURL, mimeType: .text, fileUUID: discussionUUID, sharingGroupUUID: sharingGroupUUID, gone: nil)
     }
     
     private func shareAction() {
@@ -449,13 +449,72 @@ class ImagesVC: UIViewController {
 }
 
 extension ImagesVC : UICollectionViewDelegate {
+    private func errorDetails(readProblem: Bool, gone: GoneReason?) -> String? {
+        var details: String?
+        
+        if readProblem {
+            details = "The file was corrupted in cloud storage."
+        }
+        else if let gone = gone {
+            switch gone {
+            case .userRemoved:
+                details = "The owning user was removed."
+            case .authTokenExpiredOrRevoked:
+                details = "The auth token for the owning user expired or was revoked."
+            case .fileRemovedOrRenamed:
+                details = "The cloud storage file was renamed or removed."
+            }
+        }
+        
+        return details
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
-        largeImages.startItem = indexPath.item
-        largeImages.imagesHandler = imagesHandler
-        largeImages.sharingGroup = sharingGroup
-        navigatedToLargeImages = true
-        navigationController!.pushViewController(largeImages, animated: true)
+        let imageObj = self.coreDataSource.object(at: indexPath) as! Image
+        if imageObj.eitherHasError {
+            let cell = collectionView.cellForItem(at: indexPath)
+            
+            var title = "A file had an error when synchronizing"
+            if let details = errorDetails(readProblem: imageObj.readProblem, gone:  imageObj.gone) {
+                title += ": " + details
+            }
+            else if let discussion = imageObj.discussion, let details = errorDetails(readProblem: discussion.readProblem, gone:  discussion.gone) {
+                title += ": " + details
+            }
+            
+            let alert = UIAlertController(title: title, message: "Do you want to retry for this album?", preferredStyle: .actionSheet)
+            alert.popoverPresentationController?.sourceView = cell
+            Alert.styleForIPad(alert)
+
+            alert.addAction(UIAlertAction(title: "Retry", style: .default) {alert in
+                let images = Image.fetchAll()
+                images.forEach { image in
+                    if self.sharingGroup.sharingGroupUUID == image.sharingGroupUUID && image.readProblem {
+                        try! SyncServer.session.requestDownload(forFileUUID: image.uuid!)
+                    }
+                }
+                
+                let discussions = Discussion.fetchAll()
+                discussions.forEach { discussion in
+                    if self.sharingGroup.sharingGroupUUID == discussion.sharingGroupUUID && discussion.readProblem {
+                        try! SyncServer.session.requestDownload(forFileUUID: discussion.uuid!)
+                    }
+                }
+                
+                try! SyncServer.session.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID, reAttemptGoneDownloads: true)
+            })
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) {alert in
+            })
+            self.present(alert, animated: true, completion: nil)
+        }
+        else {
+            let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
+            largeImages.startItem = indexPath.item
+            largeImages.imagesHandler = imagesHandler
+            largeImages.sharingGroup = sharingGroup
+            navigatedToLargeImages = true
+            navigationController!.pushViewController(largeImages, animated: true)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -480,7 +539,7 @@ extension ImagesVC : UICollectionViewDataSource {
         let imageObj = self.coreDataSource.object(at: indexPath) as! Image
         cell.setProperties(image: imageObj, syncController: imagesHandler.syncController, cache: imageCache)
         
-        showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+        showSelectedState(imageUUID: imageObj.uuid!, cell: cell, error: imageObj.eitherHasError)
 
         return cell
     }
@@ -511,7 +570,7 @@ extension ImagesVC : SMAcquireImageDelegate {
             return
         }
         
-        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID)
+        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID, gone: nil)
         let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
@@ -712,9 +771,14 @@ extension ImagesVC {
         }
     }
     
-    fileprivate func showSelectedState(imageUUID:String, cell:UICollectionViewCell) {        
+    fileprivate func showSelectedState(imageUUID:String, cell:UICollectionViewCell, error: Bool = false) {
         if let cell = cell as? ImageCollectionVC {
-            cell.userSelected = selectedImages.contains(imageUUID)
+            if error {
+                cell.userSelected = false
+            }
+            else {
+                cell.userSelected = selectedImages.contains(imageUUID)
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
         <attribute name="fileGroupUUID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="fileUUID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="fileVersionInternal" optional="YES" attributeType="Integer 32" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="forceDownload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="goneReasonInternal" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mimeType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sharingGroupUUID" optional="YES" attributeType="String" syncable="YES"/>
@@ -83,7 +84,7 @@
         <relationship name="queues" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="UploadQueue" inverseName="synced" inverseEntity="UploadQueue" syncable="YES"/>
     </entity>
     <elements>
-        <element name="DirectoryEntry" positionX="-63" positionY="-18" width="128" height="210"/>
+        <element name="DirectoryEntry" positionX="-63" positionY="-18" width="128" height="225"/>
         <element name="DownloadContentGroup" positionX="-45" positionY="117" width="128" height="105"/>
         <element name="DownloadFileTracker" positionX="-36" positionY="27" width="128" height="120"/>
         <element name="FileTracker" positionX="-18" positionY="117" width="128" height="180"/>

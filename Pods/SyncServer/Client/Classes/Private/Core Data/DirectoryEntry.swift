@@ -118,6 +118,7 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
     public class func newObject() -> NSManagedObject {
         let directoryEntry = CoreData.sessionNamed(Constants.coreDataName).newObject(withEntityName: self.entityName()) as! DirectoryEntry
         directoryEntry.deletedLocally = false
+        directoryEntry.forceDownload = false
         return directoryEntry
     }
     

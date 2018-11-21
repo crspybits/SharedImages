@@ -19,16 +19,6 @@ public class Discussion: NSManagedObject {
     static let UUID_KEY = "uuid"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     
-    public var sharingGroupId: Int64? {
-        get {
-            return sharingGroupIdInternal?.int64Value
-        }
-        
-        set {
-            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
-        }
-    }
-
     var url:SMRelativeLocalURL? {
         get {
             return CoreData.getSMRelativeLocalURL(fromCoreDataProperty: urlInternal as Data?)
@@ -44,6 +34,25 @@ public class Discussion: NSManagedObject {
         }
     }
     
+    var gone:GoneReason? {
+        get {
+            if let goneReasonInternal = goneReasonInternal {
+                return GoneReason(rawValue: goneReasonInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            goneReasonInternal = newValue?.rawValue
+        }
+    }
+    
+    var hasError: Bool {
+        return gone != nil || readProblem
+    }
+    
     class func entityName() -> String {
         return "Discussion"
     }
@@ -57,6 +66,7 @@ public class Discussion: NSManagedObject {
         }
         
         discussion.unreadCount = 0
+        discussion.readProblem = false
         
         return discussion
     }

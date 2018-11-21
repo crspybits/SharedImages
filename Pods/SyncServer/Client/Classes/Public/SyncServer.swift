@@ -922,7 +922,7 @@ public class SyncServer {
         - parameters:
             - forUUID: The UUID of the file to get attributes for.
     */
-    public func getAttributes(forUUID uuid: String) throws -> SyncAttributes {
+    public func getAttributes(forFileUUID fileUUID: String) throws -> SyncAttributes {
         var error:Error?
         var attr: SyncAttributes?
         
@@ -945,6 +945,45 @@ public class SyncServer {
         }
         
         return attr!
+    }
+    
+    /// Use this to request the re-download of a file, on a subsequent sync with the relevant sharing group UUID. E.g., for when a file could not be read due to some kind of corruption. A request to download a file that is already `gone` is ignored. Use the `reAttemptGoneDownloads` flag of the sync method instead. Note that this is a "request" for download because normal sync operations can take priority. E.g., it is possible that the file might be deleted by a server download deletion before this request gets a chance to operate.
+    public func requestDownload(attr: SyncAttributes) throws {
+        var error:Error?
+
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID) else {
+                error = SyncServerError.getAttributesForUnknownFile
+                return
+            }
+            
+            guard entry.sharingGroupUUID == attr.sharingGroupUUID else {
+                error = SyncServerError.generic("Bad sharing group UUID given.")
+                return
+            }
+            
+            guard !entry.deletedLocally else {
+                error = SyncServerError.fileAlreadyDeleted
+                return
+            }
+            
+            guard entry.gone == nil else {
+                error = SyncServerError.generic("gone field set.")
+                return
+            }
+
+            entry.forceDownload = true
+            
+            do {
+                try CoreData.sessionNamed(Constants.coreDataName).context.save()
+            } catch (let saveError) {
+                error = SyncServerError.coreDataError(saveError)
+            }
+        }
+        
+        if let error = error {
+            throw error
+        }
     }
     
     /// The type of reset to perform with a call to `reset`.

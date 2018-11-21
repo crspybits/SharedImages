@@ -85,7 +85,7 @@ public class ServerEndpoints {
     
     // MARK: Files
     
-    // The Index serves as a kind of snapshot of the files and sharing groups on the server for the calling app. Not specifying a lock is held at this level because caller may not give a sharing group id. If the sharing group id is given, holds lock within the controller.
+    // The Index serves as a kind of snapshot of the files and sharing groups on the server for the calling app. Not specifying a lock is held at this level because caller may not give a sharing group uuid. If the sharing group uuid is given, holds lock within the controller.
     public static let index = ServerEndpoint("Index", method: .get, messageType: IndexRequest.self)
     
     public static let uploadFile = ServerEndpoint("UploadFile", method: .post, messageType: UploadFileRequest.self, sharing: Sharing(needsLock: false, minPermission: .write))

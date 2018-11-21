@@ -9,6 +9,7 @@
 import Foundation
 import SyncServer
 import SMCoreLib
+import SyncServer_Shared
 
 class ImagesHandler {
     var syncController = SyncController()
@@ -25,25 +26,38 @@ class ImagesHandler {
         var newImage:Image!
         
         if newImageData.file.fileUUID == nil {
-            // We're creating a new image at the user's request.
+            // We're creating a new image at the local user's request.
             newImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? Image
         }
         else {
+            // We're creating an image object, downloaded from the server.
             newImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? Image
             newImage.uuid = newImageData.file.fileUUID
+            
+            // Test the image file we got from the server. Make sure the file is valid and not corrupted in some way.
+            if let imageFilePath = newImageData.file.url?.path {
+                let image = UIImage(contentsOfFile: imageFilePath)
+                if image == nil {
+                    newImage.readProblem = true
+                }
+            }
         }
 
+        // url is nil if file is gone, or other error.
         newImage.url = newImageData.file.url
+        newImage.gone = newImageData.file.gone
+        
         newImage.mimeType = newImageData.file.mimeType.rawValue
         newImage.title = newImageData.title
         newImage.discussionUUID = newImageData.discussionUUID
         newImage.fileGroupUUID = fileGroupUUID
         newImage.sharingGroupUUID = newImageData.file.sharingGroupUUID
         
-        let imageFileName = newImageData.file.url.lastPathComponent
-        let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
-        newImage.originalHeight = Float(size.height)
-        newImage.originalWidth = Float(size.width)
+        if let imageFileName = newImageData.file.url?.lastPathComponent {
+            let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
+            newImage.originalHeight = Float(size.height)
+            newImage.originalWidth = Float(size.width)
+        }
         
         // Lookup the Discussion and connect it if we have it.
         
@@ -59,10 +73,10 @@ class ImagesHandler {
         
         newImage.discussion = discussion
         
-        if discussion != nil {
+        if let discussion = discussion {
             // 4/17/18; If that discussion has the image title, get that too.
             if newImageData.title == nil {
-                if let url = discussion!.url,
+                if let url = discussion.url,
                     let fixedObjects = FixedObjects(withFile: url as URL) {
                     newImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
                 }
@@ -88,37 +102,70 @@ class ImagesHandler {
         var localDiscussion: Discussion!
         var imageTitle: String?
         
+        func newDiscussion() {
+            // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
+            if let gone = discussionData.gone {
+                localDiscussion.gone = gone
+            }
+            else if let discussionDataURL = discussionData.url,
+                let fixedObjects = FixedObjects(withFile: discussionDataURL as URL) {
+                localDiscussion.unreadCount = Int32(fixedObjects.count)
+                imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
+            }
+            else {
+                localDiscussion.readProblem = true
+                Log.error("Some error loading new server discussion.")
+            }
+        }
+        
         switch type {
         case .newLocalDiscussion:
             // 1)
             localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
             localDiscussion.uuid = discussionData.fileUUID
             localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
+            
+            // This is a new *local* discussion. Shouldn't have problems with file corruption.
 
         case .fromServer:
             if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(discussionData.fileUUID!) {
                 // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
                 
                 localDiscussion = existingLocalDiscussion
+                existingLocalDiscussion.gone = nil
                 
                 // Since we didn't have a conflict, `newFixedObjects` will be a superset of the existing objects.
-                if let newFixedObjects = FixedObjects(withFile: discussionData.url as URL),
-                    let existingDiscussionURL = existingLocalDiscussion.url,
-                    let oldFixedObjects = FixedObjects(withFile: existingDiscussionURL as URL) {
+                if let gone = discussionData.gone {
+                    existingLocalDiscussion.gone = gone
+                }
+                else if let discussionDataURL = discussionData.url,
+                    let newFixedObjects = FixedObjects(withFile: discussionDataURL as URL) {
                     
-                    // We still want to know how many new messages there are.
-                    let (_, newCount) = oldFixedObjects.merge(with: newFixedObjects)
-                    // Use `+=1` here because there may already be unread messages.
-                    existingLocalDiscussion.unreadCount += Int32(newCount)
-                    
-                    // Remove the existing discussion file
-                    do {
-                        try FileManager.default.removeItem(at: existingDiscussionURL as URL)
-                    } catch (let error) {
-                        Log.error("Error removing old discussion file: \(error)")
+                    // Existing discussion to merge?
+                    if let existingDiscussionURL = existingLocalDiscussion.url,
+                        let oldFixedObjects = FixedObjects(withFile: existingDiscussionURL as URL) {
+                        // We still want to know how many new messages there are.
+                        let (_, newCount) = oldFixedObjects.merge(with: newFixedObjects)
+                        // Use `+=1` here because there may already be unread messages.
+                        existingLocalDiscussion.unreadCount += Int32(newCount)
+                        
+                        // Remove the existing discussion file
+                        do {
+                            try FileManager.default.removeItem(at: existingDiscussionURL as URL)
+                        } catch (let error) {
+                            Log.error("Error removing old discussion file: \(error)")
+                        }
+                        
+                        imageTitle = newFixedObjects[DiscussionKeys.imageTitleKey] as? String
                     }
-                    
-                    imageTitle = newFixedObjects[DiscussionKeys.imageTitleKey] as? String
+                    else {
+                        // Recovering from an error condition: A discussion object exists already, but the file could not previously be downloaded.
+                        newDiscussion()
+                    }
+                }
+                else {
+                    existingLocalDiscussion.readProblem = true
+                    Log.error("Some error loading discussion file.")
                 }
             }
             else {
@@ -126,15 +173,9 @@ class ImagesHandler {
                 localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
                 localDiscussion.uuid = discussionData.fileUUID
                 localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
+                localDiscussion.gone = nil
                 
-                // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
-                if let fixedObjects = FixedObjects(withFile: discussionData.url as URL) {
-                    localDiscussion.unreadCount = Int32(fixedObjects.count)
-                    imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
-                }
-                else {
-                    Log.error("Could not load discussion!")
-                }
+                newDiscussion()
             }
         }
         
@@ -241,6 +282,39 @@ extension ImagesHandler: SyncControllerDelegate {
         }
         else {
             Log.error("Could not find image for UUID: \(uuid)")
+        }
+    }
+    
+    func fileGoneDuringUpload(syncController: SyncController, uuid: String, fileType: ImageExtras.FileType?, reason: GoneReason) {
+        
+        var doImage = false
+        
+        if let fileType = fileType {
+            switch fileType {
+                case .discussion:
+                if let discussion = Discussion.fetchObjectWithUUID(uuid) {
+                    discussion.gone = reason
+                    discussion.save()
+                }
+                else {
+                    Log.error("Could not find discussion for UUID: \(uuid)")
+                }
+            case .image:
+                doImage = true
+            }
+        }
+        else {
+            doImage = true
+        }
+
+        if doImage {
+            if let image = Image.fetchObjectWithUUID(uuid) {
+                image.gone = reason
+                image.save()
+            }
+            else {
+                Log.error("Could not find image for UUID: \(uuid)")
+            }
         }
     }
 

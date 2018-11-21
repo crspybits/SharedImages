@@ -30,6 +30,9 @@ class ImageCollectionVC : UICollectionViewCell {
     
     @IBOutlet weak var title: UILabel!
     
+    // Only in small image VC.
+    @IBOutlet weak var errorImageView: UIImageView!
+    
     private(set) var image:Image!
     private(set) weak var syncController:SyncController!
     weak var imageCache:LRUCache<Image>?
@@ -79,11 +82,24 @@ class ImageCollectionVC : UICollectionViewCell {
     
     func setProperties(image:Image, syncController:SyncController, cache: LRUCache<Image>, imageTapBehavior:(()->())? = nil) {
         self.image = image
-
         self.syncController = syncController
         title.text = image.title
         imageCache = cache
         
+        if let _ = errorImageView {
+            var showError = false
+            if let _ = self.image.url {
+                if self.image.eitherHasError {
+                    showError = true
+                }
+            }
+            else if self.image.eitherHasError {
+                showError = true
+            }
+            
+            errorImageView?.isHidden = !showError
+        }
+
         scrollView?.zoomScale = 1.0
         scrollView?.maximumZoomScale = 6.0
         scrollView?.delegate = self
@@ -112,6 +128,7 @@ class ImageCollectionVC : UICollectionViewCell {
     }
     
     @objc private func tapGestureAction() {
+        // Don't need to check for an error here, because this only happens with large images and we won't get that far if there is an error.
         imageTapBehavior?()
     }
     

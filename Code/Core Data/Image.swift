@@ -22,16 +22,6 @@ public class Image: NSManagedObject {
     static let UNREAD_COUNT = "discussion.unreadCount"
     static let SHARING_GROUP_UUID = "sharingGroupUUID"
     
-    public var sharingGroupId: Int64? {
-        get {
-            return sharingGroupIdInternal?.int64Value
-        }
-        
-        set {
-            sharingGroupIdInternal = newValue == nil ? nil : NSNumber(value: newValue!)
-        }
-    }
-    
     var originalSize:CGSize {
         var originalImageSize = CGSize()
 
@@ -64,6 +54,31 @@ public class Image: NSManagedObject {
             }
         }
     }
+    
+    var gone:GoneReason? {
+        get {
+            if let goneReasonInternal = goneReasonInternal {
+                return GoneReason(rawValue: goneReasonInternal)
+            }
+            else {
+                return nil
+            }
+        }
+        
+        set {
+            goneReasonInternal = newValue?.rawValue
+        }
+    }
+    
+    var hasError: Bool {
+        return gone != nil || readProblem
+    }
+    
+    // Either image or associated discussion
+    var eitherHasError: Bool {
+        let discussionError = discussion?.hasError ?? false
+        return hasError || discussionError
+    }
 
     class func entityName() -> String {
         return "Image"
@@ -82,6 +97,8 @@ public class Image: NSManagedObject {
         else {
             image.creationDate = creationDate
         }
+        
+        image.readProblem = false
         
         return image
     }

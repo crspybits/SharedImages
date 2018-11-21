@@ -34,7 +34,7 @@ public struct SyncAttributes : FileUUID, Hashable {
     
     public var appMetaData:String?
     
-    /// Used only in responses from the server (not provided by the client). If non-nil, indicates a file could not be synced, and indicates the reason. In that case, it's up to the app using the SyncServer client interface to re-initiate the operation if appropriate (e.g., an upload or download) and/or to inform the user.
+    /// Used primarily in responses from the server. If non-nil, indicates a file could not be synced, and indicates the reason. In that case, it's up to the app using the SyncServer client interface to re-initiate the operation if appropriate (e.g., an upload or download) and/or to inform the user.
     public var gone: GoneReason?
     
     public init(fileUUID:UUIDString, sharingGroupUUID: String, mimeType:MimeType, fileGroupUUID: UUIDString? = nil, creationDate: Date? = nil, updateDate: Date? = nil) {

@@ -427,20 +427,16 @@ class ServerAPI {
         }
     }
     
-    struct DownloadedFile {
-        let url: SMRelativeLocalURL
-        let appMetaData:AppMetaData?
-        let checkSum:String // in cloud storage
-        let cloudStorageType:CloudStorageType
-        let contentsChangedOnServer: Bool
+    enum DownloadedFile {
+        case content(url: SMRelativeLocalURL, appMetaData:AppMetaData?, checkSum:String, cloudStorageType:CloudStorageType, contentsChangedOnServer: Bool)
+        
+        // The GoneReason should never be userRemoved-- because when a user is removed, their files are marked as deleted in the FileIndex, and thus the files are generally not downloadable.
+        case gone(appMetaData:AppMetaData?, cloudStorageType:CloudStorageType, GoneReason)
     }
     
     enum DownloadFileResult {
         case success(DownloadedFile)
         case serverMasterVersionUpdate(Int64)
-        
-        // the GoneReason should never be userRemoved-- because when a user is removed, their files are marked as deleted in the FileIndex, and thus the files are generally not downloadable.
-        case gone(GoneReason)
     }
     
     func downloadFile(fileNamingObject: FilenamingWithAppMetaDataVersion, serverMasterVersion:MasterVersionInt!, sharingGroupUUID: String, completion:((DownloadFileResult?, SyncServerError?)->(Void))?) {
@@ -464,30 +460,6 @@ class ServerAPI {
         
         download(file: file, fromServerURL: serverURL, method: endpoint.method) { (resultURL, response, statusCode, error) in
             
-            if statusCode == HTTPStatus.gone.rawValue, let resultURL = resultURL {
-                // Due to the way the download proceeds, the body of the HTTP response, with the details of the `gone` issue, are in the file referenced by the resultURL.
-                
-                var json:Any?
-                do {
-                    let data = try Data(contentsOf: resultURL as URL)
-                    try json = JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: UInt(0)))
-                } catch (let error) {
-                    Log.error("Error in JSON conversion: \(error)")
-                    completion?(nil, .generic("Could not get Gone details."))
-                    return
-                }
-                
-                guard let jsonDict = json as? [String: Any],
-                    let goneReasonRaw = jsonDict[GoneReason.goneReasonKey] as? String,
-                    let goneReason = GoneReason(rawValue: goneReasonRaw) else {
-                    completion?(nil, .generic("Could not convert Gone reason."))
-                    return
-                }
-                
-                completion?(.gone(goneReason), nil)
-                return
-            }
-            
             guard response != nil else {
                 let resultError = error ?? .nilResponse
                 completion?(nil, resultError)
@@ -506,10 +478,22 @@ class ServerAPI {
                         completion?(nil, .couldNotObtainHeaderParameters)
                         return
                     }
-
-                    if let checkSum = downloadFileResponse.checkSum,
-                        let cloudStorageTypeRaw = downloadFileResponse.cloudStorageType,
-                        let cloudStorageType = CloudStorageType(rawValue: cloudStorageTypeRaw),
+                    
+                    guard let cloudStorageTypeRaw = downloadFileResponse.cloudStorageType,
+                        let cloudStorageType = CloudStorageType(rawValue: cloudStorageTypeRaw) else {
+                        completion?(nil, .generic("Could not get CloudStorageType"))
+                        return
+                    }
+                    
+                    let appMetaData = AppMetaData(version: fileNamingObject.appMetaDataVersion, contents: downloadFileResponse.appMetaData)
+                    
+                    if let goneRaw = downloadFileResponse.gone,
+                        let gone = GoneReason(rawValue: goneRaw) {
+                        
+                        let downloadedFile = DownloadedFile.gone(appMetaData: appMetaData, cloudStorageType: cloudStorageType, gone)
+                        completion?(.success(downloadedFile), nil)
+                    }
+                    else if let checkSum = downloadFileResponse.checkSum,
                         let contentsChanged = downloadFileResponse.contentsChanged {
 
                         guard resultURL != nil else {
@@ -528,9 +512,7 @@ class ServerAPI {
                             return
                         }
 
-                        let appMetaData = AppMetaData(version: fileNamingObject.appMetaDataVersion, contents: downloadFileResponse.appMetaData)
-                        
-                        let downloadedFile = DownloadedFile(url: resultURL!, appMetaData: appMetaData, checkSum: checkSum, cloudStorageType: cloudStorageType, contentsChangedOnServer: contentsChanged)
+                        let downloadedFile = DownloadedFile.content(url: resultURL!, appMetaData: appMetaData, checkSum: checkSum, cloudStorageType: cloudStorageType, contentsChangedOnServer: contentsChanged)
                         completion?(.success(downloadedFile), nil)
                     }
                     else if let masterVersionUpdate = jsonDict[DownloadFileResponse.masterVersionUpdateKey] as? Int64 {

@@ -84,7 +84,6 @@ public enum CloudStorageType : String {
     case Dropbox
 }
 
-// Reasons for an HTTP status "gone"
 public enum GoneReason: String {
     public static let goneReasonKey = "goneReason"
     

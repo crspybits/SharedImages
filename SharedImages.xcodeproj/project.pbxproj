@@ -117,6 +117,7 @@
 		834A7E772037858800969B18 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		834E3E9220B3FF90006AC504 /* BottomRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomRefresh.swift; sourceTree = "<group>"; };
 		835A3E461FB954AF009DB032 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages7.xcdatamodel; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
 		8380D2672161A6DC008D6231 /* Badge+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Badge+Extras.swift"; sourceTree = "<group>"; };
@@ -1045,6 +1046,7 @@
 		83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */,
 				83DD1B8B215C88D10054932C /* SharedImages6.xcdatamodel */,
 				83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */,
 				8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */,
@@ -1052,7 +1054,7 @@
 				83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */,
 				83F882441E711FC6008F644A /* SharedImages.xcdatamodel */,
 			);
-			currentVersion = 83DD1B8B215C88D10054932C /* SharedImages6.xcdatamodel */;
+			currentVersion = 8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */;
 			name = SharedImages.xcdatamodeld;
 			path = Resources/SharedImages.xcdatamodeld;
 			sourceTree = "<group>";

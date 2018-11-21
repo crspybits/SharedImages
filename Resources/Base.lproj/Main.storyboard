@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -62,6 +62,13 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="75" height="85"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                                 </imageView>
+                                                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="errorNote" translatesAutoresizingMaskIntoConstraints="NO" id="1v8-aI-ffe" userLabel="Error Image View">
+                                                    <rect key="frame" x="12.5" y="23.5" width="50" height="50"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="50" id="991-3A-uxf"/>
+                                                        <constraint firstAttribute="height" constant="50" id="f0i-ri-oHZ"/>
+                                                    </constraints>
+                                                </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nlX-iC-FAf">
                                                     <rect key="frame" x="0.0" y="85" width="75" height="12"/>
                                                     <constraints>
@@ -77,14 +84,17 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="bottom" secondItem="nlX-iC-FAf" secondAttribute="bottom" id="5mS-Rh-yeM"/>
+                                            <constraint firstItem="1v8-aI-ffe" firstAttribute="centerY" secondItem="GHm-lm-kQ4" secondAttribute="centerY" id="78z-Hu-JBM"/>
                                             <constraint firstItem="nlX-iC-FAf" firstAttribute="top" secondItem="p10-SC-T2M" secondAttribute="bottom" id="BDP-Yb-hvC"/>
                                             <constraint firstItem="p10-SC-T2M" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="FZq-DT-1ra"/>
+                                            <constraint firstItem="1v8-aI-ffe" firstAttribute="centerX" secondItem="GHm-lm-kQ4" secondAttribute="centerX" id="HCw-2u-6Tb"/>
                                             <constraint firstItem="p10-SC-T2M" firstAttribute="top" secondItem="GHm-lm-kQ4" secondAttribute="top" id="TSW-dI-kUC"/>
                                             <constraint firstItem="nlX-iC-FAf" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="cTj-rL-df1"/>
                                             <constraint firstAttribute="trailing" secondItem="p10-SC-T2M" secondAttribute="trailing" id="gPY-rR-do2"/>
                                             <constraint firstAttribute="trailing" secondItem="nlX-iC-FAf" secondAttribute="trailing" id="qzX-je-mKO"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="errorImageView" destination="1v8-aI-ffe" id="Yyj-73-a58"/>
                                             <outlet property="imageView" destination="p10-SC-T2M" id="Q4Y-a1-JBB"/>
                                             <outlet property="title" destination="nlX-iC-FAf" id="Jmz-UH-Zqo"/>
                                         </connections>
@@ -107,7 +117,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1089" y="161"/>
+            <point key="canvasLocation" x="1088.8" y="160.56971514242881"/>
         </scene>
         <!--Settings-->
         <scene sceneID="8A1-uZ-ykE">
@@ -593,6 +603,7 @@
     <resources>
         <image name="Settings" width="25.600000381469727" height="25.600000381469727"/>
         <image name="albums" width="35" height="30"/>
+        <image name="errorNote" width="128" height="128"/>
         <image name="lock" width="35" height="35"/>
     </resources>
 </document>

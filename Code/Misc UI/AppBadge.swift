@@ -98,6 +98,9 @@ class AppBadge {
 }
 
 extension AppBadge: SyncServerDelegate {
+    func syncServerFileGroupDownloadGone(group: [DownloadOperation]) {
+    }
+    
     func syncServerSharingGroupsDownloaded(created: [SyncServer.SharingGroup], updated: [SyncServer.SharingGroup], deleted: [SyncServer.SharingGroup]) {
     }
     
