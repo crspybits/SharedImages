@@ -287,7 +287,10 @@ extension SyncController : SyncServerDelegate {
                 }
                 Progress.session.next(count: 1)
 
-            case .file(let url, _):
+            case .file(let url, contentsChanged: let contentsChanged):
+                // Just checking this, for debugging. It turns out this flag isn't very useful at least in SharedImages-- the real test for this app is whether or not the (a) image file or (b) discussion thread file can be read and parsed properly.
+                Log.msg("contentsChanged: \(contentsChanged)")
+                
                 singleFileDownloadComplete(.success(url: url, attr: operation.attr))
             
             case .fileGone:
@@ -579,6 +582,9 @@ extension SyncController : SyncServerDelegate {
             Progress.session.next()
             
         case .singleUploadDeletionComplete:
+            // Because it is possible to delete an image for which you've not yet read messages, and the badge won't be updated.
+            UnreadCountBadge.update()
+            
             Progress.session.next()
 
         case .sharingGroupUploadOperationCompleted(sharingGroup: let sharingGroup, operation: let operation):

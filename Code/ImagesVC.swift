@@ -136,7 +136,7 @@ class ImagesVC: UIViewController {
         }
         
         if sharingGroup.permission.hasMinimumPermission(.admin) {
-            dropDownMenuItems += [DropDownMenuItem(name: "Share", action: {
+            dropDownMenuItems += [DropDownMenuItem(name: "Share Album", action: {
                 [unowned self] in
                 self.shareAction()
             })]
@@ -146,7 +146,7 @@ class ImagesVC: UIViewController {
             DropDownMenuItem(name: "Other Actions", action: {[unowned self] in
                 self.actionButtonAction()
             }),
-            DropDownMenuItem(name: "Remove album", action: {[unowned self] in
+            DropDownMenuItem(name: "Remove Album", action: {[unowned self] in
                 self.removeUserFromAlbum()
             })
         ]

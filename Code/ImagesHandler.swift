@@ -46,10 +46,19 @@ class ImagesHandler {
                 let image = UIImage(contentsOfFile: imageFilePath)
                 theImage.readProblem = image == nil
             }
+            else {
+                // Image is gone, but we don't have a read problem.
+                theImage.readProblem = false
+            }
         }
 
         // url is nil if file is gone, or other error.
-        theImage.url = newImageData.file.url
+        if theImage.readProblem {
+            theImage.url = nil
+        }
+        else {
+            theImage.url = newImageData.file.url
+        }
         
         theImage.gone = newImageData.file.gone
         
@@ -118,6 +127,8 @@ class ImagesHandler {
                 let fixedObjects = FixedObjects(withFile: discussionDataURL as URL) {
                 localDiscussion.unreadCount = Int32(fixedObjects.count)
                 imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
+                localDiscussion.gone = nil
+                localDiscussion.readProblem = false
             }
             else {
                 localDiscussion.readProblem = true
@@ -140,6 +151,7 @@ class ImagesHandler {
                 
                 localDiscussion = existingLocalDiscussion
                 existingLocalDiscussion.gone = nil
+                existingLocalDiscussion.readProblem = false
                 
                 // Since we didn't have a conflict, `newFixedObjects` will be a superset of the existing objects.
                 if let gone = discussionData.gone {
