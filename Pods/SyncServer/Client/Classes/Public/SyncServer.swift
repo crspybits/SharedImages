@@ -917,17 +917,17 @@ public class SyncServer {
     }
     
     /**
-        Operates synchronously and quickly. A file must have already been uploaded (or downloaded) for you to be able to get its attributes. It is an error to call this for a uuid that doesn't yet exist, or for one that has already been deleted.
+        Operates synchronously and quickly. A file must have already been uploaded (or downloaded) for you to be able to get its attributes. It is an error to call this for a file UUID that doesn't yet exist, or for one that has already been deleted.
     
         - parameters:
-            - forUUID: The UUID of the file to get attributes for.
+            - forFileUUID: The UUID of the file to get attributes for.
     */
     public func getAttributes(forFileUUID fileUUID: String) throws -> SyncAttributes {
         var error:Error?
         var attr: SyncAttributes?
         
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: uuid) else {
+            guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: fileUUID) else {
                 error = SyncServerError.getAttributesForUnknownFile
                 return
             }
@@ -947,18 +947,13 @@ public class SyncServer {
         return attr!
     }
     
-    /// Use this to request the re-download of a file, on a subsequent sync with the relevant sharing group UUID. E.g., for when a file could not be read due to some kind of corruption. A request to download a file that is already `gone` is ignored. Use the `reAttemptGoneDownloads` flag of the sync method instead. Note that this is a "request" for download because normal sync operations can take priority. E.g., it is possible that the file might be deleted by a server download deletion before this request gets a chance to operate.
-    public func requestDownload(attr: SyncAttributes) throws {
+    /// Use this to request the re-download of a file, on a subsequent sync with the relevant sharing group UUID. E.g., for when a file could not be read due to some kind of corruption. Requests to download a file that is already `gone` are ignored. Use the `reAttemptGoneDownloads` flag of the sync method instead. Note that this is a "request" for download because normal sync operations can take priority. E.g., it is possible that the file might be deleted by a server download deletion before this request gets a chance to operate.
+    public func requestDownload(forFileUUID fileUUID: String) throws {
         var error:Error?
 
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
-            guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: attr.fileUUID) else {
+            guard let entry = DirectoryEntry.fetchObjectWithUUID(uuid: fileUUID) else {
                 error = SyncServerError.getAttributesForUnknownFile
-                return
-            }
-            
-            guard entry.sharingGroupUUID == attr.sharingGroupUUID else {
-                error = SyncServerError.generic("Bad sharing group UUID given.")
                 return
             }
             
@@ -968,7 +963,6 @@ public class SyncServer {
             }
             
             guard entry.gone == nil else {
-                error = SyncServerError.generic("gone field set.")
                 return
             }
 
