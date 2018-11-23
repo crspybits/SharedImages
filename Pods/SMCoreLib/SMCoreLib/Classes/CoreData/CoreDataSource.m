@@ -112,6 +112,11 @@
     return [self.fetchedResultsController objectAtIndexPath:indexPath];
 }
 
+- (nullable NSIndexPath *) indexPathForObject: (NSManagedObject *) object;
+{
+    return [self.fetchedResultsController indexPathForObject:object];
+}
+
 - (BOOL) fetchData;
 {
     self.fetchedResultsController =

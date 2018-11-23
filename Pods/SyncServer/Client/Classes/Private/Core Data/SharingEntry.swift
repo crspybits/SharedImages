@@ -23,7 +23,7 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
         return "SharingEntry"
     }
     
-    // This will be nil for owning users.
+    // This will be nil for owning users. And for sharing users where their owning user was removed.
     var cloudStorageType: CloudStorageType? {
         get {
             if let cloudStorageTypeInternal = cloudStorageTypeInternal {
@@ -100,7 +100,7 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
     }
     
     // We're being passed the list of sharing groups in which the user is still a member. (Notably, if a sharing group has been removed from a group, it will not be in this list, so we haven't handle this specially).
-    class func update(serverSharingGroups: [SharingGroup]) throws -> Updates? {
+    class func update(serverSharingGroups: [SharingGroup], desiredEvents:EventDesired, delegate:SyncServerDelegate?) throws -> Updates? {
         var deletedOnServer = [SharingGroup]()
         var newSharingGroups = [SharingGroup]()
         var updatedSharingGroups = [SharingGroup]()
@@ -119,6 +119,13 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
                         // The master version on the server changed from what we know about. Need to sync with server to get updates.
                         found.syncNeeded = true
                     }
+                    
+                    // If a sharing user's owning user gets removed, we need to reset the sharing group's cloud storage type.
+                    if sharingGroup.cloudStorageType == nil && found.cloudStorageType != nil {
+                        found.cloudStorageType = nil
+
+                        EventDesired.reportEvent(.sharingGroupOwningUserRemoved(sharingGroup: SyncServer.SharingGroup.from(sharingGroup: sharingGroup)), mask: desiredEvents, delegate: delegate)
+                    }
                 }
                 else {
                     let sharingEntry = SharingEntry.newObject() as! SharingEntry
@@ -127,7 +134,7 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
                     sharingEntry.masterVersion = sharingGroup.masterVersion!
                     sharingEntry.permission = sharingGroup.permission
                     
-                    // sharingGroup.cloudStorageType will be nil for owning users.
+                    // sharingGroup.cloudStorageType will be nil for owning users. And for sharing users where their owning user has been removed.
                     if let cloudStorageTypeRaw = sharingGroup.cloudStorageType,
                         let cloudStorageType = CloudStorageType(rawValue: cloudStorageTypeRaw) {
                         sharingEntry.cloudStorageType = cloudStorageType
@@ -135,7 +142,6 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
                     
                     // This is a sharing group we (the client) didn't know about previously: Need to sync with the server to get files etc. for the sharing group.
                     sharingEntry.syncNeeded = true
-                    
                     
                     newSharingGroups += [sharingGroup]
                 }

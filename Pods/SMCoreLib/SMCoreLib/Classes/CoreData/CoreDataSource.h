@@ -52,6 +52,7 @@
 - (NSUInteger) numberOfRowsInSection: (NSUInteger) section;
 
 - (NSManagedObject *) objectAtIndexPath: (NSIndexPath *) indexPath;
+- (nullable NSIndexPath *) indexPathForObject: (NSManagedObject *) object;
 
 - (void) deleteObjectAtIndexPath: (NSIndexPath *) indexPath;
 

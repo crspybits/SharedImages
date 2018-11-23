@@ -75,7 +75,7 @@ class SyncController {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
                 .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
-                .sharingGroupUploadOperationCompleted]
+                .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -146,7 +146,7 @@ class SyncController {
         discussionAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.discussion.rawValue
         discussionAttr.appMetaData = dictToJSONString(discussionAppMetaData)
         assert(discussionAttr.appMetaData != nil)
-        
+
         do {
             // Make sure to enqueue both the image and discussion for upload without an intervening sync -- they are in the same file group, and this will enable other clients to download them together.
             
@@ -154,9 +154,31 @@ class SyncController {
             
             // Using uploadCopy for discussions in case the discussion gets updated locally before we complete this sync operation. i.e., discussions are mutable.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
-
+        } catch (let error) {
+            // Also removes the discussion.
+            try? image.remove()
+            image.save()
+            
+            // TODO: Need to dequeue the image enqueue if it was the discussion enqueue that failed. See https://github.com/crspybits/SyncServer-iOSClient/issues/62 I'm going to do this really crudely right now.
+            try? SyncServer.session.reset(type: .tracking)
+            
+            // A hack because otherwise the VC we ned to show the alert is not present: Instead, the UI for image selection is still present.
+            TimedCallback.withDuration(2.0) {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to start the upload of your image.")
+            }
+            
+            Log.error("An error occurred: \(error)")
+            return
+        }
+        
+        // Separate out the sync so that we can, later, dequeue both syncs should we fail.
+        do {
             try SyncServer.session.sync(sharingGroupUUID: image.sharingGroupUUID!)
         } catch (let error) {
+            // Similar hack like the above.
+            TimedCallback.withDuration(2.0) {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to sync your image.")
+            }
             Log.error("An error occurred: \(error)")
         }
     }
@@ -594,6 +616,14 @@ extension SyncController : SyncServerDelegate {
             case .creation, .update:
                 break
             }
+            
+        case .sharingGroupOwningUserRemoved(let sharingGroup):
+            var albumName = "an unnamed album"
+            if let name = sharingGroup.sharingGroupName {
+                albumName = "the album named \(name)"
+            }
+            
+            SMCoreLib.Alert.show(withTitle: "Your inviting user was removed from \(albumName).", message: "You will no longer be able to upload new images to this album.")
             
         case .syncDone:
             delegate.syncEvent(syncController: self, event: .syncDone(numberOperations: numberOperations))

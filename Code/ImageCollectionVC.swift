@@ -153,7 +153,8 @@ class ImageCollectionVC : UICollectionViewCell {
         
         scrollView?.contentSize = size
         
-        if image.hasError {
+        // Don't use image.hasError here only because on an upload/gone case, we do have a valid URL and can render the image.
+        if image.url == nil {
             originalSize = size
             return
         }

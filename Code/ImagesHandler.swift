@@ -52,11 +52,12 @@ class ImagesHandler {
             }
         }
 
-        // url is nil if file is gone, or other error.
         if theImage.readProblem {
+            // With a read problem, the url is effectively invalid.
             theImage.url = nil
         }
         else {
+            // With download/gone cases, the url will be nil. But, with upload/gone cases, we'll have a valid url.
             theImage.url = newImageData.file.url
         }
         

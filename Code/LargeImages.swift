@@ -14,7 +14,10 @@ import SyncServer
 
 class LargeImages : UIViewController {
     // Set these when creating an instance of this class.
-    var startItem: Int = 0
+    
+    // This is an image instead of an index, because the IndexPath's vary from the small images screen to the large images screen-- the large images screen doesn't display images with errors.
+    var startImage: Image?
+    
     weak var imagesHandler:ImagesHandler?
     var sharingGroup: SyncServer.SharingGroup!
     
@@ -31,9 +34,12 @@ class LargeImages : UIViewController {
                 // 2/13/18; Trying to fix: https://github.com/crspybits/SharedImages/issues/80
                 _coreDataSource = CoreDataSource(delegate: self)
                 _coreDataSource.fetchData()
-
-                let indexPath = IndexPath(item: startItem, section: 0)
-                seekToIndexPath = indexPath
+                
+                seekToIndexPath = nil
+                if let startImage = startImage,
+                    let indexPath = _coreDataSource.indexPath(for: startImage) {
+                    seekToIndexPath = indexPath
+                }
             }
             
             return _coreDataSource
@@ -134,10 +140,9 @@ class LargeImages : UIViewController {
             // 12/26/17; Adding the DispatchQueue call to cure: https://github.com/crspybits/SharedImages/issues/58
             DispatchQueue.main.async {[unowned self] in
                 // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
-                if self.seekToIndexPath != nil {
-                    Log.msg("self.seekToIndexPath: \(String(describing: self.seekToIndexPath))")
-                    Log.msg("startItem: \(self.startItem)")
-                    self.collectionView?.scrollToItem(at: self.seekToIndexPath!, at: .left, animated: false)
+                if let indexPath = self.seekToIndexPath {
+                    Log.msg("self.seekToIndexPath: \(String(describing: indexPath))")
+                    self.collectionView?.scrollToItem(at: indexPath, at: .left, animated: false)
                     self.seekToIndexPath = nil
                 }
             }

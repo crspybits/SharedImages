@@ -312,6 +312,10 @@ public class SyncServer {
                 cloudStorageType = signIn.cloudStorageType!
             case .sharing:
                 // A sharing user is creating a new file; v0 files have the cloud storage type of the "parent" owning user-- for the particular sharing group.
+                if sharingEntry.cloudStorageType == nil {
+                    throw SyncServerError.generic("No cloud storage type for sharing user: Their owning user must have been removed.")
+                }
+                
                 cloudStorageType = sharingEntry.cloudStorageType!
             }
         }

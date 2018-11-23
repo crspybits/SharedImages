@@ -35,6 +35,9 @@ public enum SyncEvent {
         case update
     }
     case sharingGroupUploadOperationCompleted(sharingGroup: SyncServer.SharingGroup, operation:SharingGroupUploadOperation)
+
+    /// Occurs for sharing users, when their owning user for a sharing group is removed from that group.
+    case sharingGroupOwningUserRemoved(sharingGroup: SyncServer.SharingGroup)
     
     case syncDelayed
     case syncStarted
@@ -62,19 +65,20 @@ public struct EventDesired: OptionSet {
     public static let uploadDeletionsCompleted = EventDesired(rawValue: 1 << 7)
     
     public static let sharingGroupUploadOperationCompleted = EventDesired(rawValue: 1 << 8)
-
-    public static let syncDelayed = EventDesired(rawValue: 1 << 9)
-    public static let syncStarted = EventDesired(rawValue: 1 << 10)
-    public static let syncDone = EventDesired(rawValue: 1 << 11)
+    public static let sharingGroupOwningUserRemoved = EventDesired(rawValue: 1 << 9)
     
-    public static let syncStopping = EventDesired(rawValue: 1 << 12)
+    public static let syncDelayed = EventDesired(rawValue: 1 << 10)
+    public static let syncStarted = EventDesired(rawValue: 1 << 11)
+    public static let syncDone = EventDesired(rawValue: 1 << 12)
+    
+    public static let syncStopping = EventDesired(rawValue: 1 << 13)
 
-    public static let refreshingCredentials = EventDesired(rawValue: 1 << 13)
+    public static let refreshingCredentials = EventDesired(rawValue: 1 << 14)
     
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone, EventDesired.sharingGroupOwningUserRemoved])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -116,6 +120,9 @@ public struct EventDesired: OptionSet {
             
         case .singleAppMetaDataUploadComplete:
             eventIsDesired = .singleAppMetaDataUploadComplete
+            
+        case .sharingGroupOwningUserRemoved:
+            eventIsDesired = .sharingGroupOwningUserRemoved
             
         case .singleUploadDeletionComplete:
             eventIsDesired = .singleUploadDeletionComplete

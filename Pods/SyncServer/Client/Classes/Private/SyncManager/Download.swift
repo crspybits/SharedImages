@@ -37,7 +37,7 @@ class Download {
             
             CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 do {
-                    sharingGroupUpdates = try SharingEntry.update(serverSharingGroups: sharingGroups)
+                    sharingGroupUpdates = try SharingEntry.update(serverSharingGroups: sharingGroups, desiredEvents: self.desiredEvents, delegate: self.delegate)
                 }
                 catch (let error) {
                     throwError = error
@@ -107,7 +107,7 @@ class Download {
             
             CoreDataSync.perform(sessionName: Constants.coreDataName) {
                 do {
-                    sharingGroupUpdates = try SharingEntry.update(serverSharingGroups: sharingGroups)
+                    sharingGroupUpdates = try SharingEntry.update(serverSharingGroups: sharingGroups, desiredEvents: self.desiredEvents, delegate: self.delegate)
                     let downloadSet =
                         try Directory.session.checkFileIndex(serverFileIndex: fileIndex)
                     completionResult =

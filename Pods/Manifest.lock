@@ -36,44 +36,44 @@ PODS:
   - Reachability (3.2)
   - rosterdev (0.1.0)
   - SDCAlertView (7.1.2)
-  - SMCoreLib (1.3.3):
+  - SMCoreLib (1.4.0):
     - HPTextViewTapGestureRecognizer (~> 0.1)
     - Reachability
     - SwiftyBeaver
   - SwiftyBeaver (1.6.1)
   - SwiftyDropbox (4.8.1):
     - Alamofire (~> 4.7.3)
-  - SyncServer (18.2.0):
+  - SyncServer (18.3.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
-    - SMCoreLib (~> 1.2)
+    - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
-    - SyncServer/Lite (= 18.2.0)
+    - SyncServer/Lite (= 18.3.0)
   - SyncServer-Shared (9.3.7):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (18.2.0):
+  - SyncServer/Dropbox (18.3.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
-    - SMCoreLib (~> 1.2)
-    - SwiftyDropbox (~> 4.6)
+    - SMCoreLib (~> 1.4)
+    - SwiftyDropbox (~> 4.8)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Facebook (18.2.0):
+  - SyncServer/Facebook (18.3.0):
     - FacebookCore
     - FacebookLogin
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
-    - SMCoreLib (~> 1.2)
+    - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Google (18.2.0):
+  - SyncServer/Google (18.3.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
-    - SMCoreLib (~> 1.2)
+    - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Lite (18.2.0):
+  - SyncServer/Lite (18.3.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
-    - SMCoreLib (~> 1.2)
+    - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
 
 DEPENDENCIES:
@@ -87,11 +87,11 @@ DEPENDENCIES:
   - Presentr (~> 1.3)
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
-  - SMCoreLib (~> 1.3)
-  - SyncServer (~> 18.2)
-  - SyncServer/Dropbox (~> 18.2)
-  - SyncServer/Facebook (~> 18.2)
-  - SyncServer/Google (~> 18.2)
+  - SMCoreLib (~> 1.4)
+  - SyncServer (~> 18.3)
+  - SyncServer/Dropbox (~> 18.3)
+  - SyncServer/Facebook (~> 18.3)
+  - SyncServer/Google (~> 18.3)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -155,12 +155,12 @@ SPEC CHECKSUMS:
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   rosterdev: 2a7b69c5d01133bd714161e1e80deea1da9cb90f
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
-  SMCoreLib: ab21fe40ff76b2cc5e873122a96b1ad22ebe02bc
+  SMCoreLib: 9f676d28e5fcb445febd9fa9f8252da154afa8ee
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 775da02bb83d02f45e37018641c41316b1edad56
-  SyncServer: c4cc18f6e31456c42f0929f98286da80a6e0c488
+  SyncServer: af6567af357a9e8b5d9b27eecd88b479efffd453
   SyncServer-Shared: 3ee7343ac6a857cfbb4c69d2caaf44a28bf27359
 
-PODFILE CHECKSUM: 417b68d531ca185aa8c0a4bbf38ae7ffcea40841
+PODFILE CHECKSUM: e7d67d3de0f0bdd3664c98958a5c3dbaa73fce32
 
 COCOAPODS: 1.5.3

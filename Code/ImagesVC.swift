@@ -460,7 +460,7 @@ extension ImagesVC : UICollectionViewDelegate {
             case .userRemoved:
                 details = "The owning user was removed."
             case .authTokenExpiredOrRevoked:
-                details = "The auth token for the owning user expired or was revoked."
+                details = "The authorization token for the owning user expired or was revoked."
             case .fileRemovedOrRenamed:
                 details = "The cloud storage file was renamed or removed."
             }
@@ -482,7 +482,7 @@ extension ImagesVC : UICollectionViewDelegate {
                 title += ": " + details
             }
             
-            let alert = UIAlertController(title: title, message: "Do you want to retry for this album?", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: title, message: "Do you want to retry synchronizing this album?", preferredStyle: .actionSheet)
             alert.popoverPresentationController?.sourceView = cell
             Alert.styleForIPad(alert)
 
@@ -509,7 +509,7 @@ extension ImagesVC : UICollectionViewDelegate {
         }
         else {
             let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
-            largeImages.startItem = indexPath.item
+            largeImages.startImage = coreDataSource.object(at: indexPath) as? Image
             largeImages.imagesHandler = imagesHandler
             largeImages.sharingGroup = sharingGroup
             navigatedToLargeImages = true
@@ -720,8 +720,10 @@ extension ImagesVC {
         var images = [Any]()
         for uuidString in selectedImages {
             if let imageObj = Image.fetchObjectWithUUID(uuidString) {
-                let uiImage = ImageExtras.fullSizedImage(url: imageObj.url! as URL)
-                images.append(uiImage)
+                if !imageObj.readProblem, let url = imageObj.url {
+                    let uiImage = ImageExtras.fullSizedImage(url: url as URL)
+                    images.append(uiImage)
+                }
                 images.append(imageObj)
             }
         }
@@ -759,6 +761,8 @@ extension ImagesVC {
             let p = gesture.location(in: self.collectionView)
             if let indexPath = collectionView.indexPathForItem(at: p) {
                 let imageObj = coreDataSource.object(at: indexPath) as! Image
+                
+                // Allowing selection of an image even when there is an error, such as image.hasError -- e.g., so that deletion can be allowed. Will have to, downstream, disable certain operations-- such as sending the image to someone, if there is no image.
                 
                 if selectedImages.contains(imageObj.uuid!) {
                     // Deselect image

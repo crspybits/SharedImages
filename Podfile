@@ -11,10 +11,10 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 18.2'
-	pod 'SyncServer/Facebook', '~> 18.2'
-	pod 'SyncServer/Dropbox', '~> 18.2'
-	pod 'SyncServer/Google', '~> 18.2'
+	pod 'SyncServer', '~> 18.3'
+	pod 'SyncServer/Facebook', '~> 18.3'
+	pod 'SyncServer/Dropbox', '~> 18.3'
+	pod 'SyncServer/Google', '~> 18.3'
 
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
@@ -24,7 +24,7 @@ target 'SharedImages' do
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 	
 	# pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-	pod 'SMCoreLib', '~> 1.3'
+	pod 'SMCoreLib', '~> 1.4'
 	
 	# For a discussion thread on images
 	# Lots of breaking changes going to v1.0.0 of MessageKit. I'm avoiding this for now.
