@@ -149,6 +149,7 @@ extension SignInVC : GenericSignInDelegate {
             
         case .sharingUserCreated:
             invite = nil
+            SharingInviteDelegate.invitationRedeemed = true
             
             // 12/26/17; https://github.com/crspybits/SharedImages/issues/54
             successfulSignIn(switchToImagesTab: true)

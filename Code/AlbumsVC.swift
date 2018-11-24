@@ -171,6 +171,17 @@ class AlbumsVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        if SharingInviteDelegate.invitationRedeemed {
+            SharingInviteDelegate.invitationRedeemed = false
+            
+            activityIndicator.startAnimating()
+            do {
+                try SyncServer.session.sync()
+            } catch (let error) {
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
+            }
+        }
+        
         AppBadge.checkForBadgeAuthorization(usingViewController: self)
     }
     

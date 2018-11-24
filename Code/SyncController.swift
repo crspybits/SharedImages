@@ -612,6 +612,9 @@ extension SyncController : SyncServerDelegate {
         case .sharingGroupUploadOperationCompleted(sharingGroup: let sharingGroup, operation: let operation):
             switch operation {
             case .userRemoval:
+                // Because it is possible to remove yourself from an album which you've not yet read messages, and the badge won't be updated.
+                UnreadCountBadge.update()
+                
                 delegate.userRemovedFromAlbum(syncController: self, sharingGroup: sharingGroup)
             case .creation, .update:
                 break

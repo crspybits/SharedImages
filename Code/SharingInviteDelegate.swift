@@ -12,7 +12,8 @@ import SMCoreLib
 
 class SharingInviteDelegate : SharingInvitationDelegate {
     private var withNotSignedInCallback: ((SharingInvitation.Invitation)->())?
-        
+    static var invitationRedeemed = false
+    
     init(withNotSignedInCallback: ((SharingInvitation.Invitation)->())? = nil) {
         self.withNotSignedInCallback = withNotSignedInCallback
     }
@@ -39,7 +40,8 @@ class SharingInviteDelegate : SharingInvitationDelegate {
                 if let credentials = SignInManager.session.currentSignIn?.credentials {
                     SyncServerUser.session.redeemSharingInvitation(creds: credentials, invitationCode: invite.sharingInvitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) { longLivedAccessToken, sharingGroupUUID, error in
                         if error == nil {
-                            SMCoreLib.Alert.show(withTitle: "Success!", message: "You now have a new shared album: Pull-down to refresh to see it!")
+                            SharingInviteDelegate.invitationRedeemed = true
+                            SMCoreLib.Alert.show(withTitle: "Success!", message: "You now have a new shared album!")
                         }
                         else {
                             Log.error("Error: \(error!)")
