@@ -283,7 +283,7 @@ class ServerAPI {
         case success(creationDate: Date, updateDate: Date)
         case serverMasterVersionUpdate(Int64)
         
-        // The GoneReason should never be userRemoved-- because when a user is removed, their files are marked as deleted in the FileIndex, and thus the files are generally not uploadable. It should also never be fileRemovedOrRenamed-- because a new upload would upload the next version, not accessing the current version.
+        // The GoneReason should never be fileRemovedOrRenamed-- because a new upload would upload the next version, not accessing the current version.
         case gone(GoneReason)
     }
     

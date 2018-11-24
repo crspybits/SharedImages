@@ -191,7 +191,10 @@
             break;
 
         default:
-            BadMojo(@"Should not get to here!");
+            // 11/24/18; I just ran across an issue: 1) I uploaded an image to Google Drive from iOS, 2) I manually downloaded that image, 3) I reuploaded that image to Google Drive. I then found that the "Orientation" field was gone from the image. I previously had an assert here that forced a crash in this case. Probably shouldn't do that.
+            SPASLogDetail(@"Should not get to here: Image had no orientation!");
+            // Just assume a default orientation.
+            result = CGSizeMake(height, width);
             break;
     }
     

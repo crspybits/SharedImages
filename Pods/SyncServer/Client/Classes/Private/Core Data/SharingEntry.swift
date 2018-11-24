@@ -120,11 +120,21 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
                         found.syncNeeded = true
                     }
                     
-                    // If a sharing user's owning user gets removed, we need to reset the sharing group's cloud storage type.
-                    if sharingGroup.cloudStorageType == nil && found.cloudStorageType != nil {
-                        found.cloudStorageType = nil
+                    if sharingGroup.cloudStorageType == nil {
+                        // If a sharing user's owning user gets removed, we need to reset the sharing group's cloud storage type.
+                        if found.cloudStorageType != nil {
+                            found.cloudStorageType = nil
 
-                        EventDesired.reportEvent(.sharingGroupOwningUserRemoved(sharingGroup: SyncServer.SharingGroup.from(sharingGroup: sharingGroup)), mask: desiredEvents, delegate: delegate)
+                            EventDesired.reportEvent(.sharingGroupOwningUserRemoved(sharingGroup: SyncServer.SharingGroup.from(sharingGroup: sharingGroup)), mask: desiredEvents, delegate: delegate)
+                        }
+                    }
+                    else {
+                        // Migration to having cloudStorageType's for sharing users. We only have a cloudStorageType in a SharingEntry for sharing users (not for owning users), and then only when their owning user has not been removed.
+                        if found.cloudStorageType == nil {
+                            if let cloudStorageType = CloudStorageType(rawValue: sharingGroup.cloudStorageType!) {
+                                found.cloudStorageType = cloudStorageType
+                            }
+                        }
                     }
                 }
                 else {

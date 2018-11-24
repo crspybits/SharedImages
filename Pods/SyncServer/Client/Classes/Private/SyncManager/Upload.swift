@@ -479,11 +479,7 @@ class Upload {
 
             case .serverMasterVersionUpdate(let masterVersionUpdate):
                 self?.masterVersionUpdate(uploadQueue: uploadQueue, masterVersionUpdate: masterVersionUpdate, sharingGroupUUID: sharingGroupUUID)
-            case .gone (let goneReason):
-                if goneReason != .authTokenExpiredOrRevoked {
-                    Log.error("Received `gone` for a file upload, but the reason was not authTokenExpiredOrRevoked.")
-                }
-                
+            case .gone (let goneReason):                
                 // We're not treating "gone" as an error-- because I want to push up "gone" to the client app, and not retain an UploadFileTracker in the SyncServer client. The client app needs to decide what to do when a file is "gone" on the server.
                 var completionResult:NextCompletion!
                 completionResult = self?.uploadFileCompletion(nextToUpload: nextToUpload, gone: goneReason)

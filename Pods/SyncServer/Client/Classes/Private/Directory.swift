@@ -33,7 +33,7 @@ class Directory {
         }
     }
     
-    /* Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. The directory is not changed as a result of this call, except for:
+    /* Compares the passed fileIndex to the current DirecotoryEntry objects, and returns just the FileInfo objects we need to download/delete, if any. Except for the following, the directory is not changed as a result of this call:
         a) the case where the file isn't in the directory already, but has been deleted on the server. 5/19/18;
         b) a case of migration to using file groups
         c) a case of migration to having a cloudStorageType attribute
