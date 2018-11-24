@@ -371,6 +371,7 @@ class ImagesVC: UIViewController {
         var fixedObjects = FixedObjects()
         
         // This is so that we have the possibility of reconstructing the image/discussions if we lose the server data. This will explicitly connect the discussion to the image.
+        // [1] It is important to note that we are *never* depending on this UUID value in app operation. This is more of a comment. While unlikely, it is possible that a user could modify this value in a discussion JSON file in cloud storage. Thus, it has unreliable contents in some real sense. See also https://github.com/crspybits/SharedImages/issues/145
         fixedObjects[DiscussionKeys.imageUUIDKey] = image.uuid
         
         // 4/17/18; Image titles are now stored in the "discussion" file. This may reduce the amount of data we need store in the server database.
