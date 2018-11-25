@@ -375,7 +375,7 @@ public class SyncServer {
             }
             
             if let _ = entry.gone {
-                errorToThrow = SyncServerError.generic("Attempt to upload a file that is gone.")
+                errorToThrow = SyncServerError.generic("Attempt to uploadAppMetaData for a file that is gone.")
                 return
             }
             
@@ -572,9 +572,7 @@ public class SyncServer {
             throw SyncServerError.deletingUnknownFile
         }
         
-        if let _ = entry.gone {
-            throw SyncServerError.generic("Attempt to upload a file that is gone.")
-        }
+        // I'm going to allow deleting a file that is `gone`. File deletion is a means to clear an error. For example, suppose the file was really deleted from cloud storage. What's the point then of keeping a reference ot it around?
         
         guard let sharingGroupUUID = entry.sharingGroupUUID else {
             throw SyncServerError.noSharingGroupUUID

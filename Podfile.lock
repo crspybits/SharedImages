@@ -43,34 +43,34 @@ PODS:
   - SwiftyBeaver (1.6.1)
   - SwiftyDropbox (4.8.1):
     - Alamofire (~> 4.7.3)
-  - SyncServer (18.4.0):
+  - SyncServer (18.4.1):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
-    - SyncServer/Lite (= 18.4.0)
+    - SyncServer/Lite (= 18.4.1)
   - SyncServer-Shared (9.3.7):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (18.4.0):
+  - SyncServer/Dropbox (18.4.1):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SwiftyDropbox (~> 4.8)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Facebook (18.4.0):
+  - SyncServer/Facebook (18.4.1):
     - FacebookCore
     - FacebookLogin
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Google (18.4.0):
+  - SyncServer/Google (18.4.1):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.2)
-  - SyncServer/Lite (18.4.0):
+  - SyncServer/Lite (18.4.1):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
@@ -88,10 +88,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (from `../SyncServer-iOSClient`)
-  - SyncServer/Dropbox (from `../SyncServer-iOSClient`)
-  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
-  - SyncServer/Google (from `../SyncServer-iOSClient`)
+  - SyncServer (~> 18.4.1)
+  - SyncServer/Dropbox (~> 18.4.1)
+  - SyncServer/Facebook (~> 18.4.1)
+  - SyncServer/Google (~> 18.4.1)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -120,13 +120,12 @@ SPEC REPOS:
   https://github.com/crspybits/Specs.git:
     - GoogleSignIn
     - SMCoreLib
+    - SyncServer
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
-  SyncServer:
-    :path: "../SyncServer-iOSClient"
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -159,9 +158,9 @@ SPEC CHECKSUMS:
   SMCoreLib: ddba8abe6d050878806236bfb4ed8495fe2ec22a
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 775da02bb83d02f45e37018641c41316b1edad56
-  SyncServer: 62fc3a23ba326b9d2e3e44be28521407d2e4f441
+  SyncServer: 63128a6ea7cd340d946a8e8446e9bce0f4c991f9
   SyncServer-Shared: 3ee7343ac6a857cfbb4c69d2caaf44a28bf27359
 
-PODFILE CHECKSUM: 71e4b84893cbf35d8fbc7e50dc63de2ffe7af63d
+PODFILE CHECKSUM: dc186d0da465a4ec30b071ad3ef212c909631d3e
 
 COCOAPODS: 1.5.3
