@@ -1,5 +1,9 @@
 SharedImages
 
+Version 0.21.0 (11/24/18)
+	* Error handling for "gone" files and for corrupted/changed files from server.
+		https://github.com/crspybits/SharedImages/issues/143
+
 Version 0.20.0 (10/13/18)
 	* Now have multi-album support for users, with server version 0.17.4.
 	* Migration from sharing group id's to sharing group UUID's.
