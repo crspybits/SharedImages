@@ -26,12 +26,16 @@ public class Image: NSManagedObject {
     static let DISCUSSION_GONE_KEY = "discussion.goneReasonInternal"
     static let DISCUSSION_READ_PROBLEM_KEY = "discussion.readProblem"
     
-    var originalSize:CGSize {
+    var originalSize:CGSize? {
         var originalImageSize = CGSize()
 
         // Originally, I wasn't storing these sizes, so need to grab & store them here if we can. (Defaults for sizes are -1).
         if originalWidth < 0 || originalHeight < 0 {
-            originalImageSize = ImageExtras.sizeFromFile(url: url! as URL)
+            guard !readProblem, let url = url else {
+                return nil
+            }
+            
+            originalImageSize = ImageExtras.sizeFromFile(url: url as URL)
             originalWidth = Float(originalImageSize.width)
             originalHeight = Float(originalImageSize.height)
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()

@@ -262,11 +262,11 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
         */
         let image = self.coreDataSource.object(at: indexPath) as! Image
         
-        if image.hasError {
+        guard !image.hasError, let imageOriginalSize = image.originalSize else {
             return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + ImageCollectionVC.largeTitleHeight)
         }
         
-        var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
+        var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: boundingCellSize)
         
         if let firstTimeZoomed = zoomedCells[indexPath], firstTimeZoomed {
             // I first tried zooming the item size along with the image. That didn't work very well, oddly enough. I get the item size growing far too large. Instead, what works better, is the first time I get zooming, just expand out the size of the item.

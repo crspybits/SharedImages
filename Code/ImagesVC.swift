@@ -699,11 +699,11 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
         // Seems like the crash Dany was getting was here: https://github.com/crspybits/SharedImages/issues/123
         let image = self.coreDataSource.object(at: indexPath) as! Image
         
-        if image.hasError {
+        guard let imageOriginalSize = image.originalSize else {
             return boundingCellSize
         }
         
-        let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: boundingCellSize)
+        let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: boundingCellSize)
 
         return CGSize(width: boundedImageSize.width, height: boundedImageSize.height + ImageCollectionVC.smallTitleHeight)
     }

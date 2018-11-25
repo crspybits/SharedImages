@@ -154,12 +154,12 @@ class ImageCollectionVC : UICollectionViewCell {
         scrollView?.contentSize = size
         
         // Don't use image.hasError here only because on an upload/gone case, we do have a valid URL and can render the image.
-        if image.url == nil {
+        guard let imageOriginalSize = image.originalSize else {
             originalSize = size
             return
         }
         
-        let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: image.originalSize, boundingSize: size)
+        let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: size)
         Log.msg("smallerSize: \(smallerSize)")
         
         // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode

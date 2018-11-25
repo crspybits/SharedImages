@@ -36,7 +36,7 @@ PODS:
   - Reachability (3.2)
   - rosterdev (0.1.0)
   - SDCAlertView (7.1.2)
-  - SMCoreLib (1.4.1):
+  - SMCoreLib (1.4.2):
     - HPTextViewTapGestureRecognizer (~> 0.1)
     - Reachability
     - SwiftyBeaver
@@ -88,10 +88,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (~> 18.4)
-  - SyncServer/Dropbox (~> 18.4)
-  - SyncServer/Facebook (~> 18.4)
-  - SyncServer/Google (~> 18.4)
+  - SyncServer (from `../SyncServer-iOSClient`)
+  - SyncServer/Dropbox (from `../SyncServer-iOSClient`)
+  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
+  - SyncServer/Google (from `../SyncServer-iOSClient`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -120,12 +120,13 @@ SPEC REPOS:
   https://github.com/crspybits/Specs.git:
     - GoogleSignIn
     - SMCoreLib
-    - SyncServer
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
+  SyncServer:
+    :path: "../SyncServer-iOSClient"
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -155,12 +156,12 @@ SPEC CHECKSUMS:
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   rosterdev: 2a7b69c5d01133bd714161e1e80deea1da9cb90f
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
-  SMCoreLib: f777422629177c7833eb2d78522b4eda3fc9acca
+  SMCoreLib: ddba8abe6d050878806236bfb4ed8495fe2ec22a
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 775da02bb83d02f45e37018641c41316b1edad56
   SyncServer: 62fc3a23ba326b9d2e3e44be28521407d2e4f441
   SyncServer-Shared: 3ee7343ac6a857cfbb4c69d2caaf44a28bf27359
 
-PODFILE CHECKSUM: 39f150f559fae71ec9873274f2a9c54503c2565d
+PODFILE CHECKSUM: 71e4b84893cbf35d8fbc7e50dc63de2ffe7af63d
 
 COCOAPODS: 1.5.3
