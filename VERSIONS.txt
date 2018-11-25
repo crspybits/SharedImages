@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.21.0 (11/24/18)
+Version 0.21.0 (11/25/18)
 	* Error handling for "gone" files and for corrupted/changed files from server.
 		https://github.com/crspybits/SharedImages/issues/143
 
