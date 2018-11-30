@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.22.0 (11/29/18)
+	* Added server down messaging.
+
 Version 0.21.1 (11/25/18)
 	* Fixed bug: I missed a migration step in the app-- not setting gone/readProblem
 		in the Core Data objects to false.

@@ -78,8 +78,9 @@ public class SyncServer {
        - withServerURL: URL for the SyncServerII server.
        - cloudFolderName: In the cloud storage service, the path of the directory/folder in which to put files. `cloudFolderName` is optional because it's only needed for some of the cloud storage services (e.g., Google Drive).
        - minimumServerVersion: The minimum SyncServerII server version needed by your app. Leave nil if your app doesn't have a specific server version requirement.
+       - failoverMessageURL: Optional URL on which to do a GET for a message if the server fails, to show a message to the user.
      */
-    public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil) {
+    public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil, failoverMessageURL:URL? = nil) {
         Log.msg("cloudFolderName: \(String(describing: cloudFolderName))")
         Log.msg("serverURL: \(serverURL.absoluteString)")
                 
@@ -105,6 +106,7 @@ public class SyncServer {
         // 12/31/17; I put this in as part of: https://github.com/crspybits/SharedImages/issues/36
         resetTrackers()
         
+        ServerNetworking.session.appLaunchSetup(failoverMessageURL: failoverMessageURL)
         ServerNetworking.session.minimumServerVersion = minimumServerVersion
 
         // Remember: `ServerNetworkingLoading` relies on Core Data, so this setup call must be after the CoreData setup.

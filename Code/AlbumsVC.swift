@@ -145,6 +145,9 @@ class AlbumsVC: UIViewController {
             
         case .syncStarted:
             activityIndicator.startAnimating()
+            
+        case .syncServerDown:
+            activityIndicator.stopAnimating()
         }
     }
     

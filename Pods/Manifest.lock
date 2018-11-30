@@ -7,10 +7,10 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Crashlytics (3.11.1):
-    - Fabric (~> 1.8.1)
+  - Crashlytics (3.12.0):
+    - Fabric (~> 1.9.0)
   - DropDown (2.3.12)
-  - Fabric (1.8.2)
+  - Fabric (1.9.0)
   - FacebookCore (0.5.0):
     - Bolts (~> 1.9)
     - FBSDKCoreKit (~> 4.37)
@@ -43,38 +43,38 @@ PODS:
   - SwiftyBeaver (1.6.1)
   - SwiftyDropbox (4.8.1):
     - Alamofire (~> 4.7.3)
-  - SyncServer (18.4.1):
+  - SyncServer (18.5.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
-    - SyncServer-Shared (~> 9.2)
-    - SyncServer/Lite (= 18.4.1)
-  - SyncServer-Shared (9.3.7):
+    - SyncServer-Shared (~> 9.4)
+    - SyncServer/Lite (= 18.5.0)
+  - SyncServer-Shared (9.4.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (18.4.1):
+  - SyncServer/Dropbox (18.5.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SwiftyDropbox (~> 4.8)
-    - SyncServer-Shared (~> 9.2)
-  - SyncServer/Facebook (18.4.1):
+    - SyncServer-Shared (~> 9.4)
+  - SyncServer/Facebook (18.5.0):
     - FacebookCore
     - FacebookLogin
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
-    - SyncServer-Shared (~> 9.2)
-  - SyncServer/Google (18.4.1):
+    - SyncServer-Shared (~> 9.4)
+  - SyncServer/Google (18.5.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
     - SMCoreLib (~> 1.4)
-    - SyncServer-Shared (~> 9.2)
-  - SyncServer/Lite (18.4.1):
+    - SyncServer-Shared (~> 9.4)
+  - SyncServer/Lite (18.5.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
-    - SyncServer-Shared (~> 9.2)
+    - SyncServer-Shared (~> 9.4)
 
 DEPENDENCIES:
   - BadgeSwift (~> 6.0)
@@ -88,10 +88,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (~> 18.4.1)
-  - SyncServer/Dropbox (~> 18.4.1)
-  - SyncServer/Facebook (~> 18.4.1)
-  - SyncServer/Google (~> 18.4.1)
+  - SyncServer (~> 18.5.0)
+  - SyncServer/Dropbox (~> 18.5.0)
+  - SyncServer/Facebook (~> 18.5.0)
+  - SyncServer/Google (~> 18.5.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -136,9 +136,9 @@ SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   BadgeSwift: 69080f6776cb812b905d46effe8263600da1bdbd
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Crashlytics: ca7ab4bc304aa216bdc2e4c1a96389ee77252203
+  Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
   DropDown: 0bcc278799ec11a3d34ce1aac9367fbbaf5423d9
-  Fabric: d2b22f443ba195d8a7cc204da230977c72733b40
+  Fabric: f988e33c97f08930a413e08123064d2e5f68d655
   FacebookCore: 74288d0add931d361b1596beae787ab72c438249
   FacebookLogin: ebcf34714a1cb9f0759d9f071cfb01ed500996cf
   FBSDKCoreKit: 8d47857400e2f5bdea697a80daff882e91c84ef6
@@ -158,9 +158,9 @@ SPEC CHECKSUMS:
   SMCoreLib: ddba8abe6d050878806236bfb4ed8495fe2ec22a
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 775da02bb83d02f45e37018641c41316b1edad56
-  SyncServer: 63128a6ea7cd340d946a8e8446e9bce0f4c991f9
-  SyncServer-Shared: 3ee7343ac6a857cfbb4c69d2caaf44a28bf27359
+  SyncServer: 2d03bcb2d524bde5bc092c187ab7540062c58fd1
+  SyncServer-Shared: 856457c2c7ba195f2a59dcf36de828f6a1e91586
 
-PODFILE CHECKSUM: dc186d0da465a4ec30b071ad3ef212c909631d3e
+PODFILE CHECKSUM: 8ec3ae15667938cfd0d1bfe711dad31963651b4d
 
 COCOAPODS: 1.5.3

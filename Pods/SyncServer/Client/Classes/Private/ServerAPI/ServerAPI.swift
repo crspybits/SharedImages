@@ -921,7 +921,13 @@ class ServerAPI {
     }
 }
 
-extension ServerAPI : ServerNetworkingDelegate {    
+extension ServerAPI : ServerNetworkingDelegate {
+    func serverNetworkingFailover(forServerNetworking: Any?, message: String) {
+        if let syncServerDelegate = syncServerDelegate {
+            EventDesired.reportEvent(.serverDown(message: message), mask: desiredEvents, delegate: syncServerDelegate)
+        }
+    }
+    
     func serverNetworkingHeaderAuthentication(forServerNetworking: Any?) -> [String:String]? {
         var result = [String:String]()
         if self.authTokens != nil {

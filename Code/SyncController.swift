@@ -17,6 +17,7 @@ enum SyncControllerEvent {
     case syncStarted
     case syncDone(numberOperations: Int)
     case syncError(message: String)
+    case syncServerDown
 }
 
 struct ImageData {
@@ -75,7 +76,8 @@ class SyncController {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
                 .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
-                .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved]
+                .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved,
+                .serverDown]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -558,6 +560,10 @@ extension SyncController : SyncServerDelegate {
             numberOperations = 0
             delegate.syncEvent(syncController: self, event: .syncStarted)
             
+        case .serverDown(message: let message):
+            delegate.syncEvent(syncController: self, event: .syncServerDown)
+            SMCoreLib.Alert.show(withTitle: "The server is down for maintenance.", message: message)
+
         case .willStartDownloads(numberContentDownloads: let numberContentDownloads, numberDownloadDeletions: let numberDownloadDeletions):
             
             numberOperations += Int(numberContentDownloads + numberDownloadDeletions)

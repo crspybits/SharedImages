@@ -14,6 +14,9 @@ import CoreTelephony
 protocol ServerNetworkingDelegate : class {
     // Key/value pairs to be added to the outgoing HTTP header for authentication
     func serverNetworkingHeaderAuthentication(forServerNetworking: Any?) -> [String:String]?
+    
+    // The server is not operating-- and the message provided should be given to the user.
+    func serverNetworkingFailover(forServerNetworking: Any?, message: String)
 }
 
 class ServerNetworking : NSObject {
@@ -24,7 +27,8 @@ class ServerNetworking : NSObject {
     private weak var _delegate:ServerNetworkingDelegate?
     private var haveCellularData: Bool?
     private let cellState = CTCellularData.init()
-
+    private var failoverMessageURL: URL?
+    
     var delegate:ServerNetworkingDelegate? {
         get {
             return _delegate
@@ -35,7 +39,9 @@ class ServerNetworking : NSObject {
         }
     }
     
-    func appLaunchSetup() {
+    func appLaunchSetup(failoverMessageURL: URL? = nil) {
+        self.failoverMessageURL = failoverMessageURL
+        
         // TODO: *3* How can I have a networking spinner in the status bar? See https://github.com/crspybits/SyncServer-iOSClient/issues/7
         
         // See https://stackoverflow.com/questions/26357954/how-to-tell-if-the-user-turned-off-cellular-data-for-my-app?noredirect=1&lq=1 and https://stackoverflow.com/questions/22563526/how-do-i-know-if-cellular-access-for-my-ios-app-is-disabled
@@ -166,6 +172,28 @@ class ServerNetworking : NSObject {
         uploadTask.resume()
     }
     
+    func getFailoverMessage(completion: @escaping (_ message: String?)->()) {
+        guard let failoverURL = self.failoverMessageURL else {
+            completion(nil)
+            return
+        }
+        
+        let config = URLSessionConfiguration.default
+        let session = URLSession(configuration: config)
+        let task = session.downloadTask(with: failoverURL) { url, urlResponse, error in
+            guard let url = url, error == nil,
+                let data = try? Data(contentsOf: url),
+                let string = String(data: data, encoding: .utf8) else {
+                completion(nil)
+                return
+            }
+            
+            completion(string)
+        }
+        
+        task.resume()
+    }
+    
     private func processResponse(data:Data?, urlResponse:URLResponse?, error: Error?, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         if error == nil {
             // With an HTTP or HTTPS request, we get HTTPURLResponse back. See https://developer.apple.com/reference/foundation/urlsession/1407613-datatask
@@ -180,6 +208,18 @@ class ServerNetworking : NSObject {
                 return
             }
             
+            if response.statusCode == HTTPStatus.serviceUnavailable.rawValue {
+                getFailoverMessage() { message in
+                    if let message = message {
+                        self.delegate?.serverNetworkingFailover(forServerNetworking: self, message: message)
+                    }
+                    
+                    completion?(nil, response.statusCode, nil)
+                }
+                
+                return
+            }
+
             if serverVersionIsOK(headerFields: response.allHeaderFields) {
                 var json:Any?
                 do {

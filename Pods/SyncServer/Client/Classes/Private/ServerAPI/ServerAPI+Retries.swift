@@ -92,7 +92,9 @@ private class RequestWithRetries {
         numberTries += 1
         let errorCheck = checkForError(statusCode, error)
         
-        if errorCheck == nil || numberTries >= maximumNumberRetries || !retryIfError {
+        // Do do a retry on serviceUnavailable. Not much point. Plus, if we do retries in this case, we'll geet multiple errror messages.
+        if errorCheck == nil || numberTries >= maximumNumberRetries ||
+            !retryIfError || statusCode == HTTPStatus.serviceUnavailable.rawValue {
             completion(errorCheck)
         }
         else if statusCode == HTTPStatus.unauthorized.rawValue {

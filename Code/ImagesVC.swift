@@ -679,6 +679,9 @@ extension ImagesVC /* ImagesHandler */ {
         case .syncError(let message):
             self.bottomRefresh.hide()
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: message)
+            
+        case .syncServerDown:
+            self.bottomRefresh.hide()
         }
     }
     

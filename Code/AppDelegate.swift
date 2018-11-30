@@ -40,19 +40,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         var serverURL:URL
         var cloudFolderName:String
+        var failoverURL:URL?
         
         switch Environment.current {
         case .production:
             let urlString = try! plist.getString(varName: "ServerURL")
             serverURL = URL(string: urlString)!
             cloudFolderName = try! plist.getString(varName: "CloudFolderName")
+            if let failoverURLString = try? plist.getString(varName: "FailoverMessageURL") {
+                failoverURL = URL(string: failoverURLString)
+            }
             
         // Only used in debug builds.
         case .staging:
             let urlString = try! plist.getString(varName: "StagingServerURL")
             serverURL = URL(string: urlString)!
             cloudFolderName = try! plist.getString(varName: "StagingCloudFolderName")
-            
+            if let failoverURLString = try? plist.getString(varName: "StagingFailoverMessageURL") {
+                failoverURL = URL(string: failoverURLString)
+            }
+        
         case .local:
             let urlString = try! plist.getString(varName: "LocalServerURL")
             serverURL = URL(string: urlString)!
@@ -61,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Call this as soon as possible in your launch sequence.
         // Version 0.18.6 of the server is the first with error handling for gone and changed files/checkSums.
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.18.6"))
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.18.6"), failoverMessageURL: failoverURL)
     
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Shared Images"

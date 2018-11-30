@@ -48,6 +48,9 @@ public enum SyncEvent {
     case syncDone
     
     case refreshingCredentials
+    
+    /// Reflects (a) getting an HTTP 503 (Service Unavailable) status from the server, and (b) successfully downloading text content from failoverMessageURL established with SyncServer.session.appLaunchSetup. The message in this case is the text content from that URL.
+    case serverDown(message: String)
 }
 
 public struct EventDesired: OptionSet {
@@ -75,10 +78,12 @@ public struct EventDesired: OptionSet {
 
     public static let refreshingCredentials = EventDesired(rawValue: 1 << 14)
     
+    public static let serverDown = EventDesired(rawValue: 1 << 15)
+    
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone, EventDesired.sharingGroupOwningUserRemoved])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone, EventDesired.sharingGroupOwningUserRemoved, EventDesired.serverDown])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -129,6 +134,9 @@ public struct EventDesired: OptionSet {
         
         case .refreshingCredentials:
             eventIsDesired = .refreshingCredentials
+            
+        case .serverDown:
+            eventIsDesired = .serverDown
         }
         
         if mask.contains(eventIsDesired) {

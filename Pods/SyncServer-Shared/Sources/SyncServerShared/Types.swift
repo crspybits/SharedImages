@@ -25,6 +25,7 @@ public enum HTTPStatus : Int {
     case ok = 200
     case unauthorized = 401
     case gone = 410
+    case serviceUnavailable = 503
 }
 
 public enum AuthenticationLevel {
