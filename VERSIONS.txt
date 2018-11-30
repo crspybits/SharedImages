@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.22.0 (11/29/18)
+Version 0.22.0 (11/30/18)
 	* Added server down messaging.
 
 Version 0.21.1 (11/25/18)
