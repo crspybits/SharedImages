@@ -315,6 +315,19 @@ extension ServerNetworkingLoading : URLSessionDelegate, URLSessionTaskDelegate, 
         
         if case .download(let completion)? = handler {
             removeCache(serverURLKey: originalRequestURL)
+            
+            if response?.statusCode == HTTPStatus.serviceUnavailable.rawValue {
+                ServerResponseCheck.session.failover {
+                    completion(nil, response, response?.statusCode, returnError)
+                }
+                
+                return
+            }
+            
+            if let response = response {
+                ServerResponseCheck.session.minimumIOSClientVersion(response: response)
+            }
+            
             completion(movedDownloadedFile, response, response?.statusCode, returnError)
         }
         else {
@@ -382,6 +395,19 @@ extension ServerNetworkingLoading : URLSessionDelegate, URLSessionTaskDelegate, 
 
             // For uploads, since this is called if we get an error or not, we always have to call the completion handler.
             let errorResult = error == nil ? nil : SyncServerError.urlSessionError(error!)
+            
+            if response?.statusCode == HTTPStatus.serviceUnavailable.rawValue {
+                ServerResponseCheck.session.failover {
+                    completion(response, response?.statusCode, errorResult, uploadBody)
+                }
+                
+                return
+            }
+            
+            if let response = response {
+                ServerResponseCheck.session.minimumIOSClientVersion(response: response)
+            }
+            
             completion(response, response?.statusCode, errorResult, uploadBody)
         }
     }

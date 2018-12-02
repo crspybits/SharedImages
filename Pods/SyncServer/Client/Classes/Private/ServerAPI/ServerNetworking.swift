@@ -17,6 +17,8 @@ protocol ServerNetworkingDelegate : class {
     
     // The server is not operating-- and the message provided should be given to the user.
     func serverNetworkingFailover(forServerNetworking: Any?, message: String)
+    
+    func serverNetworkingMinimumIOSAppVersion(forServerNetworking: Any?, version: ServerVersion)
 }
 
 class ServerNetworking : NSObject {
@@ -27,7 +29,6 @@ class ServerNetworking : NSObject {
     private weak var _delegate:ServerNetworkingDelegate?
     private var haveCellularData: Bool?
     private let cellState = CTCellularData.init()
-    private var failoverMessageURL: URL?
     
     var delegate:ServerNetworkingDelegate? {
         get {
@@ -35,12 +36,13 @@ class ServerNetworking : NSObject {
         }
         set {
             ServerNetworkingLoading.session.delegate = newValue
+            ServerResponseCheck.session.delegate = newValue
             _delegate = newValue
         }
     }
     
     func appLaunchSetup(failoverMessageURL: URL? = nil) {
-        self.failoverMessageURL = failoverMessageURL
+        ServerResponseCheck.session.failoverMessageURL = failoverMessageURL
         
         // TODO: *3* How can I have a networking spinner in the status bar? See https://github.com/crspybits/SyncServer-iOSClient/issues/7
         
@@ -171,29 +173,7 @@ class ServerNetworking : NSObject {
         
         uploadTask.resume()
     }
-    
-    func getFailoverMessage(completion: @escaping (_ message: String?)->()) {
-        guard let failoverURL = self.failoverMessageURL else {
-            completion(nil)
-            return
-        }
-        
-        let config = URLSessionConfiguration.default
-        let session = URLSession(configuration: config)
-        let task = session.downloadTask(with: failoverURL) { url, urlResponse, error in
-            guard let url = url, error == nil,
-                let data = try? Data(contentsOf: url),
-                let string = String(data: data, encoding: .utf8) else {
-                completion(nil)
-                return
-            }
-            
-            completion(string)
-        }
-        
-        task.resume()
-    }
-    
+
     private func processResponse(data:Data?, urlResponse:URLResponse?, error: Error?, completion:((_ serverResponse:[String:Any]?, _ statusCode:Int?, _ error:SyncServerError?)->())?) {
         if error == nil {
             // With an HTTP or HTTPS request, we get HTTPURLResponse back. See https://developer.apple.com/reference/foundation/urlsession/1407613-datatask
@@ -209,16 +189,14 @@ class ServerNetworking : NSObject {
             }
             
             if response.statusCode == HTTPStatus.serviceUnavailable.rawValue {
-                getFailoverMessage() { message in
-                    if let message = message {
-                        self.delegate?.serverNetworkingFailover(forServerNetworking: self, message: message)
-                    }
-                    
+                ServerResponseCheck.session.failover {
                     completion?(nil, response.statusCode, nil)
                 }
                 
                 return
             }
+            
+            ServerResponseCheck.session.minimumIOSClientVersion(response: response)
 
             if serverVersionIsOK(headerFields: response.allHeaderFields) {
                 var json:Any?

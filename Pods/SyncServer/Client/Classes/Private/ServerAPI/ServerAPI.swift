@@ -922,6 +922,12 @@ class ServerAPI {
 }
 
 extension ServerAPI : ServerNetworkingDelegate {
+    func serverNetworkingMinimumIOSAppVersion(forServerNetworking: Any?, version: ServerVersion) {
+        if let syncServerDelegate = syncServerDelegate {
+            EventDesired.reportEvent(.minimumIOSClientVersion(version), mask: desiredEvents, delegate: syncServerDelegate)
+        }
+    }
+    
     func serverNetworkingFailover(forServerNetworking: Any?, message: String) {
         if let syncServerDelegate = syncServerDelegate {
             EventDesired.reportEvent(.serverDown(message: message), mask: desiredEvents, delegate: syncServerDelegate)

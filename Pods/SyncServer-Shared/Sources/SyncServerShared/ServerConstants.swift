@@ -44,6 +44,9 @@ public class ServerConstants {
     // The value of this key is a "X.Y.Z" version string.
     public static let httpResponseCurrentServerVersion = "syncserver-version"
 
+    // If present, the value of this key is a "X.Y.Z" version string.
+    public static let httpResponseMinimumIOSClientAppVersion = "syncserver-minimum-ios-client-app-version"
+
     public enum AuthTokenType : String {
         case GoogleToken
         case FacebookToken

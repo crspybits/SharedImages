@@ -51,6 +51,8 @@ public enum SyncEvent {
     
     /// Reflects (a) getting an HTTP 503 (Service Unavailable) status from the server, and (b) successfully downloading text content from failoverMessageURL established with SyncServer.session.appLaunchSetup. The message in this case is the text content from that URL.
     case serverDown(message: String)
+    
+    case minimumIOSClientVersion(ServerVersion)
 }
 
 public struct EventDesired: OptionSet {
@@ -80,10 +82,12 @@ public struct EventDesired: OptionSet {
     
     public static let serverDown = EventDesired(rawValue: 1 << 15)
     
+    public static let minimumIOSClientVersion = EventDesired(rawValue: 1 << 16)
+    
     public static let defaults:EventDesired =
         [.singleFileUploadComplete, .singleUploadDeletionComplete, .contentUploadsCompleted,
          .uploadDeletionsCompleted]
-    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone, EventDesired.sharingGroupOwningUserRemoved, EventDesired.serverDown])
+    public static let all:EventDesired = EventDesired.defaults.union([EventDesired.syncDelayed, EventDesired.syncStarted, EventDesired.syncDone, EventDesired.syncStopping, EventDesired.refreshingCredentials, EventDesired.willStartDownloads, EventDesired.willStartUploads, EventDesired.singleAppMetaDataUploadComplete, EventDesired.sharingGroupUploadOperationCompleted, EventDesired.singleFileUploadGone, EventDesired.sharingGroupOwningUserRemoved, EventDesired.serverDown, EventDesired.minimumIOSClientVersion])
     
     static func reportEvent(_ event:SyncEvent, mask:EventDesired, delegate:SyncServerDelegate?) {
     
@@ -137,6 +141,9 @@ public struct EventDesired: OptionSet {
             
         case .serverDown:
             eventIsDesired = .serverDown
+            
+        case .minimumIOSClientVersion:
+            eventIsDesired = .minimumIOSClientVersion
         }
         
         if mask.contains(eventIsDesired) {

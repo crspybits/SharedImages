@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.23.0 (12/1/18)
+	* Added minimum iOS app version response from server.
+	
 Version 0.22.0 (11/30/18)
 	* Added server down messaging.
 

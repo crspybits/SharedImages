@@ -11,10 +11,10 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 18.5.0'
-	pod 'SyncServer/Facebook', '~> 18.5.0'
-	pod 'SyncServer/Dropbox', '~> 18.5.0'
-	pod 'SyncServer/Google', '~> 18.5.0'
+	pod 'SyncServer', '~> 18.6.0'
+	pod 'SyncServer/Facebook', '~> 18.6.0'
+	pod 'SyncServer/Dropbox', '~> 18.6.0'
+	pod 'SyncServer/Google', '~> 18.6.0'
 
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
@@ -63,12 +63,18 @@ target 'SharedImages' do
 	
 	post_install do |installer|
 	
-		myTargets = ['Gloss', 'SDCAlertView', 'SyncServer-Shared', 'FacebookCore', 'SyncServer', 'SMCoreLib']
+		my32Targets = ['Gloss', 'SDCAlertView', 'SyncServer-Shared', 'FacebookCore', 'SyncServer', 'SMCoreLib']
+		my40Targets = ['SwiftyDropbox', 'MessageKit']
 		
 		installer.pods_project.targets.each do |target|
-			if myTargets.include? target.name
+			if my32Targets.include? target.name
 				target.build_configurations.each do |config|
 					config.build_settings['SWIFT_VERSION'] = '3.2'
+				end
+			end
+			if my40Targets.include? target.name
+				target.build_configurations.each do |config|
+					config.build_settings['SWIFT_VERSION'] = '4.0'
 				end
 			end
 		end

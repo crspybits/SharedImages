@@ -43,34 +43,34 @@ PODS:
   - SwiftyBeaver (1.6.1)
   - SwiftyDropbox (4.8.1):
     - Alamofire (~> 4.7.3)
-  - SyncServer (18.5.0):
+  - SyncServer (18.6.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-    - SyncServer/Lite (= 18.5.0)
-  - SyncServer-Shared (9.4.0):
+    - SyncServer/Lite (= 18.6.0)
+  - SyncServer-Shared (9.5.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (18.5.0):
+  - SyncServer/Dropbox (18.6.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SwiftyDropbox (~> 4.8)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Facebook (18.5.0):
+  - SyncServer/Facebook (18.6.0):
     - FacebookCore
     - FacebookLogin
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Google (18.5.0):
+  - SyncServer/Google (18.6.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Lite (18.5.0):
+  - SyncServer/Lite (18.6.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - SMCoreLib (~> 1.4)
@@ -88,10 +88,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (~> 18.5.0)
-  - SyncServer/Dropbox (~> 18.5.0)
-  - SyncServer/Facebook (~> 18.5.0)
-  - SyncServer/Google (~> 18.5.0)
+  - SyncServer (~> 18.6.0)
+  - SyncServer/Dropbox (~> 18.6.0)
+  - SyncServer/Facebook (~> 18.6.0)
+  - SyncServer/Google (~> 18.6.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -158,9 +158,9 @@ SPEC CHECKSUMS:
   SMCoreLib: ddba8abe6d050878806236bfb4ed8495fe2ec22a
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 775da02bb83d02f45e37018641c41316b1edad56
-  SyncServer: 2d03bcb2d524bde5bc092c187ab7540062c58fd1
-  SyncServer-Shared: 856457c2c7ba195f2a59dcf36de828f6a1e91586
+  SyncServer: 0ff05add1c0580ca7c24164d7a14908503138302
+  SyncServer-Shared: 3917601f1231c0d9534ab87a7b6c486771f0a52e
 
-PODFILE CHECKSUM: 8ec3ae15667938cfd0d1bfe711dad31963651b4d
+PODFILE CHECKSUM: a5c9b6e4dd684eaa477b762d12e89b3e23000e69
 
 COCOAPODS: 1.5.3

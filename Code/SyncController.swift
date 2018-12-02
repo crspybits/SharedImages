@@ -77,7 +77,7 @@ class SyncController {
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
                 .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
                 .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved,
-                .serverDown]
+                .serverDown, .minimumIOSClientVersion]
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -563,6 +563,24 @@ extension SyncController : SyncServerDelegate {
         case .serverDown(message: let message):
             delegate.syncEvent(syncController: self, event: .syncServerDown)
             SMCoreLib.Alert.show(withTitle: "The server is down for maintenance.", message: message)
+            
+        case .minimumIOSClientVersion(let minVersion):
+            if userNeedsToUpdateAppVersion(minVersion) {
+                var message: String
+                #if DEBUG
+                    message = "Please update it using TestFlight"
+                #else
+                    message = "Please update it using the App Store"
+                #endif
+                
+                SMCoreLib.Alert.show(withTitle: "The SharedImages app needs to be updated.", message: message, okCompletion: {[unowned self] in
+                    #if DEBUG
+                        self.openTestFlight()
+                    #else
+                        self.openAppStore(forAppIdentifier: "1244482164")
+                    #endif
+                })
+            }
 
         case .willStartDownloads(numberContentDownloads: let numberContentDownloads, numberDownloadDeletions: let numberDownloadDeletions):
             
@@ -643,6 +661,36 @@ extension SyncController : SyncServerDelegate {
         default:
             Log.error("Unexpected event received: \(event)")
             break
+        }
+    }
+    
+    private func userNeedsToUpdateAppVersion(_ minVersion:ServerVersion) -> Bool {
+        guard let currentAppVersionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+            let currentAppVersion = ServerVersion(rawValue: currentAppVersionString) else {
+            Log.error("Could not get current iOS app version version from bundle")
+            return false
+        }
+        
+        return currentAppVersion < minVersion
+    }
+    
+    private func openAppStore(forAppIdentifier identifier: String) {
+         // App Store URL.
+         let appStoreLink = "https://itunes.apple.com/us/app/apple-store/id\(identifier)?mt=8"
+        
+         /* First create a URL, then check whether there is an installed app that can
+            open it on the device. */
+        if let url = URL(string: appStoreLink), UIApplication.shared.canOpenURL(url) {
+           // Attempt to open the URL.
+           UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+    
+    private func openTestFlight() {
+        if let customAppURL = URL(string: "itms-beta://") {
+            if UIApplication.shared.canOpenURL(customAppURL) {
+                UIApplication.shared.open(customAppURL, options: [:], completionHandler: nil)
+            }
         }
     }
 }
