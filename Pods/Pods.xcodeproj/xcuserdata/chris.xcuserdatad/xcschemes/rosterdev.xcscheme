@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FB4D429E3A946AC58C7C179CFAD7ABDD"
+               BlueprintIdentifier = "8BEE12A345FE7750045B3CEABAE8E75F"
                BlueprintName = "rosterdev"
                ReferencedContainer = "container:Pods.xcodeproj"
                BuildableName = "rosterdev.framework">

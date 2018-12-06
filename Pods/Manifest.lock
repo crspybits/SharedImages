@@ -19,19 +19,23 @@ PODS:
     - FacebookCore (~> 0.5)
     - FBSDKCoreKit (~> 4.37)
     - FBSDKLoginKit (~> 4.37)
-  - FBSDKCoreKit (4.38.1):
+  - FBSDKCoreKit (4.39.0):
     - Bolts (~> 1.9)
-  - FBSDKLoginKit (4.38.1):
+  - FBSDKLoginKit (4.39.0):
     - FBSDKCoreKit
   - FileMD5Hash (2.0.0)
   - Gloss (1.2.4)
   - GoogleSignIn (0.1.2)
   - HPTextViewTapGestureRecognizer (0.1)
+  - KeychainAccess (3.1.2)
   - lottie-ios (2.5.2)
   - LottiesBottom (0.5.0):
     - lottie-ios (~> 2.1)
   - MessageKit (0.13.5)
   - ODRefreshControl (1.2)
+  - PersistentValue (0.2.0):
+    - KeychainAccess (~> 3.1)
+    - SwiftyUserDefaults (~> 3.0)
   - Presentr (1.9)
   - Reachability (3.2)
   - rosterdev (0.1.0)
@@ -41,38 +45,44 @@ PODS:
     - Reachability
     - SwiftyBeaver
   - SwiftyBeaver (1.6.1)
-  - SwiftyDropbox (4.8.1):
+  - SwiftyDropbox (4.8.2):
     - Alamofire (~> 4.7.3)
-  - SyncServer (18.6.0):
+  - SwiftyUserDefaults (3.0.1)
+  - SyncServer (18.7.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
+    - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-    - SyncServer/Lite (= 18.6.0)
+    - SyncServer/Lite (= 18.7.0)
   - SyncServer-Shared (9.5.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (18.6.0):
+  - SyncServer/Dropbox (18.7.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
+    - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SwiftyDropbox (~> 4.8)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Facebook (18.6.0):
+  - SyncServer/Facebook (18.7.0):
     - FacebookCore
     - FacebookLogin
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
+    - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Google (18.6.0):
+  - SyncServer/Google (18.7.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
+    - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Lite (18.6.0):
+  - SyncServer/Lite (18.7.0):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
+    - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
 
@@ -88,10 +98,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (~> 18.6.0)
-  - SyncServer/Dropbox (~> 18.6.0)
-  - SyncServer/Facebook (~> 18.6.0)
-  - SyncServer/Google (~> 18.6.0)
+  - SyncServer (~> 18.7.0)
+  - SyncServer/Dropbox (~> 18.7.0)
+  - SyncServer/Facebook (~> 18.7.0)
+  - SyncServer/Google (~> 18.7.0)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -108,6 +118,7 @@ SPEC REPOS:
     - FileMD5Hash
     - Gloss
     - HPTextViewTapGestureRecognizer
+    - KeychainAccess
     - lottie-ios
     - LottiesBottom
     - MessageKit
@@ -117,8 +128,10 @@ SPEC REPOS:
     - SDCAlertView
     - SwiftyBeaver
     - SwiftyDropbox
+    - SwiftyUserDefaults
   https://github.com/crspybits/Specs.git:
     - GoogleSignIn
+    - PersistentValue
     - SMCoreLib
     - SyncServer
     - SyncServer-Shared
@@ -141,26 +154,29 @@ SPEC CHECKSUMS:
   Fabric: f988e33c97f08930a413e08123064d2e5f68d655
   FacebookCore: 74288d0add931d361b1596beae787ab72c438249
   FacebookLogin: ebcf34714a1cb9f0759d9f071cfb01ed500996cf
-  FBSDKCoreKit: 8d47857400e2f5bdea697a80daff882e91c84ef6
-  FBSDKLoginKit: 4621c690d9dd8628031a4791497062183ea34b0d
+  FBSDKCoreKit: 1e3981faefab8c88edfaa9eecd94aab02d99a9bc
+  FBSDKLoginKit: 30ba5039a2c53d65a75103889bc2deebdacd5a1f
   FileMD5Hash: 3ed69cc19a21ff4d30ae8833fc104275ad2c7de0
   Gloss: 4e036074610fdb993abcb958ebcd7332588e2333
   GoogleSignIn: c9fa579a8da31ea46b82627c259ccb2b1bf22bab
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
+  KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
   lottie-ios: 3fef45d3fabe63e3c7c2eb603dd64ddfffc73062
   LottiesBottom: a3428d59b99264d08a79870e74118de7fb0c24c8
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
+  PersistentValue: d000b636f81b82b1b13dc27801212e7f3b2d919a
   Presentr: 7078d7eb5d1661ebeaae60c9e42a1e534de1b993
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   rosterdev: 2a7b69c5d01133bd714161e1e80deea1da9cb90f
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
   SMCoreLib: ddba8abe6d050878806236bfb4ed8495fe2ec22a
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
-  SwiftyDropbox: 775da02bb83d02f45e37018641c41316b1edad56
-  SyncServer: 0ff05add1c0580ca7c24164d7a14908503138302
+  SwiftyDropbox: 5cd8d101968609dbbb002fd86ce0450e2d90838b
+  SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
+  SyncServer: ed1724ad9a6d203f3ffe856dbb3172c1831b8ea9
   SyncServer-Shared: 3917601f1231c0d9534ab87a7b6c486771f0a52e
 
-PODFILE CHECKSUM: a5c9b6e4dd684eaa477b762d12e89b3e23000e69
+PODFILE CHECKSUM: 566d480e5a3231c6f15f70fa9102f62a67284b01
 
 COCOAPODS: 1.5.3

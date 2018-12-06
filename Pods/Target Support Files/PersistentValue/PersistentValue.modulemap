@@ -1,0 +1,6 @@
+framework module PersistentValue {
+  umbrella header "PersistentValue-umbrella.h"
+
+  export *
+  module * { export * }
+}

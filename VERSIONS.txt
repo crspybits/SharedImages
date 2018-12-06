@@ -1,5 +1,9 @@
 SharedImages
 
+Version 0.23.1 (12/6/18)
+	* Attempting to fix issue with device UUID's.
+		https://github.com/crspybits/SyncServerII/issues/61
+
 Version 0.23.0 (12/1/18)
 	* Added minimum iOS app version response from server.
 	

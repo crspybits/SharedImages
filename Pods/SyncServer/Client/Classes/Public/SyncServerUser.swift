@@ -10,6 +10,7 @@ import Foundation
 import SMCoreLib
 import SyncServer_Shared
 import Gloss
+import PersistentValue
 
 public class SyncServerUser {
     var desiredEvents:EventDesired!
@@ -22,15 +23,15 @@ public class SyncServerUser {
     }
     
     // Persisting this in the keychain for security-- I'd rather this identifier wasn't known to more folks than need it.
-    static let syncServerUserId = SMPersistItemString(name: "SyncServerUser.syncServerUserId", initialStringValue: "", persistType: .keyChain)
+    static let syncServerUserId = try! PersistentValue<String>(name: "SyncServerUser.syncServerUserId2", storage: .keyChain)
     
     /// A unique identifier for the user on the SyncServer system. If creds are set this will be set.
     public var syncServerUserId:String? {
-        if SyncServerUser.syncServerUserId.stringValue == "" {
+        if SyncServerUser.syncServerUserId.value == "" {
             return nil
         }
         else {
-            return SyncServerUser.syncServerUserId.stringValue
+            return SyncServerUser.syncServerUserId.value
         }
     }
     
@@ -48,12 +49,12 @@ public class SyncServerUser {
 
     // A distinct UUID for this user mobile device.
     // I'm going to persist this in the keychain not so much because it needs to be secure, but rather because it will survive app deletions/reinstallations.
-    static let mobileDeviceUUID = SMPersistItemString(name: "SyncServerUser.mobileDeviceUUID", initialStringValue: "", persistType: .keyChain)
+    static let mobileDeviceUUID = try! PersistentValue<String>(name: "SyncServerUser.mobileDeviceUUID2", storage: .keyChain)
     
     private init() {
         // Check to see if the device has a UUID already.
-        if SyncServerUser.mobileDeviceUUID.stringValue.count == 0 {
-            SyncServerUser.mobileDeviceUUID.stringValue = UUID.make()
+        if SyncServerUser.mobileDeviceUUID.value.count == 0 {
+            SyncServerUser.mobileDeviceUUID.value = UUID.make()
         }
         
         ServerAPI.session.delegate = self
@@ -102,7 +103,7 @@ public class SyncServerUser {
             case .some(.user(let syncServerUserId, let accessToken)):
                 self.creds = creds
                 checkForUserResult = .user(accessToken:accessToken)
-                SyncServerUser.syncServerUserId.stringValue = "\(syncServerUserId)"
+                SyncServerUser.syncServerUserId.value = "\(syncServerUserId)"
                 
                 Download.session.onlyUpdateSharingGroups() { error in
                     if error != nil {
@@ -177,7 +178,7 @@ public class SyncServerUser {
                 
                 self.creds = creds
                 if let syncServerUserId = syncServerUserId  {
-                    SyncServerUser.syncServerUserId.stringValue = "\(syncServerUserId)"
+                    SyncServerUser.syncServerUserId.value = "\(syncServerUserId)"
                 }
             }
             else {
@@ -226,7 +227,7 @@ public class SyncServerUser {
 
 extension SyncServerUser : ServerAPIDelegate {    
     func deviceUUID(forServerAPI: ServerAPI) -> Foundation.UUID {
-        return Foundation.UUID(uuidString: SyncServerUser.mobileDeviceUUID.stringValue)!
+        return Foundation.UUID(uuidString: SyncServerUser.mobileDeviceUUID.value)!
     }
     
     // 1/3/18 somewhat before 9am MST; Bushrod just got this after installing v0.10.0 of SharedImages, "I just upgraded sharedimages. When i launched it, it said it was having trouble authenticating me and that I should log out and back in. I didn’t do that, changed to the login tab, back to the images tab, and it downloaded new images so I guess the sticky login worked despite the complaining."

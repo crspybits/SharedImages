@@ -59,6 +59,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>KeychainAccess.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>LottiesBottom.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -75,6 +80,11 @@
 			<false/>
 		</dict>
 		<key>ODRefreshControl.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>PersistentValue.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -115,6 +125,11 @@
 			<false/>
 		</dict>
 		<key>SwiftyDropbox.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>SwiftyUserDefaults.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

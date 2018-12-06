@@ -1,0 +1,30 @@
+{
+  "name": "PersistentValue",
+  "version": "0.1.0",
+  "summary": "Type safe persistent values for NSUserDefaults and for the KeyChain",
+  "homepage": "https://github.com/RosterHQ/PersistentValue",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "crspybits": "chris@SpasticMuffin.biz"
+  },
+  "source": {
+    "git": "https://github.com/RosterHQ/PersistentValue.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "PersistentValue/Classes/**/*",
+  "dependencies": {
+    "KeychainAccess": [
+      "~> 3.1"
+    ],
+    "SwiftyUserDefaults": [
+      "~> 3.0"
+    ]
+  },
+  "swift_version": "4.2"
+}

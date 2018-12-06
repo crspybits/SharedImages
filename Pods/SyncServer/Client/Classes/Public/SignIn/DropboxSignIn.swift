@@ -13,6 +13,7 @@ import Foundation
 import SMCoreLib
 import SwiftyDropbox
 import SyncServer_Shared
+import PersistentValue
 
 // Purely for saving creds into NSUserDefaults
 // NSObject subclass needed for NSCoding to work.
@@ -46,10 +47,10 @@ class DropboxSavedCreds : NSObject, NSCoding {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        uid = aDecoder.decodeObject(forKey: "uid") as! String
-        accountId = aDecoder.decodeObject(forKey: "accountId") as! String
-        displayName = aDecoder.decodeObject(forKey: "displayName") as! String
-        email = aDecoder.decodeObject(forKey: "email") as! String
+        uid = (aDecoder.decodeObject(forKey: "uid") as! String)
+        accountId = (aDecoder.decodeObject(forKey: "accountId") as! String)
+        displayName = (aDecoder.decodeObject(forKey: "displayName") as! String)
+        email = (aDecoder.decodeObject(forKey: "email") as! String)
     }
     
     func save() {
@@ -115,22 +116,22 @@ public class DropboxSyncServerSignIn : GenericSignIn {
     public var managerDelegate:SignInManagerDelegate!
     private var signInOutButton:DropboxSignInButton?
     
-    static private var accessToken:SMPersistItemString = SMPersistItemString(name: "DropboxSignIn.accessToken", initialStringValue: "", persistType: .keyChain)
+    static let accessToken = try! PersistentValue<String>(name: "DropboxSignIn.accessToken2", storage: .keyChain)
     var accessToken:String? {
         set {
             if newValue == nil || newValue == "" {
-                DropboxSyncServerSignIn.accessToken.stringValue = ""
+                DropboxSyncServerSignIn.accessToken.value = ""
             }
             else {
-                DropboxSyncServerSignIn.accessToken.stringValue = newValue!
+                DropboxSyncServerSignIn.accessToken.value = newValue!
             }
         }
         get {
-            if DropboxSyncServerSignIn.accessToken.stringValue.count == 0 {
+            if DropboxSyncServerSignIn.accessToken.value.count == 0 {
                 return nil
             }
             else {
-                return DropboxSyncServerSignIn.accessToken.stringValue
+                return DropboxSyncServerSignIn.accessToken.value
             }
         }
     }
