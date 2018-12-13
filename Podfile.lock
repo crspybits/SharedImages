@@ -48,23 +48,23 @@ PODS:
   - SwiftyDropbox (4.8.2):
     - Alamofire (~> 4.7.3)
   - SwiftyUserDefaults (3.0.1)
-  - SyncServer (18.7.1):
+  - SyncServer (18.7.2):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-    - SyncServer/Lite (= 18.7.1)
+    - SyncServer/Lite (= 18.7.2)
   - SyncServer-Shared (9.5.0):
     - Gloss (~> 1.2)
-  - SyncServer/Dropbox (18.7.1):
+  - SyncServer/Dropbox (18.7.2):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SwiftyDropbox (~> 4.8)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Facebook (18.7.1):
+  - SyncServer/Facebook (18.7.2):
     - FacebookCore (= 0.5.0)
     - FacebookLogin (= 0.5.0)
     - FBSDKCoreKit (= 4.38.1)
@@ -74,14 +74,14 @@ PODS:
     - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Google (18.7.1):
+  - SyncServer/Google (18.7.2):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - GoogleSignIn (~> 0.1)
     - PersistentValue (~> 0.2)
     - SMCoreLib (~> 1.4)
     - SyncServer-Shared (~> 9.4)
-  - SyncServer/Lite (18.7.1):
+  - SyncServer/Lite (18.7.2):
     - FileMD5Hash (~> 2.0)
     - Gloss (~> 1.2)
     - PersistentValue (~> 0.2)
@@ -100,10 +100,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (~> 18.7.1)
-  - SyncServer/Dropbox (~> 18.7.1)
-  - SyncServer/Facebook (~> 18.7.1)
-  - SyncServer/Google (~> 18.7.1)
+  - SyncServer (~> 18.7.2)
+  - SyncServer/Dropbox (~> 18.7.2)
+  - SyncServer/Facebook (~> 18.7.2)
+  - SyncServer/Google (~> 18.7.2)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -176,9 +176,9 @@ SPEC CHECKSUMS:
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
   SwiftyDropbox: 5cd8d101968609dbbb002fd86ce0450e2d90838b
   SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
-  SyncServer: cfa6750a06d684c3200ca3773f03304385b11cef
+  SyncServer: af22c0881d47aacdbbc79ba3b750ac841b90ce79
   SyncServer-Shared: 3917601f1231c0d9534ab87a7b6c486771f0a52e
 
-PODFILE CHECKSUM: 85b7107a7ab716b140889e9e98b01056f9f9dcc6
+PODFILE CHECKSUM: 87e23ae98b9927e91107099dcd39e4b4d0ac1b41
 
 COCOAPODS: 1.5.3

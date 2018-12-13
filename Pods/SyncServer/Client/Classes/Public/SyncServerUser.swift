@@ -215,7 +215,13 @@ public class SyncServerUser {
                 self.creds = creds
             }
             else {
-                ServerAPI.session.creds = nil
+                // 12/14/18; This was probably appropriate previously when users could just be a member of a single "sharing group", but now when they can be in multiple, it's not. See https://github.com/crspybits/SharedImages/issues/152
+                // ServerAPI.session.creds = nil
+                
+                // What I really need here is a definitive answer to "Is this user on the system?". A simple answer seems to be just checking self.creds. This will mean they've already been signed in-- and hence we know they are in the system.
+                if self.creds == nil || !equals(lhs: self.creds!, rhs: ServerAPI.session.creds!) {
+                    self.creds = nil
+                }
             }
             
             Thread.runSync(onMainThread: {

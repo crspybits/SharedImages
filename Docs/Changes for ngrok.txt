@@ -1,0 +1,12 @@
+Info.plist  
+	<key>26898a2d.ngrok.io</key>
+	<dict>
+		<key>NSIncludesSubdomains</key>
+		<true/>
+		<key>NSExceptionAllowsInsecureHTTPLoads</key>
+		<true/>
+	</dict>
+            
+Server.plist          
+	<key>LocalServerURL</key>
+	<string>http://26898a2d.ngrok.io</string>

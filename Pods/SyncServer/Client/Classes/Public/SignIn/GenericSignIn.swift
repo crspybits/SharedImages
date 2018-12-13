@@ -28,6 +28,10 @@ public protocol GenericCredentials {
     func refreshCredentials(completion: @escaping (SyncServerError?) ->())
 }
 
+func equals(lhs: GenericCredentials, rhs: GenericCredentials) -> Bool {
+    return lhs.userId == rhs.userId && type(of: lhs) == type(of: rhs)
+}
+
 public enum UserActionNeeded {
     case createSharingUser(invitationCode:String)
     case createOwningUser

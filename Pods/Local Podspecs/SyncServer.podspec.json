@@ -1,6 +1,6 @@
 {
   "name": "SyncServer",
-  "version": "18.7.0",
+  "version": "18.7.1",
   "summary": "iOS Client for the SyncServerII server",
   "description": "SyncServerII enables apps to save user files in users cloud storage, and\nenables safe sharing of those files.",
   "homepage": "https://github.com/crspybits/SyncServer-iOSClient",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/crspybits/SyncServer-iOSClient.git",
-    "tag": "18.7.0"
+    "tag": "18.7.1"
   },
   "platforms": {
     "ios": "9.0"
@@ -57,10 +57,10 @@
       },
       "dependencies": {
         "FacebookCore": [
-
+          "0.5.0"
         ],
         "FacebookLogin": [
-
+          "0.5.0"
         ],
         "FBSDKCoreKit": [
           "4.38.1"
