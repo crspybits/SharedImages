@@ -1,5 +1,9 @@
 SharedImages
 
+Version 
+	* Fixing issue with debugging/consistency check.
+	* Updating pods -- to bring in SyncServer client fixes.
+
 Version 0.23.1 (12/6/18)
 	* Attempting to fix issue with device UUID's.
 		https://github.com/crspybits/SyncServerII/issues/61

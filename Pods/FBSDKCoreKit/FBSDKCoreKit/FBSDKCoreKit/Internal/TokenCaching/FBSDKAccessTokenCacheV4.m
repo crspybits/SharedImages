@@ -35,13 +35,13 @@ static NSString *const kFBSDKAccessTokenEncodedKey = @"tokenEncoded";
 - (instancetype)init
 {
   if ((self = [super init])) {
-    NSString *keyChainServiceIdentifier = [NSString stringWithFormat:@"com.facebook.sdk.tokencache.%@", [NSBundle mainBundle].bundleIdentifier];
+    NSString *keyChainServiceIdentifier = [NSString stringWithFormat:@"com.facebook.sdk.tokencache.%@", [[NSBundle mainBundle] bundleIdentifier]];
     _keychainStore = [[FBSDKKeychainStore alloc] initWithService:keyChainServiceIdentifier accessGroup:nil];
   }
   return self;
 }
 
-- (FBSDKAccessToken *)accessToken
+- (FBSDKAccessToken *)fetchAccessToken
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *uuid = [defaults objectForKey:kFBSDKAccessTokenUserDefaultsKey];
@@ -63,7 +63,7 @@ static NSString *const kFBSDKAccessTokenEncodedKey = @"tokenEncoded";
   return nil;
 }
 
-- (void)setAccessToken:(FBSDKAccessToken *)token
+- (void)cacheAccessToken:(FBSDKAccessToken *)token
 {
   if (!token) {
     [self clearCache];
@@ -72,7 +72,7 @@ static NSString *const kFBSDKAccessTokenEncodedKey = @"tokenEncoded";
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *uuid = [defaults objectForKey:kFBSDKAccessTokenUserDefaultsKey];
   if (!uuid) {
-    uuid = [NSUUID UUID].UUIDString;
+    uuid = [[NSUUID UUID] UUIDString];
     [defaults setObject:uuid forKey:kFBSDKAccessTokenUserDefaultsKey];
     [defaults synchronize];
   }

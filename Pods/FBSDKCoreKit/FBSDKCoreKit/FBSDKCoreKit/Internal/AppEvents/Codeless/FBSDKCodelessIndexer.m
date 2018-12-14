@@ -83,7 +83,7 @@ static NSString *_lastTreeHash;
   [request startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
     _isCheckingSession = NO;
     if ([result isKindOfClass:[NSDictionary class]]) {
-      _isCodelessIndexingEnabled = [((NSDictionary *)result)[CODELESS_INDEXING_STATUS_KEY] boolValue];
+      _isCodelessIndexingEnabled = [[(NSDictionary *)result objectForKey:CODELESS_INDEXING_STATUS_KEY] boolValue];
       if (_isCodelessIndexingEnabled) {
         _lastTreeHash = nil;
         if (!_appIndexingTimer) {
@@ -105,7 +105,7 @@ static NSString *_lastTreeHash;
 + (NSString *)currentSessionDeviceID
 {
   if (!_deviceSessionID) {
-    _deviceSessionID = [NSUUID UUID].UUIDString;
+    _deviceSessionID = [[NSUUID UUID] UUIDString];
   }
   return _deviceSessionID;
 }
@@ -115,8 +115,12 @@ static NSString *_lastTreeHash;
   struct utsname systemInfo;
   uname(&systemInfo);
   NSString *machine = @(systemInfo.machine);
-  NSString *advertiserID = [FBSDKAppEventsUtility advertiserID] ?: @"";
+  NSString *advertiserID = nil;
+  if (FBSDKAdvertisingTrackingAllowed == [FBSDKAppEventsUtility advertisingTrackingStatus]) {
+    advertiserID = [FBSDKAppEventsUtility advertiserID];
+  }
   machine = machine ?: @"";
+  advertiserID = advertiserID ?: @"";
   NSString *debugStatus = [FBSDKAppEventsUtility isDebugBuild] ? @"1" : @"0";
 #if TARGET_IPHONE_SIMULATOR
   NSString *isSimulator = @"1";
@@ -126,7 +130,7 @@ static NSString *_lastTreeHash;
   NSLocale *locale = [NSLocale currentLocale];
   NSString *languageCode = [locale objectForKey:NSLocaleLanguageCode];
   NSString *countryCode = [locale objectForKey:NSLocaleCountryCode];
-  NSString *localeString = locale.localeIdentifier;
+  NSString *localeString = [locale localeIdentifier];
   if (languageCode && countryCode) {
     localeString = [NSString stringWithFormat:@"%@_%@", languageCode, countryCode];
   }
@@ -212,7 +216,7 @@ static NSString *_lastTreeHash;
     [request startWithCompletionHandler:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
         _isCodelessIndexing = NO;
         if ([result isKindOfClass:[NSDictionary class]]) {
-            _isCodelessIndexingEnabled = [result[CODELESS_INDEXING_STATUS_KEY] boolValue];
+            _isCodelessIndexingEnabled = [[result objectForKey:CODELESS_INDEXING_STATUS_KEY] boolValue];
             if (!_isCodelessIndexingEnabled) {
                 _deviceSessionID = nil;
             }
@@ -240,15 +244,15 @@ static NSString *_lastTreeHash;
     return nil;
   }
 
-  NSArray *viewTrees = [trees reverseObjectEnumerator].allObjects;
+  NSArray *viewTrees = [[trees reverseObjectEnumerator] allObjects];
 
   NSData *data = UIImageJPEGRepresentation([FBSDKCodelessIndexer screenshot], 0.5);
   NSString *screenshot = [data base64EncodedStringWithOptions:0];
 
   NSMutableDictionary *treeInfo = [NSMutableDictionary dictionary];
 
-  treeInfo[@"view"] = viewTrees;
-  treeInfo[@"screenshot"] = screenshot ?: @"";
+  [treeInfo setObject:viewTrees forKey:@"view"];
+  [treeInfo setObject:screenshot ?: @"" forKey:@"screenshot"];
 
   NSString *tree = nil;
   data = [NSJSONSerialization dataWithJSONObject:treeInfo options:0 error:nil];
@@ -282,7 +286,7 @@ static NSString *_lastTreeHash;
 }
 
 + (UIImage *)screenshot {
-  UIWindow *window = [UIApplication sharedApplication].delegate.window;
+  UIWindow *window = [[UIApplication sharedApplication].delegate window];
 
   UIGraphicsBeginImageContext(window.bounds.size);
   [window drawViewHierarchyInRect:window.bounds afterScreenUpdates:YES];

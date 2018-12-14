@@ -99,9 +99,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             selectTabInController(tab: .images)
         }
         
-        let clientUUIDs = Image.fetchAll().map { $0.uuid!}
+        let imageUUIDs = Image.fetchAll().map { $0.uuid!}
+        let discussionUUIDs = Discussion.fetchAll().map { $0.uuid!}
         do {
-            if let results = try SyncServer.session.localConsistencyCheck(clientFiles: clientUUIDs) {
+            if let results = try SyncServer.session.localConsistencyCheck(clientFiles: imageUUIDs + discussionUUIDs) {
                 let missing = Array(results.clientMissingAndDeleted)
                 // Somehow these were deleted in the SyncServer meta data, but not deleted from the Shared Images client. Delete them now.
                 ImageExtras.removeLocalImages(uuids: missing)

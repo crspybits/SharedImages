@@ -221,13 +221,8 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite;
  to allow for using the request's response in a subsequent request.
  */
 - (void)addRequest:(FBSDKGraphRequest *)request
-    batchEntryName:(NSString *)name
- completionHandler:(FBSDKGraphRequestHandler)handler;
-
-- (void)addRequest:(FBSDKGraphRequest *)request
  completionHandler:(FBSDKGraphRequestHandler)handler
-    batchEntryName:(NSString *)name
-DEPRECATED_MSG_ATTRIBUTE("Renamed `addRequest:batchEntryName:completionHandler:`");
+    batchEntryName:(NSString *)name;
 
 /**
  @method
@@ -249,13 +244,8 @@ DEPRECATED_MSG_ATTRIBUTE("Renamed `addRequest:batchEntryName:completionHandler:`
  to allow for using the request's response in a subsequent request.
  */
 - (void)addRequest:(FBSDKGraphRequest *)request
-   batchParameters:(NSDictionary<NSString *, id> *)batchParameters
- completionHandler:(FBSDKGraphRequestHandler)handler;
-
-- (void)addRequest:(FBSDKGraphRequest *)request
  completionHandler:(FBSDKGraphRequestHandler)handler
-   batchParameters:(NSDictionary *)batchParameters
-DEPRECATED_MSG_ATTRIBUTE("Renamed `addRequest:batchParameters:completionHandler:`");
+   batchParameters:(NSDictionary *)batchParameters;
 
 /**
  @methodgroup Instance methods
@@ -313,10 +303,7 @@ DEPRECATED_MSG_ATTRIBUTE("Renamed `addRequest:batchParameters:completionHandler:
 
  @param version   This is a string in the form @"v2.0" which will be used for the version part of an API path
  */
-- (void)overrideGraphAPIVersion:(NSString *)version;
-
-- (void)overrideVersionPartWith:(NSString *)version
-DEPRECATED_MSG_ATTRIBUTE("Renamed `overrideGraphAPIVersion`");
+- (void)overrideVersionPartWith:(NSString *)version;
 
 @end
 

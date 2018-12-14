@@ -30,7 +30,7 @@
   NSArray *parts = [queryString componentsSeparatedByString:@"&"];
 
   for (NSString *part in parts) {
-    if (part.length == 0) {
+    if ([part length] == 0) {
       continue;
     }
 
@@ -67,15 +67,11 @@
           withString:@" "].stringByRemovingPercentEncoding;
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 + (NSString *)URLEncode:(NSString *)value
 {
-  NSCharacterSet *urlAllowedSet = [NSCharacterSet
-                                   characterSetWithCharactersInString:@" !*();:'@&=+$,/?%#[]\""].invertedSet;
+  NSCharacterSet *urlAllowedSet = [NSCharacterSet URLFragmentAllowedCharacterSet];
   return [value stringByAddingPercentEncodingWithAllowedCharacters:urlAllowedSet];
 }
-#pragma clang diagnostic pop
 
 + (dispatch_source_t)startGCDTimerWithInterval:(double)interval block:(dispatch_block_t)block
 {

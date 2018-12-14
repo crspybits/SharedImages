@@ -46,9 +46,8 @@ typedef NS_OPTIONS(NSUInteger, FBSDKGraphRequestFlags)
 // out of context of any user action.
 @property (nonatomic, assign) FBSDKGraphRequestFlags flags;
 
-@property (nonatomic, readonly, getter=isGraphErrorRecoveryDisabled) BOOL graphErrorRecoveryDisabled;
-@property (nonatomic, readonly) BOOL hasAttachments;
-
+- (BOOL)isGraphErrorRecoveryDisabled;
+- (BOOL)hasAttachments;
 + (BOOL)isAttachment:(id)item;
 + (NSString *)serializeURL:(NSString *)baseUrl
                     params:(NSDictionary *)params

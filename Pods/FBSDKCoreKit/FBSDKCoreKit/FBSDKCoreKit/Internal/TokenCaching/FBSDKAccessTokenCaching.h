@@ -22,7 +22,9 @@
 
 @protocol FBSDKAccessTokenCaching<NSObject>
 
-@property (nonatomic, copy) FBSDKAccessToken *accessToken;
+- (FBSDKAccessToken *)fetchAccessToken;
+
+- (void)cacheAccessToken:(FBSDKAccessToken *)token;
 
 - (void)clearCache;
 

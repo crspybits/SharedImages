@@ -1305,6 +1305,14 @@ public class SyncServer {
                 if dcg.status == .downloading {
                     dcg.status = .notStarted
                 }
+                
+                // 12/6/18; Just ran into this on Natasha's device. No idea how it happened. The dcg has a status of .downloaded. BUT, the contained (related) dfts have a status of notStarted.
+                for dft in dcg.dfts {
+                    if dft.status == .notStarted {
+                        dcg.status = .notStarted
+                        break
+                    }
+                }
             }
             
             let sguts = SharingGroupUploadTracker.fetchAll()

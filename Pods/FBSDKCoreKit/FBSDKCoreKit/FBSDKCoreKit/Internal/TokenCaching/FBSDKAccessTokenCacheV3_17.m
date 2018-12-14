@@ -36,7 +36,7 @@
   }
   return self;
 }
-- (FBSDKAccessToken *)accessToken
+- (FBSDKAccessToken *)fetchAccessToken
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *uuidKey = [[FBSDKSettings legacyUserDefaultTokenInformationKeyName] stringByAppendingString:@"UUID"];
@@ -54,7 +54,7 @@
   [_keychainStore setDictionary:nil forKey:[FBSDKSettings legacyUserDefaultTokenInformationKeyName] accessibility:nil];
 }
 
-- (void)setAccessToken:(FBSDKAccessToken *)token
+- (void)cacheAccessToken:(FBSDKAccessToken *)token
 {
   //no-op.
   NSAssert(NO, @"deprecated cache FBSDKAccessTokenCacheV3_17 should not be used to cache a token");

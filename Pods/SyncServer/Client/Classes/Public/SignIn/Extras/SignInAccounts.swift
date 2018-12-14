@@ -48,6 +48,7 @@ class SignInAccounts : UIView {
         
         _ = SignInManager.session.signInStateChanged.addTarget!(self, with: #selector(signInStateChanged))
         
+        title.adjustsFontSizeToFitWidth = true
         setup()
     }
     

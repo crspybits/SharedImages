@@ -363,7 +363,6 @@ static NSString *g_overrideAppID = nil;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     _userID = [defaults stringForKey:USER_ID_USER_DEFAULTS_KEY];
-    [self fetchServerConfiguration:nil];
   }
 
   return self;
@@ -425,7 +424,7 @@ static NSString *g_overrideAppID = nil;
       parameters:(NSDictionary *)parameters
 {
   [FBSDKAppEvents logEvent:eventName
-                valueToSum:@(valueToSum)
+                valueToSum:[NSNumber numberWithDouble:valueToSum]
                 parameters:parameters
                accessToken:nil];
 }
@@ -477,7 +476,7 @@ static NSString *g_overrideAppID = nil;
   }
 
   [FBSDKAppEvents logEvent:FBSDKAppEventNamePurchased
-                valueToSum:@(purchaseAmount)
+                valueToSum:[NSNumber numberWithDouble:purchaseAmount]
                 parameters:newParameters
                accessToken:accessToken];
 
@@ -568,7 +567,7 @@ static NSString *g_overrideAppID = nil;
     [dict setValuesForKeysWithDictionary:parameters];
   }
 
-  dict[FBSDKAppEventParameterProductItemID] = itemID;
+  [dict setObject:itemID forKey:FBSDKAppEventParameterProductItemID];
 
   NSString *avail = nil;
   switch (availability) {
@@ -584,7 +583,7 @@ static NSString *g_overrideAppID = nil;
       avail = @"DISCONTINUED"; break;
   }
   if (avail) {
-    dict[FBSDKAppEventParameterProductAvailability] = avail;
+    [dict setObject:avail forKey:FBSDKAppEventParameterProductAvailability];
   }
 
   NSString *cond = nil;
@@ -597,23 +596,23 @@ static NSString *g_overrideAppID = nil;
       cond = @"USED"; break;
   }
   if (cond) {
-    dict[FBSDKAppEventParameterProductCondition] = cond;
+    [dict setObject:cond forKey:FBSDKAppEventParameterProductCondition];
   }
 
-  dict[FBSDKAppEventParameterProductDescription] = description;
-  dict[FBSDKAppEventParameterProductImageLink] = imageLink;
-  dict[FBSDKAppEventParameterProductLink] = link;
-  dict[FBSDKAppEventParameterProductTitle] = title;
-  dict[FBSDKAppEventParameterProductPriceAmount] = [NSString stringWithFormat:@"%.3lf", priceAmount];
-  dict[FBSDKAppEventParameterProductPriceCurrency] = currency;
+  [dict setObject:description forKey:FBSDKAppEventParameterProductDescription];
+  [dict setObject:imageLink forKey:FBSDKAppEventParameterProductImageLink];
+  [dict setObject:link forKey:FBSDKAppEventParameterProductLink];
+  [dict setObject:title forKey:FBSDKAppEventParameterProductTitle];
+  [dict setObject:[NSString stringWithFormat:@"%.3lf", priceAmount] forKey:FBSDKAppEventParameterProductPriceAmount];
+  [dict setObject:currency forKey:FBSDKAppEventParameterProductPriceCurrency];
   if (gtin) {
-    dict[FBSDKAppEventParameterProductGTIN] = gtin;
+    [dict setObject:gtin forKey:FBSDKAppEventParameterProductGTIN];
   }
   if (mpn) {
-    dict[FBSDKAppEventParameterProductMPN] = mpn;
+    [dict setObject:mpn forKey:FBSDKAppEventParameterProductMPN];
   }
   if (brand) {
-    dict[FBSDKAppEventParameterProductBrand] = brand;
+    [dict setObject:brand forKey:FBSDKAppEventParameterProductBrand];
   }
 
   [FBSDKAppEvents logEvent:FBSDKAppEventNameProductCatalogUpdate
@@ -640,11 +639,6 @@ static NSString *g_overrideAppID = nil;
 + (void)setPushNotificationsDeviceToken:(NSData *)deviceToken
 {
   NSString *deviceTokenString = [FBSDKInternalUtility hexadecimalStringFromData:deviceToken];
-  [FBSDKAppEvents setPushNotificationsDeviceTokenString:deviceTokenString];
-}
-
-+ (void)setPushNotificationsDeviceTokenString:(NSString *)deviceTokenString
-{
   if (deviceTokenString == nil) {
     [FBSDKAppEvents singleton].pushNotificationsDeviceTokenString = nil;
     return;
@@ -862,10 +856,7 @@ static NSString *g_overrideAppID = nil;
 + (void)sendEventBindingsToUnity
 {
   // Send event bindings to Unity only Unity is initialized
-  if ([FBSDKAppEvents singleton]->_isUnityInit
-      && [FBSDKAppEvents singleton]->_serverConfiguration
-      && [NSJSONSerialization isValidJSONObject:[FBSDKAppEvents singleton]->_serverConfiguration.eventBindings]
-      ) {
+  if ([FBSDKAppEvents singleton]->_isUnityInit) {
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[FBSDKAppEvents singleton]->_serverConfiguration.eventBindings ?: @""
                                                        options:0
                                                          error:nil];
@@ -931,7 +922,7 @@ static NSString *g_overrideAppID = nil;
 - (void)publishInstall
 {
   NSString *appID = [self appID];
-  if (appID.length == 0) {
+  if ([appID length] == 0) {
     [FBSDKLogger singleShotLogEntry:FBSDKLoggingBehaviorDeveloperErrors logEntry:@"Missing [FBSDKAppEvents appID] for [FBSDKAppEvents publishInstall:]"];
     return;
   }
@@ -1144,7 +1135,7 @@ static NSString *g_overrideAppID = nil;
     return;
   }
 
-  if (appEventsState.appID.length == 0) {
+  if ([appEventsState.appID length] == 0) {
     [FBSDKLogger singleShotLogEntry:FBSDKLoggingBehaviorDeveloperErrors logEntry:@"Missing [FBSDKAppEvents appEventsState.appID] for [FBSDKAppEvents flushOnMainQueue:]"];
     return;
   }
@@ -1163,7 +1154,7 @@ static NSString *g_overrideAppID = nil;
                                            activityParametersDictionaryForEvent:@"CUSTOM_APP_EVENTS"
                                            implicitEventsOnly:appEventsState.areAllEventsImplicit
                                            shouldAccessAdvertisingID:self->_serverConfiguration.advertisingIDEnabled];
-    NSInteger length = receipt_data.length;
+    NSInteger length = [receipt_data length];
     if (length > 0) {
       postParameters[@"receipt_data"] = receipt_data;
     }
@@ -1261,7 +1252,7 @@ static NSString *g_overrideAppID = nil;
       break;
 
     case FlushResultServerError:
-      resultString = [NSString stringWithFormat:@"Server Error - %@", error.description];
+      resultString = [NSString stringWithFormat:@"Server Error - %@", [error description]];
       break;
   }
 

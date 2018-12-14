@@ -18,8 +18,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define FBSDK_GATEKEEPER_MANAGER_CACHE_TIMEOUT (60 * 60)
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FBSDKGateKeeperManager : NSObject

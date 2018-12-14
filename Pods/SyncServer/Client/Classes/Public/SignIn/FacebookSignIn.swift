@@ -269,13 +269,13 @@ private class FacebookSignInButton : UIControl, Tappable {
             loginManager.logIn(readPermissions: permissions, viewController: nil) { (loginResult) in
                 switch loginResult {
                 case .failed(let error):
-                    print(error)
+                    Log.msg("\(error)")
                     // 10/22/17; This is an explicit sign-in request. User is not yet signed in. Seems legit to sign them out.
                     self.signIn.signUserOut()
                     Log.msg("signUserOut: FacebookSignIn: error during explicit request to signin")
 
                 case .cancelled:
-                    print("User cancelled login.")
+                    Log.msg("User cancelled login.")
                     // 10/22/17; User cancelled sign-in flow. Seems fine to sign them out.
                     self.signIn.signUserOut()
                     Log.msg("signUserOut: FacebookSignIn: user cancelled sign-in during explicit request to signin")

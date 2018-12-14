@@ -27,9 +27,9 @@ static BOOL g_tryDeprecatedCaches = YES;
 
 @implementation FBSDKAccessTokenCache
 
-- (FBSDKAccessToken*)accessToken
+- (FBSDKAccessToken*)fetchAccessToken
 {
-  FBSDKAccessToken *token = [[FBSDKAccessTokenCacheV4 alloc] init].accessToken;
+  FBSDKAccessToken *token = [[[FBSDKAccessTokenCacheV4 alloc] init] fetchAccessToken];
   if (token || !g_tryDeprecatedCaches) {
     return token;
   }
@@ -39,21 +39,21 @@ static BOOL g_tryDeprecatedCaches = YES;
   __block FBSDKAccessToken *oldToken = nil;
   [oldCacheClasses enumerateObjectsUsingBlock:^(Class obj, NSUInteger idx, BOOL *stop) {
     id<FBSDKAccessTokenCaching> cache = [[obj alloc] init];
-    oldToken = cache.accessToken;
+    oldToken = [cache fetchAccessToken];
     if (oldToken) {
       *stop = YES;
       [cache clearCache];
     }
   }];
   if (oldToken) {
-    self.accessToken = oldToken;
+    [self cacheAccessToken:oldToken];
   }
   return oldToken;
 }
 
-- (void)setAccessToken:(FBSDKAccessToken *)token
+- (void)cacheAccessToken:(FBSDKAccessToken *)token
 {
-  [[FBSDKAccessTokenCacheV4 alloc] init].accessToken = token;
+  [[[FBSDKAccessTokenCacheV4 alloc] init] cacheAccessToken:token];
   if (g_tryDeprecatedCaches) {
     g_tryDeprecatedCaches = NO;
     NSArray *oldCacheClasses = [[self class] deprecatedCacheClasses];
