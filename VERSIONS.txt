@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.23.2
+Version 0.23.2 (12/15/18)
 	* Fixing issue with debugging/consistency check.
 	* Updating pods -- to bring in SyncServer client fixes.
 	* Fixing part of sharing invitation issue:
