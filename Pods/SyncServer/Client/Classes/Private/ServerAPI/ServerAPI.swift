@@ -479,6 +479,11 @@ class ServerAPI {
                         return
                     }
                     
+                    if let masterVersionUpdate = downloadFileResponse.masterVersionUpdate {
+                        completion?(DownloadFileResult.serverMasterVersionUpdate(masterVersionUpdate), nil)
+                        return
+                    }
+                    
                     guard let cloudStorageTypeRaw = downloadFileResponse.cloudStorageType,
                         let cloudStorageType = CloudStorageType(rawValue: cloudStorageTypeRaw) else {
                         completion?(nil, .generic("Could not get CloudStorageType"))
@@ -515,9 +520,7 @@ class ServerAPI {
                         let downloadedFile = DownloadedFile.content(url: resultURL!, appMetaData: appMetaData, checkSum: checkSum, cloudStorageType: cloudStorageType, contentsChangedOnServer: contentsChanged)
                         completion?(.success(downloadedFile), nil)
                     }
-                    else if let masterVersionUpdate = jsonDict[DownloadFileResponse.masterVersionUpdateKey] as? Int64 {
-                        completion?(DownloadFileResult.serverMasterVersionUpdate(masterVersionUpdate), nil)
-                    } else {
+                    else {
                         completion?(nil, .noExpectedResultKey)
                     }
                 }

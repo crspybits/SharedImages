@@ -173,6 +173,8 @@ public class SyncServer {
     private func upload(fileURL:SMRelativeLocalURL, withAttributes attr: SyncAttributes, copy:Bool = false) throws {
         var errorToThrow:Error?
         
+        var newUft:UploadFileTracker!
+        
         guard attr.mimeType != nil else {
             throw SyncServerError.noMimeType
         }
@@ -248,7 +250,7 @@ public class SyncServer {
                 fileGroupUUID = entry!.fileGroupUUID
             }
             
-            let newUft = UploadFileTracker.newObject() as! UploadFileTracker
+            newUft = (UploadFileTracker.newObject() as! UploadFileTracker)
             newUft.appMetaData = attr.appMetaData
             newUft.fileUUID = attr.fileUUID
             newUft.mimeType = attr.mimeType.rawValue
@@ -290,11 +292,18 @@ public class SyncServer {
             // The file version to upload will be determined immediately before the upload so not assigning the fileVersion property of `newUft` yet. See https://github.com/crspybits/SyncServerII/issues/12
             // Similarly, the appMetaData version will be determined immediately before the upload.
             
-            // This does a Core Data save.
+            // This does a Core Data save, if successful.
             errorToThrow = self.tryToAddUploadFileTracker(attr: attr, newUft: newUft)
         } // end perform
         
         guard errorToThrow == nil else {
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                if let newUft = newUft {
+                    try? newUft.remove()
+                }
+                try? CoreData.sessionNamed(Constants.coreDataName).context.save()
+            }
+            
             throw errorToThrow!
         }
     }

@@ -52,7 +52,7 @@ public class DownloadContentGroup: NSManagedObject, CoreDataModel, AllOperations
         return managedObject as? DownloadContentGroup
     }
     
-    // If a DownloadContentGroup exists with this fileGroupUUID, adds this dft to it. Otherwise, creates one and adds it. The case were fileGroupUUID is nil is to deal with not having a fileGroupUUID for a file-- to enable consistency with downloads.
+    // If a DownloadContentGroup exists with this fileGroupUUID, adds this dft to it. Otherwise, creates one and adds it. The case where fileGroupUUID is nil is to deal with not having a fileGroupUUID for a file-- to enable consistency with downloads.
     class func addDownloadFileTracker(_ dft: DownloadFileTracker, to fileGroupUUID:String?) throws {
         if dft.sharingGroupUUID == nil {
             throw SyncServerError.noSharingGroupUUID
