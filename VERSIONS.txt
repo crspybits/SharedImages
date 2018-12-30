@@ -1,5 +1,11 @@
 SharedImages
 
+Version 0.24.0 (12/30/18)
+	* Update with fixes from client shared library.
+	* Fixed: Problems with sync or sticky sign in?
+		https://github.com/crspybits/SharedImages/issues/139
+	* Now have an automatic periodic sync (every 60 seconds) that will cause the Albums screen to stay up to date. Each individual album will still need a manual sync.
+	
 Version 0.23.3 (12/25/18)
 	* Update with fixes from client shared library.
 

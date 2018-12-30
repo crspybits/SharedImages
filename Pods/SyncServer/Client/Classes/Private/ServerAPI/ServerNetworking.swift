@@ -220,7 +220,6 @@ class ServerNetworking : NSObject {
                     resultDict[ServerConstants.httpResponseOAuth2AccessTokenKey] = accessTokenResponse
                 }
                 
-                Log.msg("No errors on upload: jsonDict: \(jsonDict)")
                 completion?(resultDict, response.statusCode, nil)
             }
         }

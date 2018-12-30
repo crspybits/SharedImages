@@ -160,7 +160,6 @@ class ImageCollectionVC : UICollectionViewCell {
         }
         
         let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: size)
-        Log.msg("smallerSize: \(smallerSize)")
         
         // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode
         // 11/29/17; I just got it again, while running attached to the debugger. In this case, `imageCache` was nil. I added a guard statement above to deal with this.

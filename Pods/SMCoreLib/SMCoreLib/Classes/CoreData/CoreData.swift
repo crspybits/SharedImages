@@ -14,8 +14,6 @@ public extension CoreData {
 
     public class func fetchObjectWithUUID(_ uuid:String, usingUUIDKey uuidKey:String, fromEntityName entityName: String, coreDataSession session:CoreData) -> NSManagedObject? {
         var objs:[NSManagedObject]?
-        
-        Log.msg("Looking for UUID: \(uuid)");
 
         do {
             let result = try session.fetchObjects(withEntityName: entityName) { (request: NSFetchRequest!) in

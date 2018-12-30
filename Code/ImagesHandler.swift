@@ -12,12 +12,14 @@ import SMCoreLib
 import SyncServer_Shared
 
 class ImagesHandler {
+    static let session = ImagesHandler()
+    
     var syncController = SyncController()
 
     var syncEventAction:((SyncControllerEvent)->())?
     var completedAddingOrUpdatingLocalImagesAction:(()->())?
 
-    init() {
+    private init() {
         syncController.delegate = self
     }
     

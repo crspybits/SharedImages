@@ -54,9 +54,6 @@ class ImagesVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        imagesHandler.syncEventAction = syncEvent
-        imagesHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
-        
         collectionView.dataSource = self
         collectionView.delegate = self
 
@@ -102,14 +99,24 @@ class ImagesVC: UIViewController {
         noDownloadImageView.alpha = 0
         noDownloadImageView.tintColor = .lightGray
         
+        // Because, when app enters background, AppBadge sets itself up to use handlers.
+        NotificationCenter.default.addObserver(self, selector:#selector(setupHandlers), name:
+            UIApplication.willEnterForegroundNotification, object: nil)
+        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: { [unowned self] in
+            Log.msg("bottomRefresh: starting sync")
             do {
                 try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
             } catch (let error) {
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
             }
         })
+    }
+    
+    @objc private func setupHandlers() {
+        imagesHandler.syncEventAction = syncEvent
+        imagesHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
     }
     
     @objc private func otherActionButtonAction() {
@@ -303,6 +310,8 @@ class ImagesVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        setupHandlers()
         
         coreDataSource.fetchData()
 
@@ -520,7 +529,6 @@ extension ImagesVC : UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as! ImageCollectionVC).cellSizeHasBeenChanged()
-        Log.msg("cell.frame: \(cell.frame)")
     }
 }
 
@@ -652,10 +660,6 @@ extension ImagesVC /* ImagesHandler */ {
             self.bottomRefresh.hide()
             
         case .syncDone (let numberOperations):
-            // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
-            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
-            AppBadge.setBadge(number: syncNeeded.count)
-            
             Progress.session.finish()
                         
             // 2/13/18; I had been resetting the unread counts on first use of the app, but I don't think that's appropriate. See https://github.com/crspybits/SharedImages/issues/83

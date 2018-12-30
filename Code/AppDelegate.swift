@@ -150,11 +150,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         SyncServer.session.application(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
     }
-    
-    func application(_ application: UIApplication,
-              didRegister notificationSettings: UIUserNotificationSettings) {
-        AppBadge.iOS9BadgeAuthorization(didRegister: notificationSettings)
-    }
 
     // I've had been having issues with getting this to work. For troubleshooting, see https://stackoverflow.com/questions/39197933/how-to-troubleshoot-ios-background-app-fetch-not-working
     // https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application
@@ -181,7 +176,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        AppBadge.session.setBadge()
+        
+        // 12/29/18; I think this was the cause of https://github.com/crspybits/SharedImages/issues/139 Instead, I'm going to now periodically make the Index endpoint call to make sure the Albums screen is up to date. See [1] in SyncController.
+        // AppBadge.session.setBadge()
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

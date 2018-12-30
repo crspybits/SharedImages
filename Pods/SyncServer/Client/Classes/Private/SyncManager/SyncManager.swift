@@ -167,16 +167,29 @@ class SyncManager {
             downloadDeletions = dcg.dfts.filter {$0.operation.isDeletion}
         }
         
-        ConflictManager.handleAnyContentDownloadConflicts(dfts: contentDownloads, delegate: self.delegate) {
+        // 12/27/18; Up until today, I was updating the DirectoryEntry's (see Directory class) within handleAnyContentDownloadConflicts and handleAnyDownloadDeletionConflicts (before the client was informed of changes) but this led to an error condition-- https://github.com/crspybits/SyncServer-iOSClient/issues/63 where, seemingly, the directory could get updated (i.e., file versions updated), and the client not informed of changes. Instead, I'm going to first inform the client of changes, and then update the directory. So, in the worst case if work is repeated due to a failure, a client would be informed of changes multiple times.
+        
+        ConflictManager.handleAnyContentDownloadConflicts(dfts: contentDownloads, delegate: self.delegate) { downloadsToIgnore in
             
-            ConflictManager.handleAnyDownloadDeletionConflicts(dfts: downloadDeletions, delegate: self.delegate) {
+            ConflictManager.handleAnyDownloadDeletionConflicts(dfts: downloadDeletions, delegate: self.delegate) { deleteAllOfThese, updateDirectoryAfterDownloadDeletingFiles in
 
                 var groupContent:[DownloadOperation]!
                 var numberGone = 0
                 
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                
-                    groupContent = dcg.dfts.map { dft in
+                    let updatedContentDownloads = contentDownloads.filter { dft in
+                        let shouldIgnore = downloadsToIgnore.filter {$0.fileUUID == dft.fileUUID}
+                        return shouldIgnore.count == 0
+                    }
+                    
+                    let updatedDownloadDeletions = downloadDeletions.filter { dft in
+                        let shouldIgnore = deleteAllOfThese.filter {$0.fileUUID == dft.fileUUID}
+                        return shouldIgnore.count == 0
+                    }
+                    
+                    let dfts = updatedContentDownloads + updatedDownloadDeletions
+                    
+                    groupContent = dfts.map { dft in
                         var contentType:DownloadOperation.OperationType!
                         switch dft.operation! {
                         case .file:
@@ -198,7 +211,7 @@ class SyncManager {
                         
                         return DownloadOperation(type: contentType, attr: dft.attr)
                     }
-                }
+                } // CoreDataSync.perform ends
                 
                 if groupContent.count > 0 {
                     if numberGone > 0 {
@@ -213,6 +226,12 @@ class SyncManager {
                     }
                 }
                 
+                // 12/27/18; Updating the directory *after* informimg the client. If an error occurs, in the worst case we should end up just informing the client more than once.
+                CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                    Directory.session.updateAfterDownloading(downloads: contentDownloads)
+                    updateDirectoryAfterDownloadDeletingFiles?()
+                }
+                
                 CoreDataSync.perform(sessionName: Constants.coreDataName) {                    
                     // Remove the DownloadContentGroup and related dft's -- We're finished their downloading.
                     dcg.dfts.forEach { dft in
@@ -221,13 +240,13 @@ class SyncManager {
                     dcg.remove()
                     CoreData.sessionNamed(Constants.coreDataName).saveContext()
                 }
-            }
-
-            // Downloads are completed for this file group, but we may have other file groups to download.
-            DispatchQueue.global().async {
-                self.start(sharingGroupUUID: sharingGroupUUID, self.callback)
-            }
-        }
+                
+                // Downloads are completed for this file group, but we may have other file groups to download.
+                DispatchQueue.global().async {
+                    self.start(sharingGroupUUID: sharingGroupUUID, self.callback)
+                }
+            } // ConflictManager.handleAnyDownloadDeletionConflicts ends
+        } // ConflictManager.handleAnyContentDownloadConflicts ends
     }
 
     // No DownloadFileTracker's queued up. Check the FileIndex to see if there are pending downloads on the server.

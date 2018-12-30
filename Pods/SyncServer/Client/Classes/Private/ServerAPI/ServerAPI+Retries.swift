@@ -92,7 +92,7 @@ private class RequestWithRetries {
         numberTries += 1
         let errorCheck = checkForError(statusCode, error)
         
-        // Do do a retry on serviceUnavailable. Not much point. Plus, if we do retries in this case, we'll geet multiple errror messages.
+        // Do not do a retry on serviceUnavailable. Not much point. Plus, if we do retries in this case, we'll get multiple errror messages.
         if errorCheck == nil || numberTries >= maximumNumberRetries ||
             !retryIfError || statusCode == HTTPStatus.serviceUnavailable.rawValue {
             completion(errorCheck)
@@ -121,6 +121,8 @@ private class RequestWithRetries {
             }
         }
         else {
+            Log.error("errorCheck: \(String(describing: errorCheck)); statusCode: \(String(describing: statusCode))")
+            
             // We got an error, but it wasn't an authorization problem.
             // Let's make another try after waiting for a while.
             exponentialFallback(forAttempt: numberTries) {

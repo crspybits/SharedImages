@@ -18,7 +18,10 @@ class AlbumsVC: UIViewController {
     private var sharingGroups:[SyncServer.SharingGroup]!
 
     // Sets up delegate for SyncServer also.
-    private var imagesHandler = ImagesHandler()
+    private var imagesHandler:ImagesHandler {
+        return ImagesHandler.session
+    }
+    
     private var shouldLayoutSubviews = true
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     private var addAlbum:UIBarButtonItem!
@@ -51,6 +54,15 @@ class AlbumsVC: UIViewController {
         
         // We need this for the refresh.
         collectionView.alwaysBounceVertical = true
+        
+        // Because, when app enters background, AppBadge sets itself up to use handlers.
+        NotificationCenter.default.addObserver(self, selector:#selector(setupHandlers), name:
+            UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    @objc private func setupHandlers() {
+        imagesHandler.syncEventAction = syncEvent
+        imagesHandler.completedAddingOrUpdatingLocalImagesAction = nil
     }
     
     @objc private func refresh() {
@@ -88,15 +100,6 @@ class AlbumsVC: UIViewController {
             }
         }
     }
-
-    private func sortSharingGroups() {
-        sharingGroups.sort { sg1, sg2 in
-            if let name1 = sg1.sharingGroupName, let name2 = sg2.sharingGroupName {
-                return name1 < name2
-            }
-            return true
-        }
-    }
     
     @objc private func addAlbumAction() {
         if SignInManager.session.currentSignIn?.userType == .sharing {
@@ -128,16 +131,10 @@ class AlbumsVC: UIViewController {
         switch event {
         case .syncDelayed:
             activityIndicator.stopAnimating()
+            
         case .syncDone(numberOperations: _):
             activityIndicator.stopAnimating()
-            sharingGroups = SyncServer.session.sharingGroups
-            sortSharingGroups()
-            
-            // Can't seem to do this with `performBatchUpdates` to get animations. It crashes.
-            collectionView.reloadData()
-            
-            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
-            AppBadge.setBadge(number: syncNeeded.count)
+            updateSharingGroups()
             
         case .syncError(message: _):
             activityIndicator.stopAnimating()
@@ -151,19 +148,28 @@ class AlbumsVC: UIViewController {
         }
     }
     
+    private func updateSharingGroups() {
+        sharingGroups = SyncServer.session.sharingGroups
+
+        sharingGroups.sort { sg1, sg2 in
+            if let name1 = sg1.sharingGroupName, let name2 = sg2.sharingGroupName {
+                return name1 < name2
+            }
+            return true
+        }
+    
+        // Can't seem to do this with `performBatchUpdates` to get animations. It crashes.
+        collectionView.reloadData()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Put these here because the ImagesVC changes them.
-        imagesHandler.syncEventAction = syncEvent
-        imagesHandler.completedAddingOrUpdatingLocalImagesAction = nil
+        setupHandlers()
         
-        // Putting this in `viewWillAppear` to deal with the first time the Albums are displayed and to deal with removal of an album in ImagesVC.
-        sharingGroups = SyncServer.session.sharingGroups
-        sortSharingGroups()
-        
-        // For removal, and for adding an image to an empty album
-        collectionView.reloadData()
+        // Putting this in `viewWillAppear` to deal with the first time the Albums are displayed and to deal with removal of an album in ImagesVC. And to deal with sharing group updates from other places in the app.
+        updateSharingGroups()
         
         if shouldLayoutSubviews {
             shouldLayoutSubviews = false

@@ -10,11 +10,12 @@ import SyncServer_Shared
 import SMCoreLib
 
 class ConflictManager {
-    static func handleAnyContentDownloadConflicts(dfts:[DownloadFileTracker], delegate: SyncServerDelegate, completion:@escaping ()->()) {
+    private static func handleAnyContentDownloadConflicts(dfts:[DownloadFileTracker], ignoreDownloads: [DownloadFileTracker], delegate: SyncServerDelegate,
+        completion:@escaping (_ ignoreDownloads:[DownloadFileTracker])->()) {
     
         // Are there more dft's to check for conflicts?
         if dfts.count == 0 {
-            completion()
+            completion(ignoreDownloads)
         }
         else {
             let dft = dfts[0]
@@ -37,25 +38,23 @@ class ConflictManager {
             Thread.runSync(onMainThread: {
                 ConflictManager.handleAnyContentDownloadConflict(attr: attr, content: possiblyConflictingContent, delegate: delegate) { ignoreDownload in
                     
-                    // Update the directory whether or not we're ignoring this download -- we need the updated version of the file and/or appMetaData.
-                    CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                        Directory.session.updateAfterDownloading(downloads: [dft])
-                    }
+                    var updatedIgnoreDownloads = ignoreDownloads
                     
                     if let _ = ignoreDownload {
-                        // Ignoring the download-- remove the dft.
-                        CoreDataSync.perform(sessionName: Constants.coreDataName) {
-                            dft.remove()
-                            CoreData.sessionNamed(Constants.coreDataName).saveContext()
-                        }
+                        updatedIgnoreDownloads += [dft]
                     }
                     
                     DispatchQueue.global().async {
-                        handleAnyContentDownloadConflicts(dfts:dfts.tail(), delegate: delegate, completion:completion)
+                        handleAnyContentDownloadConflicts(dfts:dfts.tail(), ignoreDownloads: updatedIgnoreDownloads, delegate: delegate, completion:completion)
                     }
                 }
             })
         }
+    }
+    
+    static func handleAnyContentDownloadConflicts(dfts:[DownloadFileTracker], delegate: SyncServerDelegate, completion:@escaping (_ ignoreDownloads:[DownloadFileTracker])->()) {
+    
+        handleAnyContentDownloadConflicts(dfts: dfts, ignoreDownloads: [], delegate: delegate, completion: completion)
     }
     
     // completion's are called when the client has resolved all conflicts if there are any. If there are no conflicts, the call to the completion is synchronous.
@@ -164,10 +163,10 @@ class ConflictManager {
         }
     }
     
-    static func handleAnyDownloadDeletionConflicts(dfts:[DownloadFileTracker], delegate: SyncServerDelegate, completion:@escaping ()->()) {
+    static func handleAnyDownloadDeletionConflicts(dfts:[DownloadFileTracker], delegate: SyncServerDelegate, completion:@escaping (_ deleteAllOfThese: Set<SyncAttributes>, _ updateDirectoryAfterDownloadDeletingFiles:(()->())?)->()) {
         
         if dfts.count == 0 {
-            completion()
+            completion(Set<SyncAttributes>(), nil)
             return
         }
         
@@ -201,22 +200,20 @@ class ConflictManager {
                 }
             }
             
-            CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            func updateAfterDownloadDeletingFiles() {
                 Directory.session.updateAfterDownloadDeletingFiles(deletions: deleteFromLocalDirectory, pendingUploadUndeletions: uploadUndeletions)
-                
-                let deleteAllOfThese = ignoreDownloadDeletionsExpandedForGroups.union(
+            }
+            
+            var deleteAllOfThese: Set<SyncAttributes>!
+            
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                deleteAllOfThese = ignoreDownloadDeletionsExpandedForGroups.union(
                     havePendingUploadDeletions)
-                deleteAllOfThese.forEach { attr in
-                    let dft = dfts.filter {$0.fileUUID == attr.fileUUID}[0]
-                    dft.remove()
-                }
-                
-                CoreData.sessionNamed(Constants.coreDataName).saveContext()
             }
                 
             // I'd like to wrap up by switching to the original thread we were on prior to switching to the main thread. Not quite sure how to do that. Do this instead.
             DispatchQueue.global().async {
-                completion()
+                completion(deleteAllOfThese, updateAfterDownloadDeletingFiles)
             }
         }
     }

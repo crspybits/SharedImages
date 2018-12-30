@@ -126,4 +126,8 @@ public class DirectoryEntry: NSManagedObject, CoreDataModel, AllOperations {
         let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(Constants.coreDataName))
         return managedObject as? DirectoryEntry
     }
+    
+    func remove()  {
+        CoreData.sessionNamed(Constants.coreDataName).remove(self)
+    }
 }

@@ -71,13 +71,39 @@ class SyncController {
     let minIntervalBetweenErrorReports: TimeInterval = 60
     private var syncDone:(()->())?
     private var lastReportedErrorTime: Date?
-    
+    let intervalBetweenPeriodicSyncs: TimeInterval = 60
+    weak var timer: Timer?
+
     init() {
         SyncServer.session.delegate = self
         SyncServer.session.eventsDesired = [.syncDelayed, .syncStarted, .syncDone, .willStartDownloads, .willStartUploads,
                 .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
                 .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved,
                 .serverDown, .minimumIOSClientVersion]
+        startPeriodicSync()
+
+        // 12/29/18; [1] So that when app goes into background/foreground, the periodic sync stops and starts. There is separate code in the AppDelegate, in performFetchWithCompletionHandler, that runs infrequently in the background to keep the app badge up to date.
+        NotificationCenter.default.addObserver(self, selector:#selector(stopPeriodicSync), name:
+            UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
+            UIApplication.willEnterForegroundNotification, object: nil)
+    }
+
+    @objc private func startPeriodicSync() {
+        timer?.invalidate()   // just in case you had existing `Timer`, `invalidate` it before we lose our reference to it
+        timer = Timer.scheduledTimer(withTimeInterval: intervalBetweenPeriodicSyncs, repeats: true) { _ in
+            if !SyncServer.session.isSyncing {
+                do {
+                    try SyncServer.session.sync()
+                } catch (let error) {
+                    Log.error("\(error)")
+                }
+            }
+        }
+    }
+
+    @objc private func stopPeriodicSync() {
+        timer?.invalidate()
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -653,6 +679,10 @@ extension SyncController : SyncServerDelegate {
             SMCoreLib.Alert.show(withTitle: "Your inviting user was removed from \(albumName).", message: "You will no longer be able to upload new images to this album.")
             
         case .syncDone:
+            // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
+            let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
+            AppBadge.setBadge(number: syncNeeded.count)
+            
             delegate.syncEvent(syncController: self, event: .syncDone(numberOperations: numberOperations))
             syncDone?()
             syncDone = nil
