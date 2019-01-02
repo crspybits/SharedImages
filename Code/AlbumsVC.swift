@@ -135,6 +135,7 @@ class AlbumsVC: UIViewController {
         case .syncDone(numberOperations: _):
             activityIndicator.stopAnimating()
             updateSharingGroups()
+            Progress.session.finish()
             
         case .syncError(message: _):
             activityIndicator.stopAnimating()
@@ -175,6 +176,8 @@ class AlbumsVC: UIViewController {
             shouldLayoutSubviews = false
             layoutSubviews()
         }
+        
+        Progress.session.viewController = self
     }
     
     override func viewDidAppear(_ animated: Bool) {

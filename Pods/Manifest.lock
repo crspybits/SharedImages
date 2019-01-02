@@ -100,10 +100,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
-  - SyncServer (~> 18.8.0)
-  - SyncServer/Dropbox (~> 18.8.0)
-  - SyncServer/Facebook (~> 18.8.0)
-  - SyncServer/Google (~> 18.8.0)
+  - SyncServer (from `../SyncServer-iOSClient`)
+  - SyncServer/Dropbox (from `../SyncServer-iOSClient`)
+  - SyncServer/Facebook (from `../SyncServer-iOSClient`)
+  - SyncServer/Google (from `../SyncServer-iOSClient`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -135,12 +135,13 @@ SPEC REPOS:
     - GoogleSignIn
     - PersistentValue
     - SMCoreLib
-    - SyncServer
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
+  SyncServer:
+    :path: "../SyncServer-iOSClient"
 
 CHECKOUT OPTIONS:
   ODRefreshControl:
@@ -179,6 +180,6 @@ SPEC CHECKSUMS:
   SyncServer: d4dab818dfe3520666271762c9d3e545352d8935
   SyncServer-Shared: 3917601f1231c0d9534ab87a7b6c486771f0a52e
 
-PODFILE CHECKSUM: e02dc7a2a61991e970c7fdc8eac66c05b337bba1
+PODFILE CHECKSUM: 37fbc5817aebbcba0c9b57f8876ee1a36911eb8f
 
 COCOAPODS: 1.5.3
