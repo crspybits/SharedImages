@@ -121,8 +121,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         UnreadCountBadge.update()
-        
         Migrations.session.launch()
+        ImagesHandler.setup()
 
         return true
     }

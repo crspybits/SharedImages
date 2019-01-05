@@ -23,6 +23,11 @@ class ImagesHandler {
         syncController.delegate = self
     }
     
+    static func setup() {
+        // Force the lazy session to be created (see also https://stackoverflow.com/questions/34667134/implicitly-lazy-static-members-in-swift). s
+        _ = ImagesHandler.session
+    }
+    
     @discardableResult
     func addOrUpdateLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
         var theImage:Image!

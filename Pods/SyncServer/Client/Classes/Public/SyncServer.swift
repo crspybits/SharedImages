@@ -11,7 +11,7 @@ import SMCoreLib
 import SyncServer_Shared
 
 /// Synchronize files and app meta data with other instances of the same client app.
-public class SyncServer {
+public class SyncServer: NSObject {
     /// The singleton for this class.
     public static let session = SyncServer()
     
@@ -36,7 +36,7 @@ public class SyncServer {
     public static let backgroundTest = SMPersistItemBool(name:"SyncServer.backgroundTest", initialBoolValue:false,  persistType: .userDefaults)
 #endif
 
-    private init() {
+    private override init() {
     }
     
     /// Enable reporting of only events desired by the client app.
@@ -121,6 +121,38 @@ public class SyncServer {
             Log.msg("Upload file tracker count: \(pendingUploads.count)")
             pendingUploads.forEach { uft in
                 Log.msg("Upload file tracker status: \(uft.status)")
+            }
+        }
+        
+        NotificationCenter.default.addObserver(self, selector:#selector(uploadIfNeeded), name:
+            NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+        Network.session().connectionStateCallbacks.resetTargets!()
+        _ = Network.session().connectionStateCallbacks.addTarget!(self, with: #selector(uploadIfNeeded))
+        
+        // To trigger upload(s) when the app is launched. But add a delay because auto-sign processes take some time.
+        TimedCallback.withDuration(2.0) {[unowned self] in
+            self.uploadIfNeeded()
+        }
+    }
+    
+    // If there is an upload pending, start it.
+    // 12/31/18; https://github.com/crspybits/SharedImages/issues/146
+    @objc private func uploadIfNeeded() {
+        let isForeground = UIApplication.shared.applicationState == .active
+        if SignInManager.session.userIsSignedIn && isForeground && Network.connected() && !isSyncing && uploadsPending {
+            var sharingGroupUUID:String?
+            
+            CoreDataSync.perform(sessionName: Constants.coreDataName) {
+                sharingGroupUUID = Upload.getSharingGroupUUIDOfHeadSyncQueue()
+            }
+            
+            if let sharingGroupUUID = sharingGroupUUID {
+                do {
+                    try self.sync(sharingGroupUUID: sharingGroupUUID)
+                }
+                catch (let error) {
+                    Log.error("\(error)")
+                }
             }
         }
     }
@@ -808,6 +840,31 @@ public class SyncServer {
         }
     }
     
+    /**
+        Are there operation uploads pending? Pending uploads are those that were enqueued and committed with a sync. This includes file uploads, groups, and deletions.
+    */
+    public var uploadsPending:Bool {
+        var result = false
+        
+        CoreDataSync.perform(sessionName: Constants.coreDataName) {
+            result = self.uploadsPendingNoPerform
+        }
+        
+        return result
+    }
+    
+    // doesn't do Core Data perform.
+    var uploadsPendingNoPerform: Bool {
+        var result = false
+        
+        if let syncedUploadQueues = Upload.synced().queues?.array as? [UploadQueue] {
+            let trackers = syncedUploadQueues.flatMap {$0.uploadTrackers}
+            result = trackers.count > 0
+        }
+        
+        return result
+    }
+    
     /// The sharing groups that the user is currently a member of, and known to the server. `syncNeeded` in sharing groups will be non-nil.
     public var sharingGroups: [SharingGroup] {
         var result: [SharingGroup]!
@@ -834,14 +891,22 @@ public class SyncServer {
 
         If a stopSync is currently pending, then this call will be ignored.
      
+        If there is no network connection, the sync will be attempted next time the app is in the foreground and there is a network connection.
+     
         Non-blocking in all cases.
     */
     public func sync(sharingGroupUUID: String? = nil, reAttemptGoneDownloads: Bool = false) throws {
         try sync(sharingGroupUUID:sharingGroupUUID, reAttemptGoneDownloads: reAttemptGoneDownloads, completion:nil)
     }
     
+    /// Is there a `sync` operation in progress?
     public var isSyncing:Bool {
-        return syncOperating
+        var result:Bool!
+        Synchronized.block(self) {
+            result = syncOperating
+        }
+        
+        return result
     }
     
     func sync(sharingGroupUUID: String?, reAttemptGoneDownloads: Bool = false, completion:(()->())?) throws {
@@ -1293,6 +1358,12 @@ public class SyncServer {
                     }
                     
                     self.delayedSync = self.delayedSync.tail()
+                    return
+                } else if self.uploadsPendingNoPerform {
+                    // 12/31/18; Uploads are pending, but not delayed. This can happen when uploads are queued and then the app is restarted. Since delayedSync's are not persistent, there will not be "delayed" uploads. See also https://github.com/crspybits/SharedImages/issues/146
+                    if let sharingGroupUUID = Upload.getSharingGroupUUIDOfHeadSyncQueue() {
+                        nextSharingGroupUUID = sharingGroupUUID
+                    }
                     return
                 }
 

@@ -1,5 +1,10 @@
 SharedImages
 
+Version 0.25.0 (1/5/19)
+	* Added progress indicator for Albums screen
+	* Updates from client library.
+	* Fixed bug from v0.24.0-- delegate for SyncServer client wasn't setup early enough in launch sequence which caused a crash in some flows through the app-- e.g., when installing the app for the first time and signing in.
+
 Version 0.24.0 (12/30/18)
 	* Update with fixes from client shared library.
 	* Fixed: Problems with sync or sticky sign in?

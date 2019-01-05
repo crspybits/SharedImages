@@ -1,5 +1,5 @@
 //
-//  Uploads.swift
+//  Upload+Extras.swift
 //  SyncServer
 //
 //  Created by Christopher Prince on 3/2/17.
@@ -84,5 +84,15 @@ extension Upload {
         let head = getHeadSyncQueue(forSharingGroupUUID: sharingGroupUUID)
         assert(head != nil)
         CoreData.sessionNamed(Constants.coreDataName).remove(head!)
+    }
+    
+    class func getSharingGroupUUIDOfHeadSyncQueue() -> String? {
+        guard let queues = Array(synced().queues!) as? [UploadQueue],
+            queues.count > 0, queues[0].uploadTrackers.count > 0,
+            let sharingGroupUUID = queues[0].uploadTrackers[0].sharingGroupUUID else {
+            return nil
+        }
+        
+        return sharingGroupUUID
     }
 }
