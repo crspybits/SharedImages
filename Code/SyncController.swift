@@ -530,6 +530,7 @@ extension SyncController : SyncServerDelegate {
     func syncServerErrorOccurred(error:SyncServerError) {
         let syncServerError = "Server error occurred: \(error)"
         Log.error(syncServerError)
+        turnIdleTimerOn()
         
         // Because these errors (a) result in UI prompts, and (b) we don't want too frequent of UI prompts, make sure there are not too many close together in time.
         let currErrorTime = Date()
@@ -575,6 +576,18 @@ extension SyncController : SyncServerDelegate {
     }
 #endif
 
+    private func turnIdleTimerOff() {
+        // 1/25/19; See https://github.com/crspybits/SharedImages/issues/157
+        UIApplication.shared.isIdleTimerDisabled = true
+        Log.msg("Idle timer: Off")
+    }
+    
+    private func turnIdleTimerOn() {
+        // 1/25/19; See https://github.com/crspybits/SharedImages/issues/157
+        UIApplication.shared.isIdleTimerDisabled = false
+        Log.msg("Idle timer: On")
+    }
+
     func syncServerEventOccurred(event:SyncEvent) {
         Log.msg("Server event occurred: \(event)")
 
@@ -583,15 +596,21 @@ extension SyncController : SyncServerDelegate {
             delegate.syncEvent(syncController: self, event: .syncDelayed)
 
         case .syncStarted:
+            // 1/25/19; Don't do this here-- because app periodically does a sync, and this causes the screen timeout to be perpetually disabled. Instead doing this when we start a batch of downloads-- i.e., in .willStartDownloads.
+            // turnIdleTimerOff()
+            
             numberOperations = 0
             delegate.syncEvent(syncController: self, event: .syncStarted)
             
         case .serverDown(message: let message):
+            turnIdleTimerOn()
             delegate.syncEvent(syncController: self, event: .syncServerDown)
             SMCoreLib.Alert.show(withTitle: "The server is down for maintenance.", message: message)
             
         case .minimumIOSClientVersion(let minVersion):
             if userNeedsToUpdateAppVersion(minVersion) {
+                turnIdleTimerOn()
+                
                 var message: String
                 #if DEBUG
                     message = "Please update it using TestFlight"
@@ -609,6 +628,7 @@ extension SyncController : SyncServerDelegate {
             }
 
         case .willStartDownloads(numberContentDownloads: let numberContentDownloads, numberDownloadDeletions: let numberDownloadDeletions):
+            turnIdleTimerOff()
             
             numberOperations += Int(numberContentDownloads + numberDownloadDeletions)
             
@@ -679,6 +699,8 @@ extension SyncController : SyncServerDelegate {
             SMCoreLib.Alert.show(withTitle: "Your inviting user was removed from \(albumName).", message: "You will no longer be able to upload new images to this album.")
             
         case .syncDone:
+            turnIdleTimerOn()
+            
             // 8/12/17; https://github.com/crspybits/SharedImages/issues/13
             let syncNeeded = SyncServer.session.sharingGroups.filter {$0.syncNeeded!}
             AppBadge.setBadge(number: syncNeeded.count)

@@ -1,5 +1,9 @@
 SharedImages
 
+Version 0.26.0
+	* Don't lock screen when downloading and in foreground
+		https://github.com/crspybits/SharedImages/issues/157
+
 Version 0.25.0 (1/5/19)
 	* Added progress indicator for Albums screen
 	* Updates from client library.
