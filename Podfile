@@ -11,15 +11,15 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 18.9.0'
-	pod 'SyncServer/Facebook', '~> 18.9.0'
-	pod 'SyncServer/Dropbox', '~> 18.9.0'
-	pod 'SyncServer/Google', '~> 18.9.0'
+# 	pod 'SyncServer', '~> 18.9.0'
+# 	pod 'SyncServer/Facebook', '~> 18.9.0'
+# 	pod 'SyncServer/Dropbox', '~> 18.9.0'
+# 	pod 'SyncServer/Google', '~> 18.9.0'
 
-# 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
-# 	pod 'SyncServer/Google', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Dropbox', :path => '../SyncServer-iOSClient'
+	pod 'SyncServer/Google', :path => '../SyncServer-iOSClient'
 
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 	

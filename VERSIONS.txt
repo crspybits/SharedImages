@@ -1,5 +1,8 @@
 SharedImages
 
+Version 0.26.1
+	* Dealing with bug with background app launching-- to update app badge.
+
 Version 0.26.0
 	* Don't lock screen when downloading and in foreground
 		https://github.com/crspybits/SharedImages/issues/157

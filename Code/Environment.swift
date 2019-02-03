@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SMCoreLib
+import PersistentValue
 
 // System scoped parameters
 
@@ -18,14 +18,20 @@ enum EnvironmentServer : String {
 }
 
 struct Environment {
-    static private var rawEnvironmentServer:SMPersistItemString = SMPersistItemString(name: "Environment.rawEnvironmentServer", initialStringValue: EnvironmentServer.production.rawValue, persistType: .userDefaults)
+    // static private var rawEnvironmentServer:SMPersistItemString = SMPersistItemString(name: "Environment.rawEnvironmentServer", initialStringValue: EnvironmentServer.production.rawValue, persistType: .userDefaults)
+    static private var rawEnvironmentServer = try! PersistentValue<String>(name: "Environment.rawEnvironmentServer", storage: .file)
     
     static var current:EnvironmentServer {
         set {
-            rawEnvironmentServer.stringValue = newValue.rawValue
+            rawEnvironmentServer.value = newValue.rawValue
         }
         get {
-            return EnvironmentServer(rawValue: rawEnvironmentServer.stringValue)!
+            if rawEnvironmentServer.value == nil {
+                return .production
+            }
+            else {
+                return EnvironmentServer(rawValue: rawEnvironmentServer.value!)!
+            }
         }
     }
     

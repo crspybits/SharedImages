@@ -80,7 +80,12 @@ class SyncController {
                 .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
                 .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved,
                 .serverDown, .minimumIOSClientVersion]
-        startPeriodicSync()
+
+        // This is to deal with the app launching in the background, in which case we don't want to start the periodic sync.
+//        if UIApplication.shared.applicationState != .background {
+//            Log.msg("SyncController: startPeriodicSync")
+//            startPeriodicSync()
+//        }
 
         // 12/29/18; [1] So that when app goes into background/foreground, the periodic sync stops and starts. There is separate code in the AppDelegate, in performFetchWithCompletionHandler, that runs infrequently in the background to keep the app badge up to date.
         NotificationCenter.default.addObserver(self, selector:#selector(stopPeriodicSync), name:
