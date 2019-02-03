@@ -81,20 +81,36 @@ class SyncController {
                 .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved,
                 .serverDown, .minimumIOSClientVersion]
 
-        // This is to deal with the app launching in the background, in which case we don't want to start the periodic sync.
-//        if UIApplication.shared.applicationState != .background {
-//            Log.msg("SyncController: startPeriodicSync")
-//            startPeriodicSync()
-//        }
-
         // 12/29/18; [1] So that when app goes into background/foreground, the periodic sync stops and starts. There is separate code in the AppDelegate, in performFetchWithCompletionHandler, that runs infrequently in the background to keep the app badge up to date.
         NotificationCenter.default.addObserver(self, selector:#selector(stopPeriodicSync), name:
             UIApplication.willResignActiveNotification, object: nil)
+        
+        // 2/3/19; Don't get this notification when app first launches, normally.
         NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
             UIApplication.willEnterForegroundNotification, object: nil)
+        
+        // 2/3/19; Adding this because on a normal app launch, the app is in the inactive application state when this method is called. This also deals with lack of willEnterForegroundNotification when app first normally launches.
+        NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
+            UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     @objc private func startPeriodicSync() {
+        Log.msg("SyncController: startPeriodicSync")
+        
+        switch UIApplication.shared.applicationState {
+        case .active:
+            Log.msg("SyncController: Continuing startPeriodicSync because app is active")
+
+        case .background:
+            Log.msg("SyncController: Cancelling startPeriodicSync because app is in background")
+            return
+            
+        // 2/3/19; Get this case when app normally launches.
+        case .inactive:
+            Log.msg("SyncController: Cancelling startPeriodicSync because app is inactive")
+            return
+        }
+        
         timer?.invalidate()   // just in case you had existing `Timer`, `invalidate` it before we lose our reference to it
         timer = Timer.scheduledTimer(withTimeInterval: intervalBetweenPeriodicSyncs, repeats: true) { _ in
             if !SyncServer.session.isSyncing {
