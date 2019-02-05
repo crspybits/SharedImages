@@ -89,7 +89,7 @@ class SyncController {
         NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
             UIApplication.willEnterForegroundNotification, object: nil)
         
-        // 2/3/19; Adding this because on a normal app launch, the app is in the inactive application state when this method is called. This also deals with lack of willEnterForegroundNotification when app first normally launches.
+        // 2/3/19; Adding this because on a normal app launch, the app is in the inactive application state when the init() method is called. This also deals with lack of willEnterForegroundNotification when app first normally launches.
         NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
             UIApplication.didBecomeActiveNotification, object: nil)
     }

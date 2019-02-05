@@ -123,6 +123,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UnreadCountBadge.update()
         Migrations.session.launch()
         ImagesHandler.setup()
+        
+        Log.msg("Completed: didFinishLaunchingWithOptions")
 
         return true
     }
@@ -167,6 +169,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             endBgTask()
         }
     
+        // Hypothesis: I think the problem I'm having is that the signin isn't happening prior to this-- because the network is not detected as online.
         AppBadge.session.setBadge() { (fetchResult:UIBackgroundFetchResult) in
             completionHandler(fetchResult)
             endBgTask()

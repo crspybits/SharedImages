@@ -51,10 +51,12 @@ class AppBadge {
     
     func setBadge(completionHandler: ((UIBackgroundFetchResult) -> Void)?=nil) {
         // 10/31/17; Don't want to call server interface if a user is not signed in because (a) it makes no sense-- how can we interact with the server without a user signed in? and (b) because with the Facebook sign-in, the sign-in process itself causes the app to go into the background and we have badge setting itself operating if the app goes into the background-- and this all messes up the signin.
+        Log.msg("AppBadge.setBadge")
         if AppBadge.badgesAuthorized.boolValue && SignInManager.session.userIsSignedIn {
             self.completionHandler = completionHandler
             ImagesHandler.session.syncEventAction = syncEvent
             
+            Log.msg("AppBadge.setBadge: sync")
             do {
                 try SyncServer.session.sync()
             } catch (let error) {
