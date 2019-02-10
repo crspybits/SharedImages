@@ -11,7 +11,7 @@
 		2987D796FBECCBAD42606057 /* Pods_SharedImagesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */; };
 		830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */; };
 		830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */; };
-		831521712206CC9000CA773D /* PushNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831521702206CC9000CA773D /* PushNotifications.swift */; };
+		831521712206CC9000CA773D /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831521702206CC9000CA773D /* Notifications.swift */; };
 		831A759E20279C76004F330A /* DiscussionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831A759D20279C76004F330A /* DiscussionMessage.swift */; };
 		831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831EEC4B2002D76B001821B9 /* DebugDashboardData.swift */; };
 		831EEC4E2002D76B001821B9 /* TestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831EEC4C2002D76B001821B9 /* TestCases.swift */; };
@@ -97,7 +97,7 @@
 		830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedImagesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedImagesTests.swift; sourceTree = "<group>"; };
 		830B1DFA1EFCC03E0022FCC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		831521702206CC9000CA773D /* PushNotifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushNotifications.swift; sourceTree = "<group>"; };
+		831521702206CC9000CA773D /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		831A759D20279C76004F330A /* DiscussionMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscussionMessage.swift; sourceTree = "<group>"; };
 		831EEC4B2002D76B001821B9 /* DebugDashboardData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugDashboardData.swift; sourceTree = "<group>"; };
 		831EEC4C2002D76B001821B9 /* TestCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestCases.swift; sourceTree = "<group>"; };
@@ -304,6 +304,7 @@
 				834A7E6E2037858800969B18 /* TabControllerDelegate.swift */,
 				834A7E6F2037858800969B18 /* Alert.swift */,
 				834A7E702037858800969B18 /* XibBasics.swift */,
+				831521702206CC9000CA773D /* Notifications.swift */,
 				834A7E712037858800969B18 /* SyncSpinner.swift */,
 				834A7E722037858800969B18 /* AppBadge.swift */,
 				834A7E732037858800969B18 /* Progress Indicator */,
@@ -418,7 +419,6 @@
 			isa = PBXGroup;
 			children = (
 				83F8824B1E712004008F644A /* AppDelegate.swift */,
-				831521702206CC9000CA773D /* PushNotifications.swift */,
 				835A3E461FB954AF009DB032 /* Environment.swift */,
 				8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */,
 				83D0BE1720B0C56200555B73 /* Migrations.swift */,
@@ -776,7 +776,7 @@
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,
 				8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */,
-				831521712206CC9000CA773D /* PushNotifications.swift in Sources */,
+				831521712206CC9000CA773D /* Notifications.swift in Sources */,
 				83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				83E51882215FFD7F005C2374 /* AlbumCell.swift in Sources */,

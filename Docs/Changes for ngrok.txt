@@ -1,5 +1,5 @@
 Info.plist  
-	<key>26898a2d.ngrok.io</key>
+	<key>af9d882b.ngrok.io</key>
 	<dict>
 		<key>NSIncludesSubdomains</key>
 		<true/>
@@ -9,4 +9,4 @@ Info.plist
             
 Server.plist          
 	<key>LocalServerURL</key>
-	<string>http://26898a2d.ngrok.io</string>
+	<string>http://af9d882b.ngrok.io</string>

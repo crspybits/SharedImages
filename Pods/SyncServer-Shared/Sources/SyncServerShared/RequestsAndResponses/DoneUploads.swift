@@ -16,7 +16,7 @@ import PerfectLib
 
 // As part of normal processing, increments the current master version for the sharing group. Calling DoneUploads a second time (immediately after the first) results in 0 files being transferred. i.e., `numberUploadsTransferred` will be 0 for the result of the second operation. This is not considered an error, and the masterVersion is still incremented in this case.
 // This operation optionally enables a sharing group update. This provides a means for the sharing group update to not to be queued on the server.
-
+// And it optionally allows for sending a push notification to members of the sharing group.
 public class DoneUploadsRequest : NSObject, RequestMessage, MasterVersionUpdateRequest {
     // MARK: Properties for use in request message.
     
@@ -35,13 +35,18 @@ public class DoneUploadsRequest : NSObject, RequestMessage, MasterVersionUpdateR
     public static let sharingGroupNameKey = "sharingGroupName"
     public var sharingGroupName: String?
     
+    // Optionally, send a push notification to all members of the sharing group (except for the sender) on a successful DoneUploads. The text of a message for a push notification is application specific and so needs to come from the client.
+    public static let pushNotificationMessageKey = "pushNotificationMessage"
+    public var pushNotificationMessage: String?
+    
     public func nonNilKeys() -> [String] {
         return [ServerEndpoint.masterVersionKey,
             ServerEndpoint.sharingGroupUUIDKey]
     }
     
     public func allKeys() -> [String] {
-        let keys = [DoneUploadsRequest.sharingGroupNameKey]
+        let keys = [DoneUploadsRequest.sharingGroupNameKey,
+            DoneUploadsRequest.pushNotificationMessageKey]
         
 #if DEBUG
         return self.nonNilKeys() + [DoneUploadsRequest.testLockSyncKey] + keys
@@ -61,6 +66,7 @@ public class DoneUploadsRequest : NSObject, RequestMessage, MasterVersionUpdateR
 #endif
 
         self.sharingGroupName = DoneUploadsRequest.sharingGroupNameKey <~~ json
+        self.pushNotificationMessage = DoneUploadsRequest.pushNotificationMessageKey <~~ json
 
         if !self.nonNilKeysHaveValues(in: json) {
 #if SERVER
@@ -80,7 +86,8 @@ public class DoneUploadsRequest : NSObject, RequestMessage, MasterVersionUpdateR
         var result = [
             ServerEndpoint.masterVersionKey ~~> self.masterVersion,
             ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID,
-            DoneUploadsRequest.sharingGroupNameKey ~~> self.sharingGroupName
+            DoneUploadsRequest.sharingGroupNameKey ~~> self.sharingGroupName,
+            DoneUploadsRequest.pushNotificationMessageKey ~~> self.pushNotificationMessage
         ]
         
 #if DEBUG

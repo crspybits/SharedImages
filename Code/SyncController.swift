@@ -201,7 +201,7 @@ class SyncController {
         
         // Separate out the sync so that we can, later, dequeue both syncs should we fail.
         do {
-            try SyncServer.session.sync(sharingGroupUUID: image.sharingGroupUUID!)
+            try SyncServer.session.sync(sharingGroupUUID: image.sharingGroupUUID!, pushNotificationMessage: "Added an image.")
         } catch (let error) {
             // Similar hack like the above.
             TimedCallback.withDuration(2.0) {
@@ -223,7 +223,7 @@ class SyncController {
             // Like before, since discussions are mutable, use uploadCopy.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
             
-            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!)
+            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!, pushNotificationMessage: "Updated image discussion.")
         } catch (let error) {
             Log.error("An error occurred: \(error)")
         }
@@ -236,9 +236,16 @@ class SyncController {
         let discussionUuids = imagesWithDiscussions.map({$0.discussion!.uuid!})
         
         // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
+        
+        var message = "Removed \(images.count) image"
+        if images.count > 1 {
+            message += "s"
+        }
+        message += "."
+        
         do {
             try SyncServer.session.delete(filesWithUUIDs: imageUuids + discussionUuids)
-            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: message)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
             return false

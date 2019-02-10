@@ -124,8 +124,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Migrations.session.launch()
         ImagesHandler.setup()
         
-        PushNotifications.session.register(application: application)
-
         return true
     }
     
@@ -176,15 +174,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        PushNotifications.session.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+        Notifications.session.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        PushNotifications.session.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
+        Notifications.session.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
-        PushNotifications.session.application(application, didReceiveRemoteNotification: userInfo)
+        Notifications.session.application(application, didReceiveRemoteNotification: userInfo)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

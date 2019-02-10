@@ -194,7 +194,7 @@ class AlbumsVC: UIViewController {
             }
         }
         
-        AppBadge.checkForBadgeAuthorization(usingViewController: self)
+        Notifications.checkForNotificationAuthorization(usingViewController: self)
     }
     
     private func layoutSubviews() {

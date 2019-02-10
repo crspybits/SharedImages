@@ -126,6 +126,10 @@ public class ServerEndpoints {
 
     // Removes the calling user from the sharing group given in the request.
     public static let removeUserFromSharingGroup = ServerEndpoint("RemoveUserFromSharingGroup", method: .post, messageType: RemoveUserFromSharingGroupRequest.self, authenticationLevel: .secondary, sharing: Sharing(needsLock: true, minPermission: nil))
+    
+    // MARK: Push Notifications
+    
+    public static let registerPushNotificationToken = ServerEndpoint("RegisterPushNotificationToken", method: .post, messageType: RegisterPushNotificationTokenRequest.self, authenticationLevel: .secondary)
 
     public static let session = ServerEndpoints()
     
@@ -141,6 +145,8 @@ public class ServerEndpoints {
             ServerEndpoints.redeemSharingInvitation,
             ServerEndpoints.createSharingGroup, ServerEndpoints.removeSharingGroup,
             ServerEndpoints.updateSharingGroup,
-            ServerEndpoints.removeUserFromSharingGroup])
+            ServerEndpoints.removeUserFromSharingGroup,
+            
+            ServerEndpoints.registerPushNotificationToken])
     }
 }
