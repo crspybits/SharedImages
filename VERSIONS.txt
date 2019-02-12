@@ -2,6 +2,7 @@ SharedImages
 
 Version 0.27.0
 	* Added push notifications
+	* Fixed issue where progress indicator would display (and not be removed) when you changed the name of an album.
 
 Version 0.26.0
 	* Don't lock screen when downloading and in foreground

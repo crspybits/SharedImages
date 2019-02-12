@@ -662,8 +662,11 @@ extension SyncController : SyncServerDelegate {
                 self.delayedCrash()
 #endif
             }
-        
-            Progress.session.start(withTotalNumber: Int(numberContentUploads + numberUploadDeletions))
+
+            // Don't display progress indicator if we're only doing sharing group operations. No point-- these operations are relatively quick.
+            if numberOperations > 0 {
+                Progress.session.start(withTotalNumber: numberOperations)
+            }
             
         case .singleFileUploadComplete(attr: let attr):
             let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
