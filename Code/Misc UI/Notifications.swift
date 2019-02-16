@@ -96,6 +96,7 @@ class Notifications {
         Log.error("\(error)")
     }
     
+    // Given [2] in AppDelegate, this is no longer needed or called.
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
         Log.msg("didReceiveRemoteNotification: \(userInfo)")
         SMCoreLib.Alert.show(withTitle: "Push Notification!", message: "Got a push notification: \(userInfo)")

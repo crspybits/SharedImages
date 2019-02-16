@@ -13,6 +13,7 @@ import SyncServer
 import Fabric
 import Crashlytics
 import rosterdev
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -124,6 +125,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Migrations.session.launch()
         ImagesHandler.setup()
         
+        // For [2] below.
+        UNUserNotificationCenter.current().delegate = self
+        
         return true
     }
     
@@ -182,7 +186,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
-        Notifications.session.application(application, didReceiveRemoteNotification: userInfo)
+        // Not needed or called given [2].
+        // Notifications.session.application(application, didReceiveRemoteNotification: userInfo)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -208,6 +213,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    // [2]. This method will be called when app received push notifications in foreground
+    // See also https://stackoverflow.com/questions/14872088/get-push-notification-while-app-in-foreground-ios
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .badge, .sound])
     }
 }
 
