@@ -53,7 +53,7 @@ public class SyncServerUser {
     
     private init() {
         // Check to see if the device has a UUID already.
-        if SyncServerUser.mobileDeviceUUID.value.count == 0 {
+        if SyncServerUser.mobileDeviceUUID.value == nil {
             SyncServerUser.mobileDeviceUUID.value = UUID.make()
         }
         
@@ -229,11 +229,20 @@ public class SyncServerUser {
             })
         }
     }
+    
+    /// Register the APNS token for the users device.
+    public func registerPushNotificationToken(token: String, completion:((Error?)->())?) {
+        ServerAPI.session.registerPushNotificationToken(token: token) { error in
+            Thread.runSync(onMainThread: {
+                completion?(error)
+            })
+        }
+    }
 }
 
 extension SyncServerUser : ServerAPIDelegate {    
     func deviceUUID(forServerAPI: ServerAPI) -> Foundation.UUID {
-        return Foundation.UUID(uuidString: SyncServerUser.mobileDeviceUUID.value)!
+        return Foundation.UUID(uuidString: SyncServerUser.mobileDeviceUUID.value!)!
     }
 
     func userWasUnauthorized(forServerAPI: ServerAPI) {

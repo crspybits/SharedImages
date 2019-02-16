@@ -30,7 +30,9 @@ class DropboxSavedCreds : NSObject, NSCoding {
     // This is what we're sending up the server. From the code docs from Dropbox: `The user's unique Dropbox ID.`
     var accountId: String!
     
+    // [1] Change to using PersistentValue .file to avoid issues with background launches.
     static private var data = SMPersistItemData(name: "DropboxSavedCreds.data", initialDataValue: Data(), persistType: .userDefaults)
+    static private var data2 = try! PersistentValue<Data>(name: "DropboxSavedCreds.data", storage: .file)
 
     init(uid:String, accountId:String, displayName:String, email:String) {
         self.uid = uid
@@ -55,11 +57,16 @@ class DropboxSavedCreds : NSObject, NSCoding {
     
     func save() {
         let data = NSKeyedArchiver.archivedData(withRootObject: self)
-        DropboxSavedCreds.data.dataValue = data
+        DropboxSavedCreds.data2.value = data
     }
     
     static func retrieve() -> DropboxSavedCreds? {
-        if let object = NSKeyedUnarchiver.unarchiveObject(with: DropboxSavedCreds.data.dataValue) as? DropboxSavedCreds {
+        // See [1].
+        if DropboxSavedCreds.data2.value == nil {
+            DropboxSavedCreds.data2.value = DropboxSavedCreds.data.dataValue
+        }
+        
+        if let object = NSKeyedUnarchiver.unarchiveObject(with: DropboxSavedCreds.data2.value!) as? DropboxSavedCreds {
             return object
         }
         else {
@@ -127,7 +134,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
             }
         }
         get {
-            if DropboxSyncServerSignIn.accessToken.value.count == 0 {
+            if DropboxSyncServerSignIn.accessToken.value == nil {
                 return nil
             }
             else {

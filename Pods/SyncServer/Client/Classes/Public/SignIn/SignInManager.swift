@@ -10,6 +10,7 @@
 import Foundation
 import SMCoreLib
 import SyncServer_Shared
+import PersistentValue
 
 // This class needs to be derived from NSObject because of use of `Network.session().connectionStateCallbacks` below.
 public class SignInManager : NSObject {
@@ -18,7 +19,9 @@ public class SignInManager : NSObject {
     public static var currentUserId = SMPersistItemString(name:"SignInManager.currentUserId", initialStringValue:"",  persistType: .userDefaults)
     
     /// The class name of the current GenericSignIn
-    static var currentSignInName = SMPersistItemString(name:"SignInManager.currentSignIn", initialStringValue:"", persistType: .userDefaults)
+    // [1] Changing to using PersistentValue .file to deal with background launching.
+    static var currentSignInName0 = SMPersistItemString(name:"SignInManager.currentSignIn", initialStringValue:"", persistType: .userDefaults)
+    static var currentSignInName = try! PersistentValue<String>(name: "SignInManager.currentSignIn", storage: .file)
 
     public static let session = SignInManager()
     
@@ -29,6 +32,11 @@ public class SignInManager : NSObject {
         super.init()
         signInStateChanged.resetTargets!()
         _ = Network.session().connectionStateCallbacks.addTarget!(self, with: #selector(networkChangedState))
+        
+        // See [1].
+        if SignInManager.currentSignInName.value == nil && SignInManager.currentSignInName0.stringValue != "" {
+            SignInManager.currentSignInName.value = SignInManager.currentSignInName0.stringValue
+        }
     }
     
     @objc private func networkChangedState() {
@@ -67,10 +75,10 @@ public class SignInManager : NSObject {
         didSet {
             if currentSignIn == nil {
                 SyncServerUser.session.creds = nil
-                SignInManager.currentSignInName.stringValue = ""
+                SignInManager.currentSignInName.value = nil
             }
             else {
-                SignInManager.currentSignInName.stringValue = stringNameForSignIn(currentSignIn!)
+                SignInManager.currentSignInName.value = stringNameForSignIn(currentSignIn!)
             }
         }
     }
@@ -99,7 +107,7 @@ public class SignInManager : NSObject {
         signIn.managerDelegate = self
         
         func userSignedIn(withSignInName name: String) -> Bool {
-            return SignInManager.currentSignInName.stringValue == name
+            return SignInManager.currentSignInName.value == name
         }
         
         signIn.appLaunchSetup(userSignedIn: userSignedIn(withSignInName: name), withLaunchOptions: options)
@@ -116,7 +124,7 @@ public class SignInManager : NSObject {
     public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         
         for signIn in alternativeSignIns {
-            if SignInManager.currentSignInName.stringValue == stringNameForSignIn(signIn) {
+            if SignInManager.currentSignInName.value == stringNameForSignIn(signIn) {
                 return signIn.application(app, open: url, options: options)
             }
         }

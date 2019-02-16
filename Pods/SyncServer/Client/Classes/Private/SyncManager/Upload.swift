@@ -577,7 +577,8 @@ class Upload {
         var errorCheckingForSharingGroupUpdate = false
         var sharingGroupNameUpdate: String?
         var sharingGroupUpdate: SharingGroupUploadTracker?
-
+        var pushNotificationMessage:String?
+        
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
             sharingEntry = SharingEntry.fetchObjectWithUUID(uuid: sharingGroupUUID)
             guard !sharingEntry.removedFromGroup else {
@@ -594,6 +595,8 @@ class Upload {
                 errorCheckingForSharingGroupUpdate = true
                 return
             }
+            
+            pushNotificationMessage = uploadQueue!.pushNotificationMessage
 
             let updates = uploadQueue!.sharingGroupUploadTrackers.filter {$0.sharingGroupOperation == .update}
             if updates.count > 0 {
@@ -627,7 +630,7 @@ class Upload {
             return
         }
         
-        ServerAPI.session.doneUploads(serverMasterVersion: masterVersion, sharingGroupUUID: sharingGroupUUID, sharingGroupNameUpdate: sharingGroupNameUpdate) { (result, error) in
+        ServerAPI.session.doneUploads(serverMasterVersion: masterVersion, sharingGroupUUID: sharingGroupUUID, sharingGroupNameUpdate: sharingGroupNameUpdate, pushNotificationMessage: pushNotificationMessage) { (result, error) in
             guard error == nil else {
                 completion?(.error(error!))
                 return

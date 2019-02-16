@@ -2,7 +2,7 @@
 //  UploadQueue+CoreDataProperties.swift
 //  SyncServer
 //
-//  Created by Christopher G Prince on 9/3/18.
+//  Created by Christopher G Prince on 2/9/19.
 //
 //
 
@@ -16,6 +16,7 @@ extension UploadQueue {
         return NSFetchRequest<UploadQueue>(entityName: "UploadQueue")
     }
 
+    @NSManaged public var pushNotificationMessage: String?
     @NSManaged public var pendingSync: Singleton?
     @NSManaged public var synced: UploadQueues?
     @NSManaged public var uploads: NSOrderedSet?

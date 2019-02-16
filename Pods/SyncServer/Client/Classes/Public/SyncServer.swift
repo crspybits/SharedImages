@@ -886,6 +886,8 @@ public class SyncServer: NSObject {
         1) If you give a non-nil sharingGroupUUID, if no other `sync` is taking place, this will asynchronously do pending downloads, file uploads, and upload deletions for the given sharing group. If there is a `sync` currently taking place (for any sharing group), this closes the collection of uploads/deletions queued (if any) for the sharingGroupUUID, and will wait until after the current sync is done, and try again. Also synchronizes the `sharingGroups` property with the server.
      
             In this case you can also give reAttemptGoneDownloads = true, which will reattempt downloads for files previously marked as gone. See SyncAttributes.
+
+            You can also give pushNotificationMessage in this case, which will be sent to all other users in the sharing group as a push notification.
      
         2) If you give a nil-sharingGroupUUID, only synchronizes the `sharingGroups` property. Doesn't do pending downloads or uploads etc. And doesn't close a collection of queued operations (reAttemptGoneDownloads ignored in this case).
 
@@ -895,8 +897,8 @@ public class SyncServer: NSObject {
      
         Non-blocking in all cases.
     */
-    public func sync(sharingGroupUUID: String? = nil, reAttemptGoneDownloads: Bool = false) throws {
-        try sync(sharingGroupUUID:sharingGroupUUID, reAttemptGoneDownloads: reAttemptGoneDownloads, completion:nil)
+    public func sync(sharingGroupUUID: String? = nil, reAttemptGoneDownloads: Bool = false, pushNotificationMessage: String? = nil) throws {
+        try sync(sharingGroupUUID:sharingGroupUUID, reAttemptGoneDownloads: reAttemptGoneDownloads, pushNotificationMessage: pushNotificationMessage, completion:nil)
     }
     
     /// Is there a `sync` operation in progress?
@@ -909,7 +911,7 @@ public class SyncServer: NSObject {
         return result
     }
     
-    func sync(sharingGroupUUID: String?, reAttemptGoneDownloads: Bool = false, completion:(()->())?) throws {
+    func sync(sharingGroupUUID: String?, reAttemptGoneDownloads: Bool = false, pushNotificationMessage: String? = nil, completion:(()->())?) throws {
         var doStart = true
         
         var errorToThrow: Error?
@@ -934,6 +936,11 @@ public class SyncServer: NSObject {
                                 pendingSync.uploadTrackers.count > 1 {
                                 errorToThrow = SyncServerError.generic("Attempt to remove sharing group user, but other operations also in queue!")
                                 return
+                            }
+                            
+                            if let pushNotificationMessage = pushNotificationMessage {
+                                pendingSync.pushNotificationMessage = pushNotificationMessage
+                                try CoreData.sessionNamed(Constants.coreDataName).context.save()
                             }
                             
                             haveUploads = true

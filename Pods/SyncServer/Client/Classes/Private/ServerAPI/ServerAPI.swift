@@ -375,7 +375,7 @@ class ServerAPI {
     }
     
     // I'm providing a numberOfDeletions parameter here because the duration of these requests varies, if we're doing deletions, based on the number of items we're deleting.
-    func doneUploads(serverMasterVersion:MasterVersionInt!, sharingGroupUUID: String, numberOfDeletions:UInt = 0, sharingGroupNameUpdate: String? = nil, completion:((DoneUploadsResult?, SyncServerError?)->(Void))?) {
+    func doneUploads(serverMasterVersion:MasterVersionInt!, sharingGroupUUID: String, numberOfDeletions:UInt = 0, sharingGroupNameUpdate: String? = nil, pushNotificationMessage: String? = nil, completion:((DoneUploadsResult?, SyncServerError?)->(Void))?) {
         let endpoint = ServerEndpoints.doneUploads
         
         // See https://developer.apple.com/reference/foundation/nsurlsessionconfiguration/1408259-timeoutintervalforrequest
@@ -391,6 +391,10 @@ class ServerAPI {
         
         if let sharingGroupNameUpdate = sharingGroupNameUpdate {
             params[DoneUploadsRequest.sharingGroupNameKey] = sharingGroupNameUpdate
+        }
+        
+        if let pushNotificationMessage = pushNotificationMessage {
+            params[DoneUploadsRequest.pushNotificationMessageKey] = pushNotificationMessage
         }
         
 #if DEBUG
@@ -955,6 +959,35 @@ extension ServerAPI : ServerNetworkingDelegate {
 #endif
         
         return result
+    }
+
+    public func registerPushNotificationToken(token: String, completion:((Error?)->())?) {
+        let endpoint = ServerEndpoints.registerPushNotificationToken
+        
+        let params:[String : Any] = [
+            RegisterPushNotificationTokenRequest.pushNotificationTokenKey: token
+        ]
+        
+        guard let registerPNToken = RegisterPushNotificationTokenRequest(json: params) else {
+            completion?(SyncServerError.couldNotCreateRequest)
+            return
+        }
+        
+        let parameters = registerPNToken.urlParameters()!
+        let url = makeURL(forEndpoint: endpoint, parameters: parameters)
+
+        sendRequestUsing(method: endpoint.method,
+            toURL: url) { (response,  httpStatus, error) in
+            
+            let error = self.checkForError(statusCode: httpStatus, error: error)
+
+            guard error == nil else {
+                completion?(error)
+                return
+            }
+            
+            completion?(nil)
+        }
     }
 }
 
