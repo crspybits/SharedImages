@@ -1,6 +1,6 @@
 SharedImages
 
-Version 0.27.0
+Version 0.27.0 (2/17/19)
 	* Added push notifications
 	* Fixed issue where progress indicator would display (and not be removed) when you changed the name of an album.
 
