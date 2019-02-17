@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.26.0</string>
+	<string>0.27.0</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -45,7 +45,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>201901252117</string>
+	<string>201902172045</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -81,6 +81,13 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>af9d882b.ngrok.io</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
 			<key>syncserver.cprince.com</key>
 			<dict>
 				<key>NSIncludesSubdomains</key>
@@ -89,13 +96,6 @@
 				<string>TLSv1.0</string>
 				<key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
 				<false/>
-			</dict>
-			<key>af9d882b.ngrok.io</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
 			</dict>
 		</dict>
 	</dict>
