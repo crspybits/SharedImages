@@ -1,5 +1,11 @@
 SharedImages
 
+Version 0.27.1 (2/18/19)
+	* Updated iOS Client to fix issue
+		See https://github.com/crspybits/SharedImages/issues/158
+	* Commented out background fetch (for app badge update) until bug resolved.
+	* Added constraint for user-signed in to do sync.
+	
 Version 0.27.0 (2/17/19)
 	* Added push notifications
 	* Fixed issue where progress indicator would display (and not be removed) when you changed the name of an album.

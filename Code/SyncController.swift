@@ -92,7 +92,7 @@ class SyncController {
     @objc private func startPeriodicSync() {
         timer?.invalidate()   // just in case you had existing `Timer`, `invalidate` it before we lose our reference to it
         timer = Timer.scheduledTimer(withTimeInterval: intervalBetweenPeriodicSyncs, repeats: true) { _ in
-            if !SyncServer.session.isSyncing {
+            if !SyncServer.session.isSyncing && SignInManager.session.userIsSignedIn {
                 do {
                     try SyncServer.session.sync()
                 } catch (let error) {

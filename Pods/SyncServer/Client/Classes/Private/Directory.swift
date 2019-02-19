@@ -175,7 +175,7 @@ class Directory {
                 
                 // This will really only ever happen in testing: A situation where the DirectoryEntry has been created for the file uuid, but we don't have a fileVersion assigned. e.g., The file gets uploaded (not using the sync system), then uploaded by the sync system, and then we get the download that was created not using the sync system.
 #if !DEBUG
-                if entry.fileVersion! < dft.fileVersion {
+                if entry.fileVersion! >= dft.fileVersion {
                     Thread.runSync(onMainThread: {[unowned self] in
                         self.delegate.syncServerErrorOccurred(error:
                             .downloadedFileVersionNotGreaterThanCurrent)

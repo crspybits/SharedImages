@@ -112,8 +112,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Log.error("Error doing local consistency check: \(error)")
         }
         
-        let minimumBackgroundFetchIntervalOneHour:TimeInterval = 60 * 60
-        application.setMinimumBackgroundFetchInterval(minimumBackgroundFetchIntervalOneHour)
+        // 2/18/19; Until I get issues with background fetching resolved.
+        // let minimumBackgroundFetchIntervalOneHour:TimeInterval = 60 * 60
+        // application.setMinimumBackgroundFetchInterval(minimumBackgroundFetchIntervalOneHour)
 
         Fabric.with([Crashlytics.self])
         
