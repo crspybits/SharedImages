@@ -1,5 +1,8 @@
 SharedImages
 
+Version
+	* Improved error message on a syncError.
+	
 Version 0.27.1 (2/18/19)
 	* Updated iOS Client to fix issue
 		See https://github.com/crspybits/SharedImages/issues/158

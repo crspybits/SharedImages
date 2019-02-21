@@ -137,9 +137,9 @@ class AlbumsVC: UIViewController {
             updateSharingGroups()
             Progress.session.finish()
             
-        case .syncError(message: _):
+        case .syncError(message: let message):
             activityIndicator.stopAnimating()
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "An error occurred!")
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "An error occurred: \(message)")
             
         case .syncStarted:
             activityIndicator.startAnimating()
