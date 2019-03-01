@@ -112,7 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Log.error("Error doing local consistency check: \(error)")
         }
         
-        // 2/18/19; Until I get issues with background fetching resolved.
+        // 2/18/19; [3] Until I get issues with background fetching resolved.
         // let minimumBackgroundFetchIntervalOneHour:TimeInterval = 60 * 60
         // application.setMinimumBackgroundFetchInterval(minimumBackgroundFetchIntervalOneHour)
 
@@ -159,6 +159,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // I've had been having issues with getting this to work. For troubleshooting, see https://stackoverflow.com/questions/39197933/how-to-troubleshoot-ios-background-app-fetch-not-working
     // https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623125-application
     // The "final" fix was to run a `beginBackgroundTask`. See the above SO link.
+    // 2/27/19; Commented this out, along with [3] above-- don't want background fetch until I get some issues resolved.
+#if false
     func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
     
         var bgTaskId:UIBackgroundTaskIdentifier!
@@ -177,6 +179,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             endBgTask()
         }
     }
+#endif
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Notifications.session.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
@@ -200,12 +203,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        ImagesHandler.session.appDidEnterBackground()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        ImagesHandler.session.appWillEnterForeground()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {

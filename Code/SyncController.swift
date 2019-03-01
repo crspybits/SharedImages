@@ -72,7 +72,7 @@ class SyncController {
     private var syncDone:(()->())?
     private var lastReportedErrorTime: Date?
     let intervalBetweenPeriodicSyncs: TimeInterval = 60
-    weak var timer: Timer?
+    var timer: Timer?
 
     init() {
         SyncServer.session.delegate = self
@@ -80,19 +80,31 @@ class SyncController {
                 .singleFileUploadComplete, .singleFileUploadGone, .singleUploadDeletionComplete,
                 .sharingGroupUploadOperationCompleted, .sharingGroupOwningUserRemoved,
                 .serverDown, .minimumIOSClientVersion]
+
         startPeriodicSync()
 
         // 12/29/18; [1] So that when app goes into background/foreground, the periodic sync stops and starts. There is separate code in the AppDelegate, in performFetchWithCompletionHandler, that runs infrequently in the background to keep the app badge up to date.
-        NotificationCenter.default.addObserver(self, selector:#selector(stopPeriodicSync), name:
-            UIApplication.willResignActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
-            UIApplication.willEnterForegroundNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector:#selector(stopPeriodicSync), name:
+//            UIApplication.willResignActiveNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector:#selector(startPeriodicSync), name:
+//            UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    // Not called on app initial launch.
+    func appWillEnterForeground() {
+        startPeriodicSync()
+    }
+    
+    func appDidEnterBackground() {
+        stopPeriodicSync()
     }
 
     @objc private func startPeriodicSync() {
-        timer?.invalidate()   // just in case you had existing `Timer`, `invalidate` it before we lose our reference to it
+        Log.msg("startPeriodicSync")
+        timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: intervalBetweenPeriodicSyncs, repeats: true) { _ in
             if !SyncServer.session.isSyncing && SignInManager.session.userIsSignedIn {
+                Log.msg("startPeriodicSync: sync")
                 do {
                     try SyncServer.session.sync()
                 } catch (let error) {
@@ -104,6 +116,7 @@ class SyncController {
 
     @objc private func stopPeriodicSync() {
         timer?.invalidate()
+        timer = nil
     }
     
     weak var delegate:SyncControllerDelegate!
@@ -111,6 +124,7 @@ class SyncController {
     
     func sync(sharingGroupUUID: String, completion: (()->())? = nil) throws {
         syncDone = completion
+        Log.msg("About to do SyncController.sync sync")
         try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
     }
     

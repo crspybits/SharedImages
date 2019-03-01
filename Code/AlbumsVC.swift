@@ -66,8 +66,10 @@ class AlbumsVC: UIViewController {
     }
     
     @objc private func refresh() {
+
         self.refreshControl.endRefreshing()
         
+        Log.msg("About to do refresh sync")
         do {
             try SyncServer.session.sync()
         } catch (let error) {
@@ -187,6 +189,7 @@ class AlbumsVC: UIViewController {
             SharingInviteDelegate.invitationRedeemed = false
             
             activityIndicator.startAnimating()
+            Log.msg("About to do AlbumsVC.viewDidAppear sync")
             do {
                 try SyncServer.session.sync()
             } catch (let error) {

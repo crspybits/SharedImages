@@ -25,6 +25,7 @@ class AppBadge {
             self.completionHandler = completionHandler
             ImagesHandler.session.syncEventAction = syncEvent
             
+            Log.msg("About to do setBadge sync")
             do {
                 try SyncServer.session.sync()
             } catch (let error) {

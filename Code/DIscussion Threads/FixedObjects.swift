@@ -51,7 +51,7 @@ struct FixedObjects: Sequence, Equatable {
     subscript(index: String) -> ConvertableToJSON? {
         get {
             if index == elementsKey {
-                Log.error("Cannot use key: \(elementsKey)")
+                Log.error("Cannot use key (getter): \(index)")
                 return nil
             }
             else {
@@ -60,8 +60,10 @@ struct FixedObjects: Sequence, Equatable {
         }
         
         set(newValue) {
-            if index != elementsKey {
-                Log.error("Cannot use key: \(elementsKey)")
+            if index == elementsKey {
+                Log.error("Cannot use key (setter): \(index)")
+            }
+            else {
                 mainDictionary[index] = newValue
             }
         }

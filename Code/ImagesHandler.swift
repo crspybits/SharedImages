@@ -28,6 +28,14 @@ class ImagesHandler {
         _ = ImagesHandler.session
     }
     
+    func appWillEnterForeground() {
+        syncController.appWillEnterForeground()
+    }
+    
+    func appDidEnterBackground() {
+        syncController.appDidEnterBackground()
+    }
+    
     @discardableResult
     func addOrUpdateLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
         var theImage:Image!

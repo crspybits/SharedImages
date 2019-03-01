@@ -2,6 +2,7 @@ SharedImages
 
 Version
 	* Improved error message on a syncError.
+	* Fixed background fetch issue: It was still occurring, but wasn't supposed to be.
 	
 Version 0.27.1 (2/18/19)
 	* Updated iOS Client to fix issue
