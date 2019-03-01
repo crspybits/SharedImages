@@ -72,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.18.6"), failoverMessageURL: failoverURL)
     
         // Used by SMEmail in messages where email isn't allowed.
-        SMUIMessages.session().appName = "Shared Images"
+        SMUIMessages.session().appName = "Neebla"
 
         let coreDataSession = CoreData(options: [
             CoreDataBundleModelName: "SharedImages",

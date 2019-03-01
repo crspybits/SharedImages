@@ -48,7 +48,7 @@ class SettingsVC : UIViewController {
             
             email.addAttachmentData(logFileData, mimeType: "text/plain", fileName: Log.logFileName)
 
-            let versionDetails = SMEmail.getVersionDetails(for: "SharedImages")!
+            let versionDetails = SMEmail.getVersionDetails(for: "Neebla")!
             email.setMessageBody(versionDetails, isHTML: false)
             email.setSubject("Log for developer of SharedImages")
             email.setToRecipients(["chris@SpasticMuffin.biz"])
