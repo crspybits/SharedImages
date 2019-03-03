@@ -433,15 +433,15 @@ class ImagesVC: UIViewController {
             if error == nil {
                 let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
                 if let email = SMEmail(parentViewController: self) {
-                    let message = "I'd like to share an album of images with you through the SharedImages app and your Dropbox, Facebook, or Google account. To share images, you need to:\n" +
-                        "1) download the SharedImages iOS app onto your iPhone or iPad,\n" +
+                    let message = "I'd like to share an album of images with you through the Neebla app and your Dropbox, Facebook, or Google account. To share images, you need to:\n" +
+                        "1) download the Neebla iOS app onto your iPhone or iPad,\n" +
                         "2) tap the link below in the Apple Mail app, and\n" +
                         "3) follow the instructions within the app to sign in to your Dropbox, Facebook, or Google account.\n" +
                         "You will have " + permission.userFriendlyText() + " access to images.\n\n" +
                             sharingURLString
                     
                     email.setMessageBody(message, isHTML: false)
-                    email.setSubject("Share images using the SharedImages app")
+                    email.setSubject("Share images using the Neebla app")
                     email.show()
                 }
             }
