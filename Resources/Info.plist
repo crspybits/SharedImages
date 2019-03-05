@@ -47,7 +47,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>201903031604</string>
+	<string>201903041947</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -106,7 +106,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>to save a copy of your image from your album.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>to pick an image to store in your cloud storage.</string>
+	<string>to pick an image to store in your cloud storage, or save a copy of your image from your album.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
