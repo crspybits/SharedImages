@@ -102,11 +102,11 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>to take photos to store in your cloud storage</string>
+	<string>to take photos to store in your cloud storage.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires access to the photo library to save your image.</string>
+	<string>to save a copy of your image from your album.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to the photo library.</string>
+	<string>to pick an image to store in your cloud storage.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
