@@ -1,9 +1,10 @@
 SharedImages
 
-Version 1.0.0 (3/3/19)
+Version 1.0.0 (3/10/19)
 	* Improved error message on a syncError.
 	* Fixed background fetch issue: It was still occurring, but wasn't supposed to be.
 	* Fixed some Neebla text-branding.
+	* First version on the Apple App Store!
 	
 Version 0.27.1 (2/18/19)
 	* Updated iOS Client to fix issue
