@@ -319,6 +319,11 @@ class Upload {
             }
             
             nextToUpload.appMetaDataVersion = directoryEntry!.appMetaDataVersionToUpload(appMetaDataUpdate: nextToUpload.appMetaData)
+
+            guard nextToUpload.appMetaDataVersion != nil && nextToUpload.appMetaData != nil else {
+                nextResult = .error(.generic("Nil nextToUpload.appMetaDataVersion and/or nextToUpload.appMetaData!"))
+                return
+            }
             
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
@@ -327,7 +332,7 @@ class Upload {
                 return
             }
             
-            appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
+            appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion!, contents: nextToUpload.appMetaData!)
             fileUUID = nextToUpload.fileUUID
             
             // It's OK to use the sharing group id from the upload tracker-- since we've already made the decision about which sharing group we're uploading.
@@ -444,14 +449,18 @@ class Upload {
             nextToUpload.uploadUndeletion = nextToUpload.uploadUndeletion ||
                 (!directoryEntry!.deletedLocally && directoryEntry!.deletedOnServer)
             
+            var appMetaData:AppMetaData?
+            
+            if nextToUpload.appMetaDataVersion != nil && nextToUpload.appMetaData != nil  {
+                appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion!, contents: nextToUpload.appMetaData!)
+            }
+            
             do {
                 try CoreData.sessionNamed(Constants.coreDataName).context.save()
             } catch (let error) {
                 nextResult = .error(.coreDataError(error))
                 return
             }
-            
-            let appMetaData = AppMetaData(version: nextToUpload.appMetaDataVersion, contents: nextToUpload.appMetaData)
             
             let mimeType = MimeType(rawValue: nextToUpload.mimeType!)!
             file = ServerAPI.File(localURL: nextToUpload.localURL as URL?, fileUUID: nextToUpload.fileUUID, fileGroupUUID: nextToUpload.fileGroupUUID, sharingGroupUUID: nextToUpload.sharingGroupUUID, mimeType: mimeType, deviceUUID:self.deviceUUID, appMetaData: appMetaData, fileVersion: nextToUpload.fileVersion, checkSum: nextToUpload.checkSum!)

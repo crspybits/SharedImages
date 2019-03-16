@@ -6,75 +6,53 @@
 //
 
 import Foundation
-import Gloss
 
-#if SERVER
-import Kitura
-#endif
+public class UpdateSharingGroupRequest : RequestMessage, MasterVersionUpdateRequest {
+    required public init() {}
 
-public class UpdateSharingGroupRequest : NSObject, RequestMessage, MasterVersionUpdateRequest {
     public var masterVersion:MasterVersionInt!
-
+    private static let masterVersionKey = "masterVersion"
+    
     // I'm having problems uploading complex objects in url parameters. So not sending a SharingGroup object yet. If I need to do this, looks like I'll have to use the request body and am not doing that yet.
     public var sharingGroupUUID:String!
     
-    public static let sharingGroupNameKey = "sharingGroupName"
     public var sharingGroupName: String?
-    
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-    
-    public required init?(json: JSON) {
-        super.init()
-        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
-        self.sharingGroupName = UpdateSharingGroupRequest.sharingGroupNameKey <~~ json
-        self.masterVersion = Decoder.decode(int64ForKey: ServerEndpoint.masterVersionKey)(json)
-        
-        if !nonNilKeysHaveValues(in: json) {
-            return nil
-        }
+
+    public func valid() -> Bool {
+        return sharingGroupUUID != nil && sharingGroupName != nil && masterVersion != nil
     }
     
-    public func toJSON() -> JSON? {
-        return jsonify([
-            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID,
-            UpdateSharingGroupRequest.sharingGroupNameKey ~~> self.sharingGroupName,
-            ServerEndpoint.masterVersionKey ~~> self.masterVersion
-        ])
-    }
+   private static func customConversions(dictionary: [String: Any]) -> [String: Any] {
+        var result = dictionary
     
-    public func nonNilKeys() -> [String] {
-        return [ServerEndpoint.sharingGroupUUIDKey, UpdateSharingGroupRequest.sharingGroupNameKey,
-            ServerEndpoint.masterVersionKey]
+        // Unfortunate customization due to https://bugs.swift.org/browse/SR-5249
+        MessageDecoder.convert(key: masterVersionKey, dictionary: &result) {MasterVersionInt($0)}
+        return result
     }
-    
-    public func allKeys() -> [String] {
-        return self.nonNilKeys()
+
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(UpdateSharingGroupRequest.self, from: customConversions(dictionary: dictionary))
     }
 }
 
 public class UpdateSharingGroupResponse : ResponseMessage, MasterVersionUpdateResponse {
+    required public init() {}
+
     public var masterVersionUpdate: MasterVersionInt?
-    
+    private static let masterVersionUpdateKey = "masterVersionUpdate"
+
     public var responseType: ResponseType {
         return .json
     }
     
-    public required init?(json: JSON) {
-        self.masterVersionUpdate = Decoder.decode(int64ForKey: ServerEndpoint.masterVersionUpdateKey)(json)
+    // Unfortunate customization due to https://bugs.swift.org/browse/SR-5249
+    private static func customConversions(dictionary: [String: Any]) -> [String: Any] {
+        var result = dictionary
+        MessageDecoder.convert(key: masterVersionUpdateKey, dictionary: &result) {MasterVersionInt($0)}
+        return result
     }
     
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-            ServerEndpoint.masterVersionUpdateKey ~~> self.masterVersionUpdate
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> UpdateSharingGroupResponse {
+        return try MessageDecoder.decode(UpdateSharingGroupResponse.self, from: customConversions(dictionary: dictionary))
     }
 }

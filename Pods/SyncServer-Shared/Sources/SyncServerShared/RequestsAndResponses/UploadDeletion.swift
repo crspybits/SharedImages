@@ -7,122 +7,81 @@
 //
 
 import Foundation
-import Gloss
-
-#if SERVER
-import Kitura
-#endif
 
 // This places a deletion request in the Upload table on the server. A DoneUploads request is subsequently required to actually perform the deletion in cloud storage.
 // An upload deletion can be repeated for the same file: This doesn't cause an error and doesn't duplicate rows in the Upload table.
 
-public class UploadDeletionRequest : NSObject, RequestMessage, Filenaming {
+public class UploadDeletionRequest : RequestMessage, Filenaming {
+    required public init() {}
+
     // The use of the Filenaming protocol here is to support the DEBUG `actualDeletion` parameter.
     
     // MARK: Properties for use in request message.
     
-    public static let fileUUIDKey = "fileUUID"
     public var fileUUID:String!
     
     // This must indicate the current version of the file in the FileIndex.
-    public static let fileVersionKey = "fileVersion"
     public var fileVersion:FileVersionInt!
+    private static let fileVersionKey = "fileVersion"
     
     // Overall version for files for the sharing group; assigned by the server.
-    public static let masterVersionKey = "masterVersion"
     public var masterVersion:MasterVersionInt!
-    
+    private static let masterVersionKey = "masterVersion"
+
     public var sharingGroupUUID: String!
 
 #if DEBUG
     // Enable the client to actually delete files-- for testing purposes. The UploadDeletionRequest will not queue the request, but instead deletes from both the FileIndex and from cloud storage.
-    public static let actualDeletionKey = "actualDeletion"
-    public var actualDeletion:Int32? // Should be 0 or non-0; I haven't been able to get Bool to work with Gloss
+    public var actualDeletion:Bool?
+    private static let actualDeletionKey = "actualDeletion"
 #endif
-    
-    public func nonNilKeys() -> [String] {
-        return [UploadDeletionRequest.fileUUIDKey, UploadDeletionRequest.fileVersionKey, UploadDeletionRequest.masterVersionKey,
-            ServerEndpoint.sharingGroupUUIDKey]
-    }
-    
-    public func allKeys() -> [String] {
-        var keys = [String]()
-        keys += self.nonNilKeys()
-#if DEBUG
-        keys += [UploadDeletionRequest.actualDeletionKey]
-#endif
-        return keys
-    }
-    
-    public required init?(json: JSON) {
-        super.init()
-        
-        self.fileUUID = UploadDeletionRequest.fileUUIDKey <~~ json
-        
-        self.masterVersion = Decoder.decode(int64ForKey: UploadDeletionRequest.masterVersionKey)(json)
-        self.fileVersion = Decoder.decode(int32ForKey: UploadDeletionRequest.fileVersionKey)(json)
-        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
-        
-#if DEBUG
-        self.actualDeletion = Decoder.decode(int32ForKey:  UploadDeletionRequest.actualDeletionKey)(json)
-#endif
-        
-        if !nonNilKeysHaveValues(in: json) {
-            return nil
+
+    public func valid() -> Bool {
+        guard fileUUID != nil && fileVersion != nil && masterVersion != nil && sharingGroupUUID != nil else {
+            return false
         }
         
-        guard let _ = NSUUID(uuidString: self.fileUUID) else {
-            return nil
-        }
+        return true
     }
     
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-    
-    public func toJSON() -> JSON? {
-        var param:[JSON?] = []
+    private static func customConversions(dictionary: [String: Any]) -> [String: Any] {
+        var result = dictionary
         
-        param += [
-            UploadDeletionRequest.fileUUIDKey ~~> self.fileUUID,
-            UploadDeletionRequest.masterVersionKey ~~> self.masterVersion,
-            UploadDeletionRequest.fileVersionKey ~~> self.fileVersion,
-            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
-        ]
-        
+        // Unfortunate customization due to https://bugs.swift.org/browse/SR-5249
+        MessageDecoder.convert(key: fileVersionKey, dictionary: &result) {FileVersionInt($0)}
+        MessageDecoder.convert(key: masterVersionKey, dictionary: &result) {MasterVersionInt($0)}
 #if DEBUG
-        param += [
-            UploadDeletionRequest.actualDeletionKey ~~> self.actualDeletion
-        ]
+        MessageDecoder.convertBool(key: actualDeletionKey, dictionary: &result)
 #endif
-        
-        return jsonify(param)
+        return result
+    }
+
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(UploadDeletionRequest.self, from: customConversions(dictionary: dictionary))
     }
 }
 
 public class UploadDeletionResponse : ResponseMessage {
+    required public init() {}
+
     public var responseType: ResponseType {
         return .json
     }
     
     // If the master version for the user on the server has been incremented, this key will be present in the response-- with the new value of the master version. The upload deletion was not attempted in this case.
-    public static let masterVersionUpdateKey = "masterVersionUpdate"
     public var masterVersionUpdate:Int64?
-    
-    public required init?(json: JSON) {
-        self.masterVersionUpdate = Decoder.decode(int64ForKey:  UploadDeletionResponse.masterVersionUpdateKey)(json)        
+    private static let masterVersionUpdateKey = "masterVersionUpdate"
+
+    private static func customConversions(dictionary: [String: Any]) -> [String: Any] {
+        var result = dictionary
+        
+        // Unfortunate customization due to https://bugs.swift.org/browse/SR-5249
+        MessageDecoder.convert(key: masterVersionUpdateKey, dictionary: &result) {MasterVersionInt($0)}
+
+        return result
     }
-    
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-            UploadDeletionResponse.masterVersionUpdateKey ~~> self.masterVersionUpdate
-        ])
+
+    public static func decode(_ dictionary: [String: Any]) throws -> UploadDeletionResponse {
+        return try MessageDecoder.decode(UploadDeletionResponse.self, from: customConversions(dictionary: dictionary))
     }
 }

@@ -168,7 +168,7 @@ public class SharingEntry: NSManagedObject, CoreDataModel, AllOperations {
                 
                 // Not going to mark localSharingGroup as `syncNeeded`. We're not a member of it now-- we'd get an error if we tried to sync with this sharing group.
                 
-                let deletedSharingGroup = SharingGroup()!
+                let deletedSharingGroup = SharingGroup()
                 deletedSharingGroup.sharingGroupUUID = localSharingGroup.sharingGroupUUID
                 deletedSharingGroup.sharingGroupName = localSharingGroup.sharingGroupName
                 deletedSharingGroup.permission = localSharingGroup.permission

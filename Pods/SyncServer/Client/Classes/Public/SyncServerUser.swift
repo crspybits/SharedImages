@@ -9,7 +9,6 @@
 import Foundation
 import SMCoreLib
 import SyncServer_Shared
-import Gloss
 import PersistentValue
 
 public class SyncServerUser {

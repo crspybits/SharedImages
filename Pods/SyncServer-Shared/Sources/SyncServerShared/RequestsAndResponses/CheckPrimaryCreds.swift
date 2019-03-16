@@ -7,48 +7,27 @@
 //
 
 import Foundation
-import Gloss
 
-#if SERVER
-import Kitura
-#endif
+public class CheckPrimaryCredsRequest : RequestMessage {
+    required public init() {}
 
-public class CheckPrimaryCredsRequest : NSObject, RequestMessage {
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-    
-    public required init?(json: JSON) {
-        super.init()
-        
-        if !nonNilKeysHaveValues(in: json) {
-            return nil
-        }
+    public func valid() -> Bool {
+        return true
     }
     
-    public func toJSON() -> JSON? {
-        return jsonify([
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(CheckPrimaryCredsRequest.self, from: dictionary)
     }
 }
 
 public class CheckPrimaryCredsResponse : ResponseMessage {
+    required public init() {}
+
     public var responseType: ResponseType {
         return .json
     }
     
-    public required init?(json: JSON) {
-    }
-    
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> CheckPrimaryCredsResponse {
+        return try MessageDecoder.decode(CheckPrimaryCredsResponse.self, from: dictionary)
     }
 }

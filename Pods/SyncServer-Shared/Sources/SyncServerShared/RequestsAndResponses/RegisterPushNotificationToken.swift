@@ -6,69 +6,35 @@
 //
 
 import Foundation
-import Gloss
-
-#if SERVER
-import Kitura
-#endif
 
 // Enable an app to register a Push Notification token.
 
-public class RegisterPushNotificationTokenRequest : NSObject, RequestMessage {
-    public static let pushNotificationTokenKey = "pushNotificationToken"
+public class RegisterPushNotificationTokenRequest : RequestMessage {
+    required public init() {}
+
     public var pushNotificationToken: String!
     
-    public func nonNilKeys() -> [String] {
-        return [RegisterPushNotificationTokenRequest.pushNotificationTokenKey]
-    }
-    
-    public func allKeys() -> [String] {
-        var keys = [String]()
-        keys += self.nonNilKeys()
-
-        return keys
-    }
-    
-    public required init?(json: JSON) {
-        super.init()
-        
-        self.pushNotificationToken = RegisterPushNotificationTokenRequest.pushNotificationTokenKey <~~ json
-        
-        if !nonNilKeysHaveValues(in: json) {
-            return nil
+    public func valid() -> Bool {
+        guard pushNotificationToken != nil else {
+            return false
         }
-    }
-    
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-    
-    public func toJSON() -> JSON? {
-        var param:[JSON?] = []
         
-        param += [RegisterPushNotificationTokenRequest.pushNotificationTokenKey ~~> self.pushNotificationToken]
-
-        return jsonify(param)
+        return true
+    }
+    
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(RegisterPushNotificationTokenRequest.self, from: dictionary)
     }
 }
 
 public class RegisterPushNotificationTokenResponse : ResponseMessage {
+    required public init() {}
+
     public var responseType: ResponseType {
         return .json
     }
     
-    public required init?(json: JSON) {
-    }
-    
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> RegisterPushNotificationTokenResponse {
+        return try MessageDecoder.decode(RegisterPushNotificationTokenResponse.self, from: dictionary)
     }
 }

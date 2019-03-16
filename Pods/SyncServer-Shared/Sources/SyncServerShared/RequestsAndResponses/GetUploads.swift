@@ -7,73 +7,36 @@
 //
 
 import Foundation
-import Gloss
-
-#if SERVER
-import Kitura
-#endif
 
 // Request an index of file uploads (UploadFile) and upload deletions (UploadDeleletion) -- queries the meta data on the sync server. The uploads are specific both to the user and the deviceUUID of the user.
 
-public class GetUploadsRequest : NSObject, RequestMessage {
+public class GetUploadsRequest : RequestMessage {
+    required public init() {}
+
     // MARK: Properties for use in request message.
 
     public var sharingGroupUUID: String!
 
-    public func nonNilKeys() -> [String] {
-        return [ServerEndpoint.sharingGroupUUIDKey]
+    public func valid() -> Bool {
+        return sharingGroupUUID != nil
     }
     
-    public func allKeys() -> [String] {
-        return self.nonNilKeys()
-    }
-    
-    public required init?(json: JSON) {
-        super.init()
-        
-        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
-        
-#if SERVER
-        if !nonNilKeysHaveValues(in: json) {
-            return nil
-        }
-#endif
-    }
-    
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-
-    public func toJSON() -> JSON? {
-        return jsonify([
-            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(GetUploadsRequest.self, from: dictionary)
     }
 }
 
 public class GetUploadsResponse : ResponseMessage {
+    required public init() {}
+
     public var responseType: ResponseType {
         return .json
     }
     
     // FileInfo objects don't contain `cloudStorageType`.
-    public static let uploadsKey = "uploads"
     public var uploads:[FileInfo]?
     
-    public required init?(json: JSON) {
-        self.uploads = GetUploadsResponse.uploadsKey <~~ json
-    }
-    
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-            GetUploadsResponse.uploadsKey ~~> self.uploads
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> GetUploadsResponse {
+        return try MessageDecoder.decode(GetUploadsResponse.self, from: dictionary)
     }
 }

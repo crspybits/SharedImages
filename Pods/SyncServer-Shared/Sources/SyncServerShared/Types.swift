@@ -34,7 +34,7 @@ public enum AuthenticationLevel {
     case secondary // must also have a record of user in our database tables
 }
 
-public enum Permission : String {
+public enum Permission : String, Codable {
     case read // aka download
     case write // aka upload; includes read
     case admin // read, write, and invite

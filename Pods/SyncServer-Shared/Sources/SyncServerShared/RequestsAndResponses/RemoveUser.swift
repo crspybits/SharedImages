@@ -7,45 +7,29 @@
 //
 
 import Foundation
-import Gloss
 
-#if SERVER
-import Kitura
-#endif
-
-public class RemoveUserRequest : NSObject, RequestMessage {
+public class RemoveUserRequest : RequestMessage {
+    required public init() {}
+    
     // No specific user info is required here because the HTTP auth headers are used to identify the user to be removed. i.e., for now a user can only remove themselves.
-    public required init?(json: JSON) {
-        super.init()
+
+    public func valid() -> Bool {
+        return true
     }
     
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-    
-    public func toJSON() -> JSON? {
-        return jsonify([
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(RemoveUserRequest.self, from: dictionary)
     }
 }
 
 public class RemoveUserResponse : ResponseMessage {
+    required public init() {}
+
     public var responseType: ResponseType {
         return .json
     }
-    
-    public required init?(json: JSON) {
-    }
-    
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-        ])
+
+    public static func decode(_ dictionary: [String: Any]) throws -> RemoveUserResponse {
+        return try MessageDecoder.decode(RemoveUserResponse.self, from: dictionary)
     }
 }

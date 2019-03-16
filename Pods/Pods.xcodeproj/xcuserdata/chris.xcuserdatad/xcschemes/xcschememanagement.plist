@@ -49,11 +49,6 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Gloss.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>HPTextViewTapGestureRecognizer.xcscheme</key>
 		<dict>
 			<key>isShown</key>

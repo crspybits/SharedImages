@@ -7,13 +7,9 @@
 //
 
 import Foundation
-import Gloss
 
-#if SERVER
-import Kitura
-#endif
-
-public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertible, Filenaming, Hashable {
+public class FileInfo : Codable, CustomStringConvertible, Filenaming, Hashable {
+    required public init() {}
 
     public var hashValue: Int {
         return fileUUID.hashValue
@@ -23,92 +19,33 @@ public class FileInfo : Gloss.Encodable, Gloss.Decodable, CustomStringConvertibl
         return lhs.fileUUID == rhs.fileUUID
     }
     
-    public static let fileUUIDKey = "fileUUID"
     public var fileUUID: String!
-    
-    public static let deviceUUIDKey = "deviceUUID"
     public var deviceUUID: String?
-    
-    public static let fileGroupUUIDKey = "fileGroupUUID"
     public var fileGroupUUID: String?
-    
     public var sharingGroupUUID:String!
 
     // The creation & update dates are not used on upload-- they are established from dates on the server so they are not dependent on possibly mis-behaving clients.
-    
-    public static let creationDateKey = "creationDate"
     public var creationDate: Date?
  
     // Based on updating the contents only (not purely app meta data updates). I.e., calls to UploadFile.
-    public static let updateDateKey = "updateDate"
     public var updateDate: Date?
     
-    public static let mimeTypeKey = "mimeType"
     public var mimeType: String?
     
-    public static let deletedKey = "deleted"
     public var deleted:Bool! = false
 
     // Optional because this will be nil if a file has no app meta data.
-    public static let appMetaDataVersionKey = "appMetaDataVersion"
     public var appMetaDataVersion: AppMetaDataVersionInt?
     
-    public static let fileVersionKey = "fileVersion"
     public var fileVersion: FileVersionInt!
     
     // OWNER
-    public static let owningUserIdKey = "owningUserId"
     public var owningUserId: UserId!
     
-    public static let cloudStorageTypeKey = "cloudStorageType"
     public var cloudStorageType: String!
     
     public var description: String {
         return "fileUUID: \(String(describing: fileUUID)); deviceUUID: \(String(describing: deviceUUID)); creationDate: \(String(describing: creationDate)); updateDate: \(String(describing: updateDate)); mimeTypeKey: \(String(describing: mimeType)); deleted: \(String(describing: deleted)); fileVersion: \(String(describing: fileVersion)); appMetaDataVersion: \(String(describing: appMetaDataVersion))"
-    }
-    
-    required public init?(json: JSON) {
-        self.fileUUID = FileInfo.fileUUIDKey <~~ json
-        self.deviceUUID = FileInfo.deviceUUIDKey <~~ json
-        self.fileGroupUUID = FileInfo.fileGroupUUIDKey <~~ json
-        self.mimeType = FileInfo.mimeTypeKey <~~ json
-        self.deleted = FileInfo.deletedKey <~~ json
-        
-        self.appMetaDataVersion = Decoder.decode(int32ForKey: FileInfo.appMetaDataVersionKey)(json)
-
-        self.fileVersion = Decoder.decode(int32ForKey: FileInfo.fileVersionKey)(json)
-        
-        let dateFormatter = DateExtras.getDateFormatter(format: .DATETIME)
-        self.creationDate = Decoder.decode(dateForKey: FileInfo.creationDateKey, dateFormatter: dateFormatter)(json)
-        self.updateDate = Decoder.decode(dateForKey: FileInfo.updateDateKey, dateFormatter: dateFormatter)(json)
-        
-        self.owningUserId = Decoder.decode(int64ForKey: FileInfo.owningUserIdKey)(json)
-        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
-        
-        self.cloudStorageType = FileInfo.cloudStorageTypeKey <~~ json
-    }
-    
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    public func toJSON() -> JSON? {
-        let dateFormatter = DateExtras.getDateFormatter(format: .DATETIME)
-
-        return jsonify([
-            FileInfo.fileUUIDKey ~~> self.fileUUID,
-            FileInfo.deviceUUIDKey ~~> self.deviceUUID,
-            FileInfo.fileGroupUUIDKey ~~> self.fileGroupUUID,
-            FileInfo.mimeTypeKey ~~> self.mimeType,
-            FileInfo.appMetaDataVersionKey ~~> self.appMetaDataVersion,
-            FileInfo.deletedKey ~~> self.deleted,
-            FileInfo.fileVersionKey ~~> self.fileVersion,
-            Encoder.encode(dateForKey: FileInfo.creationDateKey, dateFormatter: dateFormatter)(self.creationDate),
-            Encoder.encode(dateForKey: FileInfo.updateDateKey, dateFormatter: dateFormatter)(self.updateDate),
-            FileInfo.owningUserIdKey ~~> self.owningUserId,
-            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID,
-            FileInfo.cloudStorageTypeKey ~~> self.cloudStorageType
-        ])
     }
 }
 

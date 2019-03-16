@@ -6,68 +6,50 @@
 //
 
 import Foundation
-import Gloss
 
-#if SERVER
-import Kitura
-#endif
+public class RemoveSharingGroupRequest : RequestMessage, MasterVersionUpdateRequest {
+    required public init() {}
 
-public class RemoveSharingGroupRequest : NSObject, RequestMessage, MasterVersionUpdateRequest {
     public var masterVersion: MasterVersionInt!
+    private static let masterVersionKey = "masterVersion"
     
     public var sharingGroupUUID:String!
     
-#if SERVER
-    public required convenience init?(request: RouterRequest) {
-        self.init(json: request.queryParameters)
-    }
-#endif
-    
-    public required init?(json: JSON) {
-        super.init()
-        self.sharingGroupUUID = ServerEndpoint.sharingGroupUUIDKey <~~ json
-        self.masterVersion = Decoder.decode(int64ForKey: ServerEndpoint.masterVersionKey)(json)
-        
-        if !nonNilKeysHaveValues(in: json) {
-            return nil
-        }
+    public func valid() -> Bool {
+        return sharingGroupUUID != nil && masterVersion != nil
     }
     
-    public func toJSON() -> JSON? {
-        return jsonify([
-            ServerEndpoint.sharingGroupUUIDKey ~~> self.sharingGroupUUID,
-            ServerEndpoint.masterVersionKey ~~> self.masterVersion
-        ])
-    }
+   private static func customConversions(dictionary: [String: Any]) -> [String: Any] {
+        var result = dictionary
     
-    public func nonNilKeys() -> [String] {
-        return [ServerEndpoint.sharingGroupUUIDKey, ServerEndpoint.masterVersionKey]
+        // Unfortunate customization due to https://bugs.swift.org/browse/SR-5249
+        MessageDecoder.convert(key: masterVersionKey, dictionary: &result) {MasterVersionInt($0)}
+        return result
     }
-    
-    public func allKeys() -> [String] {
-        return self.nonNilKeys()
+
+    public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {
+        return try MessageDecoder.decode(RemoveSharingGroupRequest.self, from: customConversions(dictionary: dictionary))
     }
 }
 
 public class RemoveSharingGroupResponse : ResponseMessage, MasterVersionUpdateResponse {
+    required public init() {}
+
     public var masterVersionUpdate: MasterVersionInt?
-    
+    private static let masterVersionUpdateKey = "masterVersionUpdate"
+
     public var responseType: ResponseType {
         return .json
     }
     
-    public required init?(json: JSON) {
-        self.masterVersionUpdate = Decoder.decode(int64ForKey: ServerEndpoint.masterVersionUpdateKey)(json)
+    // Unfortunate customization due to https://bugs.swift.org/browse/SR-5249
+    private static func customConversions(dictionary: [String: Any]) -> [String: Any] {
+        var result = dictionary
+        MessageDecoder.convert(key: masterVersionUpdateKey, dictionary: &result) {MasterVersionInt($0)}
+        return result
     }
     
-    public convenience init?() {
-        self.init(json:[:])
-    }
-    
-    // MARK: - Serialization
-    public func toJSON() -> JSON? {
-        return jsonify([
-            ServerEndpoint.masterVersionUpdateKey ~~> self.masterVersionUpdate
-        ])
+    public static func decode(_ dictionary: [String: Any]) throws -> RemoveSharingGroupResponse {
+        return try MessageDecoder.decode(RemoveSharingGroupResponse.self, from: customConversions(dictionary: dictionary))
     }
 }
