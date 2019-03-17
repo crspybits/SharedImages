@@ -55,62 +55,75 @@ class LRUCache<DataSource:CacheDataSource> {
         self.maxCost = maxCost
     }
     
+    private func sync(closure: () -> ()) {
+        objc_sync_enter(self)
+        closure()
+        objc_sync_exit(self)
+    }
+    
     // If data is cached, returns it. If data is not cached obtains, caches, and returns it.
     func getItem(from dataSource:DataSource, with args:Arg) -> CacheData {
-        let key = dataSource.keyFor(args: args)
-        
-        if let cachedData = contents[key] {
-            // Remove key from lruKeys and put it at start-- gotta keep that LRU property.
-            lruKeys.remove(key)
-            lruKeys.insert(key, at: 0)
-            return cachedData
-        }
-        
-        func evictItem(withKey key: String) {
-            let item = contents[key]!
-#if DEBUG
-            dataSource.evictedItemFromCache(item)
-#endif
+        var result: DataSource.CachedData!
 
-            if maxCost != nil {
-                print("currentCost, before eviction: \(currentCost)")
-                currentCost -= UInt64(dataSource.costFor(item)!)
+        // Without this sync, I get crashes with rapid scrolling.
+        sync {
+            let key = dataSource.keyFor(args: args)
+            
+            if let cachedData = contents[key] {
+                // Remove key from lruKeys and put it at start-- gotta keep that LRU property.
+                lruKeys.remove(key)
+                lruKeys.insert(key, at: 0)
+                result = cachedData
+                return
             }
             
-            lruKeys.remove(key)
-            contents[key] = nil
-        }
-        
-        // Check if we've exceed item limit in the cache.
-        if lruKeys.count == Int(maxItems) {
-            // Evict LRU key and data
-            let lruKey = lruKeys.object(at: lruKeys.count-1) as! String
-            evictItem(withKey: lruKey)
-        }
-        
-        let newItemForCache = dataSource.cacheDataFor(args: args)
-        
-        // We may have to evict item(s) due to extra cost.
-        if maxCost != nil {
-            let extraCost = dataSource.costFor(newItemForCache)!
+            func evictItem(withKey key: String) {
+                let item = contents[key]!
+#if DEBUG
+                dataSource.evictedItemFromCache(item)
+#endif
+
+                if maxCost != nil {
+                    print("currentCost, before eviction: \(currentCost)")
+                    currentCost -= UInt64(dataSource.costFor(item)!)
+                }
+                
+                lruKeys.remove(key)
+                contents[key] = nil
+            }
             
-            // Need to bring the cost of the current items down, in an LRU manner.
-            while (UInt64(extraCost) + UInt64(currentCost) > maxCost!) && lruKeys.count > 0 {
+            // Check if we've exceed item limit in the cache.
+            if lruKeys.count == Int(maxItems) {
+                // Evict LRU key and data
                 let lruKey = lruKeys.object(at: lruKeys.count-1) as! String
                 evictItem(withKey: lruKey)
             }
             
-            currentCost += UInt64(extraCost)
-        }
-        
-        // Add new data in.
-        lruKeys.insert(key, at: 0)
-        contents[key] = newItemForCache
+            let newItemForCache = dataSource.cacheDataFor(args: args)
+            
+            // We may have to evict item(s) due to extra cost.
+            if maxCost != nil {
+                let extraCost = dataSource.costFor(newItemForCache)!
+                
+                // Need to bring the cost of the current items down, in an LRU manner.
+                while (UInt64(extraCost) + UInt64(currentCost) > maxCost!) && lruKeys.count > 0 {
+                    let lruKey = lruKeys.object(at: lruKeys.count-1) as! String
+                    evictItem(withKey: lruKey)
+                }
+                
+                currentCost += UInt64(extraCost)
+            }
+            
+            // Add new data in.
+            lruKeys.insert(key, at: 0)
+            contents[key] = newItemForCache
         
 #if DEBUG
-        dataSource.cachedItem(newItemForCache)
+            dataSource.cachedItem(newItemForCache)
 #endif
-
-        return newItemForCache
+            result = newItemForCache
+        }
+        
+        return result
     }
 }

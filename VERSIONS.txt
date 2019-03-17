@@ -2,8 +2,11 @@ SharedImages
 
 Version 1.2.0
 	* Added multi-image select when uploading images from photo library.
-	* Fixed issue where initial Google Sign-in prompt still showed "SharedImages" by changing product name in build settings.
-	(See also https://stackoverflow.com/questions/50448989)
+	* Fixed issue where initial Google Sign-in prompt still showed "SharedImages"
+		Did this by changing product name in build settings.
+		(See also https://stackoverflow.com/questions/50448989)
+	* Improved scrolling on the main screen within albums.
+		Previously, it had been quite jerky.
 
 Version 1.1.0
 	* Updates for new version of iOS client library.

@@ -161,9 +161,18 @@ class ImageCollectionVC : UICollectionViewCell {
         
         let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: size)
         
-        // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode
-        // 11/29/17; I just got it again, while running attached to the debugger. In this case, `imageCache` was nil. I added a guard statement above to deal with this.
-        imageView.image = imageCache.getItem(from: image, with: smallerSize)
+        DispatchQueue.global().async {[weak self] in
+            if let self = self {
+                let cachedImage = imageCache.getItem(from: self.image, with: smallerSize)
+                
+                DispatchQueue.main.async {
+                    // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode
+                    // 11/29/17; I just got it again, while running attached to the debugger. In this case, `imageCache` was nil. I added a guard statement above to deal with this.
+                    self.imageView.image = cachedImage
+                }
+            }
+        }
+        
         
         originalSize = smallerSize
     }
