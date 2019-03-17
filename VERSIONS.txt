@@ -1,6 +1,6 @@
 SharedImages
 
-Version 1.1.0
+Version 1.1.0 (3/17/19)
 	* Updates for new version of iOS client library.
 
 Version 1.0.0 (3/10/19)
