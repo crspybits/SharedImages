@@ -38,7 +38,27 @@ public class AcquireImages: NSObject {
     }
     
     private func showAlert(fromType type: ShowFromType) {
-        let alert = UIAlertController(title: "Get an image?", message: nil, preferredStyle: .actionSheet)
+        switch PHPhotoLibrary.authorizationStatus() {
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization {[weak self] status in
+                DispatchQueue.main.async {
+                    switch status {
+                    case .authorized:
+                        self?.showAlertAux(fromType: type)
+                    default:
+                        break
+                    }
+                }
+            }
+        case .restricted, .denied:
+            break
+        case .authorized:
+            self.showAlertAux(fromType: type)
+        }
+    }
+    
+    private func showAlertAux(fromType type: ShowFromType) {
+        let alert = UIAlertController(title: "Get image(s)?", message: nil, preferredStyle: .actionSheet)
         
         switch type {
         case .barButton(let barButton):
@@ -57,6 +77,7 @@ public class AcquireImages: NSObject {
                 let imagePicker = UIImagePickerController()
                 imagePicker.sourceType = .camera
                 imagePicker.allowsEditing = false
+                imagePicker.delegate = self
                 self.parentViewController.present(imagePicker, animated: true, completion: nil)
             })
         }

@@ -1,12 +1,17 @@
-Info.plist  
-	<key>af9d882b.ngrok.io</key>
-	<dict>
-		<key>NSIncludesSubdomains</key>
-		<true/>
-		<key>NSExceptionAllowsInsecureHTTPLoads</key>
-		<true/>
-	</dict>
-            
-Server.plist          
-	<key>LocalServerURL</key>
-	<string>http://af9d882b.ngrok.io</string>
+Launch ngrok
+	(download at https://ngrok.com)
+	~/bin/ngrok http 8080
+	
+App changes:
+	Info.plist  
+		<key>af9d882b.ngrok.io</key>
+		<dict>
+			<key>NSIncludesSubdomains</key>
+			<true/>
+			<key>NSExceptionAllowsInsecureHTTPLoads</key>
+			<true/>
+		</dict>
+			
+	Server.plist          
+		<key>LocalServerURL</key>
+		<string>http://af9d882b.ngrok.io</string>
