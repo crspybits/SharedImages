@@ -1,0 +1,6 @@
+framework module NohanaImagePicker {
+  umbrella header "NohanaImagePicker-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -31,6 +31,7 @@
 		834A7E802037858800969B18 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E772037858800969B18 /* Types.swift */; };
 		834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834E3E9220B3FF90006AC504 /* BottomRefresh.swift */; };
 		835A3E471FB954AF009DB032 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A3E461FB954AF009DB032 /* Environment.swift */; };
+		835A8A96223DB9ED0000FEA0 /* AcquireImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
 		8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8380D2672161A6DC008D6231 /* Badge+Extras.swift */; };
@@ -119,6 +120,7 @@
 		834A7E772037858800969B18 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		834E3E9220B3FF90006AC504 /* BottomRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomRefresh.swift; sourceTree = "<group>"; };
 		835A3E461FB954AF009DB032 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcquireImages.swift; sourceTree = "<group>"; };
 		8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages7.xcdatamodel; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 				8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */,
 				83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */,
 				83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */,
+				835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -671,6 +674,7 @@
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
 				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
+				"${BUILT_PRODUCTS_DIR}/NohanaImagePicker/NohanaImagePicker.framework",
 				"${BUILT_PRODUCTS_DIR}/ODRefreshControl/ODRefreshControl.framework",
 				"${BUILT_PRODUCTS_DIR}/PersistentValue/PersistentValue.framework",
 				"${BUILT_PRODUCTS_DIR}/Presentr/Presentr.framework",
@@ -701,6 +705,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NohanaImagePicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ODRefreshControl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PersistentValue.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Presentr.framework",
@@ -779,6 +784,7 @@
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				83E51882215FFD7F005C2374 /* AlbumCell.swift in Sources */,
 				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,
+				835A8A96223DB9ED0000FEA0 /* AcquireImages.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
 				834A7E792037858800969B18 /* Alert.swift in Sources */,
 				835A3E471FB954AF009DB032 /* Environment.swift in Sources */,

@@ -53,6 +53,9 @@ target 'SharedImages' do
     pod 'DropDown', '~> 2.3'
 	# pod 'DropDown', :path => '../DropDown'
 	# pod 'DropDown', :git => 'https://github.com/crspybits/DropDown.git'
+
+	pod 'NohanaImagePicker', :git => 'https://github.com/crspybits/NohanaImagePicker.git'
+	# pod 'NohanaImagePicker', :path => '../NohanaImagePicker'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

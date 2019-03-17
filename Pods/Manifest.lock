@@ -30,6 +30,7 @@ PODS:
   - LottiesBottom (0.5.0):
     - lottie-ios (~> 2.1)
   - MessageKit (0.13.5)
+  - NohanaImagePicker (0.9.3)
   - ODRefreshControl (1.2)
   - PersistentValue (0.3.0):
     - KeychainAccess (~> 3.1)
@@ -88,6 +89,7 @@ DEPENDENCIES:
   - Fabric
   - LottiesBottom (~> 0.5)
   - MessageKit (~> 0.13)
+  - NohanaImagePicker (from `https://github.com/crspybits/NohanaImagePicker.git`)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - Presentr (~> 1.3)
   - rosterdev (~> 0.1)
@@ -131,10 +133,15 @@ SPEC REPOS:
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
+  NohanaImagePicker:
+    :git: https://github.com/crspybits/NohanaImagePicker.git
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
 
 CHECKOUT OPTIONS:
+  NohanaImagePicker:
+    :commit: c3c893e4e6c3085b2bb5c31908c452385ecd5daa
+    :git: https://github.com/crspybits/NohanaImagePicker.git
   ODRefreshControl:
     :commit: ffaaf9d7d44306d36c9959a26a0132f62851bcfb
     :git: https://github.com/crspybits/ODRefreshControl.git
@@ -156,6 +163,7 @@ SPEC CHECKSUMS:
   lottie-ios: a50d5c0160425cd4b01b852bb9578963e6d92d31
   LottiesBottom: a3428d59b99264d08a79870e74118de7fb0c24c8
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
+  NohanaImagePicker: 1c67a853625c7700409362195e11bb7c00f10d18
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
   PersistentValue: 95a7398a6e0854854283d9d7360cd3c8d7e4a619
   Presentr: 7078d7eb5d1661ebeaae60c9e42a1e534de1b993
@@ -170,6 +178,6 @@ SPEC CHECKSUMS:
   SyncServer: 5c9dff02957400b47e54782762fcfbf01eb68f62
   SyncServer-Shared: 336b54037b6a305d4477f8302a4c7136952e98a9
 
-PODFILE CHECKSUM: f12bcdd11cb65c5b67ecee093e30430ed0d7e0b3
+PODFILE CHECKSUM: f0e17bfb23c4489a959a5b2f879475990531f521
 
 COCOAPODS: 1.5.3

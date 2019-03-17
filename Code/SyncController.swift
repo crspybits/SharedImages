@@ -151,39 +151,75 @@ class SyncController {
         return nil
     }
     
-    // Add new image and discussion
-    func add(image:Image, discussion: Discussion) {
+    // Add new images and discussions
+    func add(imageAndDiscussions:[(image: Image, discussion: Discussion)], errorCleanup: ()->()) {
+        guard imageAndDiscussions.count > 0 else {
+            return
+        }
+        
+        let sharingGroupUUID = imageAndDiscussions[0].image.sharingGroupUUID!
+        
+        for curr in imageAndDiscussions {
+            guard queueUploadImageAndDiscussion(image: curr.image, discussion: curr.discussion) else {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when preparing to sync your image(s).")
+                errorCleanup()
+                return
+            }
+        }
+        
+        var pnMessage: String
+        if imageAndDiscussions.count == 1 {
+            pnMessage = "Added an image."
+        }
+        else {
+            pnMessage = "Added \(imageAndDiscussions.count) images."
+        }
+        
+        // Separate out the sync so that we can, later, dequeue syncs should we fail.
+        do {
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: pnMessage)
+        } catch (let error) {
+            errorCleanup()
+            // Similar hack like the above.
+            TimedCallback.withDuration(2.0) {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to sync your image(s).")
+            }
+            Log.error("An error occurred: \(error)")
+        }
+    }
+    
+    private func queueUploadImageAndDiscussion(image: Image, discussion: Discussion) -> Bool {
         guard let imageMimeTypeEnum = MimeType(rawValue: image.mimeType!) else {
             SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown image mime type: \(image.mimeType!)")
-            return
+            return false
         }
-        
+    
         guard let discussionMimeTypeEnum = MimeType(rawValue: discussion.mimeType!) else {
             SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown discussion mime type: \(discussion.mimeType!)")
-            return
+            return false
         }
-        
+    
         // 12/27/17; Not sending dates to the server-- it establishes the dates.
         var imageAttr = SyncAttributes(fileUUID:image.uuid!, sharingGroupUUID: image.sharingGroupUUID!, mimeType:imageMimeTypeEnum)
-        
+    
         imageAttr.fileGroupUUID = image.fileGroupUUID
-        
+    
         var imageAppMetaData = [String: Any]()
-        
+    
         // 4/17/18; Image titles, for new images, are stored in the "discussion" file.
         // imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
-        
+    
         // 5/13/18; Only storing file type in appMetaData for new files.
         // imageAppMetaData[ImageExtras.appMetaDataDiscussionUUIDKey] = discussion.uuid
-        
+    
         imageAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.image.rawValue
 
         imageAttr.appMetaData = dictToJSONString(imageAppMetaData)
         assert(imageAttr.appMetaData != nil)
-        
+    
         var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupUUID: image.sharingGroupUUID!, mimeType:discussionMimeTypeEnum)
         discussionAttr.fileGroupUUID = discussion.fileGroupUUID
-        
+    
         var discussionAppMetaData = [String: Any]()
         discussionAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.discussion.rawValue
         discussionAttr.appMetaData = dictToJSONString(discussionAppMetaData)
@@ -191,38 +227,25 @@ class SyncController {
 
         do {
             // Make sure to enqueue both the image and discussion for upload without an intervening sync -- they are in the same file group, and this will enable other clients to download them together.
-            
+    
             try SyncServer.session.uploadImmutable(localFile: image.url!, withAttributes: imageAttr)
-            
+    
             // Using uploadCopy for discussions in case the discussion gets updated locally before we complete this sync operation. i.e., discussions are mutable.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
         } catch (let error) {
-            // Also removes the discussion.
-            try? image.remove()
-            image.save()
-            
             // TODO: Need to dequeue the image enqueue if it was the discussion enqueue that failed. See https://github.com/crspybits/SyncServer-iOSClient/issues/62 I'm going to do this really crudely right now.
             try? SyncServer.session.reset(type: .tracking)
-            
+    
             // A hack because otherwise the VC we ned to show the alert is not present: Instead, the UI for image selection is still present.
             TimedCallback.withDuration(2.0) {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to start the upload of your image.")
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to start the upload of your image(s).")
             }
-            
+    
             Log.error("An error occurred: \(error)")
-            return
+            return false
         }
         
-        // Separate out the sync so that we can, later, dequeue both syncs should we fail.
-        do {
-            try SyncServer.session.sync(sharingGroupUUID: image.sharingGroupUUID!, pushNotificationMessage: "Added an image.")
-        } catch (let error) {
-            // Similar hack like the above.
-            TimedCallback.withDuration(2.0) {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to sync your image.")
-            }
-            Log.error("An error occurred: \(error)")
-        }
+        return true
     }
     
     func update(discussion: Discussion) {

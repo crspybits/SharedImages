@@ -21,7 +21,7 @@ class ImagesVC: UIViewController {
     var initialSync = false
     
     let reuseIdentifier = "ImageIcon"
-    var acquireImage:SMAcquireImage!
+    var acquireImages: AcquireImages!
     var otherActionBarButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
     
@@ -57,8 +57,8 @@ class ImagesVC: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
 
-        acquireImage = SMAcquireImage(withParentViewController: self)
-        acquireImage.delegate = self
+        acquireImages = AcquireImages(withParentViewController: self)
+        acquireImages.delegate = self
         
         coreDataSource = CoreDataSource(delegate: self)
         
@@ -137,8 +137,8 @@ class ImagesVC: UIViewController {
         dropDownMenuItems = []
         
         if sharingGroup.permission.hasMinimumPermission(.write) {
-            dropDownMenuItems += [DropDownMenuItem(name: "Add Image", action: {
-                self.acquireImage.showAlert(fromBarButton: self.otherActionBarButton)
+            dropDownMenuItems += [DropDownMenuItem(name: "Add Image(s)", action: {
+                self.acquireImages.showAlert(fromBarButton: self.otherActionBarButton)
             })]
         }
         
@@ -554,29 +554,60 @@ extension ImagesVC : UICollectionViewDataSource {
     }
 }
 
-extension ImagesVC : SMAcquireImageDelegate {
-    // Called before the image is acquired to obtain a URL for the image. A file shouldn't exist at this URL yet.
-    func smAcquireImageURLForNewImage(_ acquireImage:SMAcquireImage) -> SMRelativeLocalURL {
-        return FileExtras().newURLForImage()
+extension ImagesVC : AcquireImagesDelegate {
+    func acquireImagesURLForNewImage(_ acquireImages: AcquireImages) -> URL {
+        return FileExtras().newURLForImage() as URL
     }
     
-    // Called after the image is acquired.
-    func smAcquireImage(_ acquireImage:SMAcquireImage, newImageURL: SMRelativeLocalURL, mimeType:String) {
-    
+    func acquireImages(_ acquireImages: AcquireImages, images: [(newImageURL: URL, mimeType: String)]) {
         // There was a crash here when I force unwrapped both of these. Not sure how. I've changed to to optional chaining. See https://github.com/crspybits/SharedImages/issues/57 We'll get an empty/nil title in that case.
         let userName = SignInManager.session.currentSignIn?.credentials?.username
         if userName == nil {
             Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
         }
         
+        var imageAndDiscussions = [(image: Image, discussion: Discussion)]()
+        
+        func cleanup() {
+            for current in imageAndDiscussions {
+                // Also removes discussion.
+                try? current.image.remove()
+            }
+            
+            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        }
+        
+        for newImage in images {
+            guard let url = newImage.newImageURL as? SMRelativeLocalURL else {
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem converting URL!")
+                cleanup()
+                return
+            }
+            
+            guard let imageAndDiscussion = createImageAndDiscussion(newImageURL: url, mimeType: newImage.mimeType, userName: userName) else {
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating image and discussion!")
+                cleanup()
+                return
+            }
+            
+            imageAndDiscussions += [imageAndDiscussion]
+        }
+        
+        scrollIfNeeded(animated:true)
+        
+        // Sync these new images & discussions with the server.
+        imagesHandler.syncController.add(imageAndDiscussions: imageAndDiscussions, errorCleanup: cleanup)
+    }
+    
+    private func createImageAndDiscussion(newImageURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (image: Image, discussion: Discussion)? {
         guard let mimeTypeEnum = MimeType(rawValue: mimeType) else {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Unknown mime type: \(mimeType)")
-            return
+            return nil
         }
         
         guard let newDiscussionUUID = UUID.make(), let fileGroupUUID = UUID.make() else {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not create  UUID(s)")
-            return
+            return nil
         }
         
         let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID, gone: nil)
@@ -587,16 +618,15 @@ extension ImagesVC : SMAcquireImageDelegate {
         newImage.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
         guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
-            return
+            try? newImage.remove()
+            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+            return nil
         }
         
         let newDiscussion = imagesHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
         newDiscussion.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
-        scrollIfNeeded(animated:true)
-        
-        // Sync this new image & discussion with the server.
-        imagesHandler.syncController.add(image: newImage, discussion: newDiscussion)
+        return (newImage, newDiscussion)
     }
 }
 
