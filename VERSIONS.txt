@@ -1,5 +1,4 @@
 SharedImages
-
 Version 1.2.0
 	* Added multi-image select when uploading images from photo library.
 	* Fixed issue where initial Google Sign-in prompt still showed "SharedImages"
@@ -8,7 +7,7 @@ Version 1.2.0
 	* Improved scrolling on the main screen within albums.
 		Previously, it had been quite jerky.
 
-Version 1.1.0
+Version 1.1.0 (3/17/19)
 	* Updates for new version of iOS client library.
 
 Version 1.0.0 (3/10/19)
@@ -16,13 +15,13 @@ Version 1.0.0 (3/10/19)
 	* Fixed background fetch issue: It was still occurring, but wasn't supposed to be.
 	* Fixed some Neebla text-branding.
 	* First version on the Apple App Store!
-	
+
 Version 0.27.1 (2/18/19)
 	* Updated iOS Client to fix issue
 		See https://github.com/crspybits/SharedImages/issues/158
 	* Commented out background fetch (for app badge update) until bug resolved.
 	* Added constraint for user-signed in to do sync.
-	
+
 Version 0.27.0 (2/17/19)
 	* Added push notifications
 	* Fixed issue where progress indicator would display (and not be removed) when you changed the name of an album.
@@ -41,7 +40,7 @@ Version 0.24.0 (12/30/18)
 	* Fixed: Problems with sync or sticky sign in?
 		https://github.com/crspybits/SharedImages/issues/139
 	* Now have an automatic periodic sync (every 60 seconds) that will cause the Albums screen to stay up to date. Each individual album will still need a manual sync.
-	
+
 Version 0.23.3 (12/25/18)
 	* Update with fixes from client shared library.
 
@@ -50,14 +49,14 @@ Version 0.23.2 (12/15/18)
 	* Updating pods -- to bring in SyncServer client fixes.
 	* Fixing part of sharing invitation issue:
 		https://github.com/crspybits/SharedImages/issues/152
-		
+
 Version 0.23.1 (12/6/18)
 	* Attempting to fix issue with device UUID's.
 		https://github.com/crspybits/SyncServerII/issues/61
 
 Version 0.23.0 (12/1/18)
 	* Added minimum iOS app version response from server.
-	
+
 Version 0.22.0 (11/30/18)
 	* Added server down messaging.
 
@@ -73,24 +72,24 @@ Version 0.20.0 (10/13/18)
 	* Now have multi-album support for users, with server version 0.17.4.
 	* Migration from sharing group id's to sharing group UUID's.
 	* Badge for app now reflects the number of sharing groups that need updating, not the number of files that need downloading (it's inefficient to keep up the previous metric).
-	
+
 Version 0.19.0 (7/28/18)
 	* Updates for sharing group ids and server version 0.16.3 -- owning users now storing data into their own cloud storage.
-	* Migration: 
+	* Migration:
 		- Need to sign the users out-- this should reupload people's tokens to get them into the database.
 		- Need to add sharingGroupId to image and discussion Core Data objects.
 
 Version 0.18.1 (6/20/18)
 	* Updated to changed SyncServer iOS client pod-- which reflects update to server. Server updated to using new libraries and new Swift version.
-	
+
 Version 0.18.0 (6/16/18)
-	* Updated to changed SyncServer iOS client pod-- changed method of checking for lack of network. 
+	* Updated to changed SyncServer iOS client pod-- changed method of checking for lack of network.
 		https://github.com/crspybits/SharedImages/issues/125
 	* Trying to deal with: "R" remains
 		https://github.com/crspybits/SharedImages/issues/126
 	* Dany: Crash in v0.16.0
 		https://github.com/crspybits/SharedImages/issues/123
-		
+
 Version 0.17.0 (6/12/18)
 	* Updated to changed SyncServer iOS client pod-- that uses dynamic GoogleSignIn framework.
 
@@ -127,13 +126,13 @@ Version 0.15.0
 	* Use completion handler on logAllTracking() to ensure flushing of output.
 	* Don't resolve download deletion/appMetaData upload conflicts by keeping upload-- this is now disallowed by client interface.
 	* Added migration-- to add fileGroupUUID to Image's.
-	
+
 Version 0.14.2 (5/3/18)
 	* Still working on Dany's issue: Resetting internal trackers and adding logging of internal trackers to log output.
-	
+
 Version 0.14.1 (4/23/18)
 	* Trying to fix Dany's issue-- crash and removing cruft UploadFileTrackers.
-	
+
 Version 0.14.0 (4/19/18)
 	* Using `rosterdev` from Cocoapods.org; update pods
 	* Using v0.14.0 of server, through v14.1.0 of client library, with appMetaData versioning.
@@ -144,7 +143,7 @@ Version 0.14.0 (4/19/18)
 Version 0.13.1 (3/3/18)
 	* Bug fix: Crash when you were viewing a discussion thread and you rotate the device multiple times.
 	* Update for client library version 13.0.0
-	
+
 Version 0.13.0 (2/18/18)
 	* Improved progress indicator.
 		https://github.com/crspybits/SharedImages/issues/86
@@ -156,7 +155,7 @@ Version 0.12.1 (2/15/18)
 		https://github.com/crspybits/SharedImages/issues/80
 	* Fixed: The discussion progress indicator now seems to go away too quickly
 		https://github.com/crspybits/SharedImages/issues/82
-		
+
 Version 0.12.0 (2/12/18)
 	* Adding discussion thread feature.
 		https://github.com/crspybits/SharedImages/issues/75
@@ -169,14 +168,14 @@ Version 0.12.0 (2/12/18)
 		- Updated terminology in upload/download progress indicator
 		- Added a close icon
 		- JSON discussion files also include image uuid's so that given only user data, discussions might be reconnected to their images.
-		
+
 Version 0.11.0 (1/7/18)
 	* Fixed crash issue-- when returning to large images screen.
 		Introduced in the last release when fixing another crash issue.
 	* Updated to SyncServer iOS Client 10.0.0-- which, amongst other things,
 		improves background uploading/downloading.
 		https://github.com/crspybits/SharedImages/issues/36
-		
+
 Version 0.10.0 (12/30/17)
 	* Fixed: App rotation doesn't leave you on the same image in the Large Images screen
 		https://github.com/crspybits/SharedImages/issues/58
@@ -196,14 +195,14 @@ Version 0.10.0 (12/30/17)
 		https://github.com/crspybits/SharedImages/issues/44
 	* Fixed: Deep linking (for accepting sharing invitations) not working unless app launched
 		https://github.com/crspybits/SharedImages/issues/42
-		
+
 Version 0.9.0 (12/26/17)
 	* Removed tap method for signin's-- no longer need Tappable protocol.
 	* Fixed crash: "Save image"-- Kudos to Bushrod
 		https://github.com/crspybits/SharedImages/issues/65
 	* Updated to SyncServer client 7.0, and integrated Dropbox sign-in for owning users.
 	* Fixed another crash issue with image deletion.
-		
+
 Version 0.8.4 (12/3/17)
 	* Fixed-- Another crash: Bushrod-- came up when adding an image
 		https://github.com/crspybits/SharedImages/issues/57
@@ -212,12 +211,12 @@ Version 0.8.4 (12/3/17)
 	* Fixed a bug where LottiesLottom would cause a crash-- on app launch on iPad
 	* Refresh when doing download deletions: "Downloading images" alert is incorrect and stays up.
 		https://github.com/crspybits/SharedImages/issues/62
-	* Fixed: Just got a crash when deleting an image 
+	* Fixed: Just got a crash when deleting an image
 		https://github.com/crspybits/SharedImages/issues/56
-	* Fixed: Deleting someone elses images crashes app 
+	* Fixed: Deleting someone elses images crashes app
 		https://github.com/crspybits/SharedImages/issues/28
 	* Using updated SyncServer-iOSClient repo (6.0.1)-- with some sign-in fixes.
-	
+
 Version 0.8.3 (11/29/17)
 	* Using SyncServer-iOSClient 5.0.1 to try to fix issue with sticky sign-in
 	* Added developer dashboard-- and ability to change between production and staging server environments in debug builds. (Shake device to access developer dashboard)
@@ -229,68 +228,68 @@ Version 0.8.3 (11/29/17)
 	* Fixed issue where icon images were getting placed in Documents directory
 		https://github.com/crspybits/SharedImages/issues/38
 	* Changed logging so that with production builds, only errors are logged.
-	
+
 Version 0.82; 10/31/17
 	* Sticky sign-in-- making sign-in's less frequent-- to improve the UX.
 		https://github.com/crspybits/SharedImages/issues/30
-		
+
 Version 0.81; 10/1/17
 	* Fixed: Logging should now enable reporting of logs to developer.
-	
+
 	* Fixed: Problems relating to accepting a sharing invitation as a Facebook user.
 
 Version 0.80; 9/23/17
 	* Fixed: Functional problem with refresh, if sorting with newest at the bottom
 		https://github.com/crspybits/SharedImages/issues/25
 		Added feature: Pull from bottom to refresh, using new Cocoapod: LottiesBottom
-	
+
 	* Fixed: Can't see captions large, taller, images
 		https://github.com/crspybits/SharedImages/issues/35
-	
+
 	* Add emailing of log from users
 		Will work only for debug builds.
 		https://github.com/crspybits/SharedImages/issues/33
-		
+
 	* Add Build number/Version number into Settings
 		https://github.com/crspybits/SharedImages/issues/32
-	
+
 	* Progress indication when downloading images
 		https://github.com/crspybits/SharedImages/issues/12
-		As part of this, enabled user to stop downloading images. 
-	
+		As part of this, enabled user to stop downloading images.
+
 Version 0.75; 9/9/17
 	* Compatibility change for NGINX use on server. Using lower-case http response headers.
-	
+
 	* Changed image deletion so that multiple images can be deleted together, in an atomic manner, based on changes to SyncServer client.
-			
+
 	* Fixed: Crashes on using Share Button
 		https://github.com/crspybits/SharedImages/issues/29
-		
+
 	* Fixed: Super-wide images crash the app
 		https://github.com/crspybits/SharedImages/issues/24
-		
+
 	* Fixed issue where deleting multiple images was not done correctly.
 		Images were previously not deleted atomically.
 
 Version 0.7; 8/20/17
 	* Clear badge after downloading images
 		https://github.com/crspybits/SharedImages/issues/13
-		
+
 	* Move ODRefreshControl to a fork
 		https://github.com/crspybits/SharedImages/issues/4
-		
+
 	* Narrow images.
 		https://github.com/crspybits/SharedImages/issues/6
-		
+
 	* Share image in other ways
 		https://github.com/crspybits/SharedImages/issues/17
 		Added new tab for Settings because of this too.
 		I've relocated the image deletion functionality to the "Action" button too because a long-press now selects images to get ready for the "Action operaton.
-	
+
 	* Reconsider spinners
 		Moved rotating black & white spinner up to right of Action button (on the upper left)
 		because with new Settings tab, we can no longer have a spinner in the middle of the tab bar.
 		https://github.com/crspybits/SharedImages/issues/22
-		
+
 	* Make images first screen on launch if signed in
 		https://github.com/crspybits/SharedImages/issues/20
