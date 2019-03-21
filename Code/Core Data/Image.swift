@@ -249,7 +249,7 @@ extension Image : CacheDataSource {
 #if DEBUG
     func cachedItem(_ item:UIImage) {}
     func evictedItemFromCache(_ item:UIImage) {
-        Log.msg("Evicted image from cache.")
+        Log.info("Evicted image from cache.")
     }
 #endif
 }

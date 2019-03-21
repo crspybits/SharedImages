@@ -46,7 +46,7 @@
 
 - (void) dealloc;
 {
-    SPASLogDetail(@"dealloc");
+    // SPASLogDetail(@"dealloc");
 }
 
 - (void) setInterval:(NSTimeInterval)interval
@@ -79,7 +79,7 @@
                 
                 if (self.doneImmediate) {
                     // We're within the time interval. We have already executed the first block. Have, just above, reset the timer. So, we're going to ignore this block.
-                    SPASLogDetail(@"Ignoring block: %@", block);
+                    // SPASLogDetail(@"Ignoring block: %@", block);
                 } else {
                     // Outside of interval. Starting afresh.
                     self.doneImmediate = YES;
@@ -100,7 +100,7 @@
 
 - (void) timerExpired: (id) sender;
 {
-    SPASLog(@"timerExpired: %@", self);
+    // SPASLog(@"timerExpired: %@", self);
     
     @synchronized(self) {
         [self.timer cancel];

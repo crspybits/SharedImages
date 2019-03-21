@@ -42,7 +42,7 @@
 {
     // 5/20/16; Fixed bug. This used to use a property called self.indexPathForDeletion, which was never assigned!
     NSManagedObject *objectToDeleted = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    SPASLogDetail(@"objectToDeleted: %@", objectToDeleted);
+    // SPASLogDetail(@"objectToDeleted: %@", objectToDeleted);
 
     [[self.delegate coreDataSourceContext:self] deleteObject:objectToDeleted];
     [self saveContext];
@@ -58,7 +58,7 @@
        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath {
     
-    SPASLogDetail(@"didChangeObject: %@; indexPath: %@; newIndexPath; %@", anObject, indexPath, newIndexPath);
+    // SPASLogDetail(@"didChangeObject: %@; indexPath: %@; newIndexPath; %@", anObject, indexPath, newIndexPath);
     
     switch(type) {
         case NSFetchedResultsChangeInsert:
@@ -129,7 +129,7 @@
     NSError *error = nil;
     BOOL success = [self.fetchedResultsController performFetch:&error];
     if (! success || error) {
-        SPASLogFile(@"Error on NSFetchedResultsController: %@", error);
+        // SPASLogFile(@"Error on NSFetchedResultsController: %@", error);
     }
     
     return success;

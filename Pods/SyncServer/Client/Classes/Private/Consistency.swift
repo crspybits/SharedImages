@@ -100,7 +100,7 @@ class Consistency {
             }
             else {
                 messageResult = "Consistency check: OK!"
-                Log.special(messageResult)
+                Log.info(messageResult)
             }
             
             if repair {

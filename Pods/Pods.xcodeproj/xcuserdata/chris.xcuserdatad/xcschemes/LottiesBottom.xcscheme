@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "20D35404C4CE9582548D804203698DC1"
+               BlueprintIdentifier = "0C73522AF27A2701356FF7BA3108F699"
+               BuildableName = "LottiesBottom.framework"
                BlueprintName = "LottiesBottom"
-               ReferencedContainer = "container:Pods.xcodeproj"
-               BuildableName = "LottiesBottom.framework">
+               ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

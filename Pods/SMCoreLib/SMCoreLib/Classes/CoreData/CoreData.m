@@ -31,12 +31,10 @@
 #import "CoreData.h"
 
 #ifdef SMCOMMONLIB
-#import <SMCommon/SPASLog.h>
 #import <SMCommon/SMUIMessages.h>
 #import <SMCommon/UserMessage.h>
 #import <SMCommon/SMAssert.h>
 #else
-#import "SPASLog.h"
 #import "SMUIMessages.h"
 #import "UserMessage.h"
 #import "SMAssert.h"
@@ -89,7 +87,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
 
 - (NSURL *) sqliteURL {
     if (!_sqliteURL) {
-        SPASLogDetail(@"%@", self.options[COREDATA_SQLITE_FILE_NAME]);
+        // SPASLogDetail(@"%@", self.options[COREDATA_SQLITE_FILE_NAME]);
         _sqliteURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:self.options[COREDATA_SQLITE_FILE_NAME]];
     }
     return _sqliteURL;
@@ -97,7 +95,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
 
 - (NSURL *) sqliteBackupURL {
     if (!_sqliteBackupURL) {
-        SPASLogDetail(@"%@", self.options[COREDATA_SQLITE_BACKUP_FILE_NAME]);
+        // SPASLogDetail(@"%@", self.options[COREDATA_SQLITE_BACKUP_FILE_NAME]);
         _sqliteBackupURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:self.options[COREDATA_SQLITE_BACKUP_FILE_NAME]];
     }
     return _sqliteBackupURL;
@@ -112,7 +110,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
     
     [[NSFileManager defaultManager] removeItemAtURL:self.sqliteBackupURL error:nil];
     if (![[NSFileManager defaultManager] copyItemAtURL:self.sqliteURL toURL:self.sqliteBackupURL error:nil]) {
-        SPASLogFile(@"CoreData.migrationSetup: Could not make backup of sqlite file");
+        // SPASLogFile(@"CoreData.migrationSetup: Could not make backup of sqlite file");
     }
     
     [self setupWithMigrationOptions:options];
@@ -130,7 +128,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
     if (self.customAlert) {
         self.customAlert(alert);
     }
-    SPASLogFile(@"%@", message);
+    // SPASLogFile(@"%@", message);
 }
 
 - (void) setupWithMigrationOptions: (NSDictionary *) migrationOptions {
@@ -157,7 +155,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
         return;
     }
     
-    SPASLog(@"CoreData.setupWithMigrationOptions: options: %@", migrationOptions);
+    // SPASLog(@"CoreData.setupWithMigrationOptions: options: %@", migrationOptions);
 }
 
 // the selector will be called when an NSManagedObject is deleted; it has a parameter of an NSSet of managed objects.
@@ -236,7 +234,7 @@ static CoreData* s_sharedInstance = nil;
         id managedObjects = userInfo[key];
             
         if (managedObjects) {
-            SPASLog(@"managed objects (%@): %@", key, managedObjects);
+            // SPASLog(@"managed objects (%@): %@", key, managedObjects);
             [targetAndSelectorObj forEachTargetInCallbacksDo:^(id target, SEL selector, NSMutableDictionary *dict) {
                 dict[key] = managedObjects;
                 [target performVoidReturnSelector:selector];
@@ -280,12 +278,12 @@ static CoreData* s_sharedInstance = nil;
 - (BOOL) saveContextWithError: (NSError * _Nullable * _Nullable) error;
 {
     if (self.managedObjectContext != nil) {
-        SPASLog(@"CoreData.saveContext: %d", [self.managedObjectContext hasChanges]);
+        // SPASLog(@"CoreData.saveContext: %d", [self.managedObjectContext hasChanges]);
         if ([self.managedObjectContext hasChanges] && ![self.managedObjectContext save:error]) {
             // Replace this implementation with code to handle the error appropriately.
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             NSString *message = [NSString stringWithFormat:@"Unresolved error %@, %@", *error, [*error userInfo]];
-            SPASLogFile(@"%@", message);
+            // SPASLogFile(@"%@", message);
             [self errorWithMessage: message];
             return NO;
         } else {
@@ -308,8 +306,8 @@ static CoreData* s_sharedInstance = nil;
 {
     NSManagedObjectContext *managedObjectContext;
     
-    SPASLog(@"CoreData.managedObjectContextWith: self.options[COREDATA_PRIVATE_QUEUE] %@", self.options[COREDATA_PRIVATE_QUEUE]);
-    SPASLog(@"CoreData.managedObjectContextWith: [self.options[COREDATA_PRIVATE_QUEUE] boolValue] %d", [self.options[COREDATA_PRIVATE_QUEUE] boolValue]);
+    // SPASLog(@"CoreData.managedObjectContextWith: self.options[COREDATA_PRIVATE_QUEUE] %@", self.options[COREDATA_PRIVATE_QUEUE]);
+    // SPASLog(@"CoreData.managedObjectContextWith: [self.options[COREDATA_PRIVATE_QUEUE] boolValue] %d", [self.options[COREDATA_PRIVATE_QUEUE] boolValue]);
     
     if (self.options[COREDATA_PRIVATE_QUEUE]
         && ([self.options[COREDATA_PRIVATE_QUEUE] boolValue])) {
@@ -322,7 +320,7 @@ static CoreData* s_sharedInstance = nil;
     
     [managedObjectContext setPersistentStoreCoordinator:persistentStoreCoordinator];
     
-    SPASLog(@"CoreData.managedObjectContextWith: %@", managedObjectContext);
+    // SPASLog(@"CoreData.managedObjectContextWith: %@", managedObjectContext);
     return managedObjectContext;
 }
 
@@ -409,8 +407,8 @@ static CoreData* s_sharedInstance = nil;
          Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
          
          */
-        SPASLogFile(@"CoreData.addSqliteFileTo: Unresolved error %@, %@",
-                    error, [error userInfo]);
+        // SPASLogFile(@"CoreData.addSqliteFileTo: Unresolved error %@, %@",
+        //            error, [error userInfo]);
         return NO;
     }
     return YES;
@@ -493,7 +491,7 @@ static CoreData* s_sharedInstance = nil;
     
     if (error && *error) {
         NSString *message = [NSString stringWithFormat:@"Error: %@", *error];
-        SPASLogFile(@"%@", message);
+        // SPASLogFile(@"%@", message);
 
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"There was an internal error fetching objects with Core Data" message:message delegate:nil cancelButtonTitle:[[SMUIMessages session] OkMsg] otherButtonTitles:nil];
         [[UserMessage session] showAlert:alert ofType:UserMessageTypeError];
@@ -537,7 +535,7 @@ static CoreData* s_sharedInstance = nil;
     
     if ((error && *error) || !self.context) {
         NSString *message = [NSString stringWithFormat:@"Error: %@; context= %@", (error ? *error : @"") , self.context];
-        SPASLogFile(@"%@", message);
+        // SPASLogFile(@"%@", message);
         
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"There was an internal error counting objects with Core Data" message:message delegate:nil cancelButtonTitle:[[SMUIMessages session] OkMsg] otherButtonTitles:nil];
         [[UserMessage session] showAlert:alert ofType:UserMessageTypeError];
@@ -549,7 +547,7 @@ static CoreData* s_sharedInstance = nil;
 
 - (void) removeObject: (NSManagedObject * _Nonnull) managedObject;
 {
-    SPASLogDetail(@"managedObject: %@", managedObject);
+    // SPASLogDetail(@"managedObject: %@", managedObject);
     [self.context deleteObject: managedObject];
 }
 

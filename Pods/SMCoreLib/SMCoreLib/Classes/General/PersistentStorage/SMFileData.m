@@ -43,7 +43,7 @@
     
     BOOL result = [FileStorage saveApplicationData:self.data toFlatFile:[FileStorage pathToItem:self.fileName]];
     if (!result) {
-        SPASLogFile(@"Error writing to file!");
+        // SPASLogFile(@"Error writing to file!");
     }
     return result;
 }
@@ -55,7 +55,7 @@
         result = YES;
     } else {
         result = NO;
-        SPASLogFile(@"Error reading from file!");
+        // SPASLogFile(@"Error reading from file!");
     }
     return result;
 }

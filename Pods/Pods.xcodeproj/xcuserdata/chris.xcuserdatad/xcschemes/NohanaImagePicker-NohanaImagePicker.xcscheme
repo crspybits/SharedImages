@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8133599DD97BEA328310E0A966FC3E99"
+               BlueprintIdentifier = "4DBF09E3C5C99AF542005FD9D573F4CB"
                BuildableName = "NohanaImagePicker.bundle"
                BlueprintName = "NohanaImagePicker-NohanaImagePicker"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8133599DD97BEA328310E0A966FC3E99"
+            BlueprintIdentifier = "4DBF09E3C5C99AF542005FD9D573F4CB"
             BuildableName = "NohanaImagePicker.bundle"
             BlueprintName = "NohanaImagePicker-NohanaImagePicker"
             ReferencedContainer = "container:Pods.xcodeproj">

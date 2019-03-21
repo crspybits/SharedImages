@@ -30,8 +30,11 @@
 		834A7E7F2037858800969B18 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 834A7E762037858800969B18 /* ProgressView.xib */; };
 		834A7E802037858800969B18 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E772037858800969B18 /* Types.swift */; };
 		834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834E3E9220B3FF90006AC504 /* BottomRefresh.swift */; };
-		835A3E471FB954AF009DB032 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A3E461FB954AF009DB032 /* Environment.swift */; };
 		835A8A96223DB9ED0000FEA0 /* AcquireImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */; };
+		835A8A9D223F40300000FEA0 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A9A223F40300000FEA0 /* Environment.swift */; };
+		835A8A9E223F40300000FEA0 /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A9B223F40300000FEA0 /* Migrations.swift */; };
+		835A8A9F223F40300000FEA0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A9C223F40300000FEA0 /* AppDelegate.swift */; };
+		835A8AA1223F40460000FEA0 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AA0223F40460000FEA0 /* Logger.swift */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
 		8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8380D2672161A6DC008D6231 /* Badge+Extras.swift */; };
@@ -46,7 +49,6 @@
 		83C34078201D939100DAD865 /* AppMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34077201D939100DAD865 /* AppMetaData.swift */; };
 		83C34081201E42C400DAD865 /* Discussion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* Discussion.swift */; };
 		83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */; };
-		83D0BE1820B0C56200555B73 /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE1720B0C56200555B73 /* Migrations.swift */; };
 		83D0BE1D20B37D6F00555B73 /* SortyFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */; };
 		83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */; };
 		83D0BE2120B3817800555B73 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2020B3817800555B73 /* Parameters.swift */; };
@@ -70,7 +72,6 @@
 		83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */; };
 		83F882471E711FC6008F644A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F882401E711FC6008F644A /* Main.storyboard */; };
 		83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */; };
-		83F8824D1E712004008F644A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F8824B1E712004008F644A /* AppDelegate.swift */; };
 		83F8824E1E712004008F644A /* ImagesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F8824C1E712004008F644A /* ImagesVC.swift */; };
 		83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F8824F1E73A6F6008F644A /* ImageCollectionVC.swift */; };
 		83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882521E73B172008F644A /* CoreDataExtras.swift */; };
@@ -119,8 +120,11 @@
 		834A7E762037858800969B18 /* ProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgressView.xib; sourceTree = "<group>"; };
 		834A7E772037858800969B18 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		834E3E9220B3FF90006AC504 /* BottomRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomRefresh.swift; sourceTree = "<group>"; };
-		835A3E461FB954AF009DB032 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcquireImages.swift; sourceTree = "<group>"; };
+		835A8A9A223F40300000FEA0 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		835A8A9B223F40300000FEA0 /* Migrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
+		835A8A9C223F40300000FEA0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		835A8AA0223F40460000FEA0 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages7.xcdatamodel; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
@@ -138,7 +142,6 @@
 		83C34077201D939100DAD865 /* AppMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetaData.swift; sourceTree = "<group>"; };
 		83C3407E201E42C400DAD865 /* Discussion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Discussion.swift; path = "Core Data/Discussion.swift"; sourceTree = "<group>"; };
 		83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discussion+CoreDataProperties.swift"; path = "Core Data/Discussion+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		83D0BE1720B0C56200555B73 /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortyFilter.swift; path = "Sorting and Filtering/SortyFilter.swift"; sourceTree = "<group>"; };
 		83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = SortyFilter.xib; path = "Sorting and Filtering/SortyFilter.xib"; sourceTree = "<group>"; };
 		83D0BE2020B3817800555B73 /* Parameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Parameters.swift; path = "Sorting and Filtering/Parameters.swift"; sourceTree = "<group>"; };
@@ -168,7 +171,6 @@
 		83F882411E711FC6008F644A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Resources/Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		83F882421E711FC6008F644A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
 		83F882441E711FC6008F644A /* SharedImages.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages.xcdatamodel; sourceTree = "<group>"; };
-		83F8824B1E712004008F644A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		83F8824C1E712004008F644A /* ImagesVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagesVC.swift; sourceTree = "<group>"; };
 		83F8824F1E73A6F6008F644A /* ImageCollectionVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCollectionVC.swift; sourceTree = "<group>"; };
 		83F882521E73B172008F644A /* CoreDataExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CoreDataExtras.swift; path = "Core Data/CoreDataExtras.swift"; sourceTree = "<group>"; };
@@ -326,6 +328,17 @@
 			path = "Progress Indicator";
 			sourceTree = "<group>";
 		};
+		835A8A99223F3FEC0000FEA0 /* App Launch */ = {
+			isa = PBXGroup;
+			children = (
+				835A8A9C223F40300000FEA0 /* AppDelegate.swift */,
+				835A8A9A223F40300000FEA0 /* Environment.swift */,
+				835A8A9B223F40300000FEA0 /* Migrations.swift */,
+				835A8AA0223F40460000FEA0 /* Logger.swift */,
+			);
+			path = "App Launch";
+			sourceTree = "<group>";
+		};
 		83A2E6A61F76F83300A2E303 /* LottieAnimations */ = {
 			isa = PBXGroup;
 			children = (
@@ -421,10 +434,8 @@
 		83F8824A1E712004008F644A /* Code */ = {
 			isa = PBXGroup;
 			children = (
-				83F8824B1E712004008F644A /* AppDelegate.swift */,
-				835A3E461FB954AF009DB032 /* Environment.swift */,
+				835A8A99223F3FEC0000FEA0 /* App Launch */,
 				8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */,
-				83D0BE1720B0C56200555B73 /* Migrations.swift */,
 				83F882601E749C18008F644A /* Consts.swift */,
 				834A7E6D2037858800969B18 /* Misc UI */,
 				8324EE2C1E74ABD4000656AF /* SignIn */,
@@ -611,7 +622,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh",
 				"${PODS_ROOT}/SMGoogleSignIn/Framework/GoogleSignIn.framework/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -620,7 +631,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		83611DEC1F3802C700464E49 /* ShellScript */ = {
@@ -660,7 +671,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-SharedImages/Pods-SharedImages-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/BadgeSwift/BadgeSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
@@ -676,6 +687,7 @@
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/NohanaImagePicker/NohanaImagePicker.framework",
 				"${BUILT_PRODUCTS_DIR}/ODRefreshControl/ODRefreshControl.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjcExceptionBridging/ObjcExceptionBridging.framework",
 				"${BUILT_PRODUCTS_DIR}/PersistentValue/PersistentValue.framework",
 				"${BUILT_PRODUCTS_DIR}/Presentr/Presentr.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
@@ -687,6 +699,7 @@
 				"${BUILT_PRODUCTS_DIR}/SwiftyUserDefaults/SwiftyUserDefaults.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer/SyncServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SyncServer-Shared/SyncServer_Shared.framework",
+				"${BUILT_PRODUCTS_DIR}/XCGLogger/XCGLogger.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 				"${BUILT_PRODUCTS_DIR}/rosterdev/rosterdev.framework",
 			);
@@ -707,6 +720,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NohanaImagePicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ODRefreshControl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjcExceptionBridging.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PersistentValue.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Presentr.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
@@ -718,12 +732,13 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyUserDefaults.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SyncServer_Shared.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/XCGLogger.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/rosterdev.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SharedImages/Pods-SharedImages-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -756,14 +771,15 @@
 				83EACE772087083000C40AA3 /* DiscussionKeys.swift in Sources */,
 				834A7E7D2037858800969B18 /* Progress.swift in Sources */,
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
-				83F8824D1E712004008F644A /* AppDelegate.swift in Sources */,
 				83EFC096216EDE7300D7A3C4 /* SharingInviteDelegate.swift in Sources */,
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
 				83D0BE2920B3B81C00555B73 /* UnreadCountBadge.swift in Sources */,
 				83D0BE2620B39C7000555B73 /* SegmentedControl.swift in Sources */,
+				835A8A9F223F40300000FEA0 /* AppDelegate.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
 				83D0BE2520B39C7000555B73 /* SortControl.swift in Sources */,
 				8324EE301E75EC62000656AF /* SignInVC.swift in Sources */,
+				835A8A9E223F40300000FEA0 /* Migrations.swift in Sources */,
 				83F882561E73B2DC008F644A /* Image.swift in Sources */,
 				83D0BE2120B3817800555B73 /* Parameters.swift in Sources */,
 				831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */,
@@ -775,10 +791,11 @@
 				834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */,
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
 				83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */,
-				83D0BE1820B0C56200555B73 /* Migrations.swift in Sources */,
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,
 				83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */,
+				835A8A9D223F40300000FEA0 /* Environment.swift in Sources */,
 				8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */,
+				835A8AA1223F40460000FEA0 /* Logger.swift in Sources */,
 				831521712206CC9000CA773D /* Notifications.swift in Sources */,
 				83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
@@ -787,7 +804,6 @@
 				835A8A96223DB9ED0000FEA0 /* AcquireImages.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
 				834A7E792037858800969B18 /* Alert.swift in Sources */,
-				835A3E471FB954AF009DB032 /* Environment.swift in Sources */,
 				83FAF3A21F4554B90009111B /* TrashActivity.swift in Sources */,
 				834A7E7A2037858800969B18 /* XibBasics.swift in Sources */,
 				838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */,

@@ -8,7 +8,6 @@
 
 #import "UIScrollView+Extras.h"
 #import "UIView+Extras.h"
-#import "SPASLog.h"
 
 @implementation UIScrollView (Extras)
 
@@ -61,11 +60,7 @@
         relaxedContentOffset.y = relaxedOffsetHeight;
     }
     
-    if (relaxed) {
-        SPASLog(@"Scroll view is 'relaxed'");
-    }
-    else {
-        SPASLog(@"*** Scroll view is NOT 'relaxed' ***");
+    if (!relaxed) {
         [UIView animateWithDurationSync0:animationDuration animations:^{
             [self setContentOffsetNoDelegate:relaxedContentOffset];
         } completion:^(BOOL finished) {

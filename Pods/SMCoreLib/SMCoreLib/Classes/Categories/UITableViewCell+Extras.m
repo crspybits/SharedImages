@@ -7,7 +7,6 @@
 //
 
 #import "UITableViewCell+Extras.h"
-#import "SPASLog.h"
 
 @implementation UITableViewCell (Extras)
 
@@ -26,8 +25,8 @@
 
 - (NSIndexPath *) indexPath;
 {
-    SPASLogDetail(@"%@", [self.superview class]);
-    SPASLogDetail(@"%@", [self.superview.superview class]);
+    // SPASLogDetail(@"%@", [self.superview class]);
+    // SPASLogDetail(@"%@", [self.superview.superview class]);
     return [[self getTableView] indexPathForCell:self];
 }
 

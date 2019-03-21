@@ -105,7 +105,7 @@ class ImagesVC: UIViewController {
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: { [unowned self] in
-            Log.msg("bottomRefresh: starting sync")
+            Log.info("bottomRefresh: starting sync")
             do {
                 try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
             } catch (let error) {
@@ -371,7 +371,7 @@ class ImagesVC: UIViewController {
     
     // Enable a reset from error when needed.
     @objc private func spinnerTapGestureAction() {
-        Log.msg("spinner tapped")
+        Log.info("spinner tapped")
         refresh()
     }
     
@@ -660,7 +660,7 @@ extension ImagesVC : CoreDataSourceDelegate {
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasDeleted indexPathOfDeletedObject: IndexPath!) {
-        Log.msg("objectWasDeleted: indexPathOfDeletedObject: \(String(describing: indexPathOfDeletedObject))")
+        Log.info("objectWasDeleted: indexPathOfDeletedObject: \(String(describing: indexPathOfDeletedObject))")
         deletedImages?.append(indexPathOfDeletedObject)
     }
     

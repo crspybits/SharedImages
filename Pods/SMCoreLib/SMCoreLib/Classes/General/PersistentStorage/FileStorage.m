@@ -10,7 +10,7 @@
 // http://stackoverflow.com/questions/8727508/ios-persistent-storage-strategy
 
 #import "FileStorage.h"
-#import "SPASLog.h"
+// #import "SPASLog.h"
 #import "SMAssert.h"
 #import "NSArray+Globbing.h"
 
@@ -23,7 +23,7 @@
                 NSDocumentDirectory, NSUserDomainMask, YES);
     //if (PersistentStorageDebug) SPASLog(@"paths= %@", [p description]);
     path = [[p objectAtIndex:0] stringByAppendingPathComponent:fileOrFolderNameWithoutPath];
-    SPASLog(@"path= %@", path);
+    // SPASLog(@"path= %@", path);
     return path;
 }
 
@@ -59,7 +59,7 @@
     NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:data];
     BOOL result = [archivedData writeToFile:fileName atomically:YES];
     if (! result) {
-        SPASLogFile(@"PersistentStorage.saveApplicationData: failed writing file: %@",fileName);
+        // SPASLogFile(@"PersistentStorage.saveApplicationData: failed writing file: %@",fileName);
     }
     return result;
 }
@@ -78,18 +78,18 @@
     
     int fd = mkstemps(template, (int) suffixLen);
     if (-1 == fd) {
-        SPASLog(@"Could not create file in directory %@", dir);
+        // SPASLog(@"Could not create file in directory %@", dir);
         return nil;
     }
     
     if (close(fd) == -1) {
-        SPASLog(@"Could not close file %@", dir);
+        // SPASLog(@"Could not close file %@", dir);
         unlink(template);
         return nil;
     }
     
     if (unlink(template) == -1) {
-        SPASLog(@"Could not remove file %@", dir);
+        // SPASLog(@"Could not remove file %@", dir);
         unlink(template);
         return nil;
     }
@@ -126,10 +126,10 @@
     
     bool done = [fileMgr removeItemAtPath:fileNameWithPath error:&error];
     if (! done) {
-        SPASLog(@"deleteFileWithPath: ERROR: Could not delete file: %@", fileNameWithPath);
+        // SPASLog(@"deleteFileWithPath: ERROR: Could not delete file: %@", fileNameWithPath);
         return NO;
     } else {
-        SPASLog(@"deleteFileWithPath: SUCCESS: Deleted file: %@", fileNameWithPath);
+        // SPASLog(@"deleteFileWithPath: SUCCESS: Deleted file: %@", fileNameWithPath);
         return YES;
     }
 }
@@ -159,11 +159,11 @@
     NSFileManager *fileMgr = [NSFileManager defaultManager];
     NSArray *dirContents = [fileMgr contentsOfDirectoryAtPath:[directoryPath path] error:&error];
     if (nil == dirContents) {
-        SPASLogDetail(@"error= %@", [error description]);
+        // SPASLogDetail(@"error= %@", [error description]);
         // Directory does not exist
         bool done = [fileMgr createDirectoryAtPath:[directoryPath path] withIntermediateDirectories:YES attributes:nil error:&error];
         if (! done) {
-            SPASLog(@"Could not create directory");
+            // SPASLog(@"Could not create directory");
             return NO;
         }
     }
@@ -189,13 +189,13 @@
     NSError *error = nil;
     NSArray *dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[dirURL path] error:&error];
     // While the docs for contentsOfDirectoryAtPath say it returns paths, it actually just returns file names. But, I really want the full URL's.
-    SPASLogDetail(@"%@; error= %@", dirContents, error);
+    // SPASLogDetail(@"%@; error= %@", dirContents, error);
     NSMutableArray *urls = [NSMutableArray array];
     for (NSString *filename in dirContents) {
         NSURL *urlForFile = [dirURL URLByAppendingPathComponent:filename];
         [urls addObject:urlForFile];
     }
-    SPASLogDetail(@"URLs: %@", urls);
+    // SPASLogDetail(@"URLs: %@", urls);
     return urls;
 }
 
@@ -206,7 +206,7 @@
     NSString  *dirPath = [NSHomeDirectory() stringByAppendingPathComponent:partialPath];
     NSArray *files = [fileMgr contentsOfDirectoryAtPath:dirPath error:&error];
     if (error) {
-        SPASLogFile(@"error: %@", error);
+        // SPASLogFile(@"error: %@", error);
         return nil;
     }
     return files;
@@ -224,7 +224,7 @@
     BOOL success = [URL setResourceValue: [NSNumber numberWithBool: exclude]
                                   forKey: NSURLIsExcludedFromBackupKey error: &error];
     if(!success){
-        SPASLogFile(@"Error: %@", error);
+        // SPASLogFile(@"Error: %@", error);
     }
     return success;
 }

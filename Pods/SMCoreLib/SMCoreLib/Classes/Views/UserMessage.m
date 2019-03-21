@@ -34,7 +34,7 @@
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    SPASLog(@"Utilities.clickedButtonAtIndex");
+    // SPASLog(@"Utilities.clickedButtonAtIndex");
     
     if (!self.called && self.buttonClickHandler) {
         [self cancelTimer];
@@ -96,7 +96,7 @@
 
 - (void) becomeActiveNotification:(id) sender;
 {
-    SPASLog(@"UIApplicationDidBecomeActiveNotification: %@", sender);
+    // SPASLog(@"UIApplicationDidBecomeActiveNotification: %@", sender);
     // From https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Notifications/Articles/NotificationCenters.html
     // "In a multithreaded application, notifications are always delivered in the thread in which the notification was posted, which may not be the same thread in which an observer registered itself."
     // So, it seems that we may not get the notification on the main thread.

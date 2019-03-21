@@ -100,11 +100,11 @@ class SyncController {
     }
 
     @objc private func startPeriodicSync() {
-        Log.msg("startPeriodicSync")
+        Log.info("startPeriodicSync")
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: intervalBetweenPeriodicSyncs, repeats: true) { _ in
             if !SyncServer.session.isSyncing && SignInManager.session.userIsSignedIn {
-                Log.msg("startPeriodicSync: sync")
+                Log.info("startPeriodicSync: sync")
                 do {
                     try SyncServer.session.sync()
                 } catch (let error) {
@@ -124,7 +124,7 @@ class SyncController {
     
     func sync(sharingGroupUUID: String, completion: (()->())? = nil) throws {
         syncDone = completion
-        Log.msg("About to do SyncController.sync sync")
+        Log.info("About to do SyncController.sync sync")
         try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
     }
     
@@ -383,7 +383,7 @@ extension SyncController : SyncServerDelegate {
 
             case .file(let url, contentsChanged: let contentsChanged):
                 // Just checking this, for debugging. It turns out this flag isn't very useful at least in SharedImages-- the real test for this app is whether or not the (a) image file or (b) discussion thread file can be read and parsed properly.
-                Log.msg("contentsChanged: \(contentsChanged)")
+                Log.info("contentsChanged: \(contentsChanged)")
                 
                 singleFileDownloadComplete(.success(url: url, attr: operation.attr))
             
@@ -499,7 +499,7 @@ extension SyncController : SyncServerDelegate {
         var title:String?
         var discussionUUID:String?
         
-        Log.msg("attr.appMetaData: \(String(describing: attr.appMetaData))")
+        Log.info("attr.appMetaData: \(String(describing: attr.appMetaData))")
     
         // If present, the appMetaData will be a JSON string
         if let appMetaData = attr.appMetaData,
@@ -623,17 +623,17 @@ extension SyncController : SyncServerDelegate {
     private func turnIdleTimerOff() {
         // 1/25/19; See https://github.com/crspybits/SharedImages/issues/157
         UIApplication.shared.isIdleTimerDisabled = true
-        Log.msg("Idle timer: Off")
+        Log.info("Idle timer: Off")
     }
     
     private func turnIdleTimerOn() {
         // 1/25/19; See https://github.com/crspybits/SharedImages/issues/157
         UIApplication.shared.isIdleTimerDisabled = false
-        Log.msg("Idle timer: On")
+        Log.info("Idle timer: On")
     }
 
     func syncServerEventOccurred(event:SyncEvent) {
-        Log.msg("Server event occurred: \(event)")
+        Log.info("Server event occurred: \(event)")
 
         switch event {
         case .syncDelayed:
@@ -709,7 +709,7 @@ extension SyncController : SyncServerDelegate {
             let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
             if fileType == nil || fileType == .image {
                 // Include the nil case because files without types are images-- i.e., they were created before we started typing files in the meta data.
-                Log.msg("fileType: \(String(describing: fileType))")
+                Log.info("fileType: \(String(describing: fileType))")
                 delegate.updateUploadedImageDate(syncController: self, uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
             }
             

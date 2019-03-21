@@ -32,7 +32,7 @@
         <!--ImagesVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController storyboardIdentifier="ImagesVC" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="ImagesVC" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ImagesVC" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="ImagesVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -51,7 +51,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ImageIcon" id="GHm-lm-kQ4" customClass="ImageCollectionVC" customModule="SharedImages" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ImageIcon" id="GHm-lm-kQ4" customClass="ImageCollectionVC" customModule="Neebla" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="75" height="97"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -122,7 +122,7 @@
         <!--Settings-->
         <scene sceneID="8A1-uZ-ykE">
             <objects>
-                <viewController title="Settings" id="LgV-c1-lQr" customClass="SettingsVC" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Settings" id="LgV-c1-lQr" customClass="SettingsVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hNa-4E-d61"/>
                         <viewControllerLayoutGuide type="bottom" id="eo5-e7-6ws"/>
@@ -188,30 +188,19 @@
                                                 <rect key="frame" x="50" y="0.0" width="275" height="70"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H85-Q5-Pwl">
-                                                        <rect key="frame" x="0.0" y="17" width="191" height="36"/>
+                                                        <rect key="frame" x="0.0" y="17" width="275" height="36"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                        <state key="normal" title="Email log to developer"/>
+                                                        <state key="normal" title="Contact developer"/>
                                                         <connections>
                                                             <action selector="emailLogAction:" destination="LgV-c1-lQr" eventType="touchUpInside" id="KdW-Z9-ofb"/>
                                                         </connections>
                                                     </button>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vnn-Mg-iFn" userLabel="Reset">
-                                                        <rect key="frame" x="225" y="17" width="50" height="36"/>
-                                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                        <state key="normal" title="Reset"/>
-                                                        <connections>
-                                                            <action selector="resetLogAction:" destination="LgV-c1-lQr" eventType="touchUpInside" id="fPs-Eg-EHm"/>
-                                                        </connections>
-                                                    </button>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="H85-Q5-Pwl" secondAttribute="trailing" constant="20" symbolic="YES" id="ExR-Hd-7Xg"/>
+                                                    <constraint firstItem="H85-Q5-Pwl" firstAttribute="centerX" secondItem="qBr-pe-ect" secondAttribute="centerX" id="ADy-Tf-EGa"/>
                                                     <constraint firstItem="H85-Q5-Pwl" firstAttribute="leading" secondItem="qBr-pe-ect" secondAttribute="leading" id="Iva-gd-e8z"/>
                                                     <constraint firstAttribute="width" constant="275" id="MNd-qG-B9d"/>
-                                                    <constraint firstItem="vnn-Mg-iFn" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qBr-pe-ect" secondAttribute="leading" constant="20" symbolic="YES" id="ZLQ-YO-fNg"/>
                                                     <constraint firstItem="H85-Q5-Pwl" firstAttribute="centerY" secondItem="qBr-pe-ect" secondAttribute="centerY" id="ZwJ-li-fOU"/>
-                                                    <constraint firstItem="vnn-Mg-iFn" firstAttribute="centerY" secondItem="qBr-pe-ect" secondAttribute="centerY" id="nfT-yQ-rMZ"/>
-                                                    <constraint firstAttribute="trailing" secondItem="vnn-Mg-iFn" secondAttribute="trailing" id="xhF-Nx-qVe"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
@@ -332,7 +321,7 @@
         <!--Large Images-->
         <scene sceneID="efv-cU-CzA">
             <objects>
-                <viewController storyboardIdentifier="LargeImages" automaticallyAdjustsScrollViewInsets="NO" id="7QN-xT-tOc" customClass="LargeImages" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LargeImages" automaticallyAdjustsScrollViewInsets="NO" id="7QN-xT-tOc" customClass="LargeImages" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ASX-tC-PLm"/>
                         <viewControllerLayoutGuide type="bottom" id="xtK-xN-Iu2"/>
@@ -351,7 +340,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" reuseIdentifier="largeImage" id="jFk-xt-pcJ" customClass="ImageCollectionVC" customModule="SharedImages" customModuleProvider="target">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" reuseIdentifier="largeImage" id="jFk-xt-pcJ" customClass="ImageCollectionVC" customModule="Neebla" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="78.5" width="375" height="446"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -425,7 +414,7 @@
         <!--Sign InVC-->
         <scene sceneID="VPd-vH-GDK">
             <objects>
-                <viewController storyboardIdentifier="SignInVC" id="lab-Y4-nCb" customClass="SignInVC" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SignInVC" id="lab-Y4-nCb" customClass="SignInVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="dcI-2e-a7n"/>
                         <viewControllerLayoutGuide type="bottom" id="Cgq-RN-DzA"/>
@@ -522,7 +511,7 @@
         <!--Albums-->
         <scene sceneID="IiJ-9Q-z1K">
             <objects>
-                <viewController id="Whm-8g-DLi" customClass="AlbumsVC" customModule="SharedImages" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Whm-8g-DLi" customClass="AlbumsVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Q1V-oZ-d0p"/>
                         <viewControllerLayoutGuide type="bottom" id="d60-bl-9ut"/>

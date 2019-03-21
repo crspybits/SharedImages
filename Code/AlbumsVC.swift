@@ -69,7 +69,7 @@ class AlbumsVC: UIViewController {
 
         self.refreshControl.endRefreshing()
         
-        Log.msg("About to do refresh sync")
+        Log.info("About to do refresh sync")
         do {
             try SyncServer.session.sync()
         } catch (let error) {
@@ -118,7 +118,7 @@ class AlbumsVC: UIViewController {
                 try SyncServer.session.createSharingGroup(sharingGroupUUID: newSharingGroupUUID)
                 try SyncServer.session.sync(sharingGroupUUID: newSharingGroupUUID)
             } catch (let error) {
-                Log.msg("\(error)")
+                Log.info("\(error)")
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not add album. Please try again later.")
             }
         })
@@ -189,7 +189,7 @@ class AlbumsVC: UIViewController {
             SharingInviteDelegate.invitationRedeemed = false
             
             activityIndicator.startAnimating()
-            Log.msg("About to do AlbumsVC.viewDidAppear sync")
+            Log.info("About to do AlbumsVC.viewDidAppear sync")
             do {
                 try SyncServer.session.sync()
             } catch (let error) {
@@ -222,7 +222,7 @@ class AlbumsVC: UIViewController {
             try SyncServer.session.updateSharingGroup(sharingGroupUUID: sharingGroupUUID, newSharingGroupName: newName)
             try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
         } catch (let error) {
-            Log.msg("\(error)")
+            Log.info("\(error)")
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not change album name. Please try again later.")
         }
     }

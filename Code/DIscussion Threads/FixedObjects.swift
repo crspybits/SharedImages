@@ -80,7 +80,7 @@ struct FixedObjects: Sequence, Equatable {
         do {
             let data = try Data(contentsOf: localURL)
             let jsonString = String(data: data, encoding: .utf8)
-            Log.msg("json: \(String(describing: jsonString))")
+            Log.info("json: \(String(describing: jsonString))")
             jsonObject = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: 0))
         } catch {
             return nil

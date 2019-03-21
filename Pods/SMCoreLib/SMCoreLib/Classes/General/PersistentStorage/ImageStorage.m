@@ -9,7 +9,7 @@
 #import "ImageStorage.h"
 #import "UIImage+Resize.h"
 #import <ImageIO/ImageIO.h>
-#import "SPASLog.h"
+// #import "SPASLog.h"
 #import "SMAssert.h"
 
 @implementation ImageStorage
@@ -28,7 +28,7 @@
 + (UIImage *) getImage: (NSString *) largeImageFileName ofSize: (CGSize) size fromIconDirectory: (NSURL *) iconDirectory withLargeImageDirectory: (NSURL *) largeImageDirectory;
 {
     AssertIf(![FileStorage createDirectoryIfNeeded:iconDirectory], @"Could not create icon directory");
-    SPASLogDetail(@"largeImageFileName: %@; size: %@", largeImageFileName, NSStringFromCGSize(size));
+    // SPASLogDetail(@"largeImageFileName: %@; size: %@", largeImageFileName, NSStringFromCGSize(size));
     
     NSString *extension = nil;
     NSString *fileNameWithoutExtension = nil;
@@ -45,7 +45,7 @@
     
     // Get it from the large image directory.
     UIImage *largeImage = [self imageFromFile:largeImageFileName withPath:largeImageDirectory];
-    SPASLogDetail(@"largeImage: %@", largeImageFileName);
+    // SPASLogDetail(@"largeImage: %@", largeImageFileName);
     AssertActionIf(!largeImage, @"No large image!", {return nil;});
     
     // Scale the image.
@@ -68,7 +68,7 @@
     // 11/29/17; Sometimes, adding this attibute is failing.
     NSURL *imageNameWithPath = [NSURL URLWithString:smallSizedFileName relativeToURL:iconDirectory];
     result = [FileStorage addSkipBackupAttributeToItemAtURL:imageNameWithPath];
-    SPASLog(@"Could not add skip attribute: %@", imageNameWithPath);
+    // SPASLog(@"Could not add skip attribute: %@", imageNameWithPath);
 
     return smallImage;
 }
@@ -120,14 +120,14 @@
     
     NSURL *imageNameWithPath = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", directoryPath.path, fileName]];
         
-    SPASLog(@"JPG file name= %@", imageNameWithPath);
+    // SPASLog(@"JPG file name= %@", imageNameWithPath);
     
     float imageQuality = IMAGE_STORAGE_DEFAULT_IMAGE_QUALITY;
     if ([ImageStorage session].imageQuality) {
         imageQuality = [ImageStorage session].imageQuality();
     }
 
-    SPASLogDetail(@"imageQuality: %f", imageQuality);
+    // SPASLogDetail(@"imageQuality: %f", imageQuality);
     AssertActionIf(![UIImageJPEGRepresentation(image, imageQuality)
                      writeToFile:[imageNameWithPath path] atomically:YES],
                    @"Could not write JPEG image",
@@ -137,15 +137,15 @@
     
     NSDictionary *fileAttributes = [fileMgr attributesOfItemAtPath:[imageNameWithPath path] error: &error];
     
-    SPASLog(@"fileAttributes: %@", [fileAttributes description]);
+    // SPASLog(@"fileAttributes: %@", [fileAttributes description]);
     
     if (error != nil) {
-        SPASLog(@"saveImageToFile: ERROR: %@", [error description]);
+        // SPASLog(@"saveImageToFile: ERROR: %@", [error description]);
         return NO;
     }
     
     NSNumber *fileSize = [fileAttributes objectForKey:@"NSFileSize"];
-    SPASLog(@"fileSize = %d", [fileSize intValue]);
+    // SPASLog(@"fileSize = %d", [fileSize intValue]);
     if (0 == fileSize) {
         // Assume that we've got a good file, if file size nonzero
         return NO;
@@ -164,11 +164,11 @@
     
     CFDictionaryRef dictRef = CGImageSourceCopyPropertiesAtIndex(source,0,NULL);
     NSDictionary* metadata = (__bridge NSDictionary *)dictRef;
-    SPASLogDetail(@"metadata= %@", metadata);
+    // SPASLogDetail(@"metadata= %@", metadata);
     CGSize result = CGSizeZero;
     CGFloat width = [metadata[@"PixelWidth"] floatValue];
     CGFloat height = [metadata[@"PixelHeight"] floatValue];
-    SPASLogDetail(@"width= %f, height= %f", width, height);
+    // SPASLogDetail(@"width= %f, height= %f", width, height);
     
     // The orientation in the metadata does *not* map to UIImageOrientation. Rather, see: https://developer.apple.com/library/ios/documentation/GraphicsImaging/Reference/CGImageProperties_Reference/index.html#//apple_ref/doc/constant_group/Individual_Image_Properties
     // This idea of orientation seems a little odd to me, but it seems it translates to even numbers need to be switched in width/height, odd numbers do not.
@@ -192,14 +192,14 @@
 
         default:
             // 11/24/18; I just ran across an issue: 1) I uploaded an image to Google Drive from iOS, 2) I manually downloaded that image, 3) I reuploaded that image to Google Drive. I then found that the "Orientation" field was gone from the image. I previously had an assert here that forced a crash in this case. Probably shouldn't do that.
-            SPASLogDetail(@"Should not get to here: Image had no orientation!");
+            // SPASLogDetail(@"Should not get to here: Image had no orientation!");
             // Just assume a default orientation.
             result = CGSizeMake(width, height);
             break;
     }
     
     CFRelease(source);
-    SPASLogDetail(@"size: %@, orientation: %lu", NSStringFromCGSize(result), (unsigned long)orientation);
+    // SPASLogDetail(@"size: %@, orientation: %lu", NSStringFromCGSize(result), (unsigned long)orientation);
     
     return result;
 }

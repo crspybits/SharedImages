@@ -102,6 +102,7 @@
 		}
 		_persistentAnimationKeys = persistentAnimationKeys;
 	}
+    // 3/18/19; Have gotten a few crashes reported through Crashlytics right here.
 }
 
 #pragma mark - Persistence

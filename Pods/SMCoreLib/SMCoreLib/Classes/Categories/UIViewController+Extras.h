@@ -13,7 +13,6 @@
 
 #define ConfigureViewController(X) {\
             [self view];\
-            SPASLog(@"ConfigureViewController");\
             X;\
         }
 

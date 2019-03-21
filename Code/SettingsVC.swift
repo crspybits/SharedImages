@@ -31,12 +31,10 @@ class SettingsVC : UIViewController {
         versionAndBuild.sizeToFit()
     }
     
-    @IBAction func emailLogAction(_ sender: Any) {
-        Log.msg("Log.logFileURL: \(Log.logFileURL!)")
-        
+    @IBAction func emailLogAction(_ sender: Any) {        
         // First, log tracking info-- to try to give as much info as possible about user's state.
         SyncServer.session.logAllTracking() {
-            guard let logFileData = try? Data(contentsOf: Log.logFileURL!, options: NSData.ReadingOptions()) else {
+            guard Logger.archivedFileURLs.count > 0 else {
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "No log file present in app!")
                 return
             }
@@ -46,20 +44,21 @@ class SettingsVC : UIViewController {
                 return
             }
             
-            email.addAttachmentData(logFileData, mimeType: "text/plain", fileName: Log.logFileName)
-
+            for fileURL in Logger.archivedFileURLs {
+                guard let logFileData = try? Data(contentsOf: fileURL, options: NSData.ReadingOptions()) else {
+                    return
+                }
+                
+                let fileName = fileURL.lastPathComponent
+                email.addAttachmentData(logFileData, mimeType: "text/plain", fileName: fileName)
+            }
+            
             let versionDetails = SMEmail.getVersionDetails(for: "Neebla")!
             email.setMessageBody(versionDetails, isHTML: false)
-            email.setSubject("Log for developer of SharedImages")
+            email.setSubject("Question or comment for developer of Neebla")
             email.setToRecipients(["chris@SpasticMuffin.biz"])
             email.show()
         }
-    }
-    
-    @IBAction func resetLogAction(_ sender: Any) {
-        SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Really reset log file?", allowCancel: true, okCompletion: {
-            _ = Log.deleteLogFile()
-        })
     }
     
     @IBAction func resetUnreadCountsAction(_ sender: Any) {

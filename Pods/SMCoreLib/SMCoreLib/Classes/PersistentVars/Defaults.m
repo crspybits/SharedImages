@@ -23,7 +23,7 @@
     dispatch_once(&onceToken, ^{
         s_sharedInstance = [[self alloc] init];
         s_sharedInstance.currentItems = [s_sharedInstance items];
-        SPASLogDetail(@"class: %@", [s_sharedInstance class]);
+        // SPASLogDetail(@"class: %@", [s_sharedInstance class]);
     });
     
     return s_sharedInstance;

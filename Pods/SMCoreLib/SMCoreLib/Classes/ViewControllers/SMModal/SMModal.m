@@ -155,9 +155,9 @@
         //}
     }
     
-    SPASLogDetail(@"self.view.frame: %@", NSStringFromCGRect(self.view.frame));
-    SPASLogDetail(@"self.navigationController.view.frame: %@", NSStringFromCGRect(self.navigationController.view.frame));
-    SPASLogDetail(@"self.navigationController.navigationBar.frame %@", NSStringFromCGRect(self.navigationController.navigationBar.frame));
+    // SPASLogDetail(@"self.view.frame: %@", NSStringFromCGRect(self.view.frame));
+    // SPASLogDetail(@"self.navigationController.view.frame: %@", NSStringFromCGRect(self.navigationController.view.frame));
+    // SPASLogDetail(@"self.navigationController.navigationBar.frame %@", NSStringFromCGRect(self.navigationController.navigationBar.frame));
 }
 
 // 9/20/14; This code was working in iOS6 and iOS7, but something has changed (how surprising!) with iOS8. And the DataEntry controller is not moving up any more.
@@ -187,10 +187,10 @@
 {
     // 7/2/15; Note that CGPointApplyAffineTransform, or conversion of points using views (e.g., convertPoint:fromView:), did not prove useful to resolve the problem I've been having with <= iOS7. E.g., Bug #P122.
 #ifdef DEBUG
-    SPASLogDetail(@"%@", NSStringFromCGAffineTransform(CENTER_VIEW.transform));
-    SPASLogDetail(@"center: %@", NSStringFromCGPoint(center));
+    // SPASLogDetail(@"%@", NSStringFromCGAffineTransform(CENTER_VIEW.transform));
+    // SPASLogDetail(@"center: %@", NSStringFromCGPoint(center));
     CGPoint newCenter = CGPointApplyAffineTransform (center, CENTER_VIEW.transform);
-    SPASLogDetail(@"newCenter: %@", NSStringFromCGPoint(newCenter));
+    // SPASLogDetail(@"newCenter: %@", NSStringFromCGPoint(newCenter));
 #endif
     
     if ([UIDevice iOS8OrLater]) {
@@ -267,9 +267,9 @@
     // 9/8/14; Because we have a strong reference.
     self.popupNavController = nil;
     
-    SPASLogDetail(@"self.modalParentVC.presentedViewController: %@", self.modalParentVC.presentedViewController);
+    // SPASLogDetail(@"self.modalParentVC.presentedViewController: %@", self.modalParentVC.presentedViewController);
     
-    SPASLogDetail(@"arcReferenceCount: %li", (long)[self arcReferenceCount]);
+    // SPASLogDetail(@"arcReferenceCount: %li", (long)[self arcReferenceCount]);
 }
 
 - (void) close;
@@ -293,7 +293,7 @@
 
 - (void) dealloc;
 {
-    SPASLogDetail(@"dealloc");
+    // SPASLogDetail(@"dealloc");
 }
 
 #pragma mark - Methods for subclasses

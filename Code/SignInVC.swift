@@ -81,7 +81,7 @@ extension SignInVC : GenericSignInDelegate {
             
             // Attempting to sign in as a different user, and there are images present. Yikes.  Not allowing this yet because this would try to access a different account on the server and would just confuse things.
             signIn.signUserOut()
-            Log.msg("signUserOut: SignInVc: shouldDoUserAction")
+            Log.info("signUserOut: SignInVc: shouldDoUserAction")
             
             var title:String = "You are trying to sign in as a different user than before."
             if SignInManager.currentUIDisplayName.stringValue != "" {

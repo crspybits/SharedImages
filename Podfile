@@ -11,10 +11,10 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 18.11.0'
-	pod 'SyncServer/Facebook', '~> 18.11.0'
-	pod 'SyncServer/Dropbox', '~> 18.11.0'
-	pod 'SyncServer/Google', '~> 18.11.0'
+	pod 'SyncServer', '~> 18.12.0'
+	pod 'SyncServer/Facebook', '~> 18.12.0'
+	pod 'SyncServer/Dropbox', '~> 18.12.0'
+	pod 'SyncServer/Google', '~> 18.12.0'
 
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
@@ -56,6 +56,8 @@ target 'SharedImages' do
 
 	pod 'NohanaImagePicker', :git => 'https://github.com/crspybits/NohanaImagePicker.git'
 	# pod 'NohanaImagePicker', :path => '../NohanaImagePicker'
+	
+	pod 'XCGLogger', '~> 6.1'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

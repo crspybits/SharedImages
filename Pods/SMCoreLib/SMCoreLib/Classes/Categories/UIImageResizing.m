@@ -1,6 +1,5 @@
 #import "UIImageResizing.h"
 #import "UIImage+Resize.h"
-#import "SPASLog.h"
 
 // http://stackoverflow.com/questions/2658738/the-simplest-way-to-resize-an-uiimage
 @implementation UIImage (ResizeVersion1)
@@ -17,7 +16,7 @@
 
     UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
     
-    SPASLog(@"UIImageResizing.scaleToSize: orientation: %ld", (long) [scaledImage imageOrientation]);
+    // SPASLog(@"UIImageResizing.scaleToSize: orientation: %ld", (long) [scaledImage imageOrientation]);
     
     UIGraphicsEndImageContext();
 
@@ -28,7 +27,7 @@
     CGFloat oldHeight = self.size.height;
     CGFloat scale = (height/oldHeight);
     CGFloat width = self.size.width * scale;
-    SPASLog(@"width = %f", width);
+    // SPASLog(@"width = %f", width);
     CGSize size = CGSizeMake(width, height);
     return [self scaleToSize:size];
 }
@@ -150,10 +149,10 @@
     UIImage *iconImage = [self resizedImage:newSize
                        interpolationQuality:kCGInterpolationHigh];
     
-    SPASLog(@"scaleImageToIcon: original: height= %f, width= %f",
-          self.size.height, self.size.width);
-    SPASLog(@"scaleImageToIcon: scale: %f; height= %f, width= %f",
-          scale, iconImage.size.height, iconImage.size.width);
+    // SPASLog(@"scaleImageToIcon: original: height= %f, width= %f",
+    //      self.size.height, self.size.width);
+    // SPASLog(@"scaleImageToIcon: scale: %f; height= %f, width= %f",
+    //      scale, iconImage.size.height, iconImage.size.width);
     
     return iconImage;
 }

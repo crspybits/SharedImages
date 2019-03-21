@@ -14,6 +14,9 @@ import Fabric
 import Crashlytics
 import rosterdev
 import UserNotifications
+import XCGLogger
+
+let Log = Logger.setup()
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,12 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var sharingDelegate:SharingInviteDelegate?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    
-#if DEBUG
-        Log.minLevel = .verbose
-#else
-        Log.minLevel = .error
-#endif
 
 #if DEBUG
         TestCases.setup()
@@ -68,8 +65,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Call this as soon as possible in your launch sequence.
-        // Version 0.18.6 of the server is the first with error handling for gone and changed files/checkSums.
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.18.6"), failoverMessageURL: failoverURL)
+        // Version 0.21.2 of the server is the first with the new Codable REST/API call interface.
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, logger: Log, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.21.2"), failoverMessageURL: failoverURL)
     
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Neebla"

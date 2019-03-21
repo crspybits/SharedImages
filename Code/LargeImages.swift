@@ -82,7 +82,7 @@ class LargeImages : UIViewController {
     }
     
     deinit {
-        Log.msg("deinit")
+        Log.info("deinit")
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -141,7 +141,7 @@ class LargeImages : UIViewController {
             DispatchQueue.main.async {[unowned self] in
                 // Because when we rotate the device, we don't end up looking at the same image. I first tried this at the end of `viewWillLayoutSubviews`, but it doesn't work there.
                 if let indexPath = self.seekToIndexPath {
-                    Log.msg("self.seekToIndexPath: \(String(describing: indexPath))")
+                    Log.info("self.seekToIndexPath: \(String(describing: indexPath))")
                     self.collectionView?.scrollToItem(at: indexPath, at: .left, animated: false)
                     self.seekToIndexPath = nil
                 }
@@ -180,7 +180,7 @@ extension LargeImages : CoreDataSourceDelegate {
     
         // 8/24/17; Looks like this is where the crash happens.
         collectionView?.deleteItems(at: [indexPathOfDeletedObject as IndexPath])
-        Log.msg("LargeImages: objectWasDeleted")
+        Log.info("LargeImages: objectWasDeleted")
     }
     
     func coreDataSource(_ cds: CoreDataSource!, objectWasUpdated indexPathOfUpdatedObject: IndexPath!) {

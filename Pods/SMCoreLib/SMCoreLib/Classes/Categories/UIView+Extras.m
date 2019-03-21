@@ -10,7 +10,6 @@
 
 #import "UIView+Extras.h"
 #import <QuartzCore/QuartzCore.h>
-#import "SPASLog.h"
 #import "SMAssert.h"
 
 @implementation UIView (Extras)
@@ -184,7 +183,7 @@
 {
     if (! self.superview) return;
     
-    SPASLog(@"self.superview.height: %f", self.superview.frameHeight);
+    // SPASLog(@"self.superview.height: %f", self.superview.frameHeight);
     CGFloat superCenterY = self.superview.frameHeight/2.0;
     CGPoint selfCenter = self.center;
     selfCenter.y = superCenterY;
@@ -212,7 +211,7 @@
 {
     if (! self.superview) return;
     
-    SPASLog(@"self.superview.height: %f", self.superview.boundsHeight);
+    // SPASLog(@"self.superview.height: %f", self.superview.boundsHeight);
     CGFloat superCenterY = self.superview.boundsHeight/2.0;
     CGPoint selfCenter = self.center;
     selfCenter.y = superCenterY;
@@ -295,7 +294,7 @@
 }
 
 + (void) performAnimationSequence: (NSArray *) animations andThenCompletion: (AnimationDone) completion {
-    SPASLog(@"UIView+Extras.performAnimationSequence: Starting: %@", [NSDate date]);
+    // SPASLog(@"UIView+Extras.performAnimationSequence: Starting: %@", [NSDate date]);
     [self performAnimation: 0 fromSequence:animations andThenCompletion:completion];
 }
 
@@ -303,7 +302,7 @@
     
     // Base case of recursion
     if (current == [animations count]) {
-        SPASLog(@"UIView+Extras.performAnimationSequence: Ending: %@", [NSDate date]);
+        // SPASLog(@"UIView+Extras.performAnimationSequence: Ending: %@", [NSDate date]);
         if (completion) completion();
         return;
     }
@@ -327,7 +326,7 @@
 // It doesn't seem good to use the same name as in UIView: see http://stackoverflow.com/questions/5272451/overriding-methods-using-categories-in-objective-c
 + (void)animateWithDurationSync0:(NSNumber *)duration animations:(void (^)(void))animations completion:(void (^)(BOOL finished))completion;
 {
-    SPASLog(@"UIView+Extras.animateWithDurationSync0");
+    // SPASLog(@"UIView+Extras.animateWithDurationSync0");
     if (nil == duration) {
         animations();
         if (completion) completion(YES);

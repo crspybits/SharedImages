@@ -69,7 +69,7 @@ class SyncSpinner : UIView {
     private let animationKey = "rotationAnimation"
     
     func start() {
-        Log.msg("Started spinning...")
+        Log.info("Started spinning...")
         self.setImage(usingBackgroundColor: .clear)
         self.animating = true
         self.isHidden = false
@@ -81,11 +81,12 @@ class SyncSpinner : UIView {
         self.icon.layer.add(rotationAnimation, forKey: self.animationKey)
         
         // Dealing with issue of animation not restarting when app comes back from background.
+        // 3/18/19; Have gotten a few crashes reported through Crashlytics right here. See https://stackoverflow.com/questions/7568567/restoring-animation-where-it-left-off-when-app-resumes-from-background
         self.icon.layer.mb_setCurrentAnimationsPersistent()
     }
     
     func stop(withBackgroundColor color:BackgroundColor = .clear) {
-        Log.msg("Stopped spinning...")
+        Log.info("Stopped spinning...")
 
         self.animating = false
         

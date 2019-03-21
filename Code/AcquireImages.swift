@@ -169,7 +169,7 @@ extension AcquireImages : UIImagePickerControllerDelegate, UINavigationControlle
     }
     
     public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        Log.msg("imagePickerControllerDidCancel")
+        Log.info("imagePickerControllerDidCancel")
         picker.dismiss(animated: true, completion: nil)
     }
 }

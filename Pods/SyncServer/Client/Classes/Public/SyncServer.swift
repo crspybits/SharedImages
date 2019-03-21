@@ -9,6 +9,9 @@
 import Foundation
 import SMCoreLib
 import SyncServer_Shared
+import XCGLogger
+
+var Log: XCGLogger!
 
 /// Synchronize files and app meta data with other instances of the same client app.
 public class SyncServer: NSObject {
@@ -76,13 +79,15 @@ public class SyncServer: NSObject {
      
      - parameters:
        - withServerURL: URL for the SyncServerII server.
+       - logger: Logger to use for debugging/error log messages.
        - cloudFolderName: In the cloud storage service, the path of the directory/folder in which to put files. `cloudFolderName` is optional because it's only needed for some of the cloud storage services (e.g., Google Drive).
        - minimumServerVersion: The minimum SyncServerII server version needed by your app. Leave nil if your app doesn't have a specific server version requirement.
        - failoverMessageURL: Optional URL on which to do a GET for a message if the server fails, to show a message to the user.
      */
-    public func appLaunchSetup(withServerURL serverURL: URL, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil, failoverMessageURL:URL? = nil) {
-        Log.msg("cloudFolderName: \(String(describing: cloudFolderName))")
-        Log.msg("serverURL: \(serverURL.absoluteString)")
+    public func appLaunchSetup(withServerURL serverURL: URL, logger: XCGLogger, cloudFolderName:String?, minimumServerVersion:ServerVersion? = nil, failoverMessageURL:URL? = nil) {
+        Log = logger
+        Log.info("cloudFolderName: \(String(describing: cloudFolderName))")
+        Log.info("serverURL: \(serverURL.absoluteString)")
                 
         // This seems a little hacky, but can't find a better way to get the bundle of the framework containing our model. I.e., "this" framework. Just using a Core Data object contained in this framework to track it down.
         // Without providing this bundle reference, I wasn't able to dynamically locate the model contained in the framework.
@@ -118,9 +123,9 @@ public class SyncServer: NSObject {
         // Debugging
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
             let pendingUploads = UploadFileTracker.fetchAll()
-            Log.msg("Upload file tracker count: \(pendingUploads.count)")
+            Log.info("Upload file tracker count: \(pendingUploads.count)")
             pendingUploads.forEach { uft in
-                Log.msg("Upload file tracker status: \(uft.status)")
+                Log.info("Upload file tracker status: \(uft.status)")
             }
         }
         
@@ -1152,7 +1157,7 @@ public class SyncServer: NSObject {
             - completion: When the completion handler is called, the file data logged should be present in persistent storage. Runs asynchronously on the main thread.
     */
     public func logAllTracking(completion: (()->())? = nil) {
-        Log.msg("*************** Starts: logAllTracking ***************")
+        Log.info("*************** Starts: logAllTracking ***************")
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
             DownloadContentGroup.printAll()
             DownloadFileTracker.printAll()
@@ -1165,7 +1170,7 @@ public class SyncServer: NSObject {
             SharingGroupUploadTracker.printAll()
             DirectoryEntry.printAll()
         }
-        Log.msg(SyncServer.trailingMarker)
+        Log.info(SyncServer.trailingMarker)
         
         // See also https://stackoverflow.com/questions/50311546/ios-flush-all-output-files/50311616
         if let completion = completion {
@@ -1247,9 +1252,9 @@ public class SyncServer: NSObject {
                 // Elements in directory that are missing in client. At least some of these could be files that were deleted on the server before they were ever actually processed by the client.
                 let directoryMissing = directory.subtracting(intersection)
                 
-                Log.msg("clientMissingAndDeleted: \(clientMissingAndDeleted)")
-                Log.msg("clientMissingNotDeleted: \(clientMissingNotDeleted)")
-                Log.msg("directoryMissing: \(directoryMissing)")
+                Log.info("clientMissingAndDeleted: \(clientMissingAndDeleted)")
+                Log.info("clientMissingNotDeleted: \(clientMissingNotDeleted)")
+                Log.info("directoryMissing: \(directoryMissing)")
                 results = LocalConsistencyResults(clientMissingAndDeleted: clientMissingAndDeleted, clientMissingNotDeleted: clientMissingNotDeleted, directoryMissing: directoryMissing)
                 
                 // 12/27/18; This is to deal with fallout from https://github.com/crspybits/SyncServer-iOSClient/issues/63 i.e., I think that issue is fixed, but existing users might need this for full recovery. I'm going to remove the relevant directory entries which, next time a sync occurs, will force another download of the files.
@@ -1275,7 +1280,7 @@ public class SyncServer: NSObject {
     
     private func start(sharingGroupUUID: String?, reAttemptGoneDownloads: Bool, completion:(()->())?) {
         EventDesired.reportEvent(.syncStarted, mask: self.eventsDesired, delegate: self.delegate)
-        Log.msg("SyncServer.start")
+        Log.info("SyncServer.start")
         
         if let sharingGroupUUID = sharingGroupUUID {
             /* Two options here:

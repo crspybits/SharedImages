@@ -58,7 +58,7 @@ class Progress {
         
         if let _ = viewController  {
             let progress = CGFloat(numberCounted)/CGFloat(totalNumber)
-            Log.msg("setProgress: \(progress)")
+            Log.info("setProgress: \(progress)")
             
             if progress > 0 {
                 progressView.setProgress(Float(progress), withAnimation: true, completion: completion)

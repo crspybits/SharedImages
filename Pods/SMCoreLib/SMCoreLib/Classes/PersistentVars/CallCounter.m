@@ -61,7 +61,7 @@
 - (void) doCallWithKey: (NSString *) nsUserDefaultsKey;
 {
     self.countOfTimesCalled++;
-    SPASLog(@"self.countOfTimesCalled: %lu, self.numberOfTimes: %lu", (unsigned long)self.countOfTimesCalled, (unsigned long)self.numberOfTimes);
+    // SPASLog(@"self.countOfTimesCalled: %lu, self.numberOfTimes: %lu", (unsigned long)self.countOfTimesCalled, (unsigned long)self.numberOfTimes);
     
     if (self.countOfTimesCalled > self.numberOfTimes) {
         return;

@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "924057B2A88FC4B5526EC3FC7483ABE2"
+               BlueprintIdentifier = "7BF2C22F370D7E87AB7F577A75CD381E"
+               BuildableName = "FileMD5Hash.framework"
                BlueprintName = "FileMD5Hash"
-               ReferencedContainer = "container:Pods.xcodeproj"
-               BuildableName = "FileMD5Hash.framework">
+               ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

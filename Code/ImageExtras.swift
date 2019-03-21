@@ -72,7 +72,7 @@ class ImageExtras {
                 return
             }
             
-            Log.msg("Deleting image with uuid: \(uuid)")
+            Log.info("Deleting image with uuid: \(uuid)")
             
             // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
             do {

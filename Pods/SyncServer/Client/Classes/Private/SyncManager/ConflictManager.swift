@@ -174,7 +174,7 @@ class ConflictManager {
 
         CoreDataSync.perform(sessionName: Constants.coreDataName) {
             deletionAttrs = dfts.map {$0.attr}
-            Log.msg("Deletions: count: \(dfts.count)")
+            Log.info("Deletions: count: \(dfts.count)")
         }
 
         ConflictManager.handleAnyDownloadDeletionConflicts(

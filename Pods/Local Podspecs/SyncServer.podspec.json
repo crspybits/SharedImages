@@ -31,17 +31,17 @@
     "SMCoreLib": [
       "~> 1.4"
     ],
-    "Gloss": [
-      "~> 1.2"
-    ],
     "SyncServer-Shared": [
-      "~> 9.6"
+      "~> 9.8"
     ],
     "FileMD5Hash": [
       "~> 2.0"
     ],
     "PersistentValue": [
       "~> 0.3"
+    ],
+    "XCGLogger": [
+      "~> 6.1"
     ]
   },
   "default_subspecs": "Lite",
@@ -87,8 +87,8 @@
         "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_GOOGLE_SIGNIN"
       },
       "dependencies": {
-        "GoogleSignIn": [
-          "~> 0.1"
+        "SMGoogleSignIn": [
+          "~> 1.1"
         ]
       }
     }

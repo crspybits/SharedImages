@@ -67,7 +67,7 @@
 
 - (void) callReachableHandlers: (BOOL) currentNetworkIsReachable;
 {
-    SPASLog(@"Network.initializeClass: Network is reachable: %d", currentNetworkIsReachable);
+    // SPASLog(@"Network.initializeClass: Network is reachable: %d", currentNetworkIsReachable);
     
     // 1/3/16; I'm going to change this so that it only calls its handlers if there is actually a change in reachability, i.e., from reachable to unreachable or vice versa.
     
@@ -76,7 +76,7 @@
         return;
     }
     
-    SPASLog(@"Network.initializeClass: Network reachability changed");
+    // SPASLog(@"Network.initializeClass: Network reachability changed");
     
     self.calledOnce = YES;
     self.previousNetworkIsReachable = currentNetworkIsReachable;

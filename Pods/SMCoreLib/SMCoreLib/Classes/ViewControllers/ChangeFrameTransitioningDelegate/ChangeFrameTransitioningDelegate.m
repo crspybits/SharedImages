@@ -115,7 +115,7 @@
         [[presentedViewController transitionCoordinator] animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
             setAlpha();
         } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-            SPASLogDetail(@"self.presentedViewController.view: %@", self.presentedViewController.view);
+            // SPASLogDetail(@"self.presentedViewController.view: %@", self.presentedViewController.view);
         }];
     }
     else
@@ -145,7 +145,7 @@
 // Subclasses method of UIPresentationController
 - (CGRect)frameOfPresentedViewInContainerView;
 {
-    SPASLogDetail(@"frameOfPresentedViewInContainerView: %@", NSStringFromCGRect(self.currentFrame));
+    // SPASLogDetail(@"frameOfPresentedViewInContainerView: %@", NSStringFromCGRect(self.currentFrame));
     return self.currentFrame;
 }
 
@@ -182,7 +182,7 @@
 
 - (void) containerViewWillLayoutSubviews;
 {
-    SPASLogDetail(@"containerViewWillLayoutSubviews");
+    // SPASLogDetail(@"containerViewWillLayoutSubviews");
 }
 
 - (void)prepareDimmingView

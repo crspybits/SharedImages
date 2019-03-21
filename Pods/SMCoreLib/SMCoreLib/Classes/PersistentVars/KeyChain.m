@@ -108,7 +108,7 @@
     if (0 < [service length] && 0 < [account length]) {
         if (removeFirst && ![KeyChain removeSecureTokenForService:service account:account]) {
             // This is not really a problem; just being verbose.
-            SPASLog(@"KeyChain.setSecureData: Could not remove previous token (service: %@, account: %@)", service, account);
+            // SPASLog(@"KeyChain.setSecureData: Could not remove previous token (service: %@, account: %@)", service, account);
         }
         
         if (0 < [tokenToSecure length]) {
@@ -128,7 +128,7 @@
                 NSError *error = [NSError errorWithDomain:KEYCHAIN_DOMAIN
                                                      code:status
                                                  userInfo:nil];
-                SPASLogFile(@"KeyChain.setSecureData: Service: %@, Account: %@, Error: %@", service, account, error);
+                // SPASLogFile(@"KeyChain.setSecureData: Service: %@, Account: %@, Error: %@", service, account, error);
                 return NO;
             }
         }
@@ -169,7 +169,7 @@
               account:(NSString *)account {
     NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:dateToSecure];
     if (! archivedData) {
-        SPASLogFile(@"Could not archive data for: %@", dateToSecure);
+        // SPASLogFile(@"Could not archive data for: %@", dateToSecure);
         return NO;
     }
     return [KeyChain setSecureData:archivedData forService:service account:account];

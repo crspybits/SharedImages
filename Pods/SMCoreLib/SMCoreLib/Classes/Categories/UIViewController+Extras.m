@@ -17,8 +17,6 @@
 #import "UIView+Extras.h"
 #endif
 
-#import "SPASLog.h"
-
 static char kStatusBarColorView;
 static char kStatusBarColor;
 
@@ -78,8 +76,8 @@ static char kStatusBarColor;
             // See also the app delegate, didFinishLaunchingWithOptions; this puts up a black status bar, and the white text of the status bar shows through.
             // 5/16/15; iOS7: self.navigationController.view hasn't always changed to the rotated size by this point. Use self.view.
             statusBarColorView = [[UIView alloc] initWithFrame:CGRectMake(0, 0,self.view.frameWidth, [SMAppearance session].statusBarHeight)];
-            SPASLogDetail(@"self.navigationController: %@", self.navigationController.view);
-            SPASLogDetail(@"self.view: %@", self.view);
+            // SPASLogDetail(@"self.navigationController: %@", self.navigationController.view);
+            // SPASLogDetail(@"self.view: %@", self.view);
 
             statusBarColorView.backgroundColor = statusBarColor;
             [self.navigationController.view addSubview:statusBarColorView];

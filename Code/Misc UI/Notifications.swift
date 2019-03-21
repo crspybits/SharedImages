@@ -25,7 +25,7 @@ class Notifications {
         let center = UNUserNotificationCenter.current()
         // The first time this gets called, it will ask the user for authorization. Subsequent times, it's not called and just return the prior result.
         center.requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
-            Log.msg("granted: \(granted)")
+            Log.info("granted: \(granted)")
             Notifications.notificationsAuthorized.boolValue = granted
 
             guard error == nil else {
@@ -39,7 +39,7 @@ class Notifications {
                 }
             }
             else {
-                Log.msg("User didn't grant Push Notifications")
+                Log.info("User didn't grant Push Notifications")
             }
         }
     }
@@ -66,19 +66,19 @@ class Notifications {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
-        Log.msg("Device token: \(deviceTokenString)")
+        Log.info("Device token: \(deviceTokenString)")
         
-        Log.msg("Device token 2: \(deviceToken)")
-        Log.msg("Device token 3: \(String(describing: String(data: deviceToken, encoding: .utf8)))")
-        Log.msg("Device token 4: \(deviceToken.description)")
+        Log.info("Device token 2: \(deviceToken)")
+        Log.info("Device token 3: \(String(describing: String(data: deviceToken, encoding: .utf8)))")
+        Log.info("Device token 4: \(deviceToken.description)")
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        Log.msg("Device token 5: \(token)")
+        Log.info("Device token 5: \(token)")
 
         if Notifications.deviceToken.value == deviceToken {
-            Log.msg("Device token unchanged.")
+            Log.info("Device token unchanged.")
         }
         else {
-            Log.msg("Device token changed: Updating in persistent store.")
+            Log.info("Device token changed: Updating in persistent store.")
             
             SyncServerUser.session.registerPushNotificationToken(token: deviceTokenString) { error in
                 guard error == nil else {
@@ -98,7 +98,7 @@ class Notifications {
     
     // Given [2] in AppDelegate, this is no longer needed or called.
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
-        Log.msg("didReceiveRemoteNotification: \(userInfo)")
+        Log.info("didReceiveRemoteNotification: \(userInfo)")
         SMCoreLib.Alert.show(withTitle: "Push Notification!", message: "Got a push notification: \(userInfo)")
     }
 }
