@@ -1,6 +1,6 @@
 SharedImages
 
-Version 1.2.0
+Version 1.2.0 (3/22/19)
 	* Added multi-image select when uploading images from photo library.
 	* Fixed issue where initial Google Sign-in prompt still showed "SharedImages"
 		Did this by changing product name in build settings.
