@@ -23,7 +23,9 @@ class AlbumCell: UIView, XibBasics {
     @IBOutlet weak var albumName: UITextField!
     private var sharingGroup: SyncServer.SharingGroup!
     @IBOutlet weak var albumSyncNeeded: UIView!
-    
+    @IBOutlet weak var shareImage: UIImageView!
+    private var sharingOn: Bool = false
+
     override func awakeFromNib() {
         super.awakeFromNib()
         albumName.delegate = self
@@ -39,8 +41,10 @@ class AlbumCell: UIView, XibBasics {
         }
     }
     
-    func setup(sharingGroup: SyncServer.SharingGroup, enableGroupNameEditing: Bool) {
+    func setup(sharingGroup: SyncServer.SharingGroup, enableGroupNameEditing: Bool, sharingOn: Bool) {
         self.sharingGroup = sharingGroup
+        self.sharingOn = sharingOn
+        
         setAlbumName()
         
         albumName.isEnabled = enableGroupNameEditing
@@ -54,6 +58,17 @@ class AlbumCell: UIView, XibBasics {
         }
         
         setSyncNeeded()
+        
+        UIView.animate(withDuration: 0.2) {[unowned self] in
+            if sharingOn {
+                self.image.alpha = 0.75
+                self.shareImage.alpha = 1
+            }
+            else {
+                self.image.alpha = 1.0
+                self.shareImage.alpha = 0
+            }
+        }
     }
     
     private func setSyncNeeded() {
@@ -144,6 +159,11 @@ class AlbumCell: UIView, XibBasics {
 
 extension AlbumCell: UITextFieldDelegate {
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if sharingOn {
+            // So user can't edit name while in sharing mode. Which is a little strange.
+            return false
+        }
+        
         startEditing?()
         albumName.borderStyle = .roundedRect
         albumName.backgroundColor = .white

@@ -174,6 +174,44 @@
                                             <constraint firstAttribute="bottom" secondItem="Nn5-Yy-MNY" secondAttribute="bottom" id="yGH-ld-uN9"/>
                                         </constraints>
                                     </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dMj-GZ-VKV" userLabel="Remove album">
+                                        <rect key="frame" x="0.0" y="70" width="375" height="70"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rzN-F8-tnD" userLabel="Separator">
+                                                <rect key="frame" x="0.0" y="69" width="375" height="1"/>
+                                                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="calibratedWhite"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="1" id="Whr-CX-M0o"/>
+                                                </constraints>
+                                            </view>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mRk-9m-Xlm" userLabel="Button Container">
+                                                <rect key="frame" x="50" y="0.0" width="275" height="70"/>
+                                                <subviews>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tj0-fZ-pBj" userLabel="Remove an album...">
+                                                        <rect key="frame" x="0.0" y="17" width="275" height="36"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                        <state key="normal" title="Remove an album ..."/>
+                                                    </button>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="tj0-fZ-pBj" firstAttribute="leading" secondItem="mRk-9m-Xlm" secondAttribute="leading" id="65b-E4-Pej"/>
+                                                    <constraint firstItem="tj0-fZ-pBj" firstAttribute="centerY" secondItem="mRk-9m-Xlm" secondAttribute="centerY" id="7Nb-ix-eIb"/>
+                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="tj0-fZ-pBj" secondAttribute="trailing" id="WsY-Uh-RZp"/>
+                                                    <constraint firstAttribute="width" constant="275" id="gup-sd-yFJ"/>
+                                                    <constraint firstItem="tj0-fZ-pBj" firstAttribute="centerX" secondItem="mRk-9m-Xlm" secondAttribute="centerX" id="ohq-Sc-nM2"/>
+                                                </constraints>
+                                            </view>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="bottom" secondItem="mRk-9m-Xlm" secondAttribute="bottom" id="3if-ss-7Zl"/>
+                                            <constraint firstAttribute="height" constant="70" id="7Ew-9a-KET"/>
+                                            <constraint firstItem="rzN-F8-tnD" firstAttribute="leading" secondItem="dMj-GZ-VKV" secondAttribute="leading" id="B6z-Vb-fh2"/>
+                                            <constraint firstAttribute="bottom" secondItem="rzN-F8-tnD" secondAttribute="bottom" id="ILb-Dh-3ap"/>
+                                            <constraint firstItem="mRk-9m-Xlm" firstAttribute="top" secondItem="dMj-GZ-VKV" secondAttribute="top" id="SWv-PB-CDv"/>
+                                            <constraint firstAttribute="trailing" secondItem="rzN-F8-tnD" secondAttribute="trailing" id="jZL-gD-Pbq"/>
+                                            <constraint firstItem="mRk-9m-Xlm" firstAttribute="centerX" secondItem="dMj-GZ-VKV" secondAttribute="centerX" id="sCT-M3-ABG"/>
+                                        </constraints>
+                                    </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Xb-gd-QUp" userLabel="Email">
                                         <rect key="frame" x="0.0" y="414" width="375" height="70"/>
                                         <subviews>
@@ -263,6 +301,8 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="375" id="2Qc-qo-9mt"/>
+                                    <constraint firstAttribute="trailing" secondItem="dMj-GZ-VKV" secondAttribute="trailing" id="2qN-PH-BcC"/>
+                                    <constraint firstItem="dMj-GZ-VKV" firstAttribute="top" secondItem="B2B-Mb-kFJ" secondAttribute="bottom" id="CjT-mI-MYG"/>
                                     <constraint firstItem="B2B-Mb-kFJ" firstAttribute="leading" secondItem="GWH-6c-1MQ" secondAttribute="leading" id="PVr-wO-hTr"/>
                                     <constraint firstAttribute="bottom" secondItem="4SX-2Q-Mb8" secondAttribute="bottom" id="QTw-oX-VFu"/>
                                     <constraint firstAttribute="trailing" secondItem="4SX-2Q-Mb8" secondAttribute="trailing" id="S8G-tz-NQW"/>
@@ -272,6 +312,7 @@
                                     <constraint firstAttribute="trailing" secondItem="0Xb-gd-QUp" secondAttribute="trailing" id="bzZ-Qv-ALZ"/>
                                     <constraint firstItem="B2B-Mb-kFJ" firstAttribute="top" secondItem="GWH-6c-1MQ" secondAttribute="top" id="fC6-5R-apo"/>
                                     <constraint firstItem="4SX-2Q-Mb8" firstAttribute="top" secondItem="0Xb-gd-QUp" secondAttribute="bottom" id="rx0-kP-cq1"/>
+                                    <constraint firstItem="dMj-GZ-VKV" firstAttribute="leading" secondItem="GWH-6c-1MQ" secondAttribute="leading" id="tcG-RQ-4WU"/>
                                 </constraints>
                                 <variation key="default">
                                     <mask key="constraints">

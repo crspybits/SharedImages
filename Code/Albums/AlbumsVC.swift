@@ -25,12 +25,16 @@ class AlbumsVC: UIViewController {
     private var shouldLayoutSubviews = true
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     private var addAlbum:UIBarButtonItem!
+    private var shareAlbums:UIBarButtonItem!
     @IBOutlet weak var collectionViewBottom: NSLayoutConstraint!
     private var originalCollectionViewBottom: CGFloat!
     
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
     var refreshControl:ODRefreshControl!
     
+    private var sharingOn: Bool = false
+    private var shareAlbum:ShareAlbum!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,7 +48,8 @@ class AlbumsVC: UIViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
         addAlbum = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbumAction))
-        navigationItem.rightBarButtonItem = addAlbum
+        shareAlbums = UIBarButtonItem(image: #imageLiteral(resourceName: "Share"), style: .plain, target: self, action: #selector(shareAction))
+        setupBarButtonItems()
         
         originalCollectionViewBottom = collectionViewBottom.constant
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardChangeFrameAction), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
@@ -58,6 +63,20 @@ class AlbumsVC: UIViewController {
         // Because, when app enters background, AppBadge sets itself up to use handlers.
         NotificationCenter.default.addObserver(self, selector:#selector(setupHandlers), name:
             UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    private func setupBarButtonItems(canShareAlbum: Bool = false) {
+        if canShareAlbum {
+            navigationItem.rightBarButtonItems = [addAlbum, shareAlbums]
+        }
+        else {
+            navigationItem.rightBarButtonItems = [addAlbum]
+        }
+    }
+    
+    @objc private func shareAction() {
+        sharingOn = !sharingOn
+        collectionView.reloadData()
     }
     
     @objc private func setupHandlers() {
@@ -104,6 +123,10 @@ class AlbumsVC: UIViewController {
     }
     
     @objc private func addAlbumAction() {
+        guard !sharingOn else {
+            return
+        }
+        
         if SignInManager.session.currentSignIn?.userType == .sharing {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Users without cloud storage cannot create sharing groups.")
             return
@@ -160,7 +183,10 @@ class AlbumsVC: UIViewController {
             }
             return true
         }
-    
+        
+        let adminGroups = sharingGroups.filter { $0.permission.hasMinimumPermission(.admin)}
+        setupBarButtonItems(canShareAlbum: adminGroups.count > 0)
+
         // Can't seem to do this with `performBatchUpdates` to get animations. It crashes.
         collectionView.reloadData()
     }
@@ -170,6 +196,10 @@ class AlbumsVC: UIViewController {
         
         // Put these here because the ImagesVC changes them.
         setupHandlers()
+        
+        // So, when we return from another screen we're not in the sharing state.
+        // updateSharingGroups, below, does a collection view reload-- so this will get used.
+        sharingOn = false
         
         // Putting this in `viewWillAppear` to deal with the first time the Albums are displayed and to deal with removal of an album in ImagesVC. And to deal with sharing group updates from other places in the app.
         updateSharingGroups()
@@ -261,20 +291,35 @@ extension AlbumsVC : UICollectionViewDataSource {
             albumCell.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         }
 
-        albumCell.setup(sharingGroup: sharingGroup, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write))
-        albumCell.tapAction = { [unowned self] in
-            self.gotoAlbum(sharingGroup: sharingGroup)
+        let sharingReallyOn = sharingGroup.permission.hasMinimumPermission(.admin) && sharingOn
+
+        func tapAction(initialSync: Bool = false) {
+            unowned let unownedSelf = self
+            if sharingReallyOn {
+                unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self)
+                unownedSelf.sharingOn = false
+                unownedSelf.collectionView.reloadData()
+                unownedSelf.shareAlbum.start()
+            }
+            else {
+                unownedSelf.gotoAlbum(sharingGroup: sharingGroup, initialSync: initialSync)
+            }
         }
-        albumCell.albumSyncAction = { [unowned self] in
-            self.gotoAlbum(sharingGroup: sharingGroup, initialSync: true)
+        
+        albumCell.setup(sharingGroup: sharingGroup, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingReallyOn)
+        albumCell.tapAction = {
+            tapAction()
         }
-        albumCell.saveAction = { newName in
+        albumCell.albumSyncAction = {
+            tapAction(initialSync: true)
+        }
+        albumCell.saveAction = {[unowned self] newName in
             self.saveNewSharingGroupName(sharingGroupUUID: sharingGroup.sharingGroupUUID, newName: newName)
         }
-        albumCell.startEditing = {
+        albumCell.startEditing = {[unowned self] in
             self.addAlbum.isEnabled = false
         }
-        albumCell.endEditing = {
+        albumCell.endEditing = {[unowned self] in
             self.addAlbum.isEnabled = true
         }
         

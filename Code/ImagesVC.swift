@@ -142,13 +142,6 @@ class ImagesVC: UIViewController {
             })]
         }
         
-        if sharingGroup.permission.hasMinimumPermission(.admin) {
-            dropDownMenuItems += [DropDownMenuItem(name: "Share Album", action: {
-                [unowned self] in
-                self.shareAction()
-            })]
-        }
-        
         dropDownMenuItems += [
             DropDownMenuItem(name: "Other Actions", action: {[unowned self] in
                 self.actionButtonAction()
@@ -172,16 +165,14 @@ class ImagesVC: UIViewController {
     }
     
     private func removeUserFromAlbum() {
-        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove the current album?", message: "This will permanently remove the album from the SharedImages app on your device(s). If images have been stored in your cloud storage, they will still be in your cloud storage.", allowCancel: true, okCompletion: {
-        
-            // TODO: Don't have any kind of spinner for this yet...
-            
+        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove you from the current album?", message: "This will permanently remove the album from the Neebla app on your device(s). Other users can still use the album, but they won't have access to your images any more. If images have been stored in your cloud storage, they will still be in your cloud storage.", allowCancel: true, okCompletion: {
+
             do {
                 try SyncServer.session.removeFromSharingGroup(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
                 try SyncServer.session.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
             } catch (let error) {
                 Log.error("\(error)")
-                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not remove the current album! Please try again later.")
+                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not remove you from the current album! Please try again later.")
                 return
             }
             
@@ -396,65 +387,6 @@ class ImagesVC: UIViewController {
         }
         
         return FileData(url: newDiscussionFileURL, mimeType: .text, fileUUID: discussionUUID, sharingGroupUUID: sharingGroupUUID, gone: nil)
-    }
-    
-    private func shareAction() {
-        var alert:UIAlertController
-        
-        if SignInManager.session.userIsSignedIn {
-            alert = UIAlertController(title: "Share album images with a Dropbox, Facebook, or Google user?", message: nil, preferredStyle: .actionSheet)
-
-            func addAlertAction(_ permission:Permission) {
-                alert.addAction(UIAlertAction(title: permission.userFriendlyText(), style: .default){alert in
-                    self.completeSharing(permission: permission)
-                })
-            }
-            
-            addAlertAction(.read)
-            addAlertAction(.write)
-            addAlertAction(.admin)
-
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel){alert in
-            })
-        }
-        else {
-            alert = UIAlertController(title: "Please sign in first!", message: "There is no signed in user.", preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "OK", style: .cancel){alert in
-            })
-        }
-        
-        Alert.styleForIPad(alert)
-        alert.popoverPresentationController?.barButtonItem = otherActionBarButton
-        present(alert, animated: true, completion: nil)
-    }
-    
-    private func completeSharing(permission:Permission) {
-        SyncServerUser.session.createSharingInvitation(withPermission: permission, sharingGroupUUID: sharingGroup.sharingGroupUUID) { invitationCode, error in
-            if error == nil {
-                let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:permission)
-                if let email = SMEmail(parentViewController: self) {
-                    let message = "I'd like to share an album of images with you through the Neebla app and your Dropbox, Facebook, or Google account. To share images, you need to:\n" +
-                        "1) download the Neebla iOS app onto your iPhone or iPad,\n" +
-                        "2) tap the link below in the Apple Mail app, and\n" +
-                        "3) follow the instructions within the app to sign in to your Dropbox, Facebook, or Google account.\n" +
-                        "You will have " + permission.userFriendlyText() + " access to images.\n\n" +
-                            sharingURLString
-                    
-                    email.setMessageBody(message, isHTML: false)
-                    email.setSubject("Share images using the Neebla app")
-                    email.show()
-                }
-            }
-            else {
-                let alert = UIAlertController(title: "Error creating sharing invitation!", message: "\(error!)", preferredStyle: .actionSheet)
-                alert.popoverPresentationController?.barButtonItem = self.otherActionBarButton
-                Alert.styleForIPad(alert)
-
-                alert.addAction(UIAlertAction(title: "OK", style: .cancel) {alert in
-                })
-                self.present(alert, animated: true, completion: nil)
-            }
-        }
     }
 }
 
