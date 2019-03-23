@@ -38,14 +38,29 @@ class ImagesVC: UIViewController {
 
     private var bottomRefresh:BottomRefresh!
     
-    // Selection (via long-press) to allow user to select images for sending via text messages, email (etc), or for deletion.
+    // To allow user to select images for sending via text messages, email (etc), or for deletion.
     typealias UUIDString = String
     fileprivate var selectedImages = Set<UUIDString>()
     
     private var deletedImages:[IndexPath]?
     private var noDownloadImageView:UIImageView!
     private let titleLabel = ImagesTitle.create()!
-    private var selectionOn = false
+    
+    private var selectionOn = false {
+        didSet {
+            if selectionOn {
+                selectImages.tintColor = .lightGray
+                selectedImages.removeAll()
+            }
+            else {
+                selectImages.tintColor = nil
+                navigationController?.setToolbarHidden(true, animated: true)
+            }
+        }
+    }
+    
+    private var removeImages:RemoveImages!
+    private var selectImages:UIButton!
     
     static func create() -> ImagesVC {
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ImagesVC") as! ImagesVC
@@ -54,11 +69,12 @@ class ImagesVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let action = UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil)
-        let trash = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
+        // These are for the toolbar that appears when you've entered the "Selection" state (selectionOn == true).
+        let action = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(actionButtonAction))
+        let trash = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(removeImagesAction))
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         setToolbarItems([action, flexSpace, trash], animated: false)
-        
+
         collectionView.dataSource = self
         collectionView.delegate = self
 
@@ -70,7 +86,6 @@ class ImagesVC: UIViewController {
         // To manually refresh-- pull down on collection view.
         refreshControl = ODRefreshControl.create(scrollView: collectionView, nav: navigationController!, target: self, selector: #selector(refresh))
         
-        // Long press on image to select.
         collectionView.alwaysBounceVertical = true
         
         titleLabel.title.text = sharingGroup.sharingGroupName ?? "Album Images"
@@ -80,7 +95,7 @@ class ImagesVC: UIViewController {
         titleLabel.updateCaret()
         navigationItem.titleView = titleLabel
         
-        let selectImages = UIButton(type: .system)
+        selectImages = UIButton(type: .system)
         selectImages.setImage(#imageLiteral(resourceName: "Select"), for: .normal)
         selectImages.addTarget(self, action: #selector(selectImagesAction), for: .touchUpInside)
         let selectImagesBarButton = UIBarButtonItem(customView: selectImages)
@@ -118,6 +133,18 @@ class ImagesVC: UIViewController {
         })
     }
     
+    @objc private func removeImagesAction() {
+        var images = [Image]()
+        for uuidString in selectedImages {
+            if let imageObj = Image.fetchObjectWithUUID(uuidString) {
+                images.append(imageObj)
+            }
+        }
+        
+        removeImages = RemoveImages(images, syncController: imagesHandler.syncController, sharingGroup: sharingGroup, withParentVC: self)
+        removeImages.start()
+    }
+    
     @objc private func addImagesAction() {
         guard !selectionOn else {
             return
@@ -128,13 +155,6 @@ class ImagesVC: UIViewController {
     
     @objc private func selectImagesAction() {
         selectionOn = !selectionOn
-        
-        if selectionOn {
-            selectedImages.removeAll()
-        }
-        else {
-            navigationController?.setToolbarHidden(true, animated: true)
-        }
         
         for indexPath in collectionView.indexPathsForVisibleItems {
             let imageObj = coreDataSource.object(at: indexPath) as! Image
@@ -154,39 +174,6 @@ class ImagesVC: UIViewController {
     
     @objc private func sortFilterAction() {
         SortyFilter.show(fromParentVC: self, delegate: self)
-    }
-    
-    func remove(images:[Image]) {
-        // The sync/remote remove must happen before the local remove-- or we lose the reference!
-        
-        // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
-        if !imagesHandler.syncController.remove(images: images, sharingGroupUUID: sharingGroup.sharingGroupUUID) {
-            var message = "Image"
-            if images.count > 1 {
-                message += "s"
-            }
-            
-            message += " already deleted on server."
-            
-            SMCoreLib.Alert.show(withTitle: "Error", message: message)
-            Log.error("Error: \(message)")
-            
-            // I'm not going to return here. Even if somehow the image was already deleted on the server, let's make sure it was deleted locally.
-        }
-        
-        // 12/2/17, 12/25/17; This is tricky. See https://github.com/crspybits/SharedImages/issues/61 and https://stackoverflow.com/questions/47614583/delete-multiple-core-data-objects-issue-with-nsfetchedresultscontroller
-        // I'm dealing with this below. See the reference to this SO issue below.
-        for image in images {
-            // This also removes any associated discussion.
-            do {
-                try image.remove()
-            }
-            catch (let error) {
-                Log.error("Could not remove image: \(error)")
-            }
-        }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }
     
     override func didReceiveMemoryWarning() {
@@ -284,24 +271,8 @@ class ImagesVC: UIViewController {
         // https://github.com/crspybits/SharedImages/issues/121 (a)
         bottomRefresh.hide()
         
-        navigationController?.setToolbarHidden(true, animated: true)
         selectionOn = false
     }
-
-#if false
-    @objc private func consistencyCheckAction(gesture : UILongPressGestureRecognizer!) {
-        if gesture.state != .ended {
-            return
-        }
-        
-        let uuids = Image.fetchAll().map { $0.uuid! }
-        do {
-            try SyncServer.session.consistencyCheck(sharingGroupUUID: sharingGroup.sharingGroupUUID, localFiles: uuids, repair: false) { error in }
-        } catch (let error) {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Problem in consistency check", message: "\(error)")
-        }
-    }
-#endif
 
     @objc private func refresh() {
         self.refreshControl.endRefreshing()
@@ -658,22 +629,17 @@ extension ImagesVC {
         
         if images.count == 0 {
             Log.warning("No images selected!")
-            SMCoreLib.Alert.show(withTitle:  "No images selected!", message: "Long-press on image(s) to select, and then try again.")
+            SMCoreLib.Alert.show(withTitle:  "No usable images selected!")
             return
         }
-        
-        // 8/19/17; It looks like you can't control the order of the actions in the list supplied by this control. See https://stackoverflow.com/questions/19060535/how-to-rearrange-activities-on-a-uiactivityviewcontroller
-        // Unfortunately, this means the deletion control occurs off to the right-- and I can't see it w/o scrolling on my iPhone6
-        let trashActivity = TrashActivity(withParentVC: self, removeImages: { images in
-            self.remove(images: images)
-        })
-        let activityViewController = UIActivityViewController(activityItems: images, applicationActivities: [trashActivity])
+
+        let activityViewController = UIActivityViewController(activityItems: images, applicationActivities: nil)
         
         activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, error in
             if completed {
-                // Action has been carried out (e.g., image has been deleted), remove selected icons.
+                // Action has been carried out (e.g., image has been deleted), remove `Selected` icons.
                 self.selectedImages.removeAll()
-                
+                self.selectionOn = false
                 self.collectionView.reloadData()
             }
         }

@@ -30,7 +30,6 @@
 		834A7E7F2037858800969B18 /* ProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 834A7E762037858800969B18 /* ProgressView.xib */; };
 		834A7E802037858800969B18 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E772037858800969B18 /* Types.swift */; };
 		834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834E3E9220B3FF90006AC504 /* BottomRefresh.swift */; };
-		835A8A96223DB9ED0000FEA0 /* AcquireImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */; };
 		835A8A9D223F40300000FEA0 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A9A223F40300000FEA0 /* Environment.swift */; };
 		835A8A9E223F40300000FEA0 /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A9B223F40300000FEA0 /* Migrations.swift */; };
 		835A8A9F223F40300000FEA0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8A9C223F40300000FEA0 /* AppDelegate.swift */; };
@@ -73,6 +72,8 @@
 		83EACE772087083000C40AA3 /* DiscussionKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EACE762087083000C40AA3 /* DiscussionKeys.swift */; };
 		83EFC096216EDE7300D7A3C4 /* SharingInviteDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */; };
 		83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */; };
+		83F5CB502246CCA2006DBB2F /* RemoveImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F5CB4F2246CCA2006DBB2F /* RemoveImages.swift */; };
+		83F5CB522246D39E006DBB2F /* AcquireImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F5CB512246D39E006DBB2F /* AcquireImages.swift */; };
 		83F882451E711FC6008F644A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823D1E711FC6008F644A /* Assets.xcassets */; };
 		83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */; };
 		83F882471E711FC6008F644A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F882401E711FC6008F644A /* Main.storyboard */; };
@@ -84,7 +85,6 @@
 		83F882611E749C18008F644A /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882601E749C18008F644A /* Consts.swift */; };
 		83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882641E74A3C5008F644A /* GoogleService-Info.plist */; };
 		83F882671E74A600008F644A /* Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882661E74A600008F644A /* Server.plist */; };
-		83FAF3A21F4554B90009111B /* TrashActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FAF3A11F4554B90009111B /* TrashActivity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,7 +124,6 @@
 		834A7E762037858800969B18 /* ProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgressView.xib; sourceTree = "<group>"; };
 		834A7E772037858800969B18 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		834E3E9220B3FF90006AC504 /* BottomRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomRefresh.swift; sourceTree = "<group>"; };
-		835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcquireImages.swift; sourceTree = "<group>"; };
 		835A8A9A223F40300000FEA0 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		835A8A9B223F40300000FEA0 /* Migrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		835A8A9C223F40300000FEA0 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -174,6 +173,8 @@
 		83EACE762087083000C40AA3 /* DiscussionKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscussionKeys.swift; sourceTree = "<group>"; };
 		83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingInviteDelegate.swift; sourceTree = "<group>"; };
 		83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extras.swift"; sourceTree = "<group>"; };
+		83F5CB4F2246CCA2006DBB2F /* RemoveImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveImages.swift; sourceTree = "<group>"; };
+		83F5CB512246D39E006DBB2F /* AcquireImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AcquireImages.swift; path = "Code/Single Album/AcquireImages.swift"; sourceTree = SOURCE_ROOT; };
 		83F8821F1E711600008F644A /* Neebla.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Neebla.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83F8823D1E711FC6008F644A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		83F8823F1E711FC6008F644A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Resources/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -187,7 +188,6 @@
 		83F882601E749C18008F644A /* Consts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		83F882641E74A3C5008F644A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Resources/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		83F882661E74A600008F644A /* Server.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Server.plist; path = Resources/Server.plist; sourceTree = "<group>"; };
-		83FAF3A11F4554B90009111B /* TrashActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrashActivity.swift; sourceTree = "<group>"; };
 		A1A9F2364274678096FAE708 /* Pods-SharedImages.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImages.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages.release.xcconfig"; sourceTree = "<group>"; };
 		AB86EA543F8CCCC9287144E0 /* Pods-SharedImagesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImagesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests.release.xcconfig"; sourceTree = "<group>"; };
 		B3A75F4AAE01ABAA5CEA09A0 /* Pods-SharedImagesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImagesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -273,7 +273,6 @@
 			isa = PBXGroup;
 			children = (
 				83D0BE1920B37D0D00555B73 /* Sorting and Filtering */,
-				83FAF3A01F45549E0009111B /* Sharing Activity */,
 				83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */,
 				835A8AA4224478BC0000FEA0 /* Albums */,
 				835A8AB22245BCBD0000FEA0 /* Single Album */,
@@ -289,7 +288,6 @@
 				8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */,
 				83EFC095216EDE7300D7A3C4 /* SharingInviteDelegate.swift */,
 				83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */,
-				835A8A95223DB9ED0000FEA0 /* AcquireImages.swift */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -354,6 +352,7 @@
 				835A8AA6224478BC0000FEA0 /* AlbumCell.swift */,
 				835A8AA7224478BC0000FEA0 /* AlbumCell.xib */,
 				835A8AAB224478D10000FEA0 /* ShareAlbum.swift */,
+				83F5CB512246D39E006DBB2F /* AcquireImages.swift */,
 			);
 			path = Albums;
 			sourceTree = "<group>";
@@ -373,6 +372,7 @@
 				835A8AB32245BCBD0000FEA0 /* ImagesVC.swift */,
 				835A8AB52245BD4D0000FEA0 /* ImagesTitle.xib */,
 				835A8AB72245BD6F0000FEA0 /* ImagesTitle.swift */,
+				83F5CB4F2246CCA2006DBB2F /* RemoveImages.swift */,
 			);
 			path = "Single Album";
 			sourceTree = "<group>";
@@ -479,14 +479,6 @@
 				83F882521E73B172008F644A /* CoreDataExtras.swift */,
 			);
 			name = "Core Data";
-			sourceTree = "<group>";
-		};
-		83FAF3A01F45549E0009111B /* Sharing Activity */ = {
-			isa = PBXGroup;
-			children = (
-				83FAF3A11F4554B90009111B /* TrashActivity.swift */,
-			);
-			name = "Sharing Activity";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -824,11 +816,11 @@
 				83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,
-				835A8A96223DB9ED0000FEA0 /* AcquireImages.swift in Sources */,
+				83F5CB522246D39E006DBB2F /* AcquireImages.swift in Sources */,
 				835A8AB42245BCBD0000FEA0 /* ImagesVC.swift in Sources */,
+				83F5CB502246CCA2006DBB2F /* RemoveImages.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
 				834A7E792037858800969B18 /* Alert.swift in Sources */,
-				83FAF3A21F4554B90009111B /* TrashActivity.swift in Sources */,
 				834A7E7A2037858800969B18 /* XibBasics.swift in Sources */,
 				838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */,
 				834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */,
