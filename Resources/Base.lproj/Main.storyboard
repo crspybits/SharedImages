@@ -79,6 +79,13 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Selected" translatesAutoresizingMaskIntoConstraints="NO" id="2L4-Ia-MsB">
+                                                    <rect key="frame" x="48" y="58" width="25" height="25"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="25" id="ksd-tc-fb4"/>
+                                                        <constraint firstAttribute="width" constant="25" id="pag-R9-gvC"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                         </view>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -89,13 +96,16 @@
                                             <constraint firstItem="p10-SC-T2M" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="FZq-DT-1ra"/>
                                             <constraint firstItem="1v8-aI-ffe" firstAttribute="centerX" secondItem="GHm-lm-kQ4" secondAttribute="centerX" id="HCw-2u-6Tb"/>
                                             <constraint firstItem="p10-SC-T2M" firstAttribute="top" secondItem="GHm-lm-kQ4" secondAttribute="top" id="TSW-dI-kUC"/>
+                                            <constraint firstAttribute="trailing" secondItem="2L4-Ia-MsB" secondAttribute="trailing" constant="2" id="Wbh-gO-2KU"/>
                                             <constraint firstItem="nlX-iC-FAf" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="cTj-rL-df1"/>
+                                            <constraint firstItem="nlX-iC-FAf" firstAttribute="top" secondItem="2L4-Ia-MsB" secondAttribute="bottom" constant="2" id="czt-QM-Hpj"/>
                                             <constraint firstAttribute="trailing" secondItem="p10-SC-T2M" secondAttribute="trailing" id="gPY-rR-do2"/>
                                             <constraint firstAttribute="trailing" secondItem="nlX-iC-FAf" secondAttribute="trailing" id="qzX-je-mKO"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="errorImageView" destination="1v8-aI-ffe" id="Yyj-73-a58"/>
                                             <outlet property="imageView" destination="p10-SC-T2M" id="Q4Y-a1-JBB"/>
+                                            <outlet property="selectedIcon" destination="2L4-Ia-MsB" id="7uR-y5-E8a"/>
                                             <outlet property="title" destination="nlX-iC-FAf" id="Jmz-UH-Zqo"/>
                                         </connections>
                                     </collectionViewCell>
@@ -190,7 +200,10 @@
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tj0-fZ-pBj" userLabel="Remove an album...">
                                                         <rect key="frame" x="0.0" y="17" width="275" height="36"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                                        <state key="normal" title="Remove an album ..."/>
+                                                        <state key="normal" title="Remove user from album ..."/>
+                                                        <connections>
+                                                            <segue destination="paJ-py-1QR" kind="show" id="11g-hl-2z6"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                                 <constraints>
@@ -549,6 +562,39 @@
             </objects>
             <point key="canvasLocation" x="-490" y="896"/>
         </scene>
+        <!--Remove User From AlbumVC-->
+        <scene sceneID="CV0-Mb-5EN">
+            <objects>
+                <viewController storyboardIdentifier="RemoveUserFromAlbumVC" id="paJ-py-1QR" customClass="RemoveUserFromAlbumVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="6iQ-n8-LW7"/>
+                        <viewControllerLayoutGuide type="bottom" id="xpN-Ka-bUL"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="KAb-em-ltd">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Vwh-O2-KsO">
+                                <rect key="frame" x="16" y="64" width="343" height="554"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="Vwh-O2-KsO" secondAttribute="trailing" id="0k0-9G-pRn"/>
+                            <constraint firstItem="Vwh-O2-KsO" firstAttribute="top" secondItem="6iQ-n8-LW7" secondAttribute="bottom" id="BbI-sS-ns3"/>
+                            <constraint firstItem="Vwh-O2-KsO" firstAttribute="leading" secondItem="KAb-em-ltd" secondAttribute="leadingMargin" id="McT-ts-ywT"/>
+                            <constraint firstItem="xpN-Ka-bUL" firstAttribute="top" secondItem="Vwh-O2-KsO" secondAttribute="bottom" id="Qgw-98-Jah"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="Vwh-O2-KsO" id="Q5d-x4-hqK"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="j9V-Iu-Rjo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1121" y="896"/>
+        </scene>
         <!--Albums-->
         <scene sceneID="IiJ-9Q-z1K">
             <objects>
@@ -631,6 +677,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Selected" width="50" height="50"/>
         <image name="Settings" width="25.600000381469727" height="25.600000381469727"/>
         <image name="albums" width="35" height="30"/>
         <image name="errorNote" width="128" height="128"/>

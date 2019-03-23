@@ -30,8 +30,9 @@ class ImageCollectionVC : UICollectionViewCell {
     
     @IBOutlet weak var title: UILabel!
     
-    // Only in small image VC.
+    // These two are only in small image VC.
     @IBOutlet weak var errorImageView: UIImageView!
+    @IBOutlet weak var selectedIcon: UIImageView!
     
     private(set) var image:Image!
     private(set) weak var syncController:SyncController!
@@ -43,30 +44,26 @@ class ImageCollectionVC : UICollectionViewCell {
     var tapGesture: UITapGestureRecognizer?
     var imageTapBehavior:(()->())?
     
-    private var selectedImage:UIImageView!
-    var userSelected:Bool = false {
+    // Only for small images.
+    enum SelectedState {
+        case notSelected
+        case selected
+    }
+    var selectedState: SelectedState? {
         didSet {
-            if userSelected {
-                if selectedImage == nil {
-                    let selected = UIImage(named: "Selected")
-                    
-                    selectedImage = UIImageView()
-                    selectedImage.image = selected
-                    
-                    let size = min(25, imageView.frameWidth, imageView.frameHeight)
-                    selectedImage.frameSize = CGSize(width: size, height: size)
-                    
-                    selectedImage.frameMaxX = imageView.frameMaxX
-                    selectedImage.frameMaxY = imageView.frameMaxY
-                    imageView.addSubview(selectedImage)
+            UIView.animate(withDuration: 0.2) {[unowned self] in
+                switch self.selectedState {
+                case .none:
+                    self.selectedIcon?.alpha = 0
+                    self.imageView.alpha = 1
+                case .some(.selected):
+                    self.selectedIcon?.alpha = 1
+                    self.imageView.alpha = 1
+                case .some(.notSelected):
+                    self.selectedIcon?.alpha = 0.5
+                    self.imageView.alpha = 0.8
                 }
             }
-            else {
-                selectedImage?.removeFromSuperview()
-                selectedImage = nil
-            }
-            
-            setNeedsDisplay()
         }
     }
 
@@ -77,10 +74,12 @@ class ImageCollectionVC : UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         switchedToFullScaleImageForZooming = false
+        selectedState = nil
         badge.removeFromSuperview()
     }
     
     func setProperties(image:Image, syncController:SyncController, cache: LRUCache<Image>, imageTapBehavior:(()->())? = nil) {
+        selectedState = nil
         self.image = image
         self.syncController = syncController
         title.text = image.title

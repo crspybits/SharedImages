@@ -22,7 +22,7 @@ class ImagesVC: UIViewController {
     
     let reuseIdentifier = "ImageIcon"
     var acquireImages: AcquireImages!
-    var otherActionBarButton:UIBarButtonItem!
+    var addImagesButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
     
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
@@ -44,8 +44,8 @@ class ImagesVC: UIViewController {
     
     private var deletedImages:[IndexPath]?
     private var noDownloadImageView:UIImageView!
-    private let otherActions = DropDown()
-    private var dropDownMenuItems:[DropDownMenuItem]!
+    private let titleLabel = ImagesTitle.create()!
+    private var selectionOn = false
     
     static func create() -> ImagesVC {
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ImagesVC") as! ImagesVC
@@ -53,6 +53,11 @@ class ImagesVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let action = UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil)
+        let trash = UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil)
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        setToolbarItems([action, flexSpace, trash], animated: false)
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -67,27 +72,26 @@ class ImagesVC: UIViewController {
         
         // Long press on image to select.
         collectionView.alwaysBounceVertical = true
-        let imageSelectionLongPress = UILongPressGestureRecognizer(target: self, action: #selector(imageSelectionLongPressAction(gesture:)))
-        imageSelectionLongPress.delaysTouchesBegan = true
-        collectionView?.addGestureRecognizer(imageSelectionLongPress)
         
-        // A label and a means to do a consistency check.
-        let titleLabel = UILabel()
-        titleLabel.text = sharingGroup.sharingGroupName ?? "Album Images"
-        titleLabel.sizeToFit()
+        titleLabel.title.text = sharingGroup.sharingGroupName ?? "Album Images"
+        titleLabel.buttonAction = { [unowned self] in
+            self.sortFilterAction()
+        }
+        titleLabel.updateCaret()
         navigationItem.titleView = titleLabel
-        let lp = UILongPressGestureRecognizer(target: self, action: #selector(consistencyCheckAction(gesture:)))
-        titleLabel.addGestureRecognizer(lp)
-        titleLabel.isUserInteractionEnabled = true
         
-        // Right nav button
-        let otherActionButton = UIButton(type: .system)
-        otherActionButton.setImage(#imageLiteral(resourceName: "otherDetails"), for: .normal)
-        otherActionButton.addTarget(self, action: #selector(otherActionButtonAction), for: .touchUpInside)
-        otherActionBarButton = UIBarButtonItem(customView: otherActionButton)
-        setupDropdown(anchorView: otherActionButton)
+        let selectImages = UIButton(type: .system)
+        selectImages.setImage(#imageLiteral(resourceName: "Select"), for: .normal)
+        selectImages.addTarget(self, action: #selector(selectImagesAction), for: .touchUpInside)
+        let selectImagesBarButton = UIBarButtonItem(customView: selectImages)
         
-        setupRightBarButtonItems()
+        if sharingGroup.permission.hasMinimumPermission(.write) {
+            addImagesButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addImagesAction))
+            navigationItem.rightBarButtonItems = [addImagesButton, selectImagesBarButton]
+        }
+        else {
+            navigationItem.rightBarButtonItems = [selectImagesBarButton]
+        }
         
         let backButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back"), style: .plain, target: self, action: #selector(backAction))
         
@@ -114,95 +118,38 @@ class ImagesVC: UIViewController {
         })
     }
     
+    @objc private func addImagesAction() {
+        guard !selectionOn else {
+            return
+        }
+        
+        acquireImages.showAlert(fromBarButton: addImagesButton)
+    }
+    
+    @objc private func selectImagesAction() {
+        selectionOn = !selectionOn
+        
+        if selectionOn {
+            selectedImages.removeAll()
+        }
+        else {
+            navigationController?.setToolbarHidden(true, animated: true)
+        }
+        
+        for indexPath in collectionView.indexPathsForVisibleItems {
+            let imageObj = coreDataSource.object(at: indexPath) as! Image
+            let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
+            showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+        }
+    }
+    
     @objc private func setupHandlers() {
         imagesHandler.syncEventAction = syncEvent
         imagesHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
     }
     
-    @objc private func otherActionButtonAction() {
-        otherActions.clearSelection()
-        otherActions.show()
-    }
-    
-    private struct DropDownMenuItem {
-        let name: String
-        let action: (()->())
-    }
-    
-    private func setupDropdown(anchorView: UIButton) {
-        otherActions.anchorView = anchorView
-        otherActions.dismissMode = .automatic
-        otherActions.direction = .any
-        
-        dropDownMenuItems = []
-        
-        if sharingGroup.permission.hasMinimumPermission(.write) {
-            dropDownMenuItems += [DropDownMenuItem(name: "Add Image(s)", action: {
-                self.acquireImages.showAlert(fromBarButton: self.otherActionBarButton)
-            })]
-        }
-        
-        dropDownMenuItems += [
-            DropDownMenuItem(name: "Other Actions", action: {[unowned self] in
-                self.actionButtonAction()
-            }),
-            DropDownMenuItem(name: "Remove Album", action: {[unowned self] in
-                self.removeUserFromAlbum()
-            })
-        ]
-        
-        otherActions.selectionAction = { [unowned self] (index, item) in
-            if index < self.dropDownMenuItems.count {
-                let action = self.dropDownMenuItems[index].action
-                action()
-            }
-            
-            self.otherActions.hide()
-        }
-
-        let menuNames = dropDownMenuItems.map {$0.name}
-        otherActions.dataSource = menuNames
-    }
-    
-    private func removeUserFromAlbum() {
-        SMCoreLib.Alert.show(fromVC: self, withTitle: "Remove you from the current album?", message: "This will permanently remove the album from the Neebla app on your device(s). Other users can still use the album, but they won't have access to your images any more. If images have been stored in your cloud storage, they will still be in your cloud storage.", allowCancel: true, okCompletion: {
-
-            do {
-                try SyncServer.session.removeFromSharingGroup(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
-                try SyncServer.session.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
-            } catch (let error) {
-                Log.error("\(error)")
-                SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not remove you from the current album! Please try again later.")
-                return
-            }
-            
-            // The delegate removes references/files to the images/discussions.
-            self.navigationController?.popViewController(animated: true)
-        })
-    }
-    
     @objc private func backAction() {
         navigationController?.popViewController(animated: true)
-    }
-    
-    private func setupRightBarButtonItems() {
-        var sortImage:UIImage
-        if Parameters.sortingOrderIsAscending {
-            sortImage = #imageLiteral(resourceName: "sortFilterUp")
-        }
-        else {
-            sortImage = #imageLiteral(resourceName: "sortFilterDown")
-        }
-        
-        sortImage = sortImage.withRenderingMode(.alwaysTemplate)
-        
-        let sortFilter = UIBarButtonItem(image: sortImage, style: .plain, target: self, action: #selector(sortFilterAction))
-        
-        if Parameters.filterApplied {
-            sortFilter.tintColor = .lightGray
-        }
-        
-        navigationItem.rightBarButtonItems = [otherActionBarButton!, sortFilter]
     }
     
     @objc private func sortFilterAction() {
@@ -308,6 +255,7 @@ class ImagesVC: UIViewController {
 
         // 6/16/18; Used to have this in `viewDidAppear`, but I'm getting a crash in that case when the filter is on to only see images with unread messages-- and coming back from large images. See https://github.com/crspybits/SharedImages/issues/123
         // To clear unread count(s)-- both in the case of coming back from navigating to large images, and in the case of resetting unread counts in Settings.
+        // And to reset selections if selectionOn = true and selections made before navigating away.
         collectionView.reloadData()
         
         Progress.session.viewController = self
@@ -335,8 +283,12 @@ class ImagesVC: UIViewController {
         
         // https://github.com/crspybits/SharedImages/issues/121 (a)
         bottomRefresh.hide()
+        
+        navigationController?.setToolbarHidden(true, animated: true)
+        selectionOn = false
     }
-    
+
+#if false
     @objc private func consistencyCheckAction(gesture : UILongPressGestureRecognizer!) {
         if gesture.state != .ended {
             return
@@ -349,7 +301,8 @@ class ImagesVC: UIViewController {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Problem in consistency check", message: "\(error)")
         }
     }
-    
+#endif
+
     @objc private func refresh() {
         self.refreshControl.endRefreshing()
         
@@ -412,6 +365,11 @@ extension ImagesVC : UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard !selectionOn else {
+            selectImage(atIndexPath: indexPath)
+            return
+        }
+        
         let imageObj = self.coreDataSource.object(at: indexPath) as! Image
         if imageObj.eitherHasError {
             let cell = collectionView.cellForItem(at: indexPath)
@@ -726,36 +684,46 @@ extension ImagesVC {
         present(activityViewController, animated: true, completion: {})
     }
     
-    @objc fileprivate func imageSelectionLongPressAction(gesture : UILongPressGestureRecognizer!) {
-        if gesture.state == .began {
-            let p = gesture.location(in: self.collectionView)
-            if let indexPath = collectionView.indexPathForItem(at: p) {
-                let imageObj = coreDataSource.object(at: indexPath) as! Image
-                
-                // Allowing selection of an image even when there is an error, such as image.hasError -- e.g., so that deletion can be allowed. Will have to, downstream, disable certain operations-- such as sending the image to someone, if there is no image.
-                
-                if selectedImages.contains(imageObj.uuid!) {
-                    // Deselect image
-                    selectedImages.remove(imageObj.uuid!)
-                }
-                else {
-                    // Select image
-                    selectedImages.insert(imageObj.uuid!)
-                }
-
-                let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
-                showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+    private func selectImage(atIndexPath indexPath: IndexPath) {
+        let imageObj = coreDataSource.object(at: indexPath) as! Image
+        
+        // Allowing selection of an image even when there is an error, such as image.hasError -- e.g., so that deletion can be allowed. Will have to, downstream, disable certain operations-- such as sending the image to someone, if there is no image.
+        
+        if selectedImages.contains(imageObj.uuid!) {
+            // Deselect image
+            selectedImages.remove(imageObj.uuid!)
+        }
+        else {
+            // Select image
+            selectedImages.insert(imageObj.uuid!)
+        }
+        
+        if selectedImages.count > 0 {
+            if navigationController?.isToolbarHidden == true {
+                navigationController?.setToolbarHidden(false, animated: true)
             }
         }
+        else {
+            if navigationController?.isToolbarHidden == false {
+                navigationController?.setToolbarHidden(true, animated: true)
+            }
+        }
+        
+
+        let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
+        showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
     }
     
     fileprivate func showSelectedState(imageUUID:String, cell:UICollectionViewCell, error: Bool = false) {
         if let cell = cell as? ImageCollectionVC {
-            if error {
-                cell.userSelected = false
+            if error || !selectionOn {
+                cell.selectedState = nil
+            }
+            else if selectedImages.contains(imageUUID) {
+                cell.selectedState = .selected
             }
             else {
-                cell.userSelected = selectedImages.contains(imageUUID)
+                cell.selectedState = .notSelected
             }
         }
     }
@@ -764,7 +732,7 @@ extension ImagesVC {
 extension ImagesVC : SortyFilterDelegate {
     func sortyFilter(sortFilterByParameters: SortyFilter) {
         coreDataSource.fetchData()
-        setupRightBarButtonItems()
+        titleLabel.updateCaret()
         collectionView.reloadData()
     }
 }

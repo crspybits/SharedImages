@@ -1,5 +1,14 @@
 SharedImages
 
+Version 1.3.0
+	* Moved "Share album" UI feature from within individual album screen to main Albums screen to improve visibility of this feature and make album sharing easier.
+	* Moved "remove user from album" UI feature from individual album screen to Settings-- this feature is (a) somewhat risky to use and (b) not frequently used so should be in a less accessible and less accessed part of the app.
+	* Moved filtering/sorting UI feature to control on the navigation bar of the app, to make room for a different nav bar button. This is a somewhat infrequently used feature and doesn't need the higher priority (scarce) nav bar button real estate.
+	* Rightmost two buttons on nav bar on individual album screen now are:
+		- Add image: This exposes a primary feature without having to do other tapping
+		- Select: Should make it more evident that images can be selected and other
+		actions taken (e.g., email an image).
+		
 Version 1.2.0 (3/22/19)
 	* Added multi-image select when uploading images from photo library.
 	* Fixed issue where initial Google Sign-in prompt still showed "SharedImages"
