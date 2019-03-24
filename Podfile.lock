@@ -101,7 +101,7 @@ DEPENDENCIES:
   - DropDown (~> 2.3)
   - Fabric
   - LGSideMenuController (~> 2.1)
-  - LottiesBottom (from `https://github.com/crspybits/LottiesBottom.git`)
+  - LottiesBottom (~> 0.5)
   - MessageKit (~> 0.13)
   - NohanaImagePicker (from `https://github.com/crspybits/NohanaImagePicker.git`)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
@@ -132,6 +132,7 @@ SPEC REPOS:
     - KeychainAccess
     - LGSideMenuController
     - lottie-ios
+    - LottiesBottom
     - MessageKit
     - ObjcExceptionBridging
     - Presentr
@@ -150,17 +151,12 @@ SPEC REPOS:
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
-  LottiesBottom:
-    :git: https://github.com/crspybits/LottiesBottom.git
   NohanaImagePicker:
     :git: https://github.com/crspybits/NohanaImagePicker.git
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
 
 CHECKOUT OPTIONS:
-  LottiesBottom:
-    :commit: 64d235ca605810948e1c6a28226d1d5e046e05bd
-    :git: https://github.com/crspybits/LottiesBottom.git
   NohanaImagePicker:
     :commit: c3c893e4e6c3085b2bb5c31908c452385ecd5daa
     :git: https://github.com/crspybits/NohanaImagePicker.git
@@ -203,6 +199,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: 336b54037b6a305d4477f8302a4c7136952e98a9
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 1eba7aa821e6e9c2578416d6fdb172b72450a67e
+PODFILE CHECKSUM: 666fdcc3957d088e8674d713c4feafdae95c9d65
 
 COCOAPODS: 1.6.1

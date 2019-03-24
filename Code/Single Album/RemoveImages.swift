@@ -16,6 +16,7 @@ class RemoveImages {
     private weak var parentVC: UIViewController!
     private let syncController: SyncController!
     private let sharingGroup: SyncServer.SharingGroup!
+    private var completion:(()->())?
     
     init(_ images: [Image], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
         self.images = images
@@ -24,7 +25,9 @@ class RemoveImages {
         self.sharingGroup = sharingGroup
     }
     
-    func start() {
+    // completion is called on successful deletion, not on cancellation.
+    func start(completion:(()->())? = nil) {
+        self.completion = completion
         var imageTerm = "image"
         
         if images.count > 1 {
@@ -75,5 +78,6 @@ class RemoveImages {
         }
         
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        completion?()
     }
 }

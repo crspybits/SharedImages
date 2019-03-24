@@ -141,7 +141,9 @@ class ImagesVC: UIViewController {
         }
         
         removeImages = RemoveImages(images, syncController: imagesHandler.syncController, sharingGroup: sharingGroup, withParentVC: self)
-        removeImages.start()
+        removeImages.start() {[unowned self] in
+            self.selectionOn = false
+        }
     }
     
     @objc private func addImagesAction() {

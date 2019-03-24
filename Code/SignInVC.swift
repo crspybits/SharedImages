@@ -36,6 +36,8 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.title = "Sign-In/Out"
+        
         // TODO: *2* Signing out and then signing in as a different user will mess up this app. What we're really assuming is that the user may sign out, but will then again sign in as the same user. If the user signs in as a different user, we need to alert them that this is going to remove all local files. And, signing in again as the prior user will cause redownload of the prior files. This may be something we want to fix in the future: To enable the client to handle multiple users. This would require indexing the meta data by user.
         
         // NOTE: When adding a new sign-in-- you need to add it here, and in SetupSignIn.swift.

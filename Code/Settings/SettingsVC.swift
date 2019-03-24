@@ -33,6 +33,8 @@ class SettingsVC : UIViewController {
         
         versionAndBuild.text = vb
         versionAndBuild.sizeToFit()
+
+        navigationItem.title = "Settings"
     }
     
     @IBAction func emailLogAction(_ sender: Any) {        

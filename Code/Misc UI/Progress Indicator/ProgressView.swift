@@ -18,6 +18,8 @@ class ProgressView : UIView, XibBasics {
     private var originalHeight: CGFloat!
     @IBOutlet weak var stopButton: UIButton!
     @IBOutlet weak var hideButton: UIButton!
+    @IBOutlet weak var contents: UIView!
+    @IBOutlet weak var contentsHeight: NSLayoutConstraint!
     private let reducedHeight:CGFloat = 5
     private var swipeGesture: UISwipeGestureRecognizer!
     private var progressViewIsHidden:Bool?
@@ -50,7 +52,7 @@ class ProgressView : UIView, XibBasics {
         spinnerContainer.addSubview(spinnerButton)
         
         progressIndicator.backgroundColor = UIColor(red: 0.0, green: 205.0/255.0, blue: 255.0/255.0, alpha: 1.0)
-        backgroundColor = UIColor(white: 0.95, alpha: 1.0)
+        contents.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
         progressIndicatorWidth.constant = 0
         
         originalHeight = frameHeight
@@ -90,9 +92,35 @@ class ProgressView : UIView, XibBasics {
         viewController.view.addSubview(self)
         progressIndicatorWidth.constant = CGFloat(progress)
         
-        if withAnimation {
-            frameHeight = 0
+        // 3/23/19; Started having difficulties placing the progress view under the nav bar when I added in the new side menu. So, using constraints below (see https://stackoverflow.com/questions/44966786/how-do-i-programmatically-add-a-view-right-under-the-navigation-bar).
+        translatesAutoresizingMaskIntoConstraints = false
+        if #available(iOS 11.0, *) {
+            let guide = viewController.view.safeAreaLayoutGuide
+            trailingAnchor.constraint(equalTo: guide.trailingAnchor).isActive = true
+            leadingAnchor.constraint(equalTo: guide.leadingAnchor).isActive = true
+            topAnchor.constraint(equalTo: guide.topAnchor).isActive = true
+        } else {
+            NSLayoutConstraint(item: self,
+                               attribute: .top,
+                               relatedBy: .equal,
+                               toItem: viewController.view, attribute: .top,
+                               multiplier: 1.0, constant: 0).isActive = true
+            NSLayoutConstraint(item: self,
+                               attribute: .leading,
+                               relatedBy: .equal, toItem: viewController.view,
+                               attribute: .leading,
+                               multiplier: 1.0,
+                               constant: 0).isActive = true
+            NSLayoutConstraint(item: self, attribute: .trailing,
+                               relatedBy: .equal,
+                               toItem: viewController.view,
+                               attribute: .trailing,
+                               multiplier: 1.0,
+                               constant: 0).isActive = true
         }
+        
+        heightAnchor.constraint(equalToConstant: frameHeight).isActive = true
+        layoutIfNeeded()
 
         show(withAnimation: withAnimation, completion: completion)
     }
@@ -126,10 +154,16 @@ class ProgressView : UIView, XibBasics {
             progressIndicatorWidth.constant = frameWidth * CGFloat(progress)
         }
         
+        contentsHeight.constant = 0
+        
+        // Avoiding animating any constraint changes we don't want animated.
+        layoutIfNeeded()
+        
         if withAnimation {
+            contentsHeight.constant = originalHeight
             UIView.animate(withDuration: 0.3, animations: {
                 self.displayButtons = true
-                self.frameHeight = self.originalHeight
+                self.layoutIfNeeded()
             }, completion: { _ in
                 completion?()
             })
@@ -137,12 +171,12 @@ class ProgressView : UIView, XibBasics {
         else {
             switch displayHeight {
             case .none, .some(.full):
-                frameHeight = originalHeight
+                contentsHeight.constant = originalHeight
                 displayHeight = .full
                 displayButtons = true
                 
             case .some(.reduced):
-                frameHeight = reducedHeight
+                contentsHeight.constant = reducedHeight
             }
             
             completion?()
@@ -170,17 +204,24 @@ class ProgressView : UIView, XibBasics {
     func hide(_ hideType: HideType, withAnimation: Bool, completion: (()->())? = nil) {
         progressViewIsHidden = true
 
+        func hideConstraint() {
+            switch hideType {
+            case .reducedHeight:
+                contentsHeight.constant = reducedHeight
+                
+            case .dismiss:
+                contentsHeight.constant = 0
+            }
+        }
+        
         func hide() {
             displayButtons = false
             
             switch hideType {
             case .reducedHeight:
-                frameHeight = reducedHeight
                 displayHeight = .reduced
                 
             case .dismiss:
-                frameHeight = 0
-                removeFromSuperview()
                 progress = 0
                 displayHeight = nil
             }
@@ -191,18 +232,25 @@ class ProgressView : UIView, XibBasics {
             case .reducedHeight:
                 spinner.stop()
                 
-                UIView.animate(withDuration: 0.3, animations: {
+                hideConstraint()
+                UIView.animate(withDuration: 0.3, animations: {[unowned self] in
                     hide()
+                    self.layoutIfNeeded()
                 }, completion: { _ in
                     completion?()
+                    self.removeFromSuperview()
                 })
                 
             case .dismiss:
-                stopSpinnerWithMinimimumDisplayTime() {
+                stopSpinnerWithMinimimumDisplayTime() {[unowned self] in
+                    self.contentsHeight.constant = 0
                     UIView.animate(withDuration: 0.3, animations: {
-                        hide()
+                        self.displayButtons = false
+                        self.layoutIfNeeded()
                     }, completion: { _ in
                         completion?()
+                        hide()
+                        self.removeFromSuperview()
                     })
                 }
             }
@@ -210,6 +258,8 @@ class ProgressView : UIView, XibBasics {
         else {
             stopSpinnerWithMinimimumDisplayTime() {
                 hide()
+                hideConstraint()
+                self.removeFromSuperview()
                 completion?()
             }
         }

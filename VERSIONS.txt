@@ -8,6 +8,7 @@ Version 1.3.0
 		- Add image: This exposes a primary feature without having to do other tapping
 		- Select: Should make it more evident that images can be selected and other
 		actions taken (e.g., email an image).
+	* Added side menu and removed tab bar at bottom.
 		
 Version 1.2.0 (3/22/19)
 	* Added multi-image select when uploading images from photo library.

@@ -36,9 +36,9 @@ target 'SharedImages' do
     pod 'SDCAlertView', '~> 7.1'
     
     # pull-up from the bottom to refresh
-    # pod 'LottiesBottom', '~> 0.5'
-#     pod 'LottiesBottom', :path => '../LottiesBottom/'
-	pod 'LottiesBottom', :git => 'https://github.com/crspybits/LottiesBottom.git'
+    pod 'LottiesBottom', '~> 0.5'
+	# pod 'LottiesBottom', :path => '../LottiesBottom/'
+	# pod 'LottiesBottom', :git => 'https://github.com/crspybits/LottiesBottom.git'
 
     # developer dashboard
     # pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
