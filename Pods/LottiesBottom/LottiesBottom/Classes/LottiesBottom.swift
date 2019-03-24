@@ -82,7 +82,8 @@ public class LottiesBottom : UIView {
     }
     
     deinit {
-        scrollView.removeObserver(self, forKeyPath: "contentOffset")
+        // 3/23/19; CGP; use scrollView as optional; get crash if scrollView deallocated first otherwise.
+        scrollView?.removeObserver(self, forKeyPath: "contentOffset")
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {

@@ -36,9 +36,10 @@ target 'SharedImages' do
     pod 'SDCAlertView', '~> 7.1'
     
     # pull-up from the bottom to refresh
-    pod 'LottiesBottom', '~> 0.5'
+    # pod 'LottiesBottom', '~> 0.5'
 #     pod 'LottiesBottom', :path => '../LottiesBottom/'
-    
+	pod 'LottiesBottom', :git => 'https://github.com/crspybits/LottiesBottom.git'
+
     # developer dashboard
     # pod 'rosterdev', :git => 'https://github.com/RosterHQ/rosterdev.git'
     pod 'rosterdev', '~> 0.1'
@@ -58,6 +59,9 @@ target 'SharedImages' do
 	# pod 'NohanaImagePicker', :path => '../NohanaImagePicker'
 	
 	pod 'XCGLogger', '~> 6.1'
+	
+	# Main menu navigation.
+	pod 'LGSideMenuController', '~> 2.1'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

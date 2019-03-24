@@ -56,8 +56,10 @@ class SetupSignIn {
 // I'm using this delegate to deal with this case: When we have an error refreshing credentials, and the SignInVC was not loaded, then we were not showing the user the sign in screen. They would otherwise be in a signed out state, but still be on the images screen.
 extension SetupSignIn : GenericSignOutDelegate {
     func userWasSignedOut(signIn: GenericSignIn) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.selectTabInController(tab: .signIn)
+        if !(SideMenu.session.rootViewController is SignInVC) {
+            let signIn = SignInVC.create()
+            SideMenu.session.setRootViewController(signIn)
+        }
     }
 }
 

@@ -13,14 +13,14 @@ class UnreadCountBadge {
     private init() {}
     
     static func update() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let tabBarItem = appDelegate.tabInController(tab: .images)
-        let total = Discussion.totalUnreadCount()
-        if total == 0 {
-            tabBarItem.badgeValue = nil
-        }
-        else {
-            tabBarItem.badgeValue = "\(total)"
-        }
+//        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//        let tabBarItem = appDelegate.tabInController(tab: .images)
+//        let total = Discussion.totalUnreadCount()
+//        if total == 0 {
+//            tabBarItem.badgeValue = nil
+//        }
+//        else {
+//            tabBarItem.badgeValue = "\(total)"
+//        }
     }
 }

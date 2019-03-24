@@ -29,6 +29,10 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     
     var sharingDelegate:SharingInviteDelegate!
     
+    static func create() -> SignInVC {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SignInVC") as! SignInVC
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -117,16 +121,17 @@ extension SignInVC : GenericSignInDelegate {
     }
     
     func userActionOccurred(action:UserActionOccurred, signIn:GenericSignIn) {
-        func successfulSignIn(switchToImagesTab:Bool = false) {
+        func successfulSignIn(switchToImages:Bool = false) {
             if SignInManager.currentUserId.stringValue == "" {
                 // No user signed in yet.
                 SignInManager.currentUIDisplayName.stringValue = signIn.credentials?.uiDisplayName ?? ""
                 SignInManager.currentUserId.stringValue = signIn.credentials?.userId ?? ""
             }
 
-            if switchToImagesTab {
+            if switchToImages {
                 if SignInManager.session.lastStateChangeSignedUserIn {
-                    (UIApplication.shared.delegate as! AppDelegate).selectTabInController(tab: .images)
+                    let albums = AlbumsVC.create()
+                    SideMenu.session.setRootViewController(albums)
                 }
             }
         }
@@ -141,18 +146,18 @@ extension SignInVC : GenericSignInDelegate {
             // Don't need to sign the user out-- already signed out when delegate called.
             
         case .existingUserSignedIn:
-            successfulSignIn(switchToImagesTab: true)
+            successfulSignIn(switchToImages: true)
             
         case .owningUserCreated:
             // 12/26/17;  https://github.com/crspybits/SharedImages/issues/54
-            successfulSignIn(switchToImagesTab: true)
+            successfulSignIn(switchToImages: true)
             
         case .sharingUserCreated:
             invite = nil
             SharingInviteDelegate.invitationRedeemed = true
             
             // 12/26/17; https://github.com/crspybits/SharedImages/issues/54
-            successfulSignIn(switchToImagesTab: true)
+            successfulSignIn(switchToImages: true)
         }
     }
 }

@@ -23,6 +23,10 @@ class SettingsVC : UIViewController {
             return ""
         }
     }
+
+    static func create() -> SettingsVC {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SettingsVC") as! SettingsVC
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

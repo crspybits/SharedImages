@@ -122,8 +122,7 @@ class ImagesVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector:#selector(setupHandlers), name:
             UIApplication.willEnterForegroundNotification, object: nil)
         
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: appDelegate.tabBarController.view, refreshAction: { [unowned self] in
+        bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: view, refreshAction: { [unowned self] in
             Log.info("bottomRefresh: starting sync")
             do {
                 try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)

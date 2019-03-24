@@ -26,8 +26,9 @@ PODS:
   - FileMD5Hash (2.0.0)
   - HPTextViewTapGestureRecognizer (0.1)
   - KeychainAccess (3.1.2)
+  - LGSideMenuController (2.1.1)
   - lottie-ios (2.5.3)
-  - LottiesBottom (0.5.0):
+  - LottiesBottom (0.5.1):
     - lottie-ios (~> 2.1)
   - MessageKit (0.13.5)
   - NohanaImagePicker (0.9.3)
@@ -99,7 +100,8 @@ DEPENDENCIES:
   - Crashlytics
   - DropDown (~> 2.3)
   - Fabric
-  - LottiesBottom (~> 0.5)
+  - LGSideMenuController (~> 2.1)
+  - LottiesBottom (from `https://github.com/crspybits/LottiesBottom.git`)
   - MessageKit (~> 0.13)
   - NohanaImagePicker (from `https://github.com/crspybits/NohanaImagePicker.git`)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
@@ -128,8 +130,8 @@ SPEC REPOS:
     - FileMD5Hash
     - HPTextViewTapGestureRecognizer
     - KeychainAccess
+    - LGSideMenuController
     - lottie-ios
-    - LottiesBottom
     - MessageKit
     - ObjcExceptionBridging
     - Presentr
@@ -148,12 +150,17 @@ SPEC REPOS:
     - SyncServer-Shared
 
 EXTERNAL SOURCES:
+  LottiesBottom:
+    :git: https://github.com/crspybits/LottiesBottom.git
   NohanaImagePicker:
     :git: https://github.com/crspybits/NohanaImagePicker.git
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
 
 CHECKOUT OPTIONS:
+  LottiesBottom:
+    :commit: 64d235ca605810948e1c6a28226d1d5e046e05bd
+    :git: https://github.com/crspybits/LottiesBottom.git
   NohanaImagePicker:
     :commit: c3c893e4e6c3085b2bb5c31908c452385ecd5daa
     :git: https://github.com/crspybits/NohanaImagePicker.git
@@ -175,8 +182,9 @@ SPEC CHECKSUMS:
   FileMD5Hash: 3ed69cc19a21ff4d30ae8833fc104275ad2c7de0
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
+  LGSideMenuController: ae40c80983ab8b8801c7cef0a6804d43aaa72d45
   lottie-ios: a50d5c0160425cd4b01b852bb9578963e6d92d31
-  LottiesBottom: a3428d59b99264d08a79870e74118de7fb0c24c8
+  LottiesBottom: 88d95cfa94dfd988f57f6cf42e39b51a2113a02d
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
   NohanaImagePicker: 1c67a853625c7700409362195e11bb7c00f10d18
   ObjcExceptionBridging: c30e00eb3700467e695faeea30e26e18bd445001
@@ -195,6 +203,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: 336b54037b6a305d4477f8302a4c7136952e98a9
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: fb6c3c4983b52f0fc7710dd04a1620ae3c9e4bce
+PODFILE CHECKSUM: 1eba7aa821e6e9c2578416d6fdb172b72450a67e
 
 COCOAPODS: 1.6.1

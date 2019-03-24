@@ -74,6 +74,8 @@
 		83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */; };
 		83F5CB502246CCA2006DBB2F /* RemoveImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F5CB4F2246CCA2006DBB2F /* RemoveImages.swift */; };
 		83F5CB522246D39E006DBB2F /* AcquireImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F5CB512246D39E006DBB2F /* AcquireImages.swift */; };
+		83F5CB552246D938006DBB2F /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F5CB542246D938006DBB2F /* SideMenu.swift */; };
+		83F5CB572246EDA9006DBB2F /* LeftMenuVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F5CB562246EDA9006DBB2F /* LeftMenuVC.swift */; };
 		83F882451E711FC6008F644A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823D1E711FC6008F644A /* Assets.xcassets */; };
 		83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */; };
 		83F882471E711FC6008F644A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83F882401E711FC6008F644A /* Main.storyboard */; };
@@ -175,6 +177,8 @@
 		83EFC097216EDFB800D7A3C4 /* UIViewController+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extras.swift"; sourceTree = "<group>"; };
 		83F5CB4F2246CCA2006DBB2F /* RemoveImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveImages.swift; sourceTree = "<group>"; };
 		83F5CB512246D39E006DBB2F /* AcquireImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AcquireImages.swift; path = "Code/Single Album/AcquireImages.swift"; sourceTree = SOURCE_ROOT; };
+		83F5CB542246D938006DBB2F /* SideMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
+		83F5CB562246EDA9006DBB2F /* LeftMenuVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftMenuVC.swift; sourceTree = "<group>"; };
 		83F8821F1E711600008F644A /* Neebla.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Neebla.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83F8823D1E711FC6008F644A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		83F8823F1E711FC6008F644A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Resources/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -352,7 +356,6 @@
 				835A8AA6224478BC0000FEA0 /* AlbumCell.swift */,
 				835A8AA7224478BC0000FEA0 /* AlbumCell.xib */,
 				835A8AAB224478D10000FEA0 /* ShareAlbum.swift */,
-				83F5CB512246D39E006DBB2F /* AcquireImages.swift */,
 			);
 			path = Albums;
 			sourceTree = "<group>";
@@ -373,6 +376,7 @@
 				835A8AB52245BD4D0000FEA0 /* ImagesTitle.xib */,
 				835A8AB72245BD6F0000FEA0 /* ImagesTitle.swift */,
 				83F5CB4F2246CCA2006DBB2F /* RemoveImages.swift */,
+				83F5CB512246D39E006DBB2F /* AcquireImages.swift */,
 			);
 			path = "Single Album";
 			sourceTree = "<group>";
@@ -411,6 +415,15 @@
 				83D0BE2420B39C6F00555B73 /* SortControl.xib */,
 			);
 			name = "Sorting and Filtering";
+			sourceTree = "<group>";
+		};
+		83F5CB532246D919006DBB2F /* SideMenu */ = {
+			isa = PBXGroup;
+			children = (
+				83F5CB542246D938006DBB2F /* SideMenu.swift */,
+				83F5CB562246EDA9006DBB2F /* LeftMenuVC.swift */,
+			);
+			path = SideMenu;
 			sourceTree = "<group>";
 		};
 		83F882161E711600008F644A = {
@@ -457,6 +470,7 @@
 				835A8A99223F3FEC0000FEA0 /* App Launch */,
 				8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */,
 				83F882601E749C18008F644A /* Consts.swift */,
+				83F5CB532246D919006DBB2F /* SideMenu */,
 				834A7E6D2037858800969B18 /* Misc UI */,
 				8324EE2C1E74ABD4000656AF /* SignIn */,
 				8324EE311E763DBE000656AF /* Images */,
@@ -696,6 +710,7 @@
 				"${BUILT_PRODUCTS_DIR}/FileMD5Hash/FileMD5Hash.framework",
 				"${BUILT_PRODUCTS_DIR}/HPTextViewTapGestureRecognizer/HPTextViewTapGestureRecognizer.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
+				"${BUILT_PRODUCTS_DIR}/LGSideMenuController/LGSideMenuController.framework",
 				"${BUILT_PRODUCTS_DIR}/LottiesBottom/LottiesBottom.framework",
 				"${BUILT_PRODUCTS_DIR}/MessageKit/MessageKit.framework",
 				"${BUILT_PRODUCTS_DIR}/NohanaImagePicker/NohanaImagePicker.framework",
@@ -729,6 +744,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FileMD5Hash.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HPTextViewTapGestureRecognizer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LGSideMenuController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LottiesBottom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MessageKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NohanaImagePicker.framework",
@@ -776,6 +792,7 @@
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
 				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
 				834A7E802037858800969B18 /* Types.swift in Sources */,
+				83F5CB552246D938006DBB2F /* SideMenu.swift in Sources */,
 				837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */,
 				83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */,
 				83E518872160710D005C2374 /* ImagesHandler.swift in Sources */,
@@ -786,6 +803,7 @@
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
 				83D0BE2920B3B81C00555B73 /* UnreadCountBadge.swift in Sources */,
 				83D0BE2620B39C7000555B73 /* SegmentedControl.swift in Sources */,
+				83F5CB572246EDA9006DBB2F /* LeftMenuVC.swift in Sources */,
 				835A8A9F223F40300000FEA0 /* AppDelegate.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
 				83D0BE2520B39C7000555B73 /* SortControl.swift in Sources */,

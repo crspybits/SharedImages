@@ -34,6 +34,10 @@ class AlbumsVC: UIViewController {
     
     private var sharingOn: Bool = false
     private var shareAlbum:ShareAlbum!
+    
+    static func create() -> AlbumsVC {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "AlbumsVC") as! AlbumsVC
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

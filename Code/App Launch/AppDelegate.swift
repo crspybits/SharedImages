@@ -22,8 +22,6 @@ let Log = Logger.setup()
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var tabBarDelegate = TabControllerDelegate()
-    var tabBarController:UITabBarController!
     var sharingDelegate:SharingInviteDelegate?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -80,21 +78,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         CoreData.registerSession(coreDataSession, forName: CoreDataExtras.sessionName)
         
-        tabBarController = (UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TabBarController") as! UITabBarController)
-        tabBarController.delegate = tabBarDelegate
-        window = UIWindow(frame: UIScreen.main.bounds)
-        window!.rootViewController = tabBarController
+//        tabBarController = (UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TabBarController") as! UITabBarController)
+//        tabBarController.delegate = tabBarDelegate
+//        window = UIWindow(frame: UIScreen.main.bounds)
+//        window!.rootViewController = tabBarController
+        
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window?.rootViewController = SideMenu.session.mainController
+        self.window?.makeKeyAndVisible()
         
         // Putting this after setting up the `tabBarController` because it can lead to access to the tabBarController.
         SetupSignIn.session.appLaunch(options: launchOptions)
         
-        // The default UI displayed tab is .signIn
         if SignInManager.session.userIsSignedIn {
             // User is signed in. We're by-passing the SignInVC screen. We need a delegate for SharingInvitation to accept sharing invitations in this case.
             sharingDelegate = SharingInviteDelegate()
             SharingInvitation.session.delegate = sharingDelegate
 
-            selectTabInController(tab: .images)
+            let albums = AlbumsVC.create()
+            SideMenu.session.setRootViewController(albums, animation: false)
+        }
+        else {
+            let signIn = SignInVC.create()
+            SideMenu.session.setRootViewController(signIn, animation: false)
         }
         
         let imageUUIDs = Image.fetchAll().map { $0.uuid!}
@@ -127,21 +133,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         
         return true
-    }
-    
-    // The specific values for this enum correspond to the order of the tabs, left to right, in the UI.
-    enum Tab : Int {
-        case signIn = 0
-        case images = 1
-        case settings = 2
-    }
-    
-    func selectTabInController(tab:Tab) {
-        tabBarController.selectedIndex = tab.rawValue
-    }
-    
-    func tabInController(tab:Tab) -> UITabBarItem {
-        return tabBarController.tabBar.items![tab.rawValue]
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {

@@ -27,11 +27,8 @@ class BottomRefresh {
         let animationLetters = ["C", "R", "D", "N"]
         let whichAnimation = Int(arc4random_uniform(UInt32(animationLetters.count)))
         let animationLetter = animationLetters[whichAnimation]
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let tabBarHeight = appDelegate.tabBarController.tabBar.frame.size.height
-        
-        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetter, withSize: size, scrollView: scrollView, scrollViewParent: scrollViewParent, bottomYOffset: -tabBarHeight) {[unowned self] in
+
+        bottomAnimation = LottiesBottom(useLottieJSONFileWithName: animationLetter, withSize: size, scrollView: scrollView, scrollViewParent: scrollViewParent, bottomYOffset: 0) {[unowned self] in
             refreshAction()
             self.bottomAnimation.hide()
         }
