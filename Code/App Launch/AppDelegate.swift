@@ -78,16 +78,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         CoreData.registerSession(coreDataSession, forName: CoreDataExtras.sessionName)
         
-//        tabBarController = (UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TabBarController") as! UITabBarController)
-//        tabBarController.delegate = tabBarDelegate
-//        window = UIWindow(frame: UIScreen.main.bounds)
-//        window!.rootViewController = tabBarController
-        
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.rootViewController = SideMenu.session.mainController
         self.window?.makeKeyAndVisible()
-        
-        // Putting this after setting up the `tabBarController` because it can lead to access to the tabBarController.
+
         SetupSignIn.session.appLaunch(options: launchOptions)
         
         if SignInManager.session.userIsSignedIn {

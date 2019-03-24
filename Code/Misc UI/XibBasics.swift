@@ -32,3 +32,11 @@ extension XibBasics {
         return viewType
     }
 }
+
+class UIViewXib: UIView {
+    // I'm finding this necessary when I name a Xib-based UIView in IB. Otherwise, the IBOutlets are not loaded in awakeFromNib. It was insufficient to make the UIView class the File's Owner.
+    override func awakeAfter(using aDecoder: NSCoder) -> Any? {
+        guard subviews.isEmpty else { return self }
+        return Bundle.main.loadNibNamed(typeName(self), owner: nil, options: nil)?.first
+    }
+}

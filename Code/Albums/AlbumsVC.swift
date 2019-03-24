@@ -32,7 +32,17 @@ class AlbumsVC: UIViewController {
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
     var refreshControl:ODRefreshControl!
     
-    private var sharingOn: Bool = false
+    private var sharingOn: Bool = false {
+        didSet {
+            if sharingOn {
+                shareAlbums.tintColor = .lightGray
+            }
+            else {
+                shareAlbums.tintColor = nil
+            }
+        }
+    }
+    
     private var shareAlbum:ShareAlbum!
     
     static func create() -> AlbumsVC {

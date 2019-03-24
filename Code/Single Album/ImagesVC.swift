@@ -12,7 +12,6 @@ import SyncServer
 import ODRefreshControl
 import LottiesBottom
 import SyncServer_Shared
-import DropDown
 
 class ImagesVC: UIViewController {
     // Set these before showing screen.
@@ -380,7 +379,7 @@ extension ImagesVC : UICollectionViewDelegate {
             self.present(alert, animated: true, completion: nil)
         }
         else {
-            let largeImages = storyboard!.instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
+            let largeImages = LargeImages.create()
             largeImages.startImage = coreDataSource.object(at: indexPath) as? Image
             largeImages.imagesHandler = imagesHandler
             largeImages.sharingGroup = sharingGroup

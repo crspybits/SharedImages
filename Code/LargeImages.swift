@@ -59,12 +59,21 @@ class LargeImages : UIViewController {
         return ImageExtras.imageCache
     }
     
+    static func create() -> LargeImages {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
-
-        edgesForExtendedLayout = []
+        
+        let backButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back"), style: .plain, target: self, action: #selector(backAction))
+        navigationItem.leftBarButtonItem = backButton
+    }
+    
+    @objc private func backAction() {
+        navigationController?.popViewController(animated: true)
     }
     
     override func didReceiveMemoryWarning() {
