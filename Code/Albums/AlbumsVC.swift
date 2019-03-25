@@ -11,6 +11,10 @@ import SMCoreLib
 import SyncServer
 import ODRefreshControl
 
+private class FlowLayout: UICollectionViewFlowLayout {
+    var viewSize: CGSize!
+}
+
 class AlbumsVC: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     let reuseIdentifier = "CollectionViewCell"
@@ -54,18 +58,6 @@ class AlbumsVC: UIViewController {
         
         title = "Albums"
         
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        collectionView.collectionViewLayout = layout
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        
-        addAlbum = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbumAction))
-        shareAlbums = UIBarButtonItem(image: #imageLiteral(resourceName: "Share"), style: .plain, target: self, action: #selector(shareAction))
-        setupBarButtonItems()
-        
-        originalCollectionViewBottom = collectionViewBottom.constant
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardChangeFrameAction), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         
         // To manually refresh-- pull down on collection view.
@@ -73,6 +65,10 @@ class AlbumsVC: UIViewController {
         
         // We need this for the refresh.
         collectionView.alwaysBounceVertical = true
+        
+        addAlbum = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbumAction))
+        shareAlbums = UIBarButtonItem(image: #imageLiteral(resourceName: "Share"), style: .plain, target: self, action: #selector(shareAction))
+        setupBarButtonItems()
         
         // Because, when app enters background, AppBadge sets itself up to use handlers.
         NotificationCenter.default.addObserver(self, selector:#selector(setupHandlers), name:
@@ -99,7 +95,6 @@ class AlbumsVC: UIViewController {
     }
     
     @objc private func refresh() {
-
         self.refreshControl.endRefreshing()
         
         Log.info("About to do refresh sync")
@@ -218,11 +213,6 @@ class AlbumsVC: UIViewController {
         // Putting this in `viewWillAppear` to deal with the first time the Albums are displayed and to deal with removal of an album in ImagesVC. And to deal with sharing group updates from other places in the app.
         updateSharingGroups()
         
-        if shouldLayoutSubviews {
-            shouldLayoutSubviews = false
-            layoutSubviews()
-        }
-        
         Progress.session.viewController = self
     }
     
@@ -245,10 +235,23 @@ class AlbumsVC: UIViewController {
     }
     
     private func layoutSubviews() {
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        let layout = FlowLayout()
+        layout.viewSize = collectionView.boundsSize
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        collectionView.collectionViewLayout = layout
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        originalCollectionViewBottom = collectionViewBottom.constant
     }
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if shouldLayoutSubviews {
+            shouldLayoutSubviews = false
+            layoutSubviews()
+        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -256,8 +259,9 @@ class AlbumsVC: UIViewController {
         
         // To resize cells when we rotate the device.
         // 9/10/18; Got a crash here on accepting an invitation because self.collectionView was nil.
-        if let flowLayout = self.collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
-                flowLayout.invalidateLayout()
+        if let flowLayout = self.collectionView?.collectionViewLayout as? FlowLayout {
+            flowLayout.viewSize = size
+            flowLayout.invalidateLayout()
         }
     }
     
@@ -357,11 +361,11 @@ extension AlbumsVC: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        let flowLayout = collectionViewLayout as! FlowLayout
         let totalSpace = flowLayout.sectionInset.left
                 + flowLayout.sectionInset.right
                 + (flowLayout.minimumInteritemSpacing * CGFloat(numberOfItemsPerRow - 1))
-        let size = (collectionView.bounds.width - totalSpace) / CGFloat(numberOfItemsPerRow)
+        let size = (flowLayout.viewSize.width - totalSpace) / CGFloat(numberOfItemsPerRow)
         
         return CGSize(width: size, height: size)
     }

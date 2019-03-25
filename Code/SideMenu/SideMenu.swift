@@ -73,9 +73,17 @@ class SideMenu: NSObject {
     private func leftAnimation(vc: UIViewController, completion: (()->())?) {
         mainController.hideLeftView(animated: true)
         transitioning = SlideLeftAnimation(animation: nil, completion: {[unowned self] in
-            self.navController.setViewControllers([vc], animated: false)
-            completion?()
             self.transitioning = nil
+            self.navController.delegate = nil
+            
+            // The following hack is due to this:
+            // setViewControllers:animated: called on <UINavigationController 0x10603a000> while an existing transition or presentation is occurring; the navigation stack will not be updated.
+            // See also https://stackoverflow.com/questions/37270113/while-an-existing-transition-or-presentation-is-occurring-the-navigation-stack
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.navController.viewControllers = [vc]
+                completion?()
+            }
         })
     
         self.navController.delegate = self
