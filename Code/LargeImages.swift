@@ -332,7 +332,6 @@ extension LargeImages : DiscussionVCDelegate {
                 // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
                 discussion.unreadCount = 0
                 discussion.save()
-                UnreadCountBadge.update()
                 
                 refreshWithCompletion?()
             }

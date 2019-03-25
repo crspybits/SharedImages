@@ -125,7 +125,6 @@ class DiscussionVC: MessagesViewController {
         
         discussion.unreadCount = 0
         discussion.save()
-        UnreadCountBadge.update()
 
         // This is for iPad-- When you tap on the large image, it should reset the unread count then. Because otherwise, you can be looking at the discussion thread for that image, with the unread count badge present, and it looks odd.
         delegate.discussionVC(self, resetUnreadCount: discussion)

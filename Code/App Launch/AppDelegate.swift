@@ -119,7 +119,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             SyncServer.session.stopSync()
         }
         
-        UnreadCountBadge.update()
         Migrations.session.launch()
         ImagesHandler.setup()
         

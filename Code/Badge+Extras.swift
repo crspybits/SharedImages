@@ -10,9 +10,14 @@ import Foundation
 import BadgeSwift
 
 extension BadgeSwift {
-    func format(withUnreadCount unreadCount: Int) {
+    func format(withUnreadCount unreadCount: Int?) {
         textColor = .white
-        text = "\(unreadCount)"
+        if let unreadCount = unreadCount {
+            text = "\(unreadCount)"
+        }
+        else {
+            text = nil
+        }
         let padding:CGFloat = 3
         frame.origin = CGPoint(x: padding, y: padding)
         sizeToFit()

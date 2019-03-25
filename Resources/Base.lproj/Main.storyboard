@@ -537,11 +537,18 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Dgn-U1-jrt" userLabel="Menus">
                                 <rect key="frame" x="26" y="50" width="200" height="587"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PO2-K4-DOL" userLabel="Top Menu" customClass="Menu" customModule="Neebla" customModuleProvider="target">
-                                        <rect key="frame" x="8" y="0.0" width="192" height="200"/>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PO2-K4-DOL" userLabel="Top Menu">
+                                        <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="200" id="cbk-e7-JP1"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c53-Om-n0H" userLabel="Bottom Menu">
+                                        <rect key="frame" x="0.0" y="437" width="200" height="150"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="150" id="tFd-g2-yd9"/>
                                         </constraints>
                                     </view>
                                 </subviews>
@@ -549,8 +556,11 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="Av2-tq-Flg"/>
                                     <constraint firstAttribute="trailing" secondItem="PO2-K4-DOL" secondAttribute="trailing" id="Syo-h1-VMm"/>
-                                    <constraint firstItem="PO2-K4-DOL" firstAttribute="leading" secondItem="Dgn-U1-jrt" secondAttribute="leading" constant="8" id="gRW-72-x9a"/>
+                                    <constraint firstItem="PO2-K4-DOL" firstAttribute="leading" secondItem="Dgn-U1-jrt" secondAttribute="leading" id="gRW-72-x9a"/>
                                     <constraint firstItem="PO2-K4-DOL" firstAttribute="top" secondItem="Dgn-U1-jrt" secondAttribute="top" id="juz-VY-Fj4"/>
+                                    <constraint firstAttribute="trailing" secondItem="c53-Om-n0H" secondAttribute="trailing" id="l8f-C6-2NT"/>
+                                    <constraint firstItem="c53-Om-n0H" firstAttribute="leading" secondItem="Dgn-U1-jrt" secondAttribute="leading" id="nOn-5I-kNd"/>
+                                    <constraint firstAttribute="bottom" secondItem="c53-Om-n0H" secondAttribute="bottom" id="tWz-gA-CLt"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -562,7 +572,10 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="topMenu" destination="PO2-K4-DOL" id="Klf-Ui-m2H"/>
+                        <outlet property="bottomMenuContainer" destination="c53-Om-n0H" id="nzm-8D-ZOF"/>
+                        <outlet property="bottomMenuHeight" destination="tFd-g2-yd9" id="c9j-MQ-o98"/>
+                        <outlet property="topMenuContainer" destination="PO2-K4-DOL" id="Ro0-4x-kAo"/>
+                        <outlet property="topMenuHeight" destination="cbk-e7-JP1" id="cBn-AQ-p3F"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bTO-tA-RXg" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -74,7 +74,6 @@ class SettingsVC : UIViewController {
                 discussion.unreadCount = 0
             }
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-            UnreadCountBadge.update()
         })
     }
 }

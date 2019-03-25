@@ -241,7 +241,6 @@ class ImagesHandler {
         }
         
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        UnreadCountBadge.update()
         
         return localDiscussion
     }

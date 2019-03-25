@@ -347,7 +347,6 @@ extension SyncController : SyncServerDelegate {
                     discussion.url = mergeURL
                     discussion.unreadCount = Int32(unreadCount)
                     CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-                    UnreadCountBadge.update()
 
                     // As before, discussion are mutable-- upload a copy.
                     try SyncServer.session.uploadCopy(localFile: mergeURL, withAttributes: attr)
@@ -721,17 +720,11 @@ extension SyncController : SyncServerDelegate {
             Progress.session.next()
             
         case .singleUploadDeletionComplete:
-            // Because it is possible to delete an image for which you've not yet read messages, and the badge won't be updated.
-            UnreadCountBadge.update()
-            
             Progress.session.next()
 
         case .sharingGroupUploadOperationCompleted(sharingGroup: let sharingGroup, operation: let operation):
             switch operation {
             case .userRemoval:
-                // Because it is possible to remove yourself from an album which you've not yet read messages, and the badge won't be updated.
-                UnreadCountBadge.update()
-                
                 delegate.userRemovedFromAlbum(syncController: self, sharingGroup: sharingGroup)
             case .creation, .update:
                 break
