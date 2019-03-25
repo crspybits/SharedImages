@@ -20,7 +20,6 @@
 		8324EE331E764907000656AF /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE321E764907000656AF /* SyncController.swift */; };
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
 		8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */; };
-		834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6E2037858800969B18 /* TabControllerDelegate.swift */; };
 		834A7E792037858800969B18 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6F2037858800969B18 /* Alert.swift */; };
 		834A7E7A2037858800969B18 /* XibBasics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E702037858800969B18 /* XibBasics.swift */; };
 		834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E712037858800969B18 /* SyncSpinner.swift */; };
@@ -119,7 +118,6 @@
 		8324EE461E778623000656AF /* CALayer+MBAnimationPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MBAnimationPersistence.h"; sourceTree = "<group>"; };
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
 		8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ODRefreshControl+Extras.swift"; sourceTree = "<group>"; };
-		834A7E6E2037858800969B18 /* TabControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabControllerDelegate.swift; sourceTree = "<group>"; };
 		834A7E6F2037858800969B18 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		834A7E702037858800969B18 /* XibBasics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XibBasics.swift; sourceTree = "<group>"; };
 		834A7E712037858800969B18 /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
@@ -321,7 +319,6 @@
 		834A7E6D2037858800969B18 /* Misc UI */ = {
 			isa = PBXGroup;
 			children = (
-				834A7E6E2037858800969B18 /* TabControllerDelegate.swift */,
 				834A7E6F2037858800969B18 /* Alert.swift */,
 				834A7E702037858800969B18 /* XibBasics.swift */,
 				831521702206CC9000CA773D /* Notifications.swift */,
@@ -828,7 +825,6 @@
 				8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */,
 				83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */,
 				834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */,
-				834A7E782037858800969B18 /* TabControllerDelegate.swift in Sources */,
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
 				83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */,
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,

@@ -238,7 +238,6 @@ class ProgressView : UIView, XibBasics {
                     self.layoutIfNeeded()
                 }, completion: { _ in
                     completion?()
-                    self.removeFromSuperview()
                 })
                 
             case .dismiss:

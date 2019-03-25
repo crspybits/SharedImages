@@ -51,7 +51,14 @@ class ImageCollectionVC : UICollectionViewCell {
     }
     var selectedState: SelectedState? {
         didSet {
-            UIView.animate(withDuration: 0.2) {[unowned self] in
+            switch self.selectedState {
+            case .none:
+                break
+            case .some(.selected), .some(.notSelected):
+                self.selectedIcon?.isHidden = false
+            }
+            
+            UIView.animate(withDuration: 0.2, animations: {[unowned self] in
                 switch self.selectedState {
                 case .none:
                     self.selectedIcon?.alpha = 0
@@ -63,7 +70,14 @@ class ImageCollectionVC : UICollectionViewCell {
                     self.selectedIcon?.alpha = 0.5
                     self.imageView.alpha = 0.8
                 }
-            }
+            }, completion: { _ in
+                switch self.selectedState {
+                case .none:
+                    self.selectedIcon?.isHidden = true
+                case .some(.selected), .some(.notSelected):
+                    break
+                }
+            })
         }
     }
 

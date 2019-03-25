@@ -309,18 +309,20 @@ extension AlbumsVC : UICollectionViewDataSource {
 
         func tapAction(initialSync: Bool = false) {
             unowned let unownedSelf = self
-            if sharingReallyOn {
-                unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self)
-                unownedSelf.sharingOn = false
-                unownedSelf.collectionView.reloadData()
-                unownedSelf.shareAlbum.start()
+            if sharingOn {
+                if sharingReallyOn {
+                    unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self)
+                    unownedSelf.sharingOn = false
+                    unownedSelf.collectionView.reloadData()
+                    unownedSelf.shareAlbum.start()
+                }
             }
             else {
                 unownedSelf.gotoAlbum(sharingGroup: sharingGroup, initialSync: initialSync)
             }
         }
         
-        albumCell.setup(sharingGroup: sharingGroup, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingReallyOn)
+        albumCell.setup(sharingGroup: sharingGroup, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingOn, sharingReallyOn: sharingReallyOn)
         albumCell.tapAction = {
             tapAction()
         }

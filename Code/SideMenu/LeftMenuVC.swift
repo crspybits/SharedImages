@@ -8,6 +8,7 @@
 
 import UIKit
 import LGSideMenuController
+import SyncServer
 
 class LeftMenuVC: UIViewController {
     @IBOutlet private weak var topMenuContainer: UIView!
@@ -47,6 +48,11 @@ class LeftMenuVC: UIViewController {
         ]
 
         topMenu.setup(items: topMenuItems, selection: {[unowned self] rowIndex in
+            guard self.canUseOtherMenus() else {
+                self.topMenu.setSelectedRowIndex(nil, animated: false)
+                return
+            }
+            
             if self.bottomMenu.selectedRowIndex == nil {
                 self.menuAction(screen: .images, newVC: { AlbumsVC.create() })
             }
@@ -79,6 +85,11 @@ class LeftMenuVC: UIViewController {
             func changeMenu() {
                 switch screen {
                 case .settings:
+                    guard self.canUseOtherMenus() else {
+                        self.bottomMenu.setSelectedRowIndex(CurrentScreen.signIn.rawValue - CurrentScreen.settingsStartIndex, animated: false)
+                        return
+                    }
+            
                     self.menuAction(screen: screen, newVC: { SettingsVC.create() })
                     
                 case .signIn:
@@ -106,6 +117,12 @@ class LeftMenuVC: UIViewController {
         bottomMenuContainer.addSubview(bottomMenu)
         
         NotificationCenter.default.addObserver(self, selector: #selector(leftMenuWillShow), name: NSNotification.Name.LGSideMenuWillShowLeftView, object: nil)
+    }
+    
+    // If there are no images in the app, and no albums, and not signed, then don't allow navigation away from SignIn screen --> Don't want them them getting the "allow notifications" questions in that case.
+    private func canUseOtherMenus() -> Bool {
+        let sharingGroups = SyncServer.session.sharingGroups
+        return SignInManager.session.userIsSignedIn || (sharingGroups.count > 1 || Image.fetchAll().count > 0)
     }
     
     @objc private func leftMenuWillShow() {
@@ -170,36 +187,4 @@ class LeftMenuVC: UIViewController {
             return nil
         }
     }
-
-#if false
-    @IBAction func imagesAction(_ sender: Any) {
-        if currentScreen == .images {
-            SideMenu.session.hideLeftMenu()
-        }
-        else {
-            let albums = AlbumsVC.create()
-            SideMenu.session.setRootViewController(albums)
-        }
-    }
-    
-    @IBAction func settingsAction(_ sender: Any) {
-        if currentScreen == .settings {
-            SideMenu.session.hideLeftMenu()
-        }
-        else {
-            let settings = SettingsVC.create()
-            SideMenu.session.setRootViewController(settings)
-        }
-    }
-    
-    @IBAction func signInAction(_ sender: Any) {
-        if currentScreen == .signIn {
-            SideMenu.session.hideLeftMenu()
-        }
-        else {
-            let signIn = SignInVC.create()
-            SideMenu.session.setRootViewController(signIn)
-        }
-    }
-#endif
 }

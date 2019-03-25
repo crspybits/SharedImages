@@ -25,6 +25,7 @@ class AlbumCell: UIView, XibBasics {
     @IBOutlet weak var albumSyncNeeded: UIView!
     @IBOutlet weak var shareImage: UIImageView!
     private var sharingOn: Bool = false
+    private var sharingReallyOn: Bool = false
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -41,9 +42,10 @@ class AlbumCell: UIView, XibBasics {
         }
     }
     
-    func setup(sharingGroup: SyncServer.SharingGroup, enableGroupNameEditing: Bool, sharingOn: Bool) {
+    func setup(sharingGroup: SyncServer.SharingGroup, enableGroupNameEditing: Bool, sharingOn: Bool, sharingReallyOn:Bool) {
         self.sharingGroup = sharingGroup
         self.sharingOn = sharingOn
+        self.sharingReallyOn = sharingReallyOn
         
         setAlbumName()
         
@@ -60,7 +62,7 @@ class AlbumCell: UIView, XibBasics {
         setSyncNeeded()
         
         UIView.animate(withDuration: 0.2) {[unowned self] in
-            if sharingOn {
+            if sharingReallyOn {
                 self.image.alpha = 0.75
                 self.shareImage.alpha = 1
             }
