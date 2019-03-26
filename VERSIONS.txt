@@ -9,6 +9,9 @@ Version 1.3.0
 		- Select: Should make it more evident that images can be selected and other
 		actions taken (e.g., email an image).
 	* Added side menu and removed tab bar at bottom.
+	* Fixed a bug in the discussion screen where a refresh and then leaving the discussion screen could crash the app.
+	* Added title to Discussion screen
+	* Swapped sides of buttons on navbar on Discussion screen.
 		
 Version 1.2.0 (3/22/19)
 	* Added multi-image select when uploading images from photo library.

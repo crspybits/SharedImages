@@ -64,13 +64,21 @@ class AlbumCell: UIView, XibBasics {
         UIView.animate(withDuration: 0.2) {[unowned self] in
             if sharingReallyOn {
                 self.image.alpha = 0.75
-                self.shareImage.alpha = 1
+                self.shareImage.alpha = 0.5
             }
             else {
                 self.image.alpha = 1.0
                 self.shareImage.alpha = 0
             }
         }
+    }
+    
+    func flashSharingIcon(completion: @escaping ()->()) {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.shareImage.alpha = 1
+        }, completion: {_ in
+            completion()
+        })
     }
     
     private func setSyncNeeded() {

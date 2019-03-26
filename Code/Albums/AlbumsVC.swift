@@ -315,10 +315,13 @@ extension AlbumsVC : UICollectionViewDataSource {
             unowned let unownedSelf = self
             if sharingOn {
                 if sharingReallyOn {
-                    unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self)
-                    unownedSelf.sharingOn = false
-                    unownedSelf.collectionView.reloadData()
-                    unownedSelf.shareAlbum.start()
+                    // Before starting the sharing process, briefly flash the sharing icon to show user that they're selecting the specific album.
+                    albumCell.flashSharingIcon {
+                        unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self)
+                        unownedSelf.sharingOn = false
+                        unownedSelf.collectionView.reloadData()
+                        unownedSelf.shareAlbum.start()
+                    }
                 }
             }
             else {

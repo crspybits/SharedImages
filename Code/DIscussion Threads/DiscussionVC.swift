@@ -34,6 +34,8 @@ class DiscussionVC: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.title = "Discussion"
+        
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -106,10 +108,10 @@ class DiscussionVC: MessagesViewController {
         senderUserId = userId
         
         let closeBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "close"), style: .plain, target: self, action: #selector(close))
-        navigationItem.rightBarButtonItem = closeBarButton
+        navigationItem.leftBarButtonItem = closeBarButton
         
         let refreshBarButton = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh))
-        navigationItem.leftBarButtonItem = refreshBarButton
+        navigationItem.rightBarButtonItem = refreshBarButton
         
         let nav = UINavigationController(rootViewController: self)
         
