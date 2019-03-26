@@ -142,9 +142,10 @@ class DiscussionVC: MessagesViewController {
     }
     
     @objc private func refresh() {
-        delegate?.discussionVC(self, discussion: discussion, refreshWithCompletion: {[unowned self] in
-            self.loadDiscussion()
-            self.messagesCollectionView.reloadData()
+        delegate?.discussionVC(self, discussion: discussion, refreshWithCompletion: {[weak self] in
+            // 3/25/19; Made self references weak. Got a crash here.
+            self?.loadDiscussion()
+            self?.messagesCollectionView.reloadData()
         })
     }
     
