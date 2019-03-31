@@ -1,6 +1,6 @@
 SharedImages
 
-Version 1.3.0
+Version 1.3.0 (3/29/19)
 	* Moved "Share album" UI feature from within individual album screen to main Albums screen to improve visibility of this feature and make album sharing easier.
 	* Moved "remove user from album" UI feature from individual album screen to Settings-- this feature is (a) somewhat risky to use and (b) not frequently used so should be in a less accessible and less accessed part of the app.
 	* Moved filtering/sorting UI feature to control on the navigation bar of the app, to make room for a different nav bar button. This is a somewhat infrequently used feature and doesn't need the higher priority (scarce) nav bar button real estate.
