@@ -52,7 +52,7 @@
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="Read &amp; Write"/>
+                                <state key="normal" title="Read &amp; Change"/>
                                 <connections>
                                     <action selector="readAndWriteAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="E2N-BH-pYU"/>
                                 </connections>
@@ -65,7 +65,7 @@
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="Read, Write, and Invite"/>
+                                <state key="normal" title="Read, Change, and Invite"/>
                                 <connections>
                                     <action selector="readWriteAndInviteAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="RUp-8v-k10"/>
                                 </connections>

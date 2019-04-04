@@ -8,17 +8,12 @@
 
 import UIKit
 import Presentr
-
-/* TODO:
-1) iPad versus iPhone: Fixed sized modal for iPad
-2) When modal launched (completion)-- need to reset collection view sharing icons.
-*/
+import SyncServer_Shared
+import SyncServer
 
 class ShareAlbumVC: UIViewController {
     @IBOutlet private weak var navBar: UINavigationBar!
     @IBOutlet private weak var tableView: UITableView!
-    private static let modalHeight = ModalSize.sideMargin(value: 40)
-    private static let modalWidth = ModalSize.sideMargin(value: 20)
     private let numberInviteesReuseId = "numberInviteesReuseId"
     private let permissionReuseId = "permissionReuseId"
     private let allowSocialReuseId = "allowSocialReuseId"
@@ -35,7 +30,27 @@ class ShareAlbumVC: UIViewController {
         static let numberTypes = 4
     }
     
+    private var cancel:(()->())!
+    private var invite:((InvitationParameters)->())!
+    private var sharingGroup: SyncServer.SharingGroup!
+    
+    // Cached cells because I don't actually want them reused so I can retain the UI state.
+    // Keyed by re-use id.
+    private var cachedCells = [String: UITableViewCell]()
+    
     private static let customTypePortrait: PresentationType = {
+        let modalHeight:ModalSize
+        let modalWidth:ModalSize
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            modalHeight = .fluid(percentage: 0.75)
+            modalWidth = .half
+        }
+        else {
+            modalHeight = .sideMargin(value: 40)
+            modalWidth = .sideMargin(value: 20)
+        }
+        
         let center = ModalCenterPosition.center
         let customType = PresentationType.custom(width: modalWidth, height: modalHeight, center: center)
         return customType
@@ -53,8 +68,17 @@ class ShareAlbumVC: UIViewController {
         return customPresenter
     }()
     
-    static func show(fromParentVC parentVC: UIViewController) {
+    struct InvitationParameters {
+        let numberAcceptors: UInt
+        let permission: Permission
+        let allowSocialAcceptance:Bool
+    }
+    
+    static func show(fromParentVC parentVC: UIViewController, sharingGroup: SyncServer.SharingGroup, cancel:@escaping ()->(), invite:@escaping (InvitationParameters)->()) {
         let shareAlbum = ShareAlbumVC.create()
+        shareAlbum.sharingGroup = sharingGroup
+        shareAlbum.invite = invite
+        shareAlbum.cancel = cancel
         parentVC.customPresentViewController(shareAlbum.presenter, viewController: shareAlbum, animated: true, completion: nil)
     }
     
@@ -78,12 +102,47 @@ class ShareAlbumVC: UIViewController {
         
         // Dealing with problems with slider UI on ShareAlbumNumberInviteesCell; see https://stackoverflow.com/questions/37316026/uitableview-cell-with-slider-touch-not-working-correctly-swift-2
         tableView.delaysContentTouches = false
+        
+        var albumName = "Album"
+        if let name = sharingGroup.sharingGroupName {
+            albumName = "'\(name)'"
+        }
+        let title = "Invite Others to " + albumName
+        let item = UINavigationItem(title: title)
+        navBar.items = [item]
+    }
+    
+    @IBAction func inviteAction(_ sender: Any) {
+        let permissionCell = getCell(reuseId: permissionReuseId, cellType: .permission) as! ShareAlbumPermissionCell
+        let numberAcceptorsCell = getCell(reuseId: numberInviteesReuseId, cellType: .numberInvitees) as! ShareAlbumNumberInviteesCell
+        let allowSocialAcceptanceCell = getCell(reuseId: allowSocialReuseId, cellType: .allowSocial) as! ShareAlbumAllowSocialCell
+        let params = InvitationParameters(numberAcceptors: numberAcceptorsCell.currSliderValue, permission: permissionCell.permission, allowSocialAcceptance: allowSocialAcceptanceCell.switch.isOn)
+        
+        dismiss(animated: true, completion: {
+            self.invite?(params)
+        })
+    }
+    
+    @IBAction func cancelAction(_ sender: Any) {
+        dismiss(animated: true, completion: cancel)
     }
 }
 
 extension ShareAlbumVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return CellType.numberTypes
+    }
+    
+    private func getCell(reuseId: String, cellType: CellType) -> UITableViewCell {
+        if let cell = cachedCells[reuseId] {
+            return cell
+        }
+        else {
+            let indexPath = IndexPath(row: cellType.rawValue, section: 0)
+            let cell = tableView.dequeueReusableCell(withIdentifier: reuseId, for: indexPath)
+            cachedCells[reuseId] = cell
+            return cell
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -93,17 +152,13 @@ extension ShareAlbumVC: UITableViewDelegate, UITableViewDataSource {
         
         switch cellType {
         case .numberInvitees:
-            let cell = tableView.dequeueReusableCell(withIdentifier: numberInviteesReuseId, for: indexPath)
-            return cell
+            return getCell(reuseId: numberInviteesReuseId, cellType: cellType)
         case .permission:
-            let cell = tableView.dequeueReusableCell(withIdentifier: permissionReuseId, for: indexPath)
-            return cell
+            return getCell(reuseId: permissionReuseId, cellType: cellType)
         case .allowSocial:
-            let cell = tableView.dequeueReusableCell(withIdentifier: allowSocialReuseId, for: indexPath)
-            return cell
+            return getCell(reuseId: allowSocialReuseId, cellType: cellType)
         case .help:
-            let cell = tableView.dequeueReusableCell(withIdentifier: helpReuseId, for: indexPath)
-            return cell
+            return getCell(reuseId: helpReuseId, cellType: cellType)
         }
     }
 }

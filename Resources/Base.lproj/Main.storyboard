@@ -616,6 +616,9 @@
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                         <state key="normal" title="Cancel"/>
+                                        <connections>
+                                            <action selector="cancelAction:" destination="yNy-10-7eY" eventType="touchUpInside" id="qkI-Co-aOg"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yb3-di-Nxy">
                                         <rect key="frame" x="313" y="10" width="52" height="30"/>
@@ -625,6 +628,9 @@
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                         <state key="normal" title="Invite"/>
+                                        <connections>
+                                            <action selector="inviteAction:" destination="yNy-10-7eY" eventType="touchUpInside" id="xKA-Tv-ohO"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

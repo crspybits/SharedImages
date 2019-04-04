@@ -671,13 +671,15 @@ class ServerAPI {
         case responseConversionError
     }
 
-    func createSharingInvitation(withPermission permission:Permission, sharingGroupUUID: String, completion:((_ sharingInvitationUUID:String?, Error?)->(Void))?) {
+    func createSharingInvitation(withPermission permission:Permission, sharingGroupUUID: String, numberAcceptors: UInt, allowSharingAcceptance: Bool, completion:((_ sharingInvitationUUID:String?, Error?)->(Void))?) {
     
         let endpoint = ServerEndpoints.createSharingInvitation
 
         let invitationRequest = CreateSharingInvitationRequest()
         invitationRequest.permission = permission
         invitationRequest.sharingGroupUUID = sharingGroupUUID
+        invitationRequest.allowSocialAcceptance = allowSharingAcceptance
+        invitationRequest.numberOfAcceptors = numberAcceptors
         
         let parameters = invitationRequest.urlParameters()!
         let serverURL = makeURL(forEndpoint: endpoint, parameters: parameters)

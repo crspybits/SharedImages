@@ -195,9 +195,9 @@ public class SyncServerUser {
     }
     
     /// Calls the server API method to create a sharing invitation.
-    public func createSharingInvitation(withPermission permission:Permission, sharingGroupUUID: String, completion:((_ invitationCode:String?, Error?)->(Void))?) {
+    public func createSharingInvitation(withPermission permission:Permission, sharingGroupUUID: String, numberAcceptors: UInt, allowSharingAcceptance: Bool = true, completion:((_ invitationCode:String?, Error?)->(Void))?) {
 
-        ServerAPI.session.createSharingInvitation(withPermission: permission, sharingGroupUUID: sharingGroupUUID) { (sharingInvitationUUID, error) in
+        ServerAPI.session.createSharingInvitation(withPermission: permission, sharingGroupUUID: sharingGroupUUID, numberAcceptors: numberAcceptors, allowSharingAcceptance: allowSharingAcceptance) { (sharingInvitationUUID, error) in
             Thread.runSync(onMainThread: {
                 completion?(sharingInvitationUUID, error)
             })
