@@ -7,18 +7,23 @@
 //
 
 import UIKit
+import SyncServer_Shared
 
 class ShareAlbumNumberInviteesCell: UITableViewCell {
-
+    @IBOutlet weak var slider: UISlider!
+    @IBOutlet weak var numberInvitees: UILabel!
+    
+    var currSliderValue:UInt {
+        return UInt(slider.value *
+            Float(ServerConstants.maxNumberSharingInvitationAcceptors-1)) + 1
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+    @IBAction func sliderAction(_ sender: Any) {
+        numberInvitees.text = "\(currSliderValue)"
     }
-    
 }

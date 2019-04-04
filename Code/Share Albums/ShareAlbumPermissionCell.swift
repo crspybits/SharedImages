@@ -7,18 +7,51 @@
 //
 
 import UIKit
+import SyncServer_Shared
 
 class ShareAlbumPermissionCell: UITableViewCell {
-
+    @IBOutlet weak var readOnly: UIButton!
+    @IBOutlet weak var readAndWrite: UIButton!
+    @IBOutlet weak var readWriteAndInvite: UIButton!
+    
+    private(set) var permission:Permission = .write
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
     
+    private func updateStates(oldPermission: Permission) {
+        if oldPermission == permission {
+            return
+        }
+        
+        let buttons:[Permission: UIButton] = [.read: readOnly, .write: readAndWrite, .admin: readWriteAndInvite]
+        
+        UIView.animate(withDuration: 0.3) {[unowned self] in
+            if let oldButton = buttons[oldPermission] {
+                oldButton.alpha = 0.5
+            }
+            if let newButton = buttons[self.permission] {
+                newButton.alpha = 1
+            }
+        }
+    }
+    
+    @IBAction func readOnlyAction(_ sender: Any) {
+        let oldPermission = permission
+        permission = .read
+        updateStates(oldPermission: oldPermission)
+    }
+    
+    @IBAction func readAndWriteAction(_ sender: Any) {
+        let oldPermission = permission
+        permission = .write
+        updateStates(oldPermission: oldPermission)
+    }
+    
+    @IBAction func readWriteAndInviteAction(_ sender: Any) {
+        let oldPermission = permission
+        permission = .admin
+        updateStates(oldPermission: oldPermission)
+    }
 }

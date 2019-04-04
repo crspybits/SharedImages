@@ -8,6 +8,8 @@
 
 import Foundation
 
+// A 403 HTTP status code is given as the response if a social user (e.g., Facebook) attempts to redeem a sharing invitation for which social users are not allowed.
+
 public class RedeemSharingInvitationRequest : RequestMessage {
     required public init() {}
 

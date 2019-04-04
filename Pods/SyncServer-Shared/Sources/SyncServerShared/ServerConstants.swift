@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 // These are shared with client apps
 
 public class ServerConstants {
@@ -63,6 +65,11 @@ public class ServerConstants {
             }
         }
     }
+    
+    public static let maxNumberSharingInvitationAcceptors:UInt = 10
+    
+    // 60 seconds/minute * 60 minutes/hour * 24 hours/day == seconds/day
+    public static let sharingInvitationExpiryDuration:TimeInterval = 60*60*24 // 1 day
 }
 
 

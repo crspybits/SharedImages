@@ -13,12 +13,13 @@ class ShareAlbumHelpCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-
+        
         guard let url = Bundle.main.url(forResource: "SharingInvitationHelp", withExtension: "html"),
             let data = try? Data(contentsOf: url) else {
             return
         }
         
+        // See https://stackoverflow.com/questions/5743844/uilabel-text-as-html-text
         guard let attrString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) else {
             return
         }

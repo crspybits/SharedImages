@@ -32,13 +32,16 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="4ag-zo-IDD">
-                                <rect key="frame" x="38" y="50" width="195" height="51"/>
+                                <rect key="frame" x="38" y="41" width="195" height="51"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="gpY-bJ-I1U"/>
                                 </constraints>
+                                <connections>
+                                    <action selector="sliderAction:" destination="KGk-i7-Jjw" eventType="valueChanged" id="WZa-Sc-vr5"/>
+                                </connections>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Txw-nk-kOa">
-                                <rect key="frame" x="261" y="50" width="35" height="50"/>
+                                <rect key="frame" x="261" y="41" width="35" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="35" id="mX8-vA-FkF"/>
                                 </constraints>
@@ -49,12 +52,12 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="4ag-zo-IDD" firstAttribute="leading" secondItem="s4X-Zy-iwL" secondAttribute="leading" constant="40" id="0a9-ES-b6q"/>
-                            <constraint firstAttribute="bottom" secondItem="4ag-zo-IDD" secondAttribute="bottom" constant="5" id="8Yj-fl-mIi"/>
                             <constraint firstItem="L3D-gZ-czS" firstAttribute="top" secondItem="s4X-Zy-iwL" secondAttribute="top" constant="5" id="8nR-ut-iUe"/>
                             <constraint firstAttribute="height" constant="105" id="Jla-pY-gSk"/>
                             <constraint firstItem="Txw-nk-kOa" firstAttribute="leading" secondItem="4ag-zo-IDD" secondAttribute="trailing" constant="30" id="Op6-oU-ezu"/>
                             <constraint firstItem="L3D-gZ-czS" firstAttribute="leading" secondItem="s4X-Zy-iwL" secondAttribute="leading" constant="10" id="P47-L4-jcM"/>
                             <constraint firstItem="Txw-nk-kOa" firstAttribute="centerY" secondItem="4ag-zo-IDD" secondAttribute="centerY" id="UZz-kk-6li"/>
+                            <constraint firstItem="4ag-zo-IDD" firstAttribute="top" secondItem="L3D-gZ-czS" secondAttribute="bottom" constant="-5" id="hWa-Bv-Z4R"/>
                             <constraint firstAttribute="trailing" secondItem="Txw-nk-kOa" secondAttribute="trailing" constant="10" id="tCB-Bp-N45"/>
                             <constraint firstItem="Txw-nk-kOa" firstAttribute="bottom" secondItem="4ag-zo-IDD" secondAttribute="bottom" id="uDk-3Y-0u6"/>
                         </constraints>
@@ -68,6 +71,10 @@
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="numberInvitees" destination="Txw-nk-kOa" id="UeG-mg-q58"/>
+                <outlet property="slider" destination="4ag-zo-IDD" id="AhT-Nd-t3u"/>
+            </connections>
             <point key="canvasLocation" x="28.800000000000001" y="47.676161919040482"/>
         </tableViewCell>
     </objects>

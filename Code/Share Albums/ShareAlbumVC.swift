@@ -9,6 +9,11 @@
 import UIKit
 import Presentr
 
+/* TODO:
+1) iPad versus iPhone: Fixed sized modal for iPad
+2) When modal launched (completion)-- need to reset collection view sharing icons.
+*/
+
 class ShareAlbumVC: UIViewController {
     @IBOutlet private weak var navBar: UINavigationBar!
     @IBOutlet private weak var tableView: UITableView!
@@ -16,16 +21,18 @@ class ShareAlbumVC: UIViewController {
     private static let modalWidth = ModalSize.sideMargin(value: 20)
     private let numberInviteesReuseId = "numberInviteesReuseId"
     private let permissionReuseId = "permissionReuseId"
+    private let allowSocialReuseId = "allowSocialReuseId"
     private let helpReuseId = "helpReuseId"
 
     // These correspond to row numbers in the table view.
     private enum CellType: Int {
         case numberInvitees = 0
         case permission = 1
-        case help = 2
+        case allowSocial = 2
+        case help = 3
         
         // This *must* reflect the number of cases.
-        static let numberTypes = 3
+        static let numberTypes = 4
     }
     
     private static let customTypePortrait: PresentationType = {
@@ -64,11 +71,12 @@ class ShareAlbumVC: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(UINib(nibName: "ShareAlbumNumberInviteesCell", bundle: nil), forCellReuseIdentifier: numberInviteesReuseId)
         tableView.register(UINib(nibName: "ShareAlbumPermissionCell", bundle: nil), forCellReuseIdentifier: permissionReuseId)
+        tableView.register(UINib(nibName: "ShareAlbumAllowSocialCell", bundle: nil), forCellReuseIdentifier: allowSocialReuseId)
         tableView.register(UINib(nibName: "ShareAlbumHelpCell", bundle: nil), forCellReuseIdentifier: helpReuseId)
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         
-        // Dealing with problems with slider UI
+        // Dealing with problems with slider UI on ShareAlbumNumberInviteesCell; see https://stackoverflow.com/questions/37316026/uitableview-cell-with-slider-touch-not-working-correctly-swift-2
         tableView.delaysContentTouches = false
     }
 }
@@ -89,6 +97,9 @@ extension ShareAlbumVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         case .permission:
             let cell = tableView.dequeueReusableCell(withIdentifier: permissionReuseId, for: indexPath)
+            return cell
+        case .allowSocial:
+            let cell = tableView.dequeueReusableCell(withIdentifier: allowSocialReuseId, for: indexPath)
             return cell
         case .help:
             let cell = tableView.dequeueReusableCell(withIdentifier: helpReuseId, for: indexPath)

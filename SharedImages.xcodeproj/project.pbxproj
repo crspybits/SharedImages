@@ -64,6 +64,8 @@
 		83CE2F1822556DAA00E6EFD7 /* ShareAlbumHelpCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F1622556DAA00E6EFD7 /* ShareAlbumHelpCell.swift */; };
 		83CE2F1922556DAA00E6EFD7 /* ShareAlbumHelpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1722556DAA00E6EFD7 /* ShareAlbumHelpCell.xib */; };
 		83CE2F1B2255740600E6EFD7 /* SharingInvitationHelp.html in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */; };
+		83CE2F1E225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F1C225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.swift */; };
+		83CE2F1F225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1D225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib */; };
 		83D0BE1D20B37D6F00555B73 /* SortyFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */; };
 		83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */; };
 		83D0BE2120B3817800555B73 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2020B3817800555B73 /* Parameters.swift */; };
@@ -173,6 +175,8 @@
 		83CE2F1622556DAA00E6EFD7 /* ShareAlbumHelpCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAlbumHelpCell.swift; sourceTree = "<group>"; };
 		83CE2F1722556DAA00E6EFD7 /* ShareAlbumHelpCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareAlbumHelpCell.xib; sourceTree = "<group>"; };
 		83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = SharingInvitationHelp.html; path = Resources/SharingInvitationHelp.html; sourceTree = "<group>"; };
+		83CE2F1C225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAlbumAllowSocialCell.swift; sourceTree = "<group>"; };
+		83CE2F1D225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareAlbumAllowSocialCell.xib; sourceTree = "<group>"; };
 		83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortyFilter.swift; path = "Sorting and Filtering/SortyFilter.swift"; sourceTree = "<group>"; };
 		83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = SortyFilter.xib; path = "Sorting and Filtering/SortyFilter.xib"; sourceTree = "<group>"; };
 		83D0BE2020B3817800555B73 /* Parameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Parameters.swift; path = "Sorting and Filtering/Parameters.swift"; sourceTree = "<group>"; };
@@ -431,6 +435,8 @@
 				83CE2F0F22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib */,
 				83CE2F1222556B6400E6EFD7 /* ShareAlbumPermissionCell.swift */,
 				83CE2F1322556B6400E6EFD7 /* ShareAlbumPermissionCell.xib */,
+				83CE2F1C225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.swift */,
+				83CE2F1D225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib */,
 				83CE2F1622556DAA00E6EFD7 /* ShareAlbumHelpCell.swift */,
 				83CE2F1722556DAA00E6EFD7 /* ShareAlbumHelpCell.xib */,
 			);
@@ -656,6 +662,7 @@
 				83CE2F1122550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
 				83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */,
+				83CE2F1F225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
 				83CE2F1922556DAA00E6EFD7 /* ShareAlbumHelpCell.xib in Resources */,
@@ -883,6 +890,7 @@
 				83F5CB522246D39E006DBB2F /* AcquireImages.swift in Sources */,
 				83CE2F1422556B6400E6EFD7 /* ShareAlbumPermissionCell.swift in Sources */,
 				835A8AB42245BCBD0000FEA0 /* ImagesVC.swift in Sources */,
+				83CE2F1E225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.swift in Sources */,
 				83F5CB502246CCA2006DBB2F /* RemoveImages.swift in Sources */,
 				83F5CB592247FCA6006DBB2F /* SideMenuItem.swift in Sources */,
 				83F882571E73B2DC008F644A /* Image+CoreDataProperties.swift in Sources */,
