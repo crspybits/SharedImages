@@ -582,6 +582,84 @@
             </objects>
             <point key="canvasLocation" x="-740" y="1558.4707646176912"/>
         </scene>
+        <!--Share AlbumVC-->
+        <scene sceneID="psY-8x-yho">
+            <objects>
+                <viewController storyboardIdentifier="ShareAlbumVC" id="yNy-10-7eY" customClass="ShareAlbumVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ba5-Af-Avm"/>
+                        <viewControllerLayoutGuide type="bottom" id="lsV-zt-1Rc"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="gpw-ML-foL">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="D7j-PU-sgc">
+                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <items>
+                                    <navigationItem title="Invite Others to Album" id="nYE-No-7fK"/>
+                                </items>
+                            </navigationBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="XZy-tW-daD">
+                                <rect key="frame" x="0.0" y="64" width="375" height="553"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Y5O-Ms-1gP" userLabel="BottomButtons">
+                                <rect key="frame" x="0.0" y="617" width="375" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ANh-9H-ukc">
+                                        <rect key="frame" x="10" y="10" width="67" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="48" id="D4u-rh-yDG"/>
+                                            <constraint firstAttribute="height" constant="30" id="wGG-GE-oWS"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                        <state key="normal" title="Cancel"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yb3-di-Nxy">
+                                        <rect key="frame" x="313" y="10" width="52" height="30"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="aC8-lw-FKk"/>
+                                            <constraint firstAttribute="height" constant="30" id="rfp-YQ-vut"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                        <state key="normal" title="Invite"/>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="ANh-9H-ukc" firstAttribute="centerY" secondItem="Y5O-Ms-1gP" secondAttribute="centerY" id="8Xn-kV-Sfv"/>
+                                    <constraint firstItem="yb3-di-Nxy" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ANh-9H-ukc" secondAttribute="trailing" constant="8" symbolic="YES" id="C3o-Wm-c2T"/>
+                                    <constraint firstItem="yb3-di-Nxy" firstAttribute="centerY" secondItem="Y5O-Ms-1gP" secondAttribute="centerY" id="UIl-Fw-J1E"/>
+                                    <constraint firstAttribute="trailing" secondItem="yb3-di-Nxy" secondAttribute="trailing" constant="10" id="gdD-3o-6kh"/>
+                                    <constraint firstItem="ANh-9H-ukc" firstAttribute="leading" secondItem="Y5O-Ms-1gP" secondAttribute="leading" constant="10" id="lnk-8i-qMb"/>
+                                    <constraint firstAttribute="height" constant="50" id="zH1-SC-MAL"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Y5O-Ms-1gP" firstAttribute="leading" secondItem="gpw-ML-foL" secondAttribute="leading" id="1IZ-LJ-kWn"/>
+                            <constraint firstAttribute="trailing" secondItem="Y5O-Ms-1gP" secondAttribute="trailing" id="7xK-IA-C1m"/>
+                            <constraint firstItem="Y5O-Ms-1gP" firstAttribute="top" secondItem="XZy-tW-daD" secondAttribute="bottom" id="D14-zD-Ezm"/>
+                            <constraint firstAttribute="trailing" secondItem="XZy-tW-daD" secondAttribute="trailing" id="DZM-gZ-yKY"/>
+                            <constraint firstItem="XZy-tW-daD" firstAttribute="top" secondItem="D7j-PU-sgc" secondAttribute="bottom" id="Hcw-hH-Ibm"/>
+                            <constraint firstItem="D7j-PU-sgc" firstAttribute="top" secondItem="ba5-Af-Avm" secondAttribute="bottom" id="Nui-2p-rPo"/>
+                            <constraint firstAttribute="trailing" secondItem="D7j-PU-sgc" secondAttribute="trailing" id="b2q-hX-gSS"/>
+                            <constraint firstItem="XZy-tW-daD" firstAttribute="leading" secondItem="gpw-ML-foL" secondAttribute="leading" id="ttH-h3-hWa"/>
+                            <constraint firstItem="D7j-PU-sgc" firstAttribute="leading" secondItem="gpw-ML-foL" secondAttribute="leading" id="wIs-tZ-kmP"/>
+                            <constraint firstItem="lsV-zt-1Rc" firstAttribute="top" secondItem="Y5O-Ms-1gP" secondAttribute="bottom" id="yh8-Fs-XN2"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="navBar" destination="D7j-PU-sgc" id="ySJ-Uo-rdS"/>
+                        <outlet property="tableView" destination="XZy-tW-daD" id="SuA-2K-EmD"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="LeU-2h-mLN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-351.19999999999999" y="2437.3313343328336"/>
+        </scene>
         <!--Remove User From AlbumVC-->
         <scene sceneID="CV0-Mb-5EN">
             <objects>

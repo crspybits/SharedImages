@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="197" id="KGk-i7-Jjw" customClass="ShareAlbumPermissionCell" customModule="Neebla" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="322" height="197"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="322" height="196.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OOS-Tc-6lF" userLabel="Inset View">
+                        <rect key="frame" x="10" y="0.0" width="302" height="197.5"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Permissions for people invited" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WXI-XW-eZ5">
+                                <rect key="frame" x="10" y="5.5" width="240.5" height="41"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="41" id="PRI-hc-2CV"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HDz-fy-ed3">
+                                <rect key="frame" x="30" y="47.5" width="242" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="RTB-h1-4BL"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="Read-only"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rf8-6i-u2i">
+                                <rect key="frame" x="30" y="97.5" width="242" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="uTy-7j-VnT"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="Read &amp; Write"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z2l-9x-iv3">
+                                <rect key="frame" x="30" y="147.5" width="242" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="Y72-Se-F08"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <inset key="contentEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="Read, Write, and Invite"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="HDz-fy-ed3" secondAttribute="trailing" constant="30" id="0sn-6r-dQN"/>
+                            <constraint firstItem="HDz-fy-ed3" firstAttribute="leading" secondItem="OOS-Tc-6lF" secondAttribute="leading" constant="30" id="8zM-mg-Bop"/>
+                            <constraint firstItem="Rf8-6i-u2i" firstAttribute="leading" secondItem="OOS-Tc-6lF" secondAttribute="leading" constant="30" id="F4u-t3-UL3"/>
+                            <constraint firstItem="z2l-9x-iv3" firstAttribute="leading" secondItem="OOS-Tc-6lF" secondAttribute="leading" constant="30" id="Fcq-sX-ROV"/>
+                            <constraint firstAttribute="bottom" secondItem="z2l-9x-iv3" secondAttribute="bottom" id="Lk9-1j-IHa"/>
+                            <constraint firstItem="z2l-9x-iv3" firstAttribute="top" secondItem="Rf8-6i-u2i" secondAttribute="bottom" id="PPU-B4-48q"/>
+                            <constraint firstAttribute="trailing" secondItem="Rf8-6i-u2i" secondAttribute="trailing" constant="30" id="aCE-nL-0W0"/>
+                            <constraint firstItem="WXI-XW-eZ5" firstAttribute="top" secondItem="OOS-Tc-6lF" secondAttribute="top" constant="5" id="aeo-Yv-pQi"/>
+                            <constraint firstItem="Rf8-6i-u2i" firstAttribute="top" secondItem="HDz-fy-ed3" secondAttribute="bottom" id="ao8-mC-05L"/>
+                            <constraint firstAttribute="height" constant="197" id="ehZ-KQ-7Hw"/>
+                            <constraint firstItem="Rf8-6i-u2i" firstAttribute="top" secondItem="HDz-fy-ed3" secondAttribute="bottom" id="g4W-vo-3dk"/>
+                            <constraint firstItem="WXI-XW-eZ5" firstAttribute="leading" secondItem="OOS-Tc-6lF" secondAttribute="leading" constant="10" id="hTU-R3-2Ym"/>
+                            <constraint firstAttribute="trailing" secondItem="z2l-9x-iv3" secondAttribute="trailing" constant="30" id="kOA-ZQ-z0y"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="OOS-Tc-6lF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="PhD-SU-S5U"/>
+                    <constraint firstAttribute="bottom" secondItem="OOS-Tc-6lF" secondAttribute="bottom" id="QwM-AN-xCf"/>
+                    <constraint firstItem="OOS-Tc-6lF" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="anV-Xh-kdk"/>
+                    <constraint firstAttribute="trailing" secondItem="OOS-Tc-6lF" secondAttribute="trailing" constant="10" id="xdX-SE-4vV"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <point key="canvasLocation" x="-172.80000000000001" y="91.304347826086968"/>
+        </tableViewCell>
+    </objects>
+</document>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="85" id="KGk-i7-Jjw" customClass="ShareAlbumNumberInviteesCell" customModule="Neebla" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="326" height="120"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="326" height="119.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s4X-Zy-iwL" userLabel="Inset Content">
+                        <rect key="frame" x="10" y="15.5" width="306" height="105"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number of people to invite" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L3D-gZ-czS">
+                                <rect key="frame" x="10" y="5" width="211.5" height="41"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="41" id="y8a-pS-a4M"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="4ag-zo-IDD">
+                                <rect key="frame" x="38" y="50" width="195" height="51"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="gpY-bJ-I1U"/>
+                                </constraints>
+                            </slider>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Txw-nk-kOa">
+                                <rect key="frame" x="261" y="50" width="35" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="35" id="mX8-vA-FkF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="4ag-zo-IDD" firstAttribute="leading" secondItem="s4X-Zy-iwL" secondAttribute="leading" constant="40" id="0a9-ES-b6q"/>
+                            <constraint firstAttribute="bottom" secondItem="4ag-zo-IDD" secondAttribute="bottom" constant="5" id="8Yj-fl-mIi"/>
+                            <constraint firstItem="L3D-gZ-czS" firstAttribute="top" secondItem="s4X-Zy-iwL" secondAttribute="top" constant="5" id="8nR-ut-iUe"/>
+                            <constraint firstAttribute="height" constant="105" id="Jla-pY-gSk"/>
+                            <constraint firstItem="Txw-nk-kOa" firstAttribute="leading" secondItem="4ag-zo-IDD" secondAttribute="trailing" constant="30" id="Op6-oU-ezu"/>
+                            <constraint firstItem="L3D-gZ-czS" firstAttribute="leading" secondItem="s4X-Zy-iwL" secondAttribute="leading" constant="10" id="P47-L4-jcM"/>
+                            <constraint firstItem="Txw-nk-kOa" firstAttribute="centerY" secondItem="4ag-zo-IDD" secondAttribute="centerY" id="UZz-kk-6li"/>
+                            <constraint firstAttribute="trailing" secondItem="Txw-nk-kOa" secondAttribute="trailing" constant="10" id="tCB-Bp-N45"/>
+                            <constraint firstItem="Txw-nk-kOa" firstAttribute="bottom" secondItem="4ag-zo-IDD" secondAttribute="bottom" id="uDk-3Y-0u6"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="s4X-Zy-iwL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="P5B-7n-WAK"/>
+                    <constraint firstAttribute="trailing" secondItem="s4X-Zy-iwL" secondAttribute="trailing" constant="10" id="PH4-Xa-ezX"/>
+                    <constraint firstAttribute="bottom" secondItem="s4X-Zy-iwL" secondAttribute="bottom" id="Tak-Iy-Paa"/>
+                    <constraint firstItem="s4X-Zy-iwL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="k7d-0F-eWn"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <point key="canvasLocation" x="28.800000000000001" y="47.676161919040482"/>
+        </tableViewCell>
+    </objects>
+</document>

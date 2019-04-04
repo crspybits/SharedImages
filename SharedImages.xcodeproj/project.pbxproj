@@ -56,6 +56,14 @@
 		83C34078201D939100DAD865 /* AppMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34077201D939100DAD865 /* AppMetaData.swift */; };
 		83C34081201E42C400DAD865 /* Discussion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* Discussion.swift */; };
 		83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */; };
+		83CE2F092254592900E6EFD7 /* ShareAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */; };
+		83CE2F1022550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F0E22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift */; };
+		83CE2F1122550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F0F22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib */; };
+		83CE2F1422556B6400E6EFD7 /* ShareAlbumPermissionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F1222556B6400E6EFD7 /* ShareAlbumPermissionCell.swift */; };
+		83CE2F1522556B6400E6EFD7 /* ShareAlbumPermissionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1322556B6400E6EFD7 /* ShareAlbumPermissionCell.xib */; };
+		83CE2F1822556DAA00E6EFD7 /* ShareAlbumHelpCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F1622556DAA00E6EFD7 /* ShareAlbumHelpCell.swift */; };
+		83CE2F1922556DAA00E6EFD7 /* ShareAlbumHelpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1722556DAA00E6EFD7 /* ShareAlbumHelpCell.xib */; };
+		83CE2F1B2255740600E6EFD7 /* SharingInvitationHelp.html in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */; };
 		83D0BE1D20B37D6F00555B73 /* SortyFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */; };
 		83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */; };
 		83D0BE2120B3817800555B73 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0BE2020B3817800555B73 /* Parameters.swift */; };
@@ -157,6 +165,14 @@
 		83C34077201D939100DAD865 /* AppMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetaData.swift; sourceTree = "<group>"; };
 		83C3407E201E42C400DAD865 /* Discussion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Discussion.swift; path = "Core Data/Discussion.swift"; sourceTree = "<group>"; };
 		83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discussion+CoreDataProperties.swift"; path = "Core Data/Discussion+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareAlbumVC.swift; sourceTree = "<group>"; };
+		83CE2F0E22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAlbumNumberInviteesCell.swift; sourceTree = "<group>"; };
+		83CE2F0F22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareAlbumNumberInviteesCell.xib; sourceTree = "<group>"; };
+		83CE2F1222556B6400E6EFD7 /* ShareAlbumPermissionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAlbumPermissionCell.swift; sourceTree = "<group>"; };
+		83CE2F1322556B6400E6EFD7 /* ShareAlbumPermissionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareAlbumPermissionCell.xib; sourceTree = "<group>"; };
+		83CE2F1622556DAA00E6EFD7 /* ShareAlbumHelpCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAlbumHelpCell.swift; sourceTree = "<group>"; };
+		83CE2F1722556DAA00E6EFD7 /* ShareAlbumHelpCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareAlbumHelpCell.xib; sourceTree = "<group>"; };
+		83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = SharingInvitationHelp.html; path = Resources/SharingInvitationHelp.html; sourceTree = "<group>"; };
 		83D0BE1A20B37D6F00555B73 /* SortyFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortyFilter.swift; path = "Sorting and Filtering/SortyFilter.swift"; sourceTree = "<group>"; };
 		83D0BE1C20B37D6F00555B73 /* SortyFilter.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = SortyFilter.xib; path = "Sorting and Filtering/SortyFilter.xib"; sourceTree = "<group>"; };
 		83D0BE2020B3817800555B73 /* Parameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Parameters.swift; path = "Sorting and Filtering/Parameters.swift"; sourceTree = "<group>"; };
@@ -283,6 +299,7 @@
 				83D0BE1920B37D0D00555B73 /* Sorting and Filtering */,
 				83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */,
 				835A8AA4224478BC0000FEA0 /* Albums */,
+				83CE2F07225458DF00E6EFD7 /* Share Albums */,
 				835A8AB22245BCBD0000FEA0 /* Single Album */,
 				83D1FE331EAB074A00DD468F /* LargeImages.swift */,
 				83F8824F1E73A6F6008F644A /* ImageCollectionVC.swift */,
@@ -406,6 +423,20 @@
 			path = "DIscussion Threads";
 			sourceTree = "<group>";
 		};
+		83CE2F07225458DF00E6EFD7 /* Share Albums */ = {
+			isa = PBXGroup;
+			children = (
+				83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */,
+				83CE2F0E22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift */,
+				83CE2F0F22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib */,
+				83CE2F1222556B6400E6EFD7 /* ShareAlbumPermissionCell.swift */,
+				83CE2F1322556B6400E6EFD7 /* ShareAlbumPermissionCell.xib */,
+				83CE2F1622556DAA00E6EFD7 /* ShareAlbumHelpCell.swift */,
+				83CE2F1722556DAA00E6EFD7 /* ShareAlbumHelpCell.xib */,
+			);
+			path = "Share Albums";
+			sourceTree = "<group>";
+		};
 		83D0BE1920B37D0D00555B73 /* Sorting and Filtering */ = {
 			isa = PBXGroup;
 			children = (
@@ -458,6 +489,7 @@
 		83F8823C1E711F80008F644A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */,
 				83A2E6A61F76F83300A2E303 /* LottieAnimations */,
 				83F8823D1E711FC6008F644A /* Assets.xcassets */,
 				83F8823E1E711FC6008F644A /* LaunchScreen.storyboard */,
@@ -614,15 +646,19 @@
 				835A8AB62245BD4D0000FEA0 /* ImagesTitle.xib in Resources */,
 				83A2E6AC1F76F84500A2E303 /* D.json in Resources */,
 				83D0BE2720B39C7000555B73 /* SortControl.xib in Resources */,
+				83CE2F1522556B6400E6EFD7 /* ShareAlbumPermissionCell.xib in Resources */,
 				83F882471E711FC6008F644A /* Main.storyboard in Resources */,
 				83A2E6AB1F76F84500A2E303 /* C.json in Resources */,
 				83F882671E74A600008F644A /* Server.plist in Resources */,
+				83CE2F1B2255740600E6EFD7 /* SharingInvitationHelp.html in Resources */,
 				83A2E6AE1F76F84500A2E303 /* R.json in Resources */,
 				83A2E6AD1F76F84500A2E303 /* N.json in Resources */,
+				83CE2F1122550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
 				83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
+				83CE2F1922556DAA00E6EFD7 /* ShareAlbumHelpCell.xib in Resources */,
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
 				835A8AAA224478BC0000FEA0 /* AlbumCell.xib in Resources */,
 				83F5CB612247FF71006DBB2F /* Menu.xib in Resources */,
@@ -825,6 +861,8 @@
 				8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */,
 				83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */,
 				834E3E9320B3FF90006AC504 /* BottomRefresh.swift in Sources */,
+				83CE2F092254592900E6EFD7 /* ShareAlbumVC.swift in Sources */,
+				83CE2F1822556DAA00E6EFD7 /* ShareAlbumHelpCell.swift in Sources */,
 				83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */,
 				83EFC098216EDFB800D7A3C4 /* UIViewController+Extras.swift in Sources */,
 				830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */,
@@ -834,6 +872,7 @@
 				835A8AAF22448BB90000FEA0 /* SettingsVC.swift in Sources */,
 				835A8AA9224478BC0000FEA0 /* AlbumCell.swift in Sources */,
 				835A8AA1223F40460000FEA0 /* Logger.swift in Sources */,
+				83CE2F1022550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift in Sources */,
 				835A8AB1224566590000FEA0 /* RemoveUserFromAlbumVC.swift in Sources */,
 				831521712206CC9000CA773D /* Notifications.swift in Sources */,
 				835A8AA8224478BC0000FEA0 /* AlbumsVC.swift in Sources */,
@@ -842,6 +881,7 @@
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,
 				83F5CB522246D39E006DBB2F /* AcquireImages.swift in Sources */,
+				83CE2F1422556B6400E6EFD7 /* ShareAlbumPermissionCell.swift in Sources */,
 				835A8AB42245BCBD0000FEA0 /* ImagesVC.swift in Sources */,
 				83F5CB502246CCA2006DBB2F /* RemoveImages.swift in Sources */,
 				83F5CB592247FCA6006DBB2F /* SideMenuItem.swift in Sources */,

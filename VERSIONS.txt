@@ -1,5 +1,8 @@
 SharedImages
 
+Version 1.4.0
+	* Added number acceptors option to sharing invitation creation.
+
 Version 1.3.0 (3/29/19)
 	* Moved "Share album" UI feature from within individual album screen to main Albums screen to improve visibility of this feature and make album sharing easier.
 	* Moved "remove user from album" UI feature from individual album screen to Settings-- this feature is (a) somewhat risky to use and (b) not frequently used so should be in a less accessible and less accessed part of the app.
