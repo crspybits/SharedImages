@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F4DD677252DB95FBFD030521A21F84FF"
+               BlueprintIdentifier = "0CCB57A8CE2B907EF32073B1C3BFA6CF"
                BuildableName = "SyncServer_Shared.framework"
                BlueprintName = "SyncServer-Shared"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F4DD677252DB95FBFD030521A21F84FF"
+            BlueprintIdentifier = "0CCB57A8CE2B907EF32073B1C3BFA6CF"
             BuildableName = "SyncServer_Shared.framework"
             BlueprintName = "SyncServer-Shared"
             ReferencedContainer = "container:Pods.xcodeproj">

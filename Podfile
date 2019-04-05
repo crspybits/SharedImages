@@ -62,6 +62,8 @@ target 'SharedImages' do
 	
 	# Main menu navigation.
 	pod 'LGSideMenuController', '~> 2.1'
+	
+	pod 'NVActivityIndicatorView', '~> 4.7'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

@@ -32,6 +32,9 @@ PODS:
     - lottie-ios (~> 2.1)
   - MessageKit (0.13.5)
   - NohanaImagePicker (0.9.3)
+  - NVActivityIndicatorView (4.7.0):
+    - NVActivityIndicatorView/Presenter (= 4.7.0)
+  - NVActivityIndicatorView/Presenter (4.7.0)
   - ObjcExceptionBridging (1.0.1):
     - ObjcExceptionBridging/ObjcExceptionBridging (= 1.0.1)
   - ObjcExceptionBridging/ObjcExceptionBridging (1.0.1)
@@ -104,6 +107,7 @@ DEPENDENCIES:
   - LottiesBottom (~> 0.5)
   - MessageKit (~> 0.13)
   - NohanaImagePicker (from `https://github.com/crspybits/NohanaImagePicker.git`)
+  - NVActivityIndicatorView (~> 4.7)
   - ODRefreshControl (from `https://github.com/crspybits/ODRefreshControl.git`)
   - Presentr (~> 1.3)
   - rosterdev (~> 0.1)
@@ -134,6 +138,7 @@ SPEC REPOS:
     - lottie-ios
     - LottiesBottom
     - MessageKit
+    - NVActivityIndicatorView
     - ObjcExceptionBridging
     - Presentr
     - Reachability
@@ -183,6 +188,7 @@ SPEC CHECKSUMS:
   LottiesBottom: 88d95cfa94dfd988f57f6cf42e39b51a2113a02d
   MessageKit: c4bd50e285a0f0761bc23a2e982aa7840873c4f5
   NohanaImagePicker: 1c67a853625c7700409362195e11bb7c00f10d18
+  NVActivityIndicatorView: b19ddab2576f805cbe0fb2306cba3476e09a1dea
   ObjcExceptionBridging: c30e00eb3700467e695faeea30e26e18bd445001
   ODRefreshControl: 907e6149d72dde488d5917ccfabee5bd8d711a20
   PersistentValue: 95a7398a6e0854854283d9d7360cd3c8d7e4a619
@@ -199,6 +205,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: d08124f86fc93a27b405b4fe09f6738c461791d5
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: fb3a826e8798df5d703b12c6b46460ea4c179c85
+PODFILE CHECKSUM: db730a3338de0a6b3985b31bb1cbbb446a6eef18
 
 COCOAPODS: 1.6.1

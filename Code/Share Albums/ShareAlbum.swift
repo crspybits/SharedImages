@@ -10,13 +10,14 @@ import Foundation
 import SyncServer_Shared
 import SyncServer
 import SMCoreLib
+import NVActivityIndicatorView
 
 class ShareAlbum {
     private let sharingGroup: SyncServer.SharingGroup
-    private weak var viewController: UIViewController!
+    private weak var viewController: (UIViewController & NVActivityIndicatorViewable)!
     private let view: UIView
     
-    init(sharingGroup: SyncServer.SharingGroup, fromView view: UIView, viewController: UIViewController) {
+    init(sharingGroup: SyncServer.SharingGroup, fromView view: UIView, viewController: UIViewController & NVActivityIndicatorViewable) {
         self.sharingGroup = sharingGroup
         self.viewController = viewController
         self.view = view
@@ -41,7 +42,12 @@ class ShareAlbum {
     }
     
     private func completeSharing(params:ShareAlbumVC.InvitationParameters) {
+        let size = CGSize(width: 50, height: 50)
+        let indicatorType:NVActivityIndicatorType = .lineSpinFadeLoader
+        viewController.startAnimating(size, message: "Creating...", type: indicatorType, fadeInAnimation: nil)
+        
         SyncServerUser.session.createSharingInvitation(withPermission: params.permission, sharingGroupUUID: sharingGroup.sharingGroupUUID, numberAcceptors: params.numberAcceptors, allowSharingAcceptance: params.allowSocialAcceptance) {[unowned self] invitationCode, error in
+            self.viewController.stopAnimating(nil)
             if error == nil {
                 var socialText = " "
                 if params.allowSocialAcceptance {

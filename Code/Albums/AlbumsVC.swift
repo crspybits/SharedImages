@@ -10,12 +10,13 @@ import UIKit
 import SMCoreLib
 import SyncServer
 import ODRefreshControl
+import NVActivityIndicatorView
 
 private class FlowLayout: UICollectionViewFlowLayout {
     var viewSize: CGSize!
 }
 
-class AlbumsVC: UIViewController {
+class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     @IBOutlet weak var collectionView: UICollectionView!
     let reuseIdentifier = "CollectionViewCell"
     let numberOfItemsPerRow = 2
