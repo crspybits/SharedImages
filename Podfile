@@ -27,8 +27,7 @@ target 'SharedImages' do
 	pod 'SMCoreLib', '~> 1.4'
 	
 	# For a discussion thread on images
-	# Lots of breaking changes going to v1.0.0 of MessageKit. I'm avoiding this for now.
-	pod 'MessageKit', '~> 0.13'
+	pod 'MessageKit', '~> 2.0'
 
 	# Using my fork because of changes I made
 	pod 'ODRefreshControl', :git => 'https://github.com/crspybits/ODRefreshControl.git'

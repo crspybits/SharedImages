@@ -10,6 +10,7 @@ import UIKit
 import MessageKit
 import SMCoreLib
 import SyncServer
+import MessageInputBar
 
 protocol DiscussionVCDelegate {
     func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion)
@@ -45,7 +46,7 @@ class DiscussionVC: MessagesViewController {
         messageInputBar.sendButton.titleLabel?.font = UIFont.systemFont(ofSize: 22.0)
 
         messageInputBar.sendButton.tintColor = UIColor(red: 69/255, green: 193/255, blue: 89/255, alpha: 1)
-        scrollsToBottomOnKeybordBeginsEditing = true // default false
+        scrollsToBottomOnKeyboardBeginsEditing = true // default false
         maintainPositionOnKeyboardFrameChanged = true // default false
         
         // So the view controller starts immediately below the nav bar
@@ -221,6 +222,23 @@ extension DiscussionVC: MessagesDisplayDelegate {
 }
 
 extension DiscussionVC: MessagesLayoutDelegate {
+    func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        if isPreviousMessageSameDay(at: indexPath) {
+            return 10
+        }
+        else {
+            return 35
+        }
+    }
+    
+    func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 20
+    }
+    
+    func messageBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
+        return 16
+    }
+    
     func avatarPosition(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> AvatarPosition {
         return AvatarPosition(horizontal: .natural, vertical: .messageBottom)
     }
@@ -232,23 +250,8 @@ extension DiscussionVC: MessagesLayoutDelegate {
             return UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 30)
         }
     }
-
-    // The following two delegate methods fail with v1.0.0: See https://stackoverflow.com/questions/52583843/migration-to-1-0-0-messagekit-cocoapod-with-messageslayoutdelegate
-    func cellTopLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
-        if isFromCurrentSender(message: message) {
-            return .messageTrailing(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10))
-        } else {
-            return .messageLeading(UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0))
-        }
-    }
-
-    func cellBottomLabelAlignment(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LabelAlignment {
-        if isFromCurrentSender(message: message) {
-            return .messageLeading(UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0))
-        } else {
-            return .messageTrailing(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10))
-        }
-    }
+    
+    // Prior to version 2.0.0 of MessageKit, I had a cellTopLabelAlignment delegate method in here (nor cellBottomLabelAlignment). Seems like (a) it's been removed and (b) it's not needed any more. See also https://github.com/MessageKit/MessageKit/issues/1041 and https://stackoverflow.com/questions/52583843/migration-to-1-0-0-messagekit-cocoapod-with-messageslayoutdelegate
 
     func footerViewSize(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGSize {
 
@@ -263,41 +266,78 @@ extension DiscussionVC: MessagesLayoutDelegate {
 }
 
 extension DiscussionVC: MessagesDataSource {
+    func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
+        return fixedObjects?.count ?? 0
+    }
+    
     func currentSender() -> Sender {        
         return Sender(id: senderUserId, displayName: senderUserDisplayName)
     }
 
-    func numberOfMessages(in messagesCollectionView: MessagesCollectionView) -> Int {
-        return fixedObjects?.count ?? 0
-    }
-
-    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        
+    private func messageForItem(at indexPath: IndexPath) -> MessageType {
         // We've already checked to make sure the fixedObjects are valid.
         let dict = fixedObjects![indexPath.section] as! [String: String]
         let message = DiscussionMessage.fromDictionary(dict)!
         
         return message
     }
-
-    func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-        let name = message.sender.displayName
-        return NSAttributedString(string: name, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption1)])
+    
+    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
+        return messageForItem(at: indexPath)
     }
-
-    func cellBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+    
+    private func isPreviousMessageSameDay(at indexPath: IndexPath) -> Bool {
+        guard indexPath.section - 1 >= 0 else { return false }
         
-        struct ConversationDateFormatter {
+        let currentMessage = messageForItem(at: indexPath)
+        let currentMessageDate = currentMessage.sentDate
+        
+        let previousIndexPath = IndexPath(row: 0, section: indexPath.section - 1)
+        let previousMessage = messageForItem(at: previousIndexPath)
+        let previousMessageDate = previousMessage.sentDate
+        
+        return Calendar.current.isDate(currentMessageDate, inSameDayAs:previousMessageDate)
+    }
+    
+    func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        struct CellDateFormatter {
             static let formatter: DateFormatter = {
                 let formatter = DateFormatter()
-                formatter.dateStyle = .medium
+                // See https://nsdateformatter.com
+                formatter.dateFormat = "EEEE, MMM d, yyyy"
                 return formatter
             }()
         }
         
-        let formatter = ConversationDateFormatter.formatter
+        if !isPreviousMessageSameDay(at: indexPath) {
+            let formatter = CellDateFormatter.formatter
+            let dateString = formatter.string(from: message.sentDate)
+            return NSAttributedString(string: dateString, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedString.Key.foregroundColor: UIColor.darkGray])
+        }
+        
+        return nil
+    }
+    
+    func messageTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        let name = message.sender.displayName
+        return NSAttributedString(string: name, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption1)])
+    }
+
+    func messageBottomLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
+        
+        struct BottomDateFormatter {
+            static let formatter: DateFormatter = {
+                let formatter = DateFormatter()
+                // See https://nsdateformatter.com
+                formatter.dateFormat = "MMM d, h:mm a"
+                return formatter
+            }()
+        }
+        
+        let formatter = BottomDateFormatter.formatter
         let dateString = formatter.string(from: message.sentDate)
-        return NSAttributedString(string: dateString, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
+        let result = NSAttributedString(string: dateString, attributes: [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .caption2)])
+        return result
     }
 }
 
@@ -306,7 +346,7 @@ extension DiscussionVC: MessageInputBarDelegate {
         for component in inputBar.inputTextView.components {
             if let text = component as? String {
                 let messageUUID = UUID.make()!
-                let message = DiscussionMessage(messageId: messageUUID, sender: currentSender(), sentDate: Date(), sentTimezone: TimeZone.current.identifier, data: .text(text))
+                let message = DiscussionMessage(messageId: messageUUID, sender: currentSender(), sentDate: Date(), sentTimezone: TimeZone.current.identifier, kind: .text(text))
                 
                 guard let fixedObject = message.toDictionary() else {
                     SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Failed creating message!")

@@ -24,26 +24,27 @@
 
 import UIKit
 
-open class MessageDateHeaderView: MessageHeaderView {
-    open override class func reuseIdentifier() -> String { return "messagekit.header.date" }
+/// An object is responsible for
+/// sizing and configuring cells for given `IndexPath`s.
+open class CellSizeCalculator {
 
-    // MARK: - Properties
+    /// The layout object for which the cell size calculator is used.
+    public weak var layout: UICollectionViewFlowLayout?
 
-    open let dateLabel = UILabel()
+    /// Used to configure the layout attributes for a given cell.
+    ///
+    /// - Parameters:
+    /// - attributes: The attributes of the cell.
+    /// The default does nothing
+    open func configure(attributes: UICollectionViewLayoutAttributes) {}
 
-    // MARK: - Initializers
-
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        addSubview(dateLabel)
-        dateLabel.fillSuperview()
-        dateLabel.textAlignment = .center
-        dateLabel.font = .boldSystemFont(ofSize: 10)
-        dateLabel.textColor = .darkGray
-    }
+    /// Used to size an item at a given `IndexPath`.
+    ///
+    /// - Parameters:
+    /// - indexPath: The `IndexPath` of the item to be displayed.
+    /// The default return .zero
+    open func sizeForItem(at indexPath: IndexPath) -> CGSize { return .zero }
     
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    public init() {}
 
 }

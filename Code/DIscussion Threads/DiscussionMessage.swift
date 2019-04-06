@@ -9,6 +9,7 @@
 import Foundation
 import SMCoreLib
 import MessageKit
+import MessageInputBar
 
 struct DiscussionMessage: MessageType {
     static let messageIdKey = "id" // Needs to be `id` for the FixedObjects class.
@@ -25,10 +26,10 @@ struct DiscussionMessage: MessageType {
     let sentTimezone: String
     
     static let messageStringKey = "messageString"
-    let data: MessageData
-    
+    var kind: MessageKind
+
     func toDictionary() -> [String: Any]? {
-        guard case .text(let string) = data else {
+        guard case .text(let string) = kind else {
             return nil
         }
         
@@ -55,7 +56,7 @@ struct DiscussionMessage: MessageType {
         }
         
         let sender = Sender(id: senderId, displayName: senderDisplayName)
-        return DiscussionMessage(messageId: messageId, sender: sender, sentDate: sendDate, sentTimezone: sendTimezone, data: .text(message))
+        return DiscussionMessage(messageId: messageId, sender: sender, sentDate: sendDate, sentTimezone: sendTimezone, kind: .text(message))
     }
     
     static let formatter:DateFormatter = {

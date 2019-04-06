@@ -74,9 +74,15 @@ open class AvatarView: UIImageView {
         super.init(frame: frame)
         prepareView()
     }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        prepareView()
+    }
 
     convenience public init() {
         self.init(frame: .zero)
+        prepareView()
     }
     
     private func setImageFrom(initials: String?) {
@@ -96,15 +102,16 @@ open class AvatarView: UIImageView {
 
         //// Text Drawing
         let textRect = calculateTextRect(outerViewWidth: width, outerViewHeight: height)
+        let initialsText = NSAttributedString(string: initials, attributes: [.font: font])
         if adjustsFontSizeToFitWidth,
-            initials.width(considering: textRect.height, and: font) > textRect.width {
+            initialsText.width(considering: textRect.height) > textRect.width {
             let newFontSize = calculateFontSize(text: initials, font: font, width: textRect.width, height: textRect.height)
             font = placeholderFont.withSize(newFontSize)
         }
 
         let textStyle = NSMutableParagraphStyle()
         textStyle.alignment = .center
-        let textFontAttributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: font, NSAttributedStringKey.foregroundColor: placeholderTextColor, NSAttributedStringKey.paragraphStyle: textStyle]
+        let textFontAttributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: placeholderTextColor, NSAttributedString.Key.paragraphStyle: textStyle]
 
         let textTextHeight: CGFloat = initials.boundingRect(with: CGSize(width: textRect.width, height: CGFloat.infinity), options: .usesLineFragmentOrigin, attributes: textFontAttributes, context: nil).height
         context.saveGState()
@@ -119,7 +126,8 @@ open class AvatarView: UIImageView {
      Recursively find the biggest size to fit the text with a given width and height
      */
     private func calculateFontSize(text: String, font: UIFont, width: CGFloat, height: CGFloat) -> CGFloat {
-        if text.width(considering: height, and: font) > width {
+        let attributedText = NSAttributedString(string: text, attributes: [.font: font])
+        if attributedText.width(considering: height) > width {
             let newFont = font.withSize(font.pointSize - 1)
             if newFont.pointSize > minimumFontSize {
                 return font.pointSize
@@ -148,10 +156,6 @@ open class AvatarView: UIImageView {
         let startY = (outerViewHeight - h)/2
         // In case the font exactly fits to the region, put 2 pixel both left and right
         return CGRect(startX+2, startY, w-4, h)
-    }
-
-    required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Internal methods
