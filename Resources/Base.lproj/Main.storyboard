@@ -667,6 +667,70 @@
             </objects>
             <point key="canvasLocation" x="-351.19999999999999" y="2437.3313343328336"/>
         </scene>
+        <!--Album SharingVC-->
+        <scene sceneID="iyF-Dh-gp9">
+            <objects>
+                <viewController storyboardIdentifier="AlbumSharingVC" id="u46-Gh-bxD" customClass="AlbumSharingVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="YjY-YP-c9Y"/>
+                        <viewControllerLayoutGuide type="bottom" id="s06-Tu-kEk"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="lI5-58-YWu">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IZA-vX-2Af" userLabel="Sharing Code Container">
+                                <rect key="frame" x="26" y="95" width="323" height="158"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sharing code" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lk0-Sh-7q3">
+                                        <rect key="frame" x="20" y="0.0" width="102" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NBy-of-NPw">
+                                        <rect key="frame" x="20" y="91" width="170" height="30"/>
+                                        <state key="normal" title="Accept sharing invitation"/>
+                                        <connections>
+                                            <action selector="acceptSharingInvitationAction:" destination="u46-Gh-bxD" eventType="touchUpInside" id="7N9-NM-KuR"/>
+                                        </connections>
+                                    </button>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="FVb-1j-9cq">
+                                        <rect key="frame" x="20" y="31" width="283" height="30"/>
+                                        <nil key="textColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                    </textField>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="Lk0-Sh-7q3" firstAttribute="leading" secondItem="IZA-vX-2Af" secondAttribute="leading" constant="20" id="IB3-f4-nMf"/>
+                                    <constraint firstAttribute="height" constant="158" id="MKx-9g-TSJ"/>
+                                    <constraint firstItem="FVb-1j-9cq" firstAttribute="top" secondItem="Lk0-Sh-7q3" secondAttribute="bottom" constant="10" id="Mga-Px-Tn8"/>
+                                    <constraint firstItem="FVb-1j-9cq" firstAttribute="leading" secondItem="Lk0-Sh-7q3" secondAttribute="leading" id="Rwn-mH-JCo"/>
+                                    <constraint firstAttribute="trailing" secondItem="FVb-1j-9cq" secondAttribute="trailing" constant="20" id="SeV-LO-VM0"/>
+                                    <constraint firstItem="NBy-of-NPw" firstAttribute="top" secondItem="FVb-1j-9cq" secondAttribute="bottom" constant="30" id="agf-n8-fht"/>
+                                    <constraint firstItem="Lk0-Sh-7q3" firstAttribute="top" secondItem="IZA-vX-2Af" secondAttribute="top" id="efn-8e-hya"/>
+                                    <constraint firstItem="NBy-of-NPw" firstAttribute="leading" secondItem="FVb-1j-9cq" secondAttribute="leading" id="g3I-Xx-NX3"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="IZA-vX-2Af" firstAttribute="top" secondItem="YjY-YP-c9Y" secondAttribute="bottom" constant="75" id="Y1D-2Y-0dt"/>
+                            <constraint firstItem="IZA-vX-2Af" firstAttribute="leading" secondItem="lI5-58-YWu" secondAttribute="leadingMargin" constant="10" id="iTh-pl-qYp"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="IZA-vX-2Af" secondAttribute="trailing" constant="10" id="rX7-kj-mSx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="acceptSharingInvitation" destination="NBy-of-NPw" id="1xW-hX-Zor"/>
+                        <outlet property="sharingCode" destination="FVb-1j-9cq" id="JeN-0o-JwU"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7aH-W0-y9s" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="404" y="2436.4317841079464"/>
+        </scene>
         <!--Remove User From AlbumVC-->
         <scene sceneID="CV0-Mb-5EN">
             <objects>

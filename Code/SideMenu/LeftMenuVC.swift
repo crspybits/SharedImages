@@ -44,7 +44,8 @@ class LeftMenuVC: UIViewController {
         }
         
         let topMenuItems = [
-            Menu.MenuItem(name: "Images", icon: #imageLiteral(resourceName: "albums"), badgeValueGetter: numberUnreadDiscussions)
+            Menu.MenuItem(name: "Images", icon: #imageLiteral(resourceName: "albums"), badgeValueGetter: numberUnreadDiscussions),
+            Menu.MenuItem(name: "Album Sharing", icon: #imageLiteral(resourceName: "Share")),
         ]
 
         topMenu.setup(items: topMenuItems, selection: {[unowned self] rowIndex in
@@ -53,13 +54,31 @@ class LeftMenuVC: UIViewController {
                 return
             }
             
+            let screenIndex = UInt(rowIndex)
+            guard let screen = CurrentScreen(rawValue: screenIndex) else {
+                return
+            }
+            
+            func changeMenu() {
+                switch screen {
+                case .images:
+                    self.menuAction(screen: screen, newVC: { AlbumsVC.create() })
+
+                case .albumSharing:
+                    self.menuAction(screen: screen, newVC: { AlbumSharingVC.create() })
+
+                default:
+                    return
+                }
+            }
+            
             if self.bottomMenu.selectedRowIndex == nil {
-                self.menuAction(screen: .images, newVC: { AlbumsVC.create() })
+                changeMenu()
             }
             else {
                 self.bottomMenu.selectedRowIndex = nil
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(300)) {
-                    self.menuAction(screen: .images, newVC: { AlbumsVC.create() })
+                    changeMenu()
                 }
             }
         })
@@ -139,7 +158,10 @@ class LeftMenuVC: UIViewController {
         switch currentScreen {
         case .images:
             topMenu.setSelectedRowIndex(CurrentScreen.images.rawValue, animated: false)
-            
+
+        case .albumSharing:
+            topMenu.setSelectedRowIndex(CurrentScreen.albumSharing.rawValue, animated: false)
+
         case .settings:
             bottomMenu.setSelectedRowIndex(CurrentScreen.settings.rawValue - CurrentScreen.settingsStartIndex, animated: false)
 
@@ -166,13 +188,14 @@ class LeftMenuVC: UIViewController {
     enum CurrentScreen: UInt {
         // Ordering in top menu
         case images = 0
+        case albumSharing = 1
         
-        // Needs to be the same as the value for `settings`
-        static let settingsStartIndex:UInt = 1
+        // Needs to be the same as the value, immediately below, for `settings`
+        static let settingsStartIndex:UInt = 2
         
         // Ordering in lower menu
-        case settings = 1
-        case signIn = 2
+        case settings = 2
+        case signIn = 3
     }
     
     var currentScreen: CurrentScreen? {

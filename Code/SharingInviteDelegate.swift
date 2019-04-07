@@ -36,28 +36,53 @@ class SharingInviteDelegate : SharingInvitationDelegate {
         alert.addAction(UIAlertAction(title: "Not now", style: .cancel) {alert in
         })
         alert.addAction(UIAlertAction(title: "Share", style: .default) {[unowned self] alert in
-            if SignInManager.session.userIsSignedIn {
-                if let credentials = SignInManager.session.currentSignIn?.credentials {
-                    SyncServerUser.session.redeemSharingInvitation(creds: credentials, invitationCode: invite.sharingInvitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) { longLivedAccessToken, sharingGroupUUID, error in
-                        if error == nil {
-                            SharingInviteDelegate.invitationRedeemed = true
-                            SMCoreLib.Alert.show(withTitle: "Success!", message: "You now have a new shared album!")
-                        }
-                        else {
-                            Log.error("Error: \(error!)")
-                            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error accepting sharing invitation!")
-                        }
-                    }
+            SharingInviteDelegate.redeem(invitationCode: invite.sharingInvitationCode, success: {
+                SharingInviteDelegate.invitationRedeemed = true
+            }, failure: { failure in
+                switch failure {
+                case .error, .noCredentials:
+                    break
+                case .userNotSignedIn:
+                    self.withNotSignedInCallback?(invite)
                 }
-                else {
-                    SMCoreLib.Alert.show(withTitle: "Alert!", message: "User is signed in, but there are no credentials!")
-                }
-            }
-            else {
-                self.withNotSignedInCallback?(invite)
-            }
+            })
         })
         
         vc.present(alert, animated: true, completion: nil)
+    }
+    
+    enum Failure {
+        // These two cases show an alert before returning.
+        case error(Error)
+        case noCredentials
+
+        // No alert is shown before returning.
+        case userNotSignedIn
+    }
+    
+    static func redeem(invitationCode: String, success:(()->())? = nil, failure:((Failure)->())? = nil) {
+        if SignInManager.session.userIsSignedIn {
+            if let credentials = SignInManager.session.currentSignIn?.credentials {
+                SyncServerUser.session.redeemSharingInvitation(creds: credentials, invitationCode: invitationCode, cloudFolderName: SyncServerUser.session.cloudFolderName) { longLivedAccessToken, sharingGroupUUID, error in
+                    if error == nil {
+                        SharingInviteDelegate.invitationRedeemed = true
+                        SMCoreLib.Alert.show(withTitle: "Success!", message: "You now have a new shared album!")
+                        success?()
+                    }
+                    else {
+                        Log.error("Error: \(error!)")
+                        SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error accepting sharing invitation!")
+                        failure?(.error(error!))
+                    }
+                }
+            }
+            else {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "User is signed in, but there are no credentials!")
+                failure?(.noCredentials)
+            }
+        }
+        else {
+            failure?(.userNotSignedIn)
+        }
     }
 }

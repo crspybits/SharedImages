@@ -57,12 +57,16 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         signInContainer.addSubview(signIn)
         
         sharingDelegate = SharingInviteDelegate(withNotSignedInCallback: {[unowned self] invite in
-            self.acceptSharingInvitation = true
-            self.invite = invite
-            self.signIn.showSignIns(for: .sharingAccount)
+            self.userNotSignedIn(invitation: invite)
         })
         
         SharingInvitation.session.delegate = sharingDelegate
+    }
+    
+    func userNotSignedIn(invitation: SharingInvitation.Invitation) {
+        self.acceptSharingInvitation = true
+        self.invite = invitation
+        self.signIn.showSignIns(for: .sharingAccount)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -94,7 +98,7 @@ extension SignInVC : GenericSignInDelegate {
                 title = "You were previously signed in as \(SignInManager.currentUIDisplayName.stringValue) but you are now signing in as a different user."
             }
             
-            let alert = UIAlertController(title: title, message: "The Shared Images app doesn't allow this (yet).", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: title, message: "The Neebla app doesn't allow this (yet).", preferredStyle: .actionSheet)
             alert.popoverPresentationController?.sourceView = navigationController?.navigationBar
             Alert.styleForIPad(alert)
 

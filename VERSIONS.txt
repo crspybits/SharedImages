@@ -4,7 +4,10 @@ Version 1.4.0
 	* Added number acceptors & social sharing acceptance options to sharing invitation creation-- as part of with, changed the UI to have these. Added "help" section on this UI also.
 	* Updated MessageKit Cocoapod to 2.0.0-- which required a fair number of changes to the DiscussionVC of the app.
 	* Enabled tapping of URLs in discussions to open Safari browser.
-	* Enable tapping of phone numbers in discussions to open phone app.
+	* Enabled tapping of phone numbers in discussions to open phone app.
+	* Enabled tapping of addresses in discussions to provide navigation directions.
+	* Added new Album Sharing screen-- to allow pasting in of an album sharing code.
+		Dealing with part of: https://github.com/crspybits/SharedImages/issues/162
 
 Version 1.3.0 (3/29/19)
 	* Moved "Share album" UI feature from within individual album screen to main Albums screen to improve visibility of this feature and make album sharing easier.

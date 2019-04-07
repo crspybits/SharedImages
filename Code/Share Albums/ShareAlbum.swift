@@ -54,17 +54,28 @@ class ShareAlbum {
                     socialText = ", Facebook, "
                 }
                 
+                var albumName = "an album of images"
+                var subjectAlbumName = ""
+                if let name = self.sharingGroup.sharingGroupName {
+                    albumName = "the album of images '\(name)'"
+                    subjectAlbumName = "\(name) "
+                }
+                
                 let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:params.permission)
                 if let email = SMEmail(parentViewController: self.viewController) {
-                    let message = "I'd like to share an album of images with you through the Neebla app and your Dropbox\(socialText)or Google account. To share images, you need to:\n" +
+                    let message = "I'd like to share \(albumName) with you through the Neebla app and your Dropbox\(socialText)or Google account. To share images, you need to:\n" +
                         "1) download the Neebla iOS app onto your iPhone or iPad,\n" +
                         "2) tap the link below in the Apple Mail app, and\n" +
                         "3) follow the instructions within the app to sign in to your Dropbox\(socialText)or Google account.\n" +
                         "You will have " + params.permission.userFriendlyText() + " access to images.\n\n" +
-                            sharingURLString
+                            sharingURLString +
+                        "\n" +
+                        "If you can't tap the link above, then you can copy the code below:" +
+                        "\t\(invitationCode!)" +
+                        "and paste it into the 'Album Sharing' screen of the Neebla app"
                     
                     email.setMessageBody(message, isHTML: false)
-                    email.setSubject("Share images using the Neebla app")
+                    email.setSubject("Share \(subjectAlbumName)images using the Neebla app")
                     email.show()
                 }
             }
