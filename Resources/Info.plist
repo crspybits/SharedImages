@@ -74,6 +74,16 @@
 		<string>fbshareextension</string>
 		<string>dbapi-8-emm</string>
 		<string>dbapi-2</string>
+        <string>comgooglemaps</string>
+        <string>citymapper</string>
+        <string>transit</string>
+        <string>lyft</string>
+        <string>uber</string>
+        <string>navigon</string>
+        <string>waze</string>
+        <string>dbnavigator</string>
+        <string>yandexnavi</string>
+        <string>moovit</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

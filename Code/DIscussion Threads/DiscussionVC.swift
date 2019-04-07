@@ -352,7 +352,25 @@ extension DiscussionVC: MessageCellDelegate {
     }
     
     func didSelectAddress(_ addressComponents: [String : String]) {
-
+        // It's not documented, but the keys are from NSTextCheckingKey. Having to do some machinations to get just a simple address string again to geocode it. See also https://github.com/MessageKit/MessageKit/issues/1043
+        let keys = [NSTextCheckingKey.street.rawValue, NSTextCheckingKey.city.rawValue, NSTextCheckingKey.state.rawValue, NSTextCheckingKey.zip.rawValue]
+        var address = ""
+        
+        for key in keys {
+            if let value = addressComponents[key] {
+                if address.count > 0 {
+                    address += ", "
+                }
+                
+                address += value
+            }
+        }
+        
+        guard address.count > 0 else {
+            return
+        }
+    
+        AddressNavigation.navigate(to: address, using: self)
     }
 }
 

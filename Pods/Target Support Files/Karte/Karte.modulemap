@@ -1,0 +1,6 @@
+framework module Karte {
+  umbrella header "Karte-umbrella.h"
+
+  export *
+  module * { export * }
+}

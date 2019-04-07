@@ -25,6 +25,7 @@ PODS:
     - FBSDKCoreKit
   - FileMD5Hash (2.0.0)
   - HPTextViewTapGestureRecognizer (0.1)
+  - Karte (2.2.1)
   - KeychainAccess (3.2.0)
   - LGSideMenuController (2.1.1)
   - lottie-ios (2.5.3)
@@ -53,9 +54,12 @@ PODS:
     - Reachability
     - SwiftyBeaver
   - SMGoogleSignIn (1.1.0)
+  - SwiftLocation (3.2.3):
+    - SwiftyJSON (~> 4.0.0-alpha.1)
   - SwiftyBeaver (1.7.0)
   - SwiftyDropbox (4.8.2):
     - Alamofire (~> 4.7.3)
+  - SwiftyJSON (4.0.0)
   - SwiftyUserDefaults (3.0.1)
   - SyncServer (18.13.0):
     - FileMD5Hash (~> 2.0)
@@ -105,6 +109,7 @@ DEPENDENCIES:
   - Crashlytics
   - DropDown (~> 2.3)
   - Fabric
+  - Karte (~> 2.2)
   - LGSideMenuController (~> 2.1)
   - LottiesBottom (~> 0.5)
   - MessageKit (~> 2.0)
@@ -115,6 +120,7 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 7.1)
   - SMCoreLib (~> 1.4)
+  - SwiftLocation (~> 3.2)
   - SyncServer (~> 18.13.0)
   - SyncServer/Dropbox (~> 18.13.0)
   - SyncServer/Facebook (~> 18.13.0)
@@ -135,6 +141,7 @@ SPEC REPOS:
     - FBSDKLoginKit
     - FileMD5Hash
     - HPTextViewTapGestureRecognizer
+    - Karte
     - KeychainAccess
     - LGSideMenuController
     - lottie-ios
@@ -147,8 +154,10 @@ SPEC REPOS:
     - Reachability
     - rosterdev
     - SDCAlertView
+    - SwiftLocation
     - SwiftyBeaver
     - SwiftyDropbox
+    - SwiftyJSON
     - SwiftyUserDefaults
     - XCGLogger
   https://github.com/crspybits/Specs.git:
@@ -185,6 +194,7 @@ SPEC CHECKSUMS:
   FBSDKLoginKit: 4621c690d9dd8628031a4791497062183ea34b0d
   FileMD5Hash: 3ed69cc19a21ff4d30ae8833fc104275ad2c7de0
   HPTextViewTapGestureRecognizer: 6a73fd09f858e49a2743c3a338dc5c0791b0fae0
+  Karte: 970fa8f7349f70433b4b9f5134e1c10d3ec61296
   KeychainAccess: 3b1bf8a77eb4c6ea1ce9404c292e48f948954c6b
   LGSideMenuController: ae40c80983ab8b8801c7cef0a6804d43aaa72d45
   lottie-ios: a50d5c0160425cd4b01b852bb9578963e6d92d31
@@ -202,13 +212,15 @@ SPEC CHECKSUMS:
   SDCAlertView: c39fa91a3aeb5eeba58fe9cea648263b131ff2bf
   SMCoreLib: 5c10eb65ba23ebe054f6a93336aae9c834ec8182
   SMGoogleSignIn: de1b8302583b61df51b71b81e349cbe487cbbda3
+  SwiftLocation: a3c3bc2023118171ef3572188a31def94aa0892c
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
   SwiftyDropbox: 5cd8d101968609dbbb002fd86ce0450e2d90838b
+  SwiftyJSON: 070dabdcb1beb81b247c65ffa3a79dbbfb3b48aa
   SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
   SyncServer: f3f236d0864b627f221bc3ba60d3ec07a8b6c4b1
   SyncServer-Shared: d08124f86fc93a27b405b4fe09f6738c461791d5
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 977e59347cc4c312331be720f79520c0e57c346d
+PODFILE CHECKSUM: 5e272277bce19607ffeeac3a0ac6834fee62b0c2
 
 COCOAPODS: 1.6.1

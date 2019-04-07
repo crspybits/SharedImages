@@ -63,6 +63,12 @@ target 'SharedImages' do
 	pod 'LGSideMenuController', '~> 2.1'
 	
 	pod 'NVActivityIndicatorView', '~> 4.7'
+	
+	# Navigation directions using Google Maps, Apple Maps etc.
+	pod 'Karte', '~> 2.2'
+	
+	# Geocoding
+	pod 'SwiftLocation', '~> 3.2'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths

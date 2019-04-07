@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7DEDCBA129EF765057F96A6D6F457FD4"
+               BlueprintIdentifier = "F3D36C77FC2D5396424FCBA1A0B0A67D"
                BuildableName = "SyncServer.framework"
                BlueprintName = "SyncServer"
                ReferencedContainer = "container:Pods.xcodeproj">
