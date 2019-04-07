@@ -73,6 +73,7 @@
 		83D0BE2720B39C7000555B73 /* SortControl.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83D0BE2420B39C6F00555B73 /* SortControl.xib */; };
 		83D1FE341EAB074A00DD468F /* LargeImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D1FE331EAB074A00DD468F /* LargeImages.swift */; };
 		83DA1E802256A24D0064E817 /* ShareAlbum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DA1E7F2256A24C0064E817 /* ShareAlbum.swift */; };
+		83DA1E82225974630064E817 /* AddressNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DA1E81225974630064E817 /* AddressNavigation.swift */; };
 		83DC0C311EE7A0CD00727EF2 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */; };
 		83E13B2520318366005A0A18 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E13B2420318366005A0A18 /* GameKit.framework */; };
 		83E13B272031836A005A0A18 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E13B262031836A005A0A18 /* StoreKit.framework */; };
@@ -185,6 +186,7 @@
 		83D1FE331EAB074A00DD468F /* LargeImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeImages.swift; sourceTree = "<group>"; };
 		83D7333B210D37D80077CB94 /* SharedImages5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages5.xcdatamodel; sourceTree = "<group>"; };
 		83DA1E7F2256A24C0064E817 /* ShareAlbum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareAlbum.swift; sourceTree = "<group>"; };
+		83DA1E81225974630064E817 /* AddressNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressNavigation.swift; sourceTree = "<group>"; };
 		83DC0C2B1EE795FA00727EF2 /* SharedImages2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages2.xcdatamodel; sourceTree = "<group>"; };
 		83DC0C301EE7A0CD00727EF2 /* ImageExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageExtras.swift; sourceTree = "<group>"; };
 		83DD1B8B215C88D10054932C /* SharedImages6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages6.xcdatamodel; sourceTree = "<group>"; };
@@ -422,6 +424,7 @@
 				83C34070201D58C500DAD865 /* FixedObjects.swift */,
 				838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */,
 				831A759D20279C76004F330A /* DiscussionMessage.swift */,
+				83DA1E81225974630064E817 /* AddressNavigation.swift */,
 			);
 			path = "DIscussion Threads";
 			sourceTree = "<group>";
@@ -853,6 +856,7 @@
 				83E518872160710D005C2374 /* ImagesHandler.swift in Sources */,
 				83EACE772087083000C40AA3 /* DiscussionKeys.swift in Sources */,
 				834A7E7D2037858800969B18 /* Progress.swift in Sources */,
+				83DA1E82225974630064E817 /* AddressNavigation.swift in Sources */,
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83EFC096216EDE7300D7A3C4 /* SharingInviteDelegate.swift in Sources */,
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,

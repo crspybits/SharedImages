@@ -40,6 +40,7 @@ class DiscussionVC: MessagesViewController {
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
+        messagesCollectionView.messageCellDelegate = self
         messageInputBar.delegate = self
         
         // 2/13/18; See https://github.com/crspybits/SharedImages/issues/81 and see https://github.com/MessageKit/MessageKit/issues/518
@@ -341,6 +342,20 @@ extension DiscussionVC: MessagesDataSource {
     }
 }
 
+extension DiscussionVC: MessageCellDelegate {
+    func didSelectURL(_ url: URL) {
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
+    
+    func didSelectPhoneNumber(_ phoneNumber: String) {
+        phoneNumber.makeACall()
+    }
+    
+    func didSelectAddress(_ addressComponents: [String : String]) {
+
+    }
+}
+
 extension DiscussionVC: MessageInputBarDelegate {
     func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
         for component in inputBar.inputTextView.components {
@@ -388,5 +403,38 @@ extension String {
     
     func substring(toIndex: Int) -> String {
         return self[0 ..< max(0, toIndex)]
+    }
+}
+
+// From https://stackoverflow.com/questions/40078370/how-to-make-phone-call-in-ios-10-using-swift/52644570
+extension String {
+    enum RegularExpressions: String {
+        case phone = "^\\s*(?:\\+?(\\d{1,3}))?([-. (]*(\\d{3})[-. )]*)?((\\d{3})[-. ]*(\\d{2,4})(?:[-.x ]*(\\d+))?)\\s*$"
+    }
+
+    func isValid(regex: RegularExpressions) -> Bool {
+        return isValid(regex: regex.rawValue)
+    }
+
+    func isValid(regex: String) -> Bool {
+        let matches = range(of: regex, options: .regularExpression)
+        return matches != nil
+    }
+
+    func onlyDigits() -> String {
+        let filtredUnicodeScalars = unicodeScalars.filter{CharacterSet.decimalDigits.contains($0)}
+        return String(String.UnicodeScalarView(filtredUnicodeScalars))
+    }
+
+    func makeACall() {
+        if isValid(regex: .phone) {
+            if let url = URL(string: "tel://\(self.onlyDigits())"), UIApplication.shared.canOpenURL(url) {
+                if #available(iOS 10, *) {
+                    UIApplication.shared.open(url)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
+            }
+        }
     }
 }
