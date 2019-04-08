@@ -2,6 +2,7 @@ source 'https://github.com/crspybits/Specs.git'
 source 'https://github.com/CocoaPods/Specs.git'
 
 use_frameworks!
+platform :ios, '10.0'
 
 target 'SharedImages' do
 	# https://stackoverflow.com/questions/13208202
@@ -11,10 +12,10 @@ target 'SharedImages' do
 	pod 'Fabric'
 	pod 'Crashlytics'
 
-	pod 'SyncServer', '~> 18.13.0'
-	pod 'SyncServer/Facebook', '~> 18.13.0'
-	pod 'SyncServer/Dropbox', '~> 18.13.0'
-	pod 'SyncServer/Google', '~> 18.13.0'
+	pod 'SyncServer', '~> 19.0.0'
+	pod 'SyncServer/Facebook', '~> 19.0.0'
+	pod 'SyncServer/Dropbox', '~> 19.0.0'
+	pod 'SyncServer/Google', '~> 19.0.0'
 
 # 	pod 'SyncServer', :path => '../SyncServer-iOSClient'
 # 	pod 'SyncServer/Facebook', :path => '../SyncServer-iOSClient'
@@ -24,7 +25,7 @@ target 'SharedImages' do
 # 	pod 'SyncServer-Shared', :path => '../SyncServer-Shared'
 	
 # 	pod 'SMCoreLib', :path => '../Common/SMCoreLib/'
-	pod 'SMCoreLib', '~> 1.4'
+	pod 'SMCoreLib', '~> 2.0'
 	
 	# For a discussion thread on images
 	pod 'MessageKit', '~> 2.0'
@@ -32,7 +33,7 @@ target 'SharedImages' do
 	# Using my fork because of changes I made
 	pod 'ODRefreshControl', :git => 'https://github.com/crspybits/ODRefreshControl.git'
     
-    pod 'SDCAlertView', '~> 7.1'
+    pod 'SDCAlertView', '~> 9.0'
     
     # pull-up from the bottom to refresh
     pod 'LottiesBottom', '~> 0.5'
@@ -77,23 +78,23 @@ target 'SharedImages' do
   	# 9/14/17; Cocoapods isn't quite ready for Xcode9. This is a workaround:
 	# See also https://github.com/CocoaPods/CocoaPods/issues/6791
 	
-	post_install do |installer|
-	
-		my32Targets = ['SDCAlertView', 'SyncServer-Shared', 'FacebookCore', 'SyncServer', 'SMCoreLib']
-		my40Targets = ['SwiftyDropbox', 'MessageKit']
-		
-		installer.pods_project.targets.each do |target|
-			if my32Targets.include? target.name
-				target.build_configurations.each do |config|
-					config.build_settings['SWIFT_VERSION'] = '3.2'
-				end
-			end
-			if my40Targets.include? target.name
-				target.build_configurations.each do |config|
-					config.build_settings['SWIFT_VERSION'] = '4.0'
-				end
-			end
-		end
-	end
+# 	post_install do |installer|
+# 	
+# 		my32Targets = ['SDCAlertView', 'SyncServer-Shared', 'FacebookCore', 'SyncServer', 'SMCoreLib']
+# 		my40Targets = ['SwiftyDropbox', 'MessageKit']
+# 		
+# 		installer.pods_project.targets.each do |target|
+# 			if my32Targets.include? target.name
+# 				target.build_configurations.each do |config|
+# 					config.build_settings['SWIFT_VERSION'] = '3.2'
+# 				end
+# 			end
+# 			if my40Targets.include? target.name
+# 				target.build_configurations.each do |config|
+# 					config.build_settings['SWIFT_VERSION'] = '4.0'
+# 				end
+# 			end
+# 		end
+# 	end
 end
 

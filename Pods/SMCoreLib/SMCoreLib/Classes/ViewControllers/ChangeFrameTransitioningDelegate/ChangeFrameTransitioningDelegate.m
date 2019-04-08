@@ -106,8 +106,8 @@
     
     [containerView insertSubview:_dimmingView atIndex:0];
     
-    void (^setAlpha)() = ^{
-        [_dimmingView setAlpha:1.0];
+    void (^setAlpha)(void) = ^{
+        [self->_dimmingView setAlpha:1.0];
     };
     
     if([presentedViewController transitionCoordinator])
@@ -126,8 +126,8 @@
 
 - (void)dismissalTransitionWillBegin
 {
-    void (^resetAlpha)() = ^{
-        [_dimmingView setAlpha:0.0];
+    void (^resetAlpha)(void) = ^{
+        [self->_dimmingView setAlpha:0.0];
     };
     
     if([[self presentedViewController] transitionCoordinator])

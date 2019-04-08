@@ -130,7 +130,7 @@ public class SyncServer: NSObject {
         }
         
         NotificationCenter.default.addObserver(self, selector:#selector(uploadIfNeeded), name:
-            NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+            UIApplication.willEnterForegroundNotification, object: nil)
         Network.session().connectionStateCallbacks.resetTargets!()
         _ = Network.session().connectionStateCallbacks.addTarget!(self, with: #selector(uploadIfNeeded))
         

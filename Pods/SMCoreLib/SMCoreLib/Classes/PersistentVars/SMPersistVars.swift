@@ -32,15 +32,15 @@ open class SMPersistItem : NSObject {
     // 10/31/15; I've introduced this for performance reasons, and specifically for the KeyChain persistence type, but will use it for NS user defaults too just for generality.
     fileprivate var _cachedCurrentValue:AnyObject?
     
-    open let persistType:SMPersistVarType
-    open let name:String
+    public let persistType:SMPersistVarType
+    public let name:String
 
     init(name:String!, initialValue:AnyObject!, persistType:SMPersistVarType) {
         self.name = name
         self.initialValue = initialValue
         self.persistType = persistType
         
-        Log.msg("type: \(self.persistType); name: \(self.name); initialValue: \(self.initialValue); initialValueType: \(type(of: initialValue))")
+        Log.msg("type: \(self.persistType); name: \(self.name); initialValue: \(String(describing: self.initialValue)); initialValueType: \(type(of: initialValue))")
         
         switch (persistType) {
         case .userDefaults:
@@ -160,7 +160,7 @@ open class SMPersistItem : NSObject {
             }
             else {
                 if persistentValue is NSData {
-                    let unarchivedValue = self.unarchiveValue(persistentValue! as! Data)
+                    let unarchivedValue = self.unarchiveValue((persistentValue! as! Data))
                     Log.msg("name: \(self.name); \(String(describing: unarchivedValue)); type: \(type(of: unarchivedValue))")
                     returnValue = unarchivedValue
                 }
@@ -188,7 +188,7 @@ open class SMPersistItem : NSObject {
 
 open class SMPersistItemBool : SMPersistItem {
     public init(name:String!, initialBoolValue:Bool!,  persistType:SMPersistVarType) {
-        super.init(name: name, initialValue:initialBoolValue as AnyObject!, persistType:persistType)
+        super.init(name: name, initialValue:initialBoolValue as AnyObject, persistType:persistType)
     }
     
     // Current Bool value
@@ -209,7 +209,7 @@ open class SMPersistItemBool : SMPersistItem {
 
 open class SMPersistItemInt : SMPersistItem {
     public init(name:String!, initialIntValue:Int!,  persistType:SMPersistVarType) {
-        super.init(name: name, initialValue:initialIntValue as AnyObject!, persistType:persistType)
+        super.init(name: name, initialValue:initialIntValue as AnyObject, persistType:persistType)
     }
 
     // Current Int value
@@ -230,7 +230,7 @@ open class SMPersistItemInt : SMPersistItem {
 
 open class SMPersistItemString : SMPersistItem {
     public init(name:String!, initialStringValue:String!,  persistType:SMPersistVarType) {
-        super.init(name: name, initialValue:initialStringValue as AnyObject!, persistType:persistType)
+        super.init(name: name, initialValue:initialStringValue as AnyObject, persistType:persistType)
     }
     
     // Current String value
@@ -251,7 +251,7 @@ open class SMPersistItemString : SMPersistItem {
 
 open class SMPersistItemData : SMPersistItem {
     public init(name:String!, initialDataValue:Data!,  persistType:SMPersistVarType) {
-        super.init(name: name, initialValue:initialDataValue as AnyObject!, persistType:persistType)
+        super.init(name: name, initialValue:initialDataValue as AnyObject, persistType:persistType)
     }
 
     // Current NSData value
@@ -556,16 +556,16 @@ open class SMPersistVarTest : NSObject {
         func printValues(messagePrefix:String) {
             print("\(messagePrefix): self.TEST_BOOL.boolValue: \(self.TEST_BOOL.boolValue)")
             print("\(messagePrefix): self.TEST_INT.intValue: \(self.TEST_INT.intValue)")
-            print("\(messagePrefix): self.TEST_SET.setValue: \(self.TEST_SET.setValue)")
+            print("\(messagePrefix): self.TEST_SET.setValue: \(String(describing: self.TEST_SET.setValue))")
             print("\(messagePrefix): self.TEST_STRING.stringValue: \(self.TEST_STRING.stringValue)")
-            print("\(messagePrefix): self.TEST_DICT.dictValue: \(self.TEST_DICT.dictValue)")
-            print("\(messagePrefix): self.TEST_DICT2.dictValue: \(self.TEST_DICT2.dictValue)")
+            print("\(messagePrefix): self.TEST_DICT.dictValue: \(String(describing: self.TEST_DICT.dictValue))")
+            print("\(messagePrefix): self.TEST_DICT2.dictValue: \(String(describing: self.TEST_DICT2.dictValue))")
 
             print("\(messagePrefix): self.TEST_BOOL_KEYCHAIN.boolValue: \(self.TEST_BOOL_KEYCHAIN.boolValue)")
             print("\(messagePrefix): self.TEST_INT_KEYCHAIN.intValue: \(self.TEST_INT_KEYCHAIN.intValue)")
-            print("\(messagePrefix): self.TEST_SET_KEYCHAIN.setValue: \(self.TEST_SET_KEYCHAIN.setValue)")
+            print("\(messagePrefix): self.TEST_SET_KEYCHAIN.setValue: \(String(describing: self.TEST_SET_KEYCHAIN.setValue))")
             print("\(messagePrefix): self.TEST_STRING_KEYCHAIN.stringValue: \(self.TEST_STRING_KEYCHAIN.stringValue)")
-            print("\(messagePrefix): self.TEST_DICT_KEYCHAIN.dictValue: \(self.TEST_DICT_KEYCHAIN.dictValue)")
+            print("\(messagePrefix): self.TEST_DICT_KEYCHAIN.dictValue: \(String(describing: self.TEST_DICT_KEYCHAIN.dictValue))")
         }
 
         //printValues("before")
@@ -584,7 +584,7 @@ open class SMPersistVarTest : NSObject {
             self.TEST_DICT.dictValue["someKey"] = "someValue"
             self.TEST_DICT2.dictValue["someKey"] = true
             testChangeVar(dictVar: self.TEST_DICT2)
-            Log.msg("\(self.TEST_DICT2.dictValue)")
+            Log.msg("\(String(describing: self.TEST_DICT2.dictValue))")
             self.TEST_BOOL_KEYCHAIN.boolValue = false
             self.TEST_INT_KEYCHAIN.intValue = 10
             self.TEST_SET_KEYCHAIN.setValue.add("new")

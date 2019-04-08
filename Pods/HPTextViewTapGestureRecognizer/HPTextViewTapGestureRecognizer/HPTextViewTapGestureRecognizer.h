@@ -32,6 +32,8 @@
 
 @interface HPTextViewTapGestureRecognizer : UITapGestureRecognizer
 
+// https://stackoverflow.com/questions/29534654/xcode-6-3-warning-synthesize-property
+// Added @dynamic to implementation in .m file.
 @property (nonatomic, weak) id<UIGestureRecognizerDelegate, HPTextViewTapGestureRecognizerDelegate> delegate;
 
 @end

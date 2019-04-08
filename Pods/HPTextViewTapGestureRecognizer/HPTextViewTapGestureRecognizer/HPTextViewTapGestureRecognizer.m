@@ -33,6 +33,7 @@
     NSTextAttachment *_textAttachment;
     NSRange _range;
 }
+@dynamic delegate;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {

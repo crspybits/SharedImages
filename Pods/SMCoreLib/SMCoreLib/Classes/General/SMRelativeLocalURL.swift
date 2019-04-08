@@ -82,7 +82,8 @@ open class SMRelativeLocalURL : NSURL {
     }
     
     // TODO: See what it will take to make this support secure coding. See Apple's Secure Coding Guide
-    open override static var supportsSecureCoding : Bool {
+    // Fixed odd circular warning here: https://stackoverflow.com/questions/53269608/circular-warnings-about-swift-static-override-being-final
+    override open class var supportsSecureCoding: Bool {
         return false
     }
     

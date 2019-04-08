@@ -64,8 +64,8 @@ open class SMImageTextView : UITextView, UITextViewDelegate {
     fileprivate func setup() {
         super.delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         let tapGesture = HPTextViewTapGestureRecognizer()
         tapGesture.delegate = self
@@ -73,8 +73,8 @@ open class SMImageTextView : UITextView, UITextViewDelegate {
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     /*
@@ -87,7 +87,7 @@ open class SMImageTextView : UITextView, UITextViewDelegate {
     // There are a number of ways to get the text view to play well the keyboard *and* autolayout: http://stackoverflow.com/questions/14140536/resizing-an-uitextview-when-the-keyboard-pops-up-with-auto-layout (see https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/KeyboardManagement/KeyboardManagement.html for the idea of changing bottom .contentInset). I didn't use http://stackoverflow.com/questions/12924649/autolayout-constraint-keyboard, but it seems to be another means.
     @objc fileprivate func keyboardWillShow(_ notification:Notification) {
         let info = notification.userInfo!
-        let kbFrame = info[UIKeyboardFrameEndUserInfoKey] as! NSValue
+        let kbFrame = info[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
         let keyboardFrame = kbFrame.cgRectValue
         Log.msg("keyboardFrame: \(keyboardFrame)")
         
@@ -245,11 +245,7 @@ open class SMImageTextView : UITextView, UITextViewDelegate {
                 
                 // 9/10/17; I'm having an odd issue here with NSAttributedStringKey.attachment versus NSAttachmentAttributeName. I can't seem to use #available(iOS 11, *) to select between them.
                 // See https://stackoverflow.com/questions/46145780/nsattributedstringkey-attachment-versus-nsattachmentattributename/46148528#46148528
-#if SWIFT4
-                let dictValue = dict[NSAttributedStringKey.attachment]
-#else
-                let dictValue = dict[NSAttachmentAttributeName]
-#endif
+                let dictValue = dict[NSAttributedString.Key.attachment]
                 if dictValue == nil {
                     let string = (self.attributedText.string as NSString).substring(with: range)
                     Log.msg("string in range: \(range): \(string)")
@@ -311,12 +307,7 @@ extension SMImageTextView {
         if text.isEmpty {
                 // 9/10/17; I'm having an odd issue here with NSAttributedStringKey.attachment versus NSAttachmentAttributeName. I can't seem to use #available(iOS 11, *) to select between them.
                 // See // See https://stackoverflow.com/questions/46145780/nsattributedstringkey-attachment-versus-nsattachmentattributename/46148528#46148528
-#if SWIFT4
-                let key = NSAttributedStringKey.attachment
-#else
-                let key = NSAttachmentAttributeName
-#endif
-            
+                let key = NSAttributedString.Key.attachment
                 textView.attributedText.enumerateAttribute(key, in: NSMakeRange(0, textView.attributedText.length), options: NSAttributedString.EnumerationOptions(rawValue: 0)) { (object, imageRange, stop) in
             
                 if let textAttachment = object as? ImageTextAttachment {

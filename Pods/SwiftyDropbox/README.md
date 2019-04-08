@@ -9,7 +9,6 @@ Full documentation [here](http://dropbox.github.io/SwiftyDropbox/api-docs/latest
 ## Table of Contents
 
 * [System requirements](#system-requirements)
-  * [Swift 3 Keychain bug](#swift-3-keychain-bug)
 * [Get started](#get-started)
   * [Register your application](#register-your-application)
   * [Obtain an OAuth 2.0 token](#obtain-an-oauth-20-token)
@@ -52,17 +51,8 @@ Full documentation [here](http://dropbox.github.io/SwiftyDropbox/api-docs/latest
 
 - iOS 9.0+
 - macOS 10.11+
-- Xcode 8.0+
-
-### Swift 3 Keychain bug
-
-> SwiftyDropbox currently supports Swift 3, Xcode 8 and iOS 10. However, there appears to be a bug with the Keychain in the iOS simulator environment where data is not persistently saved to the Keychain.
->
-> As a temporary workaround, in the Project Navigator, select **your project** > **Capabilities** > **Keychain Sharing** > **ON**.
->
-> You can read more about the bug [here](https://forums.developer.apple.com/message/170381#170381).
-
----
+- Xcode 10.0+
+- Swift 4.2+
 
 ## Get Started
 
@@ -131,7 +121,7 @@ To install the Dropbox Swift SDK via Carthage, you need to create a `Cartfile` i
 
 ```
 # SwiftyDropbox
-github "https://github.com/dropbox/SwiftyDropbox" ~> 4.8.2
+github "https://github.com/dropbox/SwiftyDropbox" ~> 5.0.0
 ```
 
 Then, run the following command to install the dependency to checkout and build the Dropbox Swift SDK repository:
@@ -260,14 +250,14 @@ To facilitate the above authorization flows, you should take the following steps
 
 #### Initialize a `DropboxClient` instance
 
-From your application delegate: 
+From your application delegate:
 
 ##### iOS
 
 ```Swift
 import SwiftyDropbox
 
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     DropboxClientsManager.setupWithAppKey("<APP_KEY>")
     return true
 }
@@ -290,7 +280,7 @@ func applicationDidFinishLaunching(_ aNotification: Notification) {
 You can commence the auth flow by calling `authorizeFromController:controller:openURL` method in your application's
 view controller.
 
-From your view controller: 
+From your view controller:
 
 ##### iOS
 
@@ -313,10 +303,10 @@ func myButtonInControllerPressed() {
 import SwiftyDropbox
 
 func myButtonInControllerPressed() {
-    DropboxClientsManager.authorizeFromController(sharedWorkspace: NSWorkspace.shared(),
+    DropboxClientsManager.authorizeFromController(sharedWorkspace: NSWorkspace.shared,
                                                   controller: self,
                                                   openURL: { (url: URL) -> Void in
-                                                    NSWorkspace.shared().open(url)
+                                                    NSWorkspace.shared.open(url)
                                                   })
 }
 ```
@@ -339,7 +329,7 @@ To handle the redirection back into the Swift SDK once the authentication flow i
 ```Swift
 import SwiftyDropbox
 
-func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     if let authResult = DropboxClientsManager.handleRedirectURL(url) {
         switch authResult {
         case .success:
@@ -551,7 +541,7 @@ client.files.deleteV2(path: "/test/path/in/Dropbox/account").response { response
         switch error as CallError {
         case .routeError(let boxed, let userMessage, let errorSummary, let requestId):
             print("RouteError[\(requestId)]:")
-            
+
             switch boxed.unboxed as Files.DeleteError {
             case .pathLookup(let lookupError):
                 switch lookupError {
@@ -594,9 +584,9 @@ client.files.deleteV2(path: "/test/path/in/Dropbox/account").response { response
 
 #### Generic network request errors
 
-In the case of a network error, errors are either specific to the endpoint (as shown above) or more generic errors. 
+In the case of a network error, errors are either specific to the endpoint (as shown above) or more generic errors.
 
-To determine if an error is route-specific or not, the error object should be cast as a `CallError`, and depending on the type of error, handled in the appropriate switch statement. 
+To determine if an error is route-specific or not, the error object should be cast as a `CallError`, and depending on the type of error, handled in the appropriate switch statement.
 
 ```Swift
 client.files.deleteV2(path: "/test/path/in/Dropbox/account").response { response, error in
@@ -740,7 +730,7 @@ The Swift SDK includes a convenience class, `DropboxClientsManager`, for integra
 
 #### Single Dropbox user case
 
-For most apps, it is reasonable to assume that only one Dropbox account (and access token) needs to be managed at a time. In this case, the `DropboxClientsManager` flow looks like this: 
+For most apps, it is reasonable to assume that only one Dropbox account (and access token) needs to be managed at a time. In this case, the `DropboxClientsManager` flow looks like this:
 
 * call `setupWithAppKey`/`setupWithAppKeyDesktop` (or `setupWithTeamAppKey`/`setupWithTeamAppKeyDesktop`) in integrating app's app delegate
 * client manager determines whether any access tokens are stored -- if any exist, one token is arbitrarily chosen to use
@@ -755,7 +745,7 @@ The `DropboxClient` (or `DropboxTeamClient`) is then used to make all of the des
 
 #### Multiple Dropbox user case
 
-For some apps, it is necessary to manage more than one Dropbox account (and access token) at a time. In this case, the `DropboxClientsManager` flow looks like this: 
+For some apps, it is necessary to manage more than one Dropbox account (and access token) at a time. In this case, the `DropboxClientsManager` flow looks like this:
 
 * access token uids are managed by the app that is integrating with the SDK for later lookup
 * call `setupWithAppKeyMultiUser`/`setupWithAppKeyMultiUserDesktop` (or `setupWithTeamAppKeyMultiUser`/`setupWithTeamAppKeyMultiUserDesktop`) in integrating app's app delegate
@@ -819,7 +809,7 @@ To ensure your changes have not broken any existing functionality, you can run a
 ## Bugs
 
 Please post any bugs to the [issue tracker](https://github.com/dropbox/SwiftyDropbox/issues) found on the project's GitHub page.
-  
+
 Please include the following with your issue:
  - a description of what is not working right
  - sample code to help replicate the issue

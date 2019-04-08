@@ -40,6 +40,7 @@ class ActionsCollectionView: UICollectionView {
         self.delegate = self
         self.backgroundColor = .clear
         self.delaysContentTouches = false
+        self.translatesAutoresizingMaskIntoConstraints = false
 
         self.collectionViewLayout.register(ActionSeparatorView.self,
             forDecorationViewOfKind: kHorizontalActionSeparator)
@@ -47,7 +48,7 @@ class ActionsCollectionView: UICollectionView {
             forDecorationViewOfKind: kVerticalActionSeparator)
 
         let nibName = String(describing: ActionCell.self)
-        let nib = UINib(nibName: nibName, bundle: Bundle(for: type(of: self)))
+        let nib = UINib(nibName: nibName, bundle: Bundle.resourceBundle)
         self.register(nib, forCellWithReuseIdentifier: kActionCellIdentifier)
     }
 

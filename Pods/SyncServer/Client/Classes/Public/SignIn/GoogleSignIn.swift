@@ -116,7 +116,7 @@ public class GoogleSyncServerSignIn : NSObject, GenericSignIn {
     public let userType:UserType = .owning
     public let cloudStorageType: CloudStorageType? = .Google
     
-    public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
+    public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplication.LaunchOptionsKey : Any]?) {
     
         stickySignIn = userSignedIn
     
@@ -171,9 +171,9 @@ public class GoogleSyncServerSignIn : NSObject, GenericSignIn {
         }
     }
 
-    public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
-        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as! String
+    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        let annotation = options[UIApplication.OpenURLOptionsKey.annotation]
+        let sourceApplication = options[UIApplication.OpenURLOptionsKey.sourceApplication] as! String
         return GIDSignIn.sharedInstance().handle(url, sourceApplication: sourceApplication,
             annotation: annotation)
     }
@@ -201,7 +201,7 @@ public class GoogleSyncServerSignIn : NSObject, GenericSignIn {
         creds.email = email
         creds.username = name!
         creds.accessToken = user.authentication.accessToken
-        Log.msg("user.serverAuthCode: \(user.serverAuthCode)")
+        Log.msg("user.serverAuthCode: \(String(describing: user.serverAuthCode))")
         creds.serverAuthCode = user.serverAuthCode
         creds.googleUser = user
         

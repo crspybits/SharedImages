@@ -189,7 +189,7 @@
 #ifdef DEBUG
     // SPASLogDetail(@"%@", NSStringFromCGAffineTransform(CENTER_VIEW.transform));
     // SPASLogDetail(@"center: %@", NSStringFromCGPoint(center));
-    CGPoint newCenter = CGPointApplyAffineTransform (center, CENTER_VIEW.transform);
+    // CGPoint newCenter = CGPointApplyAffineTransform (center, CENTER_VIEW.transform);
     // SPASLogDetail(@"newCenter: %@", NSStringFromCGPoint(newCenter));
 #endif
     

@@ -97,7 +97,7 @@ public class SignInManager : NSObject {
     }
     
     /// At launch, you must set up all the SignIn's that you'll be presenting to the user. This will call their `appLaunchSetup` method.
-    public func addSignIn(_ signIn:GenericSignIn, launchOptions options: [UIApplicationLaunchOptionsKey: Any]?) {
+    public func addSignIn(_ signIn:GenericSignIn, launchOptions options: [UIApplication.LaunchOptionsKey: Any]?) {
         // Make sure we don't already have an instance of this signIn
         let name = stringNameForSignIn(signIn)
         let result = alternativeSignIns.filter({stringNameForSignIn($0) == name})
@@ -121,7 +121,7 @@ public class SignInManager : NSObject {
     }
     
     /// Based on the currently active signin method, this will call the corresponding method on that class.
-    public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         
         for signIn in alternativeSignIns {
             if SignInManager.currentSignInName.value == stringNameForSignIn(signIn) {

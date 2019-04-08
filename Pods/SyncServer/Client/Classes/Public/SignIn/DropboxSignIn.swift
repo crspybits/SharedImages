@@ -150,7 +150,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
     public let userType:UserType = .owning
     public let cloudStorageType: CloudStorageType? = .Dropbox
     
-    public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
+    public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplication.LaunchOptionsKey : Any]?) {
 
         if userSignedIn {
             if let creds = credentials {
@@ -178,7 +178,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
         self.completeSignInProcess(autoSignIn: true)
     }
     
-    public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     
         if let authResult = DropboxClientsManager.handleRedirectURL(url) {
             switch authResult {
@@ -340,7 +340,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                     SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error creating owning user: \(error!)")
                     // 10/22/17; User is signing up. I.e., they don't have an account. Seems OK to sign them out.
                     self.signUserOut()
-                    Log.msg("signUserOut: GoogleSignIn: createOwningUser error")
+                    Log.msg("signUserOut: DropboxSignIn: createOwningUser error")
                 }
             }
             
@@ -355,7 +355,7 @@ public class DropboxSyncServerSignIn : GenericSignIn {
                     Alert.show(withTitle: "Alert!", message: "Error creating sharing user: \(error!)")
                     // 10/22/17; The common situation here seems to be the user is signing up via a sharing invitation. They are not on the system yet in that case. Seems safe to sign them out.
                     self.signUserOut()
-                    Log.msg("signUserOut: FacebookSignIn: error in redeemSharingInvitation in")
+                    Log.msg("signUserOut: DropboxSignIn: error in redeemSharingInvitation")
                 }
             }
             

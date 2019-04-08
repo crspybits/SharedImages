@@ -47,4 +47,6 @@
 // In order to have inverted portrait on iPhone, it seems  you have to have this. It's not sufficient to have the Info.plist with all orientations, or the method in the app delegate that gives the orientation mask. See http://stackoverflow.com/questions/12542472/why-iphone-5-doesnt-rotate-to-upsidedown?lq=1
 - (NSUInteger)supportedInterfaceOrientations;
 
++ (UIViewController *) getTop;
+
 @end

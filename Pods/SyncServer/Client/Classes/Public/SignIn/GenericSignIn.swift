@@ -92,9 +92,9 @@ public protocol GenericSignIn : class {
     var managerDelegate:SignInManagerDelegate! {get set}
     
     /// `userSignedIn`, when true, indicates that the user was signed-in with this GenericSignIn last time, and not signed out.
-    func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?)
+    func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplication.LaunchOptionsKey : Any]?)
     
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
     
     /// To enable sticky sign-in, and the GenericSignIn to refresh credentials if that wasn't possible at app launch, this will be called when network connectivity changes state.
     func networkChangedState(networkIsOnline: Bool)

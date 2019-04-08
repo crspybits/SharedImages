@@ -83,8 +83,8 @@ class ProgressIndicator {
         label.bottomAnchor.constraint(equalTo: alert.contentView.bottomAnchor).isActive = true
         
         updateProgress(withNumberFilesProcessed: 0)
-
-        alert.add(AlertAction(title: "Stop", style: .destructive) { alert in
+        
+        alert.addAction(AlertAction(title: "Stop", style: .destructive) { alert in
             stop()
         })
     }

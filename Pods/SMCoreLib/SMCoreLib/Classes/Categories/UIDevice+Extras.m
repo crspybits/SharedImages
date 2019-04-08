@@ -138,15 +138,15 @@
 {
     // Returns true if the current process is being debugged (either
     // running under the debugger or has a debugger attached post facto).
+    
+    // Do we have a production build?
+#ifndef DEBUG
+        return NO;
+#else
     int                 junk;
     int                 mib[4];
     struct kinfo_proc   info;
     size_t              size;
-    
-    // Do we have a production build?
-    #ifndef DEBUG
-        return NO;
-    #endif
     
     // Initialize the flags so that, if sysctl fails for some bizarre 
     // reason, we get a predictable result.
@@ -170,6 +170,7 @@
     // We're being debugged if the P_TRACED flag is set.
 
     return ( (info.kp_proc.p_flag & P_TRACED) != 0 );
+#endif
 }
 
 @end

@@ -8,7 +8,6 @@
 
 #import "SMEmail.h"
 #import "SMUIMessages.h"
-#import "UserMessage.h"
 #import "UIDevice+Extras.h"
 
 @interface SMEmail ()<MFMailComposeViewControllerDelegate>
@@ -29,12 +28,13 @@
 - (id) initWithParentViewController: (UIViewController *) theParent {
     if(! [MFMailComposeViewController canSendMail]) {
         NSString *title = [[NSString alloc] initWithFormat:@"Sorry, the %@ app isn't allowed to send email.", [SMUIMessages session].appName];
-        UIAlertView *emailAlert =
-        [[UIAlertView alloc]
-         initWithTitle: title message: @"Have you configured this device to send email?" delegate:nil
-         cancelButtonTitle:[[SMUIMessages session] OkMsg]
-         otherButtonTitles: nil];
-        [[UserMessage session] showAlert:emailAlert ofType:UserMessageTypeError];
+        
+        UIAlertController *emailAlert = [UIAlertController alertControllerWithTitle:title message:@"Have you configured this device to send email?" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:[[SMUIMessages session] OkMsg] style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        }];
+        [emailAlert addAction:cancelAction];
+        [theParent presentViewController:emailAlert animated:TRUE completion:nil];
+
         return nil;
     }
     

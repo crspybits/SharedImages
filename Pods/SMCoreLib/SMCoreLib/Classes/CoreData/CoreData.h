@@ -82,7 +82,7 @@ extern const NSString * _Nonnull CoreDataLightWeightMigration;
 + (void) registerSession: (CoreData * _Nonnull) coreData forName: (NSString * _Nonnull) sessionName;
 + (instancetype _Nonnull) sessionNamed: (NSString * _Nonnull) sessionName;
 
-- (void) setupCustomAlert: (void (^ _Nullable)(UIAlertView * _Nonnull alert)) alert;
+- (void) setupCustomAlert: (void (^ _Nullable)(UIAlertController * _Nonnull alert)) alert;
 
 @property (strong, nonatomic, readonly) NSManagedObjectContext * _Nonnull context;
 

@@ -65,7 +65,6 @@
 #import "SMModal.h"
 #import "SMRotation.h"
 #import "SMEdgeInsetLabel.h"
-#import "UserMessage.h"
 
 FOUNDATION_EXPORT double SMCoreLibVersionNumber;
 FOUNDATION_EXPORT const unsigned char SMCoreLibVersionString[];

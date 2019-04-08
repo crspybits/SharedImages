@@ -64,7 +64,7 @@ open class SMAcquireImage : NSObject {
         })
         
         if UIImagePickerController.isSourceTypeAvailable(
-                UIImagePickerControllerSourceType.camera) {
+            UIImagePickerController.SourceType.camera) {
             alert.addAction(UIAlertAction(title: "Camera", style: .default) { alert in
                 self.getImageUsing(.camera)
             })
@@ -93,7 +93,7 @@ open class SMAcquireImage : NSObject {
         showAlert(fromType: .barButton(barButton))
     }
     
-    fileprivate func getImageUsing(_ sourceType:UIImagePickerControllerSourceType) {
+    fileprivate func getImageUsing(_ sourceType:UIImagePickerController.SourceType) {
         self.imagePicker.sourceType = sourceType
         self.imagePicker.allowsEditing = false
 
@@ -103,9 +103,9 @@ open class SMAcquireImage : NSObject {
 }
 
 extension SMAcquireImage : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         Log.msg("info: \(info)")
-        let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+        let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
         
         // Save image to album if you want; also considers video
         // http://www.techotopia.com/index.php/Accessing_the_iOS_8_Camera_and_Photo_Library_in_Swift
@@ -113,8 +113,8 @@ extension SMAcquireImage : UIImagePickerControllerDelegate, UINavigationControll
         let newFileURL = self.delegate?.smAcquireImageURLForNewImage(self)
         Log.msg("newFileURL: \(String(describing: newFileURL))")
         
-        var success:Bool = true
-        if let imageData = UIImageJPEGRepresentation(image, self.compressionQuality) {
+        var success:Bool = true        
+        if let imageData = image.jpegData(compressionQuality: self.compressionQuality) {
             do {
                 try imageData.write(to: newFileURL! as URL, options: .atomicWrite)
             } catch (let error) {

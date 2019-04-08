@@ -9,9 +9,9 @@
 import Foundation
 
 open class FileExtras {
-    open static let defaultDirectoryPath = "LargeImages"
-    open static let defaultFileExtension = "jpg"
-    open static let defaultFilePrefix = "img"
+    public static let defaultDirectoryPath = "LargeImages"
+    public static let defaultFileExtension = "jpg"
+    public static let defaultFilePrefix = "img"
     
     // Change these if you want.
     open var directoryPathFromDocuments:String = FileExtras.defaultDirectoryPath

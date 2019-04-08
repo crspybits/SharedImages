@@ -21,7 +21,7 @@ import Foundation
 @objc open class SMDebug : NSObject {
     // public let exampleInjectionTest = SMDebugInjectionTest()
     
-    open static let SMIAPReceiptInvalidReceipt = SMDebugInjectionTest()
+    public static let SMIAPReceiptInvalidReceipt = SMDebugInjectionTest()
     
     // My hope is that Swift will entirely compile out uses of these functions in production builds because their bodies will be empty.
     

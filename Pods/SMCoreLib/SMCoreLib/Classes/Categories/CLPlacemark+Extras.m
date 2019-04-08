@@ -8,17 +8,17 @@
 
 #import "CLPlacemark+Extras.h"
 #import <AddressBook/AddressBook.h>
-
+#import <Contacts/Contacts.h>
 @implementation CLPlacemark (Extras)
 
 - (NSString *) addressDictionaryCity;
 {
-    return self.addressDictionary[(NSString *) kABPersonAddressCityKey];
+    return self.addressDictionary[(NSString *) CNPostalAddressCityKey];
 }
 
 - (NSString *) addressDictionaryState;
 {
-    return self.addressDictionary[(NSString *) kABPersonAddressStateKey];
+    return self.addressDictionary[(NSString *) CNPostalAddressStateKey];
 }
 
 @end

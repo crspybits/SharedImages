@@ -88,7 +88,7 @@ static char kStatusBarColor;
 
 - (BOOL) orientationIsPortrait;
 {
-    switch (self.interfaceOrientation) {
+    switch ([[UIApplication sharedApplication] statusBarOrientation]) {
         case UIInterfaceOrientationPortrait:
         case UIInterfaceOrientationPortraitUpsideDown:
             return YES;
@@ -102,7 +102,7 @@ static char kStatusBarColor;
 
 - (BOOL) orientationIsInverted;
 {
-    switch (self.interfaceOrientation) {
+    switch ([[UIApplication sharedApplication] statusBarOrientation]) {
         case UIInterfaceOrientationPortraitUpsideDown:
         case UIInterfaceOrientationLandscapeRight:
             return YES;
@@ -116,6 +116,24 @@ static char kStatusBarColor;
 
 - (NSUInteger) supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskAll;
+}
+
++ (UIViewController *) getTop;
+{
+    UIViewController *result;
+    
+    UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+    
+    if (vc) {
+        result = vc;
+        UIViewController *presented = vc;
+        while (presented.presentedViewController) {
+            presented = presented.presentedViewController;
+            result = presented.presentedViewController;
+        }
+    }
+    
+    return result;
 }
 
 @end

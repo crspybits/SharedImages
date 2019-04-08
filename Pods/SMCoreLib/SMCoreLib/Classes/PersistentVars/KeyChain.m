@@ -125,9 +125,9 @@
             AssertIf(nil == KEYCHAIN_DOMAIN, @"No KEYCHAIN_DOMAIN");
             
             if (status != noErr) {
-                NSError *error = [NSError errorWithDomain:KEYCHAIN_DOMAIN
-                                                     code:status
-                                                 userInfo:nil];
+                // NSError *error = [NSError errorWithDomain:KEYCHAIN_DOMAIN
+                //                                     code:status
+                //                                 userInfo:nil];
                 // SPASLogFile(@"KeyChain.setSecureData: Service: %@, Account: %@, Error: %@", service, account, error);
                 return NO;
             }

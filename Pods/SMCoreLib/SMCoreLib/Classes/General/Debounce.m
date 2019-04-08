@@ -59,7 +59,7 @@
 {
     AssertIf(!block, @"Yikes, nil block");
     
-    void (^restart)() = ^{
+    void (^restart)(void) = ^{
         if (self.timer.running) {
             [self.timer cancel];
         }

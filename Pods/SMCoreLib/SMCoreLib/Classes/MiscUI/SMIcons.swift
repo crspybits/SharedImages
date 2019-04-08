@@ -11,12 +11,12 @@
 import Foundation
 
 open class SMIcons {
-    open static var GoogleIcon:UIImage {
+    public static var GoogleIcon:UIImage {
         let bundle = Bundle(for: self)
         return UIImage(named: "GoogleIcon", in: bundle,compatibleWith: nil)!
     }
     
-    open static var DropboxIcon:UIImage {
+    public static var DropboxIcon:UIImage {
         let bundle = Bundle(for: self)
         return UIImage(named: "DropboxIcon", in: bundle,compatibleWith: nil)!
     }

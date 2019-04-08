@@ -29,7 +29,7 @@ open class SMDefaultItem : NSObject {
 
 class SMDefaultItemBool : SMDefaultItem {
     init(name:String!, initialBoolValue:Bool!) {
-        super.init(name: name, initialValue:initialBoolValue as AnyObject!)
+        super.init(name: name, initialValue:initialBoolValue as AnyObject)
     }
     
     // Current Bool value
@@ -236,7 +236,7 @@ class SMDefaultsTest {
     class func run() {
         print("before: self.TEST_BOOL.boolValue: \(self.TEST_BOOL.boolValue)", terminator: "")
         print("before: self.TEST_INT.intValue: \(self.TEST_INT.intValue)", terminator: "")
-        print("before: self.TEST_SET.setValue: \(self.TEST_SET.setValue)", terminator: "")
+        print("before: self.TEST_SET.setValue: \(String(describing: self.TEST_SET.setValue))", terminator: "")
 
         let testType:TestType = .ChangeValues
         
@@ -255,7 +255,7 @@ class SMDefaultsTest {
         
         print("after: self.TEST_BOOL.boolValue: \(self.TEST_BOOL.boolValue)", terminator: "")
         print("before: self.TEST_INT.intValue: \(self.TEST_INT.intValue)", terminator: "")
-        print("after: self.TEST_SET.setValue: \(self.TEST_SET.setValue)", terminator: "")
+        print("after: self.TEST_SET.setValue: \(String(describing: self.TEST_SET.setValue))", terminator: "")
     }
     
 #endif

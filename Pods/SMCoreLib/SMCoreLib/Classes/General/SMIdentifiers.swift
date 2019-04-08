@@ -13,19 +13,19 @@ import Foundation
 // @objc so we can access static properties from Objective-C.
 @objc open class SMIdentifiers : NSObject {
     // You can make a subclass that assigns to this.
-    open static var _session:SMIdentifiers?
+    public static var _session:SMIdentifiers?
     
     fileprivate static var appVersionString:String!
     fileprivate static var appBundleIdentifier:String!
     fileprivate static var appBuildString:String!
 
     // Exclusive property of SMShowingHints.swift
-    open static let SHOWING_HINTS_FILE = "ShowingHints.dat"
+    public static let SHOWING_HINTS_FILE = "ShowingHints.dat"
     
-    open static let SM_SUPPORT_EMAIL = "support@SpasticMuffin.biz"
+    public static let SM_SUPPORT_EMAIL = "support@SpasticMuffin.biz"
     
-    open static let LARGE_IMAGE_DIRECTORY = "largeImages"
-    open static let SMALL_IMAGE_DIRECTORY = "smallImages"
+    public static let LARGE_IMAGE_DIRECTORY = "largeImages"
+    public static let SMALL_IMAGE_DIRECTORY = "smallImages"
     
     open class func session() -> SMIdentifiers {
         if self._session == nil {
@@ -36,9 +36,9 @@ import Foundation
     
     public override init() {
         super.init()
-        SMIdentifiers.appVersionString = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-        SMIdentifiers.appBundleIdentifier = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as! String
-        SMIdentifiers.appBuildString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
+        SMIdentifiers.appVersionString = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String)
+        SMIdentifiers.appBundleIdentifier = (Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as! String)
+        SMIdentifiers.appBuildString = (Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String)
     }
     
     open func APP_BUILD_STRING() -> String {

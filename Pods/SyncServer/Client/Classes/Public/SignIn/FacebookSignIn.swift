@@ -61,7 +61,7 @@ public class FacebookSyncServerSignIn : GenericSignIn {
     public let userType:UserType = .sharing
     public let cloudStorageType: CloudStorageType? = nil // not owning; must be nil.
     
-    public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplicationLaunchOptionsKey : Any]?) {
+    public func appLaunchSetup(userSignedIn: Bool, withLaunchOptions options:[UIApplication.LaunchOptionsKey : Any]?) {
     
         SDKApplicationDelegate.shared.application(UIApplication.shared, didFinishLaunchingWithOptions: options)
         
@@ -94,7 +94,7 @@ public class FacebookSyncServerSignIn : GenericSignIn {
         }
     }
     
-    public func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         return SDKApplicationDelegate.shared.application(app, open: url, options: options)
     }
 

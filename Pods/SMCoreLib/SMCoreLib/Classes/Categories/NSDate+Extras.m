@@ -12,15 +12,15 @@
 
 - (NSDate *) removeHMS;
 {
-    NSDateComponents *components = [[NSCalendar currentCalendar] components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:self];
+    NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:self];
     NSCalendar* cal = [NSCalendar currentCalendar];
     return [cal dateFromComponents:components];
 };
 
 - (BOOL) equalDMY: (NSDate *) date2;
 {
-    NSDateComponents *componentsDate1 = [[NSCalendar currentCalendar] components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:self];
-    NSDateComponents *componentsDate2 = [[NSCalendar currentCalendar] components:NSDayCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit fromDate:date2];
+    NSDateComponents *componentsDate1 = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:self];
+    NSDateComponents *componentsDate2 = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:date2];
     
     if (componentsDate1.year == componentsDate2.year
         && componentsDate1.month == componentsDate2.month

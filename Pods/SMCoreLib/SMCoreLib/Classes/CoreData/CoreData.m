@@ -36,10 +36,10 @@
 #import <SMCommon/SMAssert.h>
 #else
 #import "SMUIMessages.h"
-#import "UserMessage.h"
 #import "SMAssert.h"
 #import "NSObject+Extras.h"
 #import "NSObject+TargetsAndSelectors.h"
+#import "UIViewController+Extras.h"
 #endif
 
 const NSString *CoreDataBundleModelName = @"CoreDataModelName";
@@ -69,7 +69,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
 @property (nonatomic, strong) NSURL *sqliteURL;
 @property (nonatomic, strong) NSURL *sqliteBackupURL;
 
-@property (nonatomic, strong) void (^customAlert)(UIAlertView *alert);
+@property (nonatomic, strong) void (^customAlert)(UIAlertController *alert);
 
 //@property (nonatomic) NSUInteger currentSqliteFileIndex;
 //@property (nonatomic, strong) NSString *currentSqliteFileName;
@@ -116,15 +116,19 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
     [self setupWithMigrationOptions:options];
 }
 
-- (void) setupCustomAlert: (void (^)(UIAlertView *alert)) alert;
+- (void) setupCustomAlert: (void (^ _Nullable)(UIAlertController * _Nonnull alert)) alert;
 {
     self.customAlert = alert;
 }
 
 - (void) errorWithMessage: (NSString *) messageString;
 {
-    NSString *message = [NSString stringWithFormat:@"Internal error in Core Data: Did you change your model?: %@", messageString];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:message message:@"Please contact customer support" delegate:nil cancelButtonTitle:[[SMUIMessages session] OkMsg] otherButtonTitles: nil];
+    NSString *title = [NSString stringWithFormat:@"Internal error in Core Data: Did you change your model?: %@", messageString];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:@"Please contact customer support" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:[[SMUIMessages session] OkMsg] style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    }];
+    [alert addAction:cancelAction];
+    
     if (self.customAlert) {
         self.customAlert(alert);
     }
@@ -315,7 +319,7 @@ static CoreData* s_sharedInstance = nil;
     }
     else {
         // This is old, but maintains backward compatiblity with previous versions of the CoreData class.
-        managedObjectContext = [[NSManagedObjectContext alloc] init];
+        managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
     }
     
     [managedObjectContext setPersistentStoreCoordinator:persistentStoreCoordinator];
@@ -492,9 +496,14 @@ static CoreData* s_sharedInstance = nil;
     if (error && *error) {
         NSString *message = [NSString stringWithFormat:@"Error: %@", *error];
         // SPASLogFile(@"%@", message);
-
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"There was an internal error fetching objects with Core Data" message:message delegate:nil cancelButtonTitle:[[SMUIMessages session] OkMsg] otherButtonTitles:nil];
-        [[UserMessage session] showAlert:alert ofType:UserMessageTypeError];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"There was an internal error fetching objects with Core Data" message:message preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:[[SMUIMessages session] OkMsg] style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        }];
+        [alert addAction:cancelAction];
+        
+        UIViewController *top = [UIViewController getTop];
+        [top presentViewController:alert animated:YES completion:nil];
     }
     
     return objs;
@@ -537,8 +546,14 @@ static CoreData* s_sharedInstance = nil;
         NSString *message = [NSString stringWithFormat:@"Error: %@; context= %@", (error ? *error : @"") , self.context];
         // SPASLogFile(@"%@", message);
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"There was an internal error counting objects with Core Data" message:message delegate:nil cancelButtonTitle:[[SMUIMessages session] OkMsg] otherButtonTitles:nil];
-        [[UserMessage session] showAlert:alert ofType:UserMessageTypeError];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"There was an internal error counting objects with Core Data" message:message preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:[[SMUIMessages session] OkMsg] style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        }];
+        [alert addAction:cancelAction];
+        
+        UIViewController *top = [UIViewController getTop];
+        [top presentViewController:alert animated:YES completion:nil];
+
         count = 0;
     }
     
