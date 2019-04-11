@@ -204,6 +204,23 @@ public class SyncServerUser {
         }
     }
     
+    /// Calls the server API method to get sharing invitation info.
+    public func getSharingInvitationInfo(invitationCode:String, completion:((_ info:SyncServer.SharingInvitationInfo?, Error?)->(Void))?) {
+        
+        ServerAPI.session.getSharingInvitationInfo(sharingInvitationUUID: invitationCode) { response in
+            switch response {
+            case .error(let error):
+                Thread.runSync(onMainThread: {
+                    completion?(nil, error)
+                })
+            case .success(let info):
+                Thread.runSync(onMainThread: {
+                    completion?(info, nil)
+                })
+            }
+        }
+    }
+    
     /// Calls the server API method to redeem a sharing invitation.
     public func redeemSharingInvitation(creds: GenericCredentials, invitationCode:String, cloudFolderName: String?, completion:((_ accessToken:String?, _ sharingGroupUUID: String?, Error?)->())?) {
         

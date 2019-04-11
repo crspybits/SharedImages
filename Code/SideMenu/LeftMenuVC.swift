@@ -17,6 +17,8 @@ class LeftMenuVC: UIViewController {
     @IBOutlet weak var bottomMenuHeight: NSLayoutConstraint!
     private let topMenu = Menu.create()!
     private let bottomMenu = Menu.create()!
+    private var topMenuSelection: UInt?
+    private var bottomMenuSelection: UInt?
 
     static func create() -> LeftMenuVC {
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LeftMenuVC") as! LeftMenuVC
@@ -29,6 +31,17 @@ class LeftMenuVC: UIViewController {
         else {
             let vc = newVC()
             SideMenu.session.setRootViewController(vc)
+        }
+    }
+    
+    private func setSelectedMenuItem(from screen: CurrentScreen) {
+        switch screen {
+        case .images, .albumSharing:
+            self.bottomMenu.setSelectedRowIndex(nil, animated: false)
+            self.topMenu.setSelectedRowIndex(screen.rawValue, animated: false)
+        case .settings, .signIn:
+            self.bottomMenu.setSelectedRowIndex(screen.rawValue - CurrentScreen.settingsStartIndex, animated: false)
+            self.topMenu.setSelectedRowIndex(nil, animated: false)
         }
     }
     
@@ -49,11 +62,6 @@ class LeftMenuVC: UIViewController {
         ]
 
         topMenu.setup(items: topMenuItems, selection: {[unowned self] rowIndex in
-            guard self.canUseOtherMenus() else {
-                self.topMenu.setSelectedRowIndex(nil, animated: false)
-                return
-            }
-            
             let screenIndex = UInt(rowIndex)
             guard let screen = CurrentScreen(rawValue: screenIndex) else {
                 return
@@ -62,6 +70,12 @@ class LeftMenuVC: UIViewController {
             func changeMenu() {
                 switch screen {
                 case .images:
+                    guard self.canUseOtherMenus() else {
+                        let priorScreen = self.currentScreen ?? .signIn
+                        self.setSelectedMenuItem(from: priorScreen)
+                        return
+                    }
+                    
                     self.menuAction(screen: screen, newVC: { AlbumsVC.create() })
 
                 case .albumSharing:
@@ -105,7 +119,8 @@ class LeftMenuVC: UIViewController {
                 switch screen {
                 case .settings:
                     guard self.canUseOtherMenus() else {
-                        self.bottomMenu.setSelectedRowIndex(CurrentScreen.signIn.rawValue - CurrentScreen.settingsStartIndex, animated: false)
+                        let priorScreen = self.currentScreen ?? .signIn
+                        self.setSelectedMenuItem(from: priorScreen)
                         return
                     }
             
@@ -206,6 +221,8 @@ class LeftMenuVC: UIViewController {
             return .settings
         case is SignInVC:
             return .signIn
+        case is AlbumSharingVC:
+            return .albumSharing
         default:
             return nil
         }

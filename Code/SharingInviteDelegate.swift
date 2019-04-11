@@ -11,14 +11,14 @@ import SyncServer
 import SMCoreLib
 
 class SharingInviteDelegate : SharingInvitationDelegate {
-    private var withNotSignedInCallback: ((SharingInvitation.Invitation)->())?
+    private var withNotSignedInCallback: ((SyncServer.Invitation)->())?
     static var invitationRedeemed = false
     
-    init(withNotSignedInCallback: ((SharingInvitation.Invitation)->())? = nil) {
+    init(withNotSignedInCallback: ((SyncServer.Invitation)->())? = nil) {
         self.withNotSignedInCallback = withNotSignedInCallback
     }
     
-    func sharingInvitationReceived(_ invite:SharingInvitation.Invitation) {
+    func sharingInvitationReceived(_ invite:SyncServer.Invitation) {
         guard let vc = UIViewController.getTop() else {
             return
         }
@@ -28,7 +28,7 @@ class SharingInviteDelegate : SharingInvitationDelegate {
 #endif
 
         // Creating a user.
-        let userFriendlyText = invite.sharingInvitationPermission.userFriendlyText()
+        let userFriendlyText = invite.permission.userFriendlyText()
         let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: .actionSheet)
         Alert.styleForIPad(alert)
         alert.popoverPresentationController?.sourceView = vc.view
@@ -36,7 +36,7 @@ class SharingInviteDelegate : SharingInvitationDelegate {
         alert.addAction(UIAlertAction(title: "Not now", style: .cancel) {alert in
         })
         alert.addAction(UIAlertAction(title: "Share", style: .default) {[unowned self] alert in
-            SharingInviteDelegate.redeem(invitationCode: invite.sharingInvitationCode, success: {
+            SharingInviteDelegate.redeem(invitationCode: invite.code, success: {
                 SharingInviteDelegate.invitationRedeemed = true
             }, failure: { failure in
                 switch failure {

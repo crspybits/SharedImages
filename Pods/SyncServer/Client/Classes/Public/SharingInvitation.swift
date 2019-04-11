@@ -11,21 +11,13 @@ import SMCoreLib
 import SyncServer_Shared
 
 public protocol SharingInvitationDelegate : class {
-    func sharingInvitationReceived(_ invite:SharingInvitation.Invitation)
+    func sharingInvitationReceived(_ invite:SyncServer.Invitation)
 }
 
-public class SharingInvitation {
-    public struct Invitation {
-        public let sharingInvitationCode:String
-        
-        /// It seems odd to have this coming in as a URL parameter, but it has no effect on the permissions granted. Rather, it's here for the UI-- to tell the invited person what kind of permissions they would get if they accept the invitation. (The alternative would be to have a dedicated backend call which would return the sharing permission given the invitation code).
-        public let sharingInvitationPermission:Permission
-    }
-    
-    private var invitation:Invitation?
+public class SharingInvitation {    
+    private var invitation:SyncServer.Invitation?
     
     private static let queryItemAuthorizationCode = "code"
-    private static let queryItemPermission = "permission"
 
     public static let session = SharingInvitation()
     
@@ -42,7 +34,7 @@ public class SharingInvitation {
  
         This will be nil if the invitation has already been processed by the delegate. If it returns non-nil, it returns non-nil only once for that invitation.
     */
-    public func receive() -> Invitation? {
+    public func receive() -> SyncServer.Invitation? {
         let result = invitation
         invitation = nil
         return result
@@ -52,11 +44,11 @@ public class SharingInvitation {
         This URL/String is suitable for sending in an email to the person being invited.
      
         Handles urls of the form:
-          <BundleId>.invitation://?code=<InvitationCode>&permission=<permission>
+          <BundleId>.invitation://?code=<InvitationCode>
           where <BundleId> is something like biz.SpasticMuffin.SharedImages
     */
-    public static func createSharingURL(invitationCode:String, permission:Permission) -> String {
-        let urlString = self.urlScheme + "://?\(queryItemAuthorizationCode)=" + invitationCode + "&\(queryItemPermission)=" + permission.rawValue
+    public static func createSharingURL(invitationCode:String) -> String {
+        let urlString = self.urlScheme + "://?\(queryItemAuthorizationCode)=" + invitationCode
         return urlString
     }
     
@@ -75,36 +67,36 @@ public class SharingInvitation {
             if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
                 Log.msg("components.queryItems: \(String(describing: components.queryItems))")
                 
-                if components.queryItems != nil && components.queryItems!.count == 2 {
-                    var code:String?
-                    var permission:Permission?
-                    
+                // 4/10/19; Keeping the count check as >= 1 to be backward compatible with the older style which included permission.
+                if components.queryItems != nil && components.queryItems!.count >= 1 {
                     let queryItemCode = components.queryItems![0]
                     if queryItemCode.name == SharingInvitation.queryItemAuthorizationCode && queryItemCode.value != nil  {
                         Log.msg("queryItemCode.value: \(queryItemCode.value!)")
-                        code = queryItemCode.value!
-                    }
-                    
-                    let queryItemPermission = components.queryItems![1]
-                    if queryItemPermission.name == SharingInvitation.queryItemPermission && queryItemPermission.value != nil  {
-                        Log.msg("queryItemPermission.value: \(queryItemPermission.value!)")
-                        permission = Permission(rawValue: queryItemPermission.value!)
-                    }
-                    
-#if false
-                    Alert.show(withTitle: "SharingInvitation", message: "code: \(String(describing: code)); permission: \(String(describing: permission)); delegate: \(String(describing: delegate))")
-#endif
-                    
-                    if code != nil && permission != nil {
-                        let invite = Invitation(sharingInvitationCode: code!, sharingInvitationPermission: permission!)
-                        returnResult = true
+                        let code = queryItemCode.value!
+
+                        ServerAPI.session.getSharingInvitationInfo(sharingInvitationUUID: code) { result in
+                            switch result {
+                            case .error(let error):
+                                Log.error("\(error)")
+                                Alert.show(withTitle: "Alert!", message: "There was an error contacting the server for the sharing information.")
+                            case .success(let info):
+                                switch info {
+                                case .noInvitationFound:
+                                    Alert.show(withTitle: "Alert!", message: "No invitation was found on the server. Did the invitation expire?")
+                                case .invitation(let invite):
+                                    if self.delegate == nil {
+                                        self.invitation = invite
+                                    }
+                                    else {
+                                        Thread.runSync(onMainThread: {
+                                            self.delegate!.sharingInvitationReceived(invite)
+                                        })
+                                    }
+                                }
+                            }
+                        }
                         
-                        if self.delegate == nil {
-                            invitation = invite
-                        }
-                        else {
-                            self.delegate!.sharingInvitationReceived(invite)
-                        }
+                        returnResult = true
                     }
                 }
             }

@@ -61,7 +61,7 @@ class ShareAlbum {
                     subjectAlbumName = "\(name) "
                 }
                 
-                let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!, permission:params.permission)
+                let sharingURLString = SharingInvitation.createSharingURL(invitationCode: invitationCode!)
                 if let email = SMEmail(parentViewController: self.viewController) {
                     let message = "I'd like to share \(albumName) with you through the Neebla app and your Dropbox\(socialText)or Google account. To share images, you need to:\n" +
                         "1) download the Neebla iOS app onto your iPhone or iPad,\n" +
@@ -69,9 +69,9 @@ class ShareAlbum {
                         "3) follow the instructions within the app to sign in to your Dropbox\(socialText)or Google account.\n" +
                         "You will have " + params.permission.userFriendlyText() + " access to images.\n\n" +
                             sharingURLString +
-                        "\n" +
-                        "If you can't tap the link above, then you can copy the code below:" +
-                        "\t\(invitationCode!)" +
+                        "\n\n" +
+                        "If you can't tap the link above, then you can copy the code below:\n" +
+                        "\t\(invitationCode!)\n" +
                         "and paste it into the 'Album Sharing' screen of the Neebla app"
                     
                     email.setMessageBody(message, isHTML: false)

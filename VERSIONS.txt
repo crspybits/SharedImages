@@ -8,7 +8,9 @@ Version 1.4.0
 	* Enabled tapping of addresses in discussions to provide navigation directions.
 	* Added new Album Sharing screen-- to allow pasting in of an album sharing code.
 		Dealing with part of: https://github.com/crspybits/SharedImages/issues/162
-
+	* Improved UX/UI of spinner on albums screen.
+	* Added usage of endpoint to get sharing invite info.
+	
 Version 1.3.0 (3/29/19)
 	* Moved "Share album" UI feature from within individual album screen to main Albums screen to improve visibility of this feature and make album sharing easier.
 	* Moved "remove user from album" UI feature from individual album screen to Settings-- this feature is (a) somewhat risky to use and (b) not frequently used so should be in a less accessible and less accessed part of the app.

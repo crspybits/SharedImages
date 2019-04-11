@@ -24,8 +24,8 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
     var dropboxSignInButton:TappableButton!
     var signIn:SignIn!
     
-    private var acceptSharingInvitation: Bool = false
-    private var invite:SharingInvitation.Invitation?
+    private var acceptSharingInvitation: Bool = false    
+    private var invite: SyncServer.Invitation?
     
     var sharingDelegate:SharingInviteDelegate!
     
@@ -57,16 +57,32 @@ class SignInVC : UIViewController, GoogleSignInUIProtocol {
         signInContainer.addSubview(signIn)
         
         sharingDelegate = SharingInviteDelegate(withNotSignedInCallback: {[unowned self] invite in
-            self.userNotSignedIn(invitation: invite)
+            self.userNotSignedIn(invitation: invite, viewLoaded: true)
         })
         
         SharingInvitation.session.delegate = sharingDelegate
+        
+        userNotSignedIn?()
+        userNotSignedIn = nil
     }
     
-    func userNotSignedIn(invitation: SharingInvitation.Invitation) {
-        self.acceptSharingInvitation = true
-        self.invite = invitation
-        self.signIn.showSignIns(for: .sharingAccount)
+    private var userNotSignedIn: (()->())?
+    func userNotSignedIn(invitation: SyncServer.Invitation, viewLoaded: Bool = false) {
+        userNotSignedIn = {[unowned self] in
+            self.acceptSharingInvitation = true
+            self.invite = invitation
+            if invitation.allowsSocialSharing {
+                self.signIn.showSignIns(for: .sharingAccount)
+            }
+            else {
+                self.signIn.showSignIns(for: .newAccount)
+            }
+        }
+        
+        if viewLoaded {
+            userNotSignedIn!()
+            userNotSignedIn = nil
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -108,7 +124,7 @@ extension SignInVC : GenericSignInDelegate {
         }
         else if invite != nil && acceptSharingInvitation {
             acceptSharingInvitation = false
-            result = .createSharingUser(invitationCode: invite!.sharingInvitationCode)
+            result = .createSharingUser(invitationCode: invite!.code)
         }
         else {
             switch SignIn.userInterfaceState {

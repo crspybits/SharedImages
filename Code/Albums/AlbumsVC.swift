@@ -97,7 +97,7 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     
     @objc private func refresh() {
         self.refreshControl.endRefreshing()
-        
+        startActivityIndicator()
         Log.info("About to do refresh sync")
         do {
             try SyncServer.session.sync()
@@ -162,25 +162,36 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
         present(alert, animated: true, completion: nil)
     }
     
+    private func startActivityIndicator() {
+        let minDisplayTimeMilliseconds = 300
+        let size = CGSize(width: 50, height: 50)
+        let indicatorType:NVActivityIndicatorType = .lineSpinFadeLoader
+        startAnimating(size, message: "Syncing...", type: indicatorType, minimumDisplayTime: minDisplayTimeMilliseconds, fadeInAnimation: nil)
+    }
+    
+    private func stopActivityIndicator() {
+        stopAnimating(nil)
+    }
+    
     private func syncEvent(event: SyncControllerEvent) {
         switch event {
         case .syncDelayed:
-            activityIndicator.stopAnimating()
+            stopActivityIndicator()
             
         case .syncDone(numberOperations: _):
-            activityIndicator.stopAnimating()
+            stopActivityIndicator()
             updateSharingGroups()
             Progress.session.finish()
             
         case .syncError(message: let message):
-            activityIndicator.stopAnimating()
+            stopActivityIndicator()
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "An error occurred: \(message)")
             
         case .syncStarted:
-            activityIndicator.startAnimating()
+            break
             
         case .syncServerDown:
-            activityIndicator.stopAnimating()
+            stopActivityIndicator()
         }
     }
     
@@ -223,7 +234,7 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
         if SharingInviteDelegate.invitationRedeemed {
             SharingInviteDelegate.invitationRedeemed = false
             
-            activityIndicator.startAnimating()
+            startActivityIndicator()
             Log.info("About to do AlbumsVC.viewDidAppear sync")
             do {
                 try SyncServer.session.sync()

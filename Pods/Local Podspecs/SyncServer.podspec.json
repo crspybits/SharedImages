@@ -1,0 +1,90 @@
+{
+  "name": "SyncServer",
+  "version": "19.1.0",
+  "summary": "iOS Client for the SyncServerII server",
+  "description": "SyncServerII enables apps to save user files in users cloud storage, and\nenables safe sharing of those files.",
+  "homepage": "https://github.com/crspybits/SyncServer-iOSClient",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Christopher Prince": "chris@SpasticMuffin.biz"
+  },
+  "source": {
+    "git": "https://github.com/crspybits/SyncServer-iOSClient.git",
+    "tag": "19.1.0"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "pod_target_xcconfig": {
+    "OTHER_SWIFT_FLAGS[config=Debug]": "$(inherited) -DDEBUG"
+  },
+  "source_files": "Client/Classes/**/*.{swift}",
+  "resources": [
+    "Client/Assets/**/*",
+    "Client/Classes/**/*.{xib}"
+  ],
+  "preserve_paths": "Client/Assets/**/*",
+  "dependencies": {
+    "SMCoreLib": [
+      "~> 2.0"
+    ],
+    "SyncServer-Shared": [
+      "~> 10.0"
+    ],
+    "FileMD5Hash": [
+      "~> 2.0"
+    ],
+    "PersistentValue": [
+      "~> 0.3"
+    ],
+    "XCGLogger": [
+      "~> 6.1"
+    ]
+  },
+  "default_subspecs": "Lite",
+  "swift_version": "4.2",
+  "subspecs": [
+    {
+      "name": "Lite"
+    },
+    {
+      "name": "Facebook",
+      "xcconfig": {
+        "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_FACEBOOK_SIGNIN"
+      },
+      "dependencies": {
+        "FacebookCore": [
+          "0.5.0"
+        ],
+        "FacebookLogin": [
+          "0.5.0"
+        ]
+      }
+    },
+    {
+      "name": "Dropbox",
+      "xcconfig": {
+        "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_DROPBOX_SIGNIN"
+      },
+      "dependencies": {
+        "SwiftyDropbox": [
+          "~> 5.0"
+        ]
+      }
+    },
+    {
+      "name": "Google",
+      "xcconfig": {
+        "OTHER_SWIFT_FLAGS": "$(inherited) -DSYNCSERVER_GOOGLE_SIGNIN"
+      },
+      "dependencies": {
+        "SMGoogleSignIn": [
+          "~> 1.1"
+        ]
+      }
+    }
+  ]
+}

@@ -18,7 +18,12 @@ public class GetUploadsRequest : RequestMessage {
     public var sharingGroupUUID: String!
 
     public func valid() -> Bool {
-        return sharingGroupUUID != nil
+        guard sharingGroupUUID != nil,
+            let _ = UUID(uuidString: sharingGroupUUID) else {
+            return false
+        }
+        
+        return true
     }
     
     public static func decode(_ dictionary: [String: Any]) throws -> RequestMessage {

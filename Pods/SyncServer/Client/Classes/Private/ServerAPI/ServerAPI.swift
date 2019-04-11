@@ -999,5 +999,43 @@ extension ServerAPI : ServerNetworkingDelegate {
             completion?(nil)
         }
     }
+    
+    func getSharingInvitationInfo(sharingInvitationUUID: String, completion:((Result<SyncServer.SharingInvitationInfo>)->(Void))?) {
+        let endpoint = ServerEndpoints.getSharingInvitationInfo
+        
+        let getSharingInfoRequest = GetSharingInvitationInfoRequest()
+        getSharingInfoRequest.sharingInvitationUUID = sharingInvitationUUID
+        
+        guard getSharingInfoRequest.valid() else {
+            completion?(.error(SyncServerError.couldNotCreateRequest))
+            return
+        }
+        
+        let parameters = getSharingInfoRequest.urlParameters()!
+        let url = makeURL(forEndpoint: endpoint, parameters: parameters)
+        
+        sendRequestUsing(method: endpoint.method, toURL: url) { (response,  httpStatus, error) in
+            let resultError = self.checkForError(statusCode: httpStatus, error: error)
+            
+            if httpStatus == HTTPStatus.gone.rawValue {
+                completion?(.success(.noInvitationFound))
+                return
+            }
+            
+            if resultError == nil {
+                if let response = response,
+                    let getSharingInvitationResponse = try? GetSharingInvitationInfoResponse.decode(response) {
+                    let info = SyncServer.Invitation(code: sharingInvitationUUID, permission: getSharingInvitationResponse.permission, allowsSocialSharing: getSharingInvitationResponse.allowSocialAcceptance)
+                    completion?(.success(.invitation(info)))
+                }
+                else {
+                    completion?(.error(SyncServerError.couldNotCreateResponse))
+                }
+            }
+            else {
+                completion?(.error(resultError!))
+            }
+        }
+    }
 }
 
