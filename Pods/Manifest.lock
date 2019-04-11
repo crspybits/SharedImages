@@ -55,12 +55,9 @@ PODS:
     - Reachability
     - SwiftyBeaver
   - SMGoogleSignIn (1.1.0)
-  - SwiftLocation (3.2.3):
-    - SwiftyJSON (~> 4.0.0-alpha.1)
   - SwiftyBeaver (1.7.0)
   - SwiftyDropbox (5.0.0):
     - Alamofire (~> 4.7.3)
-  - SwiftyJSON (4.0.0)
   - SwiftyUserDefaults (3.0.1)
   - SyncServer (19.2.1):
     - FileMD5Hash (~> 2.0)
@@ -110,7 +107,7 @@ DEPENDENCIES:
   - Fabric
   - Karte (~> 2.2)
   - LGSideMenuController (~> 2.1)
-  - LMGeocoderUniversal
+  - LMGeocoderUniversal (~> 1.2)
   - LottiesBottom (~> 0.5)
   - MessageKit (~> 2.0)
   - NohanaImagePicker (from `https://github.com/crspybits/NohanaImagePicker.git`)
@@ -120,7 +117,6 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 9.0)
   - SMCoreLib (~> 2.0)
-  - SwiftLocation (~> 3.2)
   - SyncServer (~> 19.2.1)
   - SyncServer/Dropbox (~> 19.2.1)
   - SyncServer/Facebook (~> 19.2.1)
@@ -154,10 +150,8 @@ SPEC REPOS:
     - Reachability
     - rosterdev
     - SDCAlertView
-    - SwiftLocation
     - SwiftyBeaver
     - SwiftyDropbox
-    - SwiftyJSON
     - SwiftyUserDefaults
     - XCGLogger
   https://github.com/crspybits/Specs.git:
@@ -214,15 +208,13 @@ SPEC CHECKSUMS:
   SDCAlertView: f24c447279278dca39d41562b414276980b066d8
   SMCoreLib: d0f23c31acc266eb56f8cc18a5a20a8e5065a9aa
   SMGoogleSignIn: de1b8302583b61df51b71b81e349cbe487cbbda3
-  SwiftLocation: a3c3bc2023118171ef3572188a31def94aa0892c
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
   SwiftyDropbox: 378b4425a2e8d0cb24c7b0f2e3af72bfbaaf1e73
-  SwiftyJSON: 070dabdcb1beb81b247c65ffa3a79dbbfb3b48aa
   SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
   SyncServer: 01afb23603025ae940da66136888dfeda021b863
   SyncServer-Shared: a24b6f0de8cda11c6a65a4582a4260e81539b7eb
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 741dc543f30b84cf62ba982836a652c741b3448d
+PODFILE CHECKSUM: 939e1c97caabcc477e1ed60c9036c040970b07a8
 
 COCOAPODS: 1.6.1
