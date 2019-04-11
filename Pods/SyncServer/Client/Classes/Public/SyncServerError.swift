@@ -69,4 +69,6 @@ public enum SyncServerError: Error {
 #endif
 
     case credentialsRefreshError
+    
+    case socialAcceptanceNotAllowed
 }

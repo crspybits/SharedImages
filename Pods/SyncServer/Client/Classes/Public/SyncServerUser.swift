@@ -221,8 +221,8 @@ public class SyncServerUser {
         }
     }
     
-    /// Calls the server API method to redeem a sharing invitation.
-    public func redeemSharingInvitation(creds: GenericCredentials, invitationCode:String, cloudFolderName: String?, completion:((_ accessToken:String?, _ sharingGroupUUID: String?, Error?)->())?) {
+    /// Calls the server API method to redeem a sharing invitation. The error is SyncServerError.socialAcceptanceNotAllowed if you try to redeem a sharing invitation with a social account and social acceptance is not allowed by the invitation.
+    public func redeemSharingInvitation(creds: GenericCredentials, invitationCode:String, cloudFolderName: String?, completion:((_ accessToken:String?, _ sharingGroupUUID: String?, SyncServerError?)->())?) {
         
         ServerAPI.session.creds = creds
         

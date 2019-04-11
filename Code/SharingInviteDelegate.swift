@@ -69,6 +69,11 @@ class SharingInviteDelegate : SharingInvitationDelegate {
                         SMCoreLib.Alert.show(withTitle: "Success!", message: "You now have a new shared album!")
                         success?()
                     }
+                    else if case .socialAcceptanceNotAllowed = error! {
+                        Log.error("Error: \(error!)")
+                        SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unfortunately, you are signed in with a social account (e.g., Facebook), but the invitation requires acceptance with an owning account (e.g., Dropbox, Google).")
+                        failure?(.error(error!))
+                    }
                     else {
                         Log.error("Error: \(error!)")
                         SMCoreLib.Alert.show(withTitle: "Alert!", message: "Error accepting sharing invitation!")
