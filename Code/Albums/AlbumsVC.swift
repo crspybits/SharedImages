@@ -279,9 +279,11 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     
     private func saveNewSharingGroupName(sharingGroupUUID: String, newName: String) {
         do {
+            startActivityIndicator()
             try SyncServer.session.updateSharingGroup(sharingGroupUUID: sharingGroupUUID, newSharingGroupName: newName)
             try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
         } catch (let error) {
+            stopActivityIndicator()
             Log.info("\(error)")
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not change album name. Please try again later.")
         }
