@@ -1,0 +1,6 @@
+framework module LMGeocoderUniversal {
+  umbrella header "LMGeocoderUniversal-umbrella.h"
+
+  export *
+  module * { export * }
+}

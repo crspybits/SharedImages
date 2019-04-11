@@ -9,18 +9,18 @@
 import Foundation
 import Karte
 import CoreLocation
-import SwiftLocation
+import LMGeocoderUniversal
 
 class AddressNavigation {
     static func navigate(to address: String, using viewController: UIViewController) {
-        Locator.location(fromAddress: address, onSuccess: { places in
-            guard places.count > 0, let coordinate = places[0].coordinates else {
+        LMGeocoder.sharedInstance().geocodeAddressString(address, service: .appleService) { addresses, error in
+            guard let addresses = addresses, let addrObj = addresses.first, error == nil else {
                 return
             }
-            let location = Location(name: address, coordinate: coordinate)
+            
+            let coord = addrObj.coordinate
+            let location = Location(name: address, coordinate: coord)
             Karte.presentPicker(destination: location, presentOn: viewController, title: "Navigate to address using:")
-        }) { error  in
-            Log.error("error: \(error)")
         }
     }
 }

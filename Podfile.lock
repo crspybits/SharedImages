@@ -28,6 +28,7 @@ PODS:
   - Karte (2.2.1)
   - KeychainAccess (3.2.0)
   - LGSideMenuController (2.1.1)
+  - LMGeocoderUniversal (1.2.2)
   - lottie-ios (2.5.3)
   - LottiesBottom (0.5.1):
     - lottie-ios (~> 2.1)
@@ -109,6 +110,7 @@ DEPENDENCIES:
   - Fabric
   - Karte (~> 2.2)
   - LGSideMenuController (~> 2.1)
+  - LMGeocoderUniversal
   - LottiesBottom (~> 0.5)
   - MessageKit (~> 2.0)
   - NohanaImagePicker (from `https://github.com/crspybits/NohanaImagePicker.git`)
@@ -141,6 +143,7 @@ SPEC REPOS:
     - Karte
     - KeychainAccess
     - LGSideMenuController
+    - LMGeocoderUniversal
     - lottie-ios
     - LottiesBottom
     - MessageInputBar
@@ -195,6 +198,7 @@ SPEC CHECKSUMS:
   Karte: 970fa8f7349f70433b4b9f5134e1c10d3ec61296
   KeychainAccess: 3b1bf8a77eb4c6ea1ce9404c292e48f948954c6b
   LGSideMenuController: ae40c80983ab8b8801c7cef0a6804d43aaa72d45
+  LMGeocoderUniversal: c093e8d7705745179ce93ff6d3c39e666e6bea67
   lottie-ios: a50d5c0160425cd4b01b852bb9578963e6d92d31
   LottiesBottom: 88d95cfa94dfd988f57f6cf42e39b51a2113a02d
   MessageInputBar: e81c7535347f1f7b923de7080409a535a004b6e4
@@ -219,6 +223,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: a24b6f0de8cda11c6a65a4582a4260e81539b7eb
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 83fca00331ee821fa621a28ff1df65c6f944da2e
+PODFILE CHECKSUM: 741dc543f30b84cf62ba982836a652c741b3448d
 
 COCOAPODS: 1.6.1

@@ -14,9 +14,9 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "23AD312C05AAE8DD50A98165E71E259E"
-               BuildableName = "SyncServer.framework"
-               BlueprintName = "SyncServer"
+               BlueprintIdentifier = "B5D249EF4CE0516B5B71BABAEF3DF095"
+               BuildableName = "LMGeocoderUniversal.framework"
+               BlueprintName = "LMGeocoderUniversal"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

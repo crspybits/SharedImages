@@ -68,8 +68,7 @@ target 'SharedImages' do
 	# Navigation directions using Google Maps, Apple Maps etc.
 	pod 'Karte', '~> 2.2'
 	
-	# Geocoding
-	pod 'SwiftLocation', '~> 3.2'
+	pod 'LMGeocoderUniversal', '~> 1.2'
     
 	target 'SharedImagesTests' do
     	inherit! :search_paths
