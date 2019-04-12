@@ -13,6 +13,7 @@ import SyncServer
 
 class SettingsVC : UIViewController {
     @IBOutlet weak var versionAndBuild: UILabel!
+    @IBOutlet weak var resetUnreadCounts: UIButton!
     
     var vb:String {
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
@@ -35,6 +36,12 @@ class SettingsVC : UIViewController {
         versionAndBuild.sizeToFit()
 
         navigationItem.title = "Settings"
+        
+        // 4/12/19; Trying to fix https://github.com/crspybits/SharedImages/issues/134
+        // Solution from https://stackoverflow.com/questions/6178545/adjust-uibutton-font-size-to-width
+        resetUnreadCounts.titleLabel?.numberOfLines = 1
+        resetUnreadCounts.titleLabel?.adjustsFontSizeToFitWidth = true
+        resetUnreadCounts.titleLabel?.lineBreakMode = .byClipping
     }
     
     @IBAction func emailLogAction(_ sender: Any) {        

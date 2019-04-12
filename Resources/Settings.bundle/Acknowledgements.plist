@@ -20,6 +20,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Icon made by Ionicons (https://www.iconfinder.com/icons/211686/arrow_back_icon)</string>
+			<key>Title</key>
+			<string>Back</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>The MIT License 
 
 Copyright (c) 2015 Evgenii Neumerzhitckii 
@@ -78,6 +86,48 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Icon made by olcay kurtulus (https://thenounproject.com/search/?q=caret&amp;i=650676)</string>
+			<key>Title</key>
+			<string>Caret</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by Mateo Zlatar (https://thenounproject.com/term/close/6484/)</string>
+			<key>Title</key>
+			<string>Close</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by kiddo (https://thenounproject.com/search/?q=close&amp;i=435264)</string>
+			<key>Title</key>
+			<string>Close2</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by shwepes (https://thenounproject.com/search/?q=download&amp;i=870241)</string>
+			<key>Title</key>
+			<string>Download</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by Gregor Cresnar (https://thenounproject.com/search/?q=no%20download&amp;i=1563391)
+
+</string>
+			<key>Title</key>
+			<string>Download2</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>The MIT License (MIT) 
 
 Copyright (c) 2014 kevin-hirsch 
@@ -91,6 +141,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </string>
 			<key>Title</key>
 			<string>DropDown</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by Pawel Kadysz (https://www.iconfinder.com/icons/66831/error_note_icon)</string>
+			<key>Title</key>
+			<string>Error note</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -228,6 +286,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Icon made by Freepik (https://www.flaticon.com/free-icon/funnel_773545)
+
+</string>
+			<key>Title</key>
+			<string>Funnel</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>Apache License                            Version 2.0, January 2004                         http://www.apache.org/licenses/ 
 
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION 
@@ -297,6 +365,22 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </string>
 			<key>Title</key>
 			<string>HPTextViewTapGestureRecognizer</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by Timothy Miller (https://www.iconfinder.com/icons/134216/hamburger_lines_menu_icon)</string>
+			<key>Title</key>
+			<string>Hamburger</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by Adrien Coquet (https://thenounproject.com/term/image/1858220/)</string>
+			<key>Title</key>
+			<string>Image</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -384,6 +468,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Icon made by Marina Reut (https://www.iconfinder.com/icons/372205/lock_login_password_icon#size=128)</string>
+			<key>Title</key>
+			<string>Lock</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>Copyright (c) 2017 Spastic Muffin, LLC &lt;chris@SpasticMuffin.biz&gt; 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: 
@@ -425,6 +517,16 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
 			<key>Title</key>
 			<string>MessageKit</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by ImageCatalog (https://thenounproject.com/term/move-up/406269/)
+
+</string>
+			<key>Title</key>
+			<string>Move-Up</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -846,9 +948,27 @@ The hypothetical commands `show w' and `show c' should show the appropriate part
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Icon made by Gregor Cresnar (https://thenounproject.com/search/?q=select&amp;i=1565255)
+
+</string>
+			<key>Title</key>
+			<string>Select</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon made by Freepik (https://www.flaticon.com/free-icon/settings-gears_60473)</string>
+			<key>Title</key>
+			<string>Settings</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>MIT License 
 
-Copyright (c) 2017 Christopher Prince 
+Copyright (c) 2017 Spastic Muffin, LLC 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: 
 
@@ -933,6 +1053,14 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
 			<key>Title</key>
 			<string>SyncServer-Shared</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Icon from https://icons8.com/icon/362/delete</string>
+			<key>Title</key>
+			<string>Trash</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>

@@ -47,7 +47,9 @@ class ShareAlbumVC: UIViewController {
             modalWidth = .half
         }
         else {
-            modalHeight = .sideMargin(value: 40)
+            // 4/11/19; A value of 40 causes a white bar to appear above the nav bar on an iPhone Xr. 50 makes it go away.
+            modalHeight = .sideMargin(value: 50)
+            
             modalWidth = .sideMargin(value: 20)
         }
         
