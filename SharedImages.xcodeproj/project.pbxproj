@@ -41,6 +41,7 @@
 		835A8AB42245BCBD0000FEA0 /* ImagesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AB32245BCBD0000FEA0 /* ImagesVC.swift */; };
 		835A8AB62245BD4D0000FEA0 /* ImagesTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = 835A8AB52245BD4D0000FEA0 /* ImagesTitle.xib */; };
 		835A8AB82245BD6F0000FEA0 /* ImagesTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AB72245BD6F0000FEA0 /* ImagesTitle.swift */; };
+		836E0C142260185B00BA4BC6 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 836E0C132260185B00BA4BC6 /* Settings.bundle */; };
 		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
 		8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8380D2672161A6DC008D6231 /* Badge+Extras.swift */; };
@@ -151,6 +152,7 @@
 		835A8AB32245BCBD0000FEA0 /* ImagesVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagesVC.swift; sourceTree = "<group>"; };
 		835A8AB52245BD4D0000FEA0 /* ImagesTitle.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImagesTitle.xib; sourceTree = "<group>"; };
 		835A8AB72245BD6F0000FEA0 /* ImagesTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesTitle.swift; sourceTree = "<group>"; };
+		836E0C132260185B00BA4BC6 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = Resources/Settings.bundle; sourceTree = "<group>"; };
 		8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages7.xcdatamodel; sourceTree = "<group>"; };
 		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
@@ -508,6 +510,7 @@
 		83F8823C1E711F80008F644A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				836E0C132260185B00BA4BC6 /* Settings.bundle */,
 				83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */,
 				83A2E6A61F76F83300A2E303 /* LottieAnimations */,
 				83F8823D1E711FC6008F644A /* Assets.xcassets */,
@@ -586,6 +589,7 @@
 				C1556D21C4BD5BF879CF9960 /* [CP] Embed Pods Frameworks */,
 				83611DEC1F3802C700464E49 /* ShellScript */,
 				22C7F4E644D323C383DB3EF8 /* [CP] Copy Pods Resources */,
+				836E0C1522601A8C00BA4BC6 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -683,6 +687,7 @@
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
 				835A8AAA224478BC0000FEA0 /* AlbumCell.xib in Resources */,
 				83F5CB612247FF71006DBB2F /* Menu.xib in Resources */,
+				836E0C142260185B00BA4BC6 /* Settings.bundle in Resources */,
 				83F5CB5B2247FCB8006DBB2F /* SideMenuItem.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -737,7 +742,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Fabric/run\" 237a6efa41c3712c4dc41003288df88ae5178ace be4decc6d7607c046cfeb875f6566953c885689481a0b1517f8ebe420708cc08";
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 237a6efa41c3712c4dc41003288df88ae5178ace be4decc6d7607c046cfeb875f6566953c885689481a0b1517f8ebe420708cc08\n";
+		};
+		836E0C1522601A8C00BA4BC6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Tools/LicenseGenerator-iOS/credits.py\" -s \"$SRCROOT\" -o \"$SRCROOT/Resources/Settings.bundle/Acknowledgements.plist\" -e \"$SRCROOT/Tools/LicenseGenerator-iOS/Example,$SRCROOT/Tools/LicenseGenerator-iOS/Tests\"\n\n";
 		};
 		85165C831E6E583405C214AA /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1119,7 +1141,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
@@ -1143,7 +1165,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\"";
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;

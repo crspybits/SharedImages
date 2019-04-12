@@ -1,5 +1,9 @@
 SharedImages
 
+Version 1.5.0
+	* Added acknowledgments for open source libraries and for image assets (see the Apple Settings app).
+	* Bumped minimim iOS version to iOS 11.
+
 Version 1.4.0
 	* Added number acceptors & social sharing acceptance options to sharing invitation creation-- as part of with, changed the UI to have these. Added "help" section on this UI also.
 	* Updated MessageKit Cocoapod to 2.0.0-- which required a fair number of changes to the DiscussionVC of the app.
