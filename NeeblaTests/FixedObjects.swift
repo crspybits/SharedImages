@@ -343,7 +343,7 @@ class FixedObjectsTests: XCTestCase {
         let (result, unread) = fixedObjects1.merge(with: fixedObjects2)
         XCTAssert(unread == 1)
         XCTAssert(result ~~ standard)
-        XCTAssert(result.count == 3)
+        XCTAssert(result.count == 3, "Count was: \(result.count)")
     }
     
     func testMergeHaveNoSameObjectsWorks() {
@@ -488,11 +488,28 @@ class FixedObjectsTests: XCTestCase {
             XCTFail()
             return
         }
+
+        guard let result1 = fromFile[key1] as? String, result1 == value1 else {
+            XCTFail()
+            return
+        }
         
-        guard let result1 = fromFile[key1] as? String, result1 == value1,
-            let result2 = fromFile[key2] as? Int, result2 == value2,
-            example == fromFile, example ~~ fromFile,
-            fromFile.count == example.count else {
+        guard let result2 = fromFile[key2] as? Int, result2 == value2 else {
+            XCTFail()
+            return
+        }
+
+        guard example == fromFile else {
+            XCTFail()
+            return
+        }
+        
+        guard example ~~ fromFile else {
+            XCTFail()
+            return
+        }
+        
+        guard fromFile.count == example.count else {
             XCTFail()
             return
         }
@@ -558,6 +575,117 @@ class FixedObjectsTests: XCTestCase {
         XCTAssert(result1 == value1)
         XCTAssert(result2 == value2)
         XCTAssert(result3 == value2)
+    }
+    
+    func testTwoUnequalFixedObjectsAreNotTheSame1() {
+        var example1 = FixedObjects()
+        
+        let key1 = "test1"
+        let value1 = "Hello World!"
+        example1[key1] = value1
+        
+        let key2 = "test2"
+        let value2 = 42
+        example1[key2] = value2
+        
+        let example2 = FixedObjects()
+
+        XCTAssert(example1 != example2)
+    }
+    
+    func testTwoUnequalFixedObjectsAreNotTheSame2() {
+        var example1 = FixedObjects()
+        
+        let key1 = "test1"
+        let value1 = "Hello World!"
+        example1[key1] = value1
+        
+        let key2 = "test2"
+        let value2 = 42
+        example1[key2] = value2
+        
+        var example2 = FixedObjects()
+        example2[key1] = "Smarg"
+        example2[key2] = value2
+
+        XCTAssert(example1 != example2)
+    }
+    
+    func testTwoUnequalFixedObjectsAreNotTheSame3() {
+        var example1 = FixedObjects()
+        
+        let key1 = "test1"
+        let value1 = "Hello World!"
+        example1[key1] = value1
+        
+        let key2 = "test2"
+        let value2 = 42
+        example1[key2] = value2
+        
+        var example2 = FixedObjects()
+        example2[key1] = value1
+        example2[key2] = value2
+        
+        do {
+            try example1.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+
+        XCTAssert(example1 != example2)
+    }
+    
+    func testTwoUnequalFixedObjectsAreNotTheSame4() {
+        var example1 = FixedObjects()
+        
+        let key1 = "test1"
+        let value1 = "Hello World!"
+        example1[key1] = value1
+        
+        let key2 = "test2"
+        let value2 = 42
+        example1[key2] = value2
+        
+        var example2 = FixedObjects()
+        example2[key1] = value1
+        example2[key2] = value2
+        
+        do {
+            try example1.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try example2.add(newFixedObject: [FixedObjects.idKey: "2"])
+        } catch {
+            XCTFail()
+            return
+        }
+
+        XCTAssert(example1 != example2)
+    }
+    
+    func testTwoUnequalFixedObjectsAreTheSame() {
+        var example1 = FixedObjects()
+        
+        let key1 = "test1"
+        let value1 = "Hello World!"
+        example1[key1] = value1
+        
+        let key2 = "test2"
+        let value2 = 42
+        example1[key2] = value2
+        
+        var example2 = FixedObjects()
+        example2[key1] = value1
+        example2[key2] = value2
+        
+        do {
+            try example1.add(newFixedObject: [FixedObjects.idKey: "1"])
+            try example2.add(newFixedObject: [FixedObjects.idKey: "1"])
+        } catch {
+            XCTFail()
+            return
+        }
+
+        XCTAssert(example1 == example2)
     }
 }
 

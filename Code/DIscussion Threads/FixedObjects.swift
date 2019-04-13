@@ -50,8 +50,16 @@ struct FixedObjects: Sequence, Equatable {
     let elementsKey = "elements"
     
     private var mainDictionary = MainDictionary()
-    private var elements = [Element]()
+    private var elements:[Element] {
+        get {
+            return mainDictionary[elementsKey] as! [Element]
+        }
+        set {
+            mainDictionary[elementsKey] = newValue
+        }
+    }
     
+    // id's in the elements
     fileprivate var ids = Set<String>()
     static let idKey = "id"
     
@@ -91,10 +99,13 @@ struct FixedObjects: Sequence, Equatable {
     
     // Create empty sequence.
     public init() {
+        mainDictionary[elementsKey] = [Element]()
     }
     
     // Reads the file as JSON formatted contents.
     public init?(withFile localURL: URL) {
+        self.init()
+        
         var jsonObject:Any!
         
         do {
@@ -153,18 +164,22 @@ struct FixedObjects: Sequence, Equatable {
         var new = 0
         for otherFixedObject in otherFixedObjects {
             let id = otherFixedObject[FixedObjects.idKey] as! String
-            if !ids.contains(id) {
+            if !mergedResult.ids.contains(id) {
                 try! mergedResult.add(newFixedObject: otherFixedObject)
                 new += 1
             }
         }
         
         for (mainDictKey, mainDictValue) in otherFixedObjects.mainDictionary {
-            mergedResult.mainDictionary[mainDictKey] = mainDictValue
+            if mainDictKey != elementsKey {
+                mergedResult.mainDictionary[mainDictKey] = mainDictValue
+            }
         }
         
         for (mainDictKey, mainDictValue) in self.mainDictionary {
-            mergedResult.mainDictionary[mainDictKey] = mainDictValue
+            if mainDictKey != elementsKey {
+                mergedResult.mainDictionary[mainDictKey] = mainDictValue
+            }
         }
         
         return (mergedResult, new)
@@ -177,9 +192,11 @@ struct FixedObjects: Sequence, Equatable {
     }
     
     private func getData() throws -> Data {
-        var mainDictionary = self.mainDictionary
-        mainDictionary[elementsKey] = elements
-        return try JSONSerialization.data(withJSONObject: mainDictionary, options: JSONSerialization.WritingOptions(rawValue: 0))
+        return try FixedObjects.getData(obj: mainDictionary)
+    }
+
+    private static func getData(obj: Any) throws -> Data {
+        return try JSONSerialization.data(withJSONObject: obj, options: JSONSerialization.WritingOptions(rawValue: 0))
     }
     
     // Adapted from https://digitalleaves.com/blog/2017/03/sequence-hacking-in-swift-iii-building-custom-sequences-for-fun-and-profit/
@@ -199,14 +216,40 @@ struct FixedObjects: Sequence, Equatable {
     
     // Equality includes ordering of calls to `add`, i.e., ordering of the FixedObjects in the sequence. And contents of the main dictionary.
     static func ==(lhs: FixedObjects, rhs: FixedObjects) -> Bool {
-        do {
-            let data1 = try lhs.getData()
-            let data2 = try rhs.getData()
-            return data1 == data2
-        }
-        catch {
+        if lhs.mainDictionary.count != rhs.mainDictionary.count {
             return false
         }
+        
+        if lhs.elements.count != rhs.elements.count {
+            return false
+        }
+        
+        // Put the components of both of the dictionaries into a standard order for easier comparison.
+        // `elements` is one of the mainDictionary keys, so this will be tested below.
+        var lhsComponents = [Any]()
+        var rhsComponents = [Any]()
+        
+        for lhsMainKey in lhs.mainDictionary.keys {
+            let lhsObj = lhs.mainDictionary[lhsMainKey]!
+            lhsComponents += [lhsObj]
+            
+            guard let rhsObj = rhs.mainDictionary[lhsMainKey] else {
+                return false
+            }
+            
+            rhsComponents += [rhsObj]
+        }
+        
+        guard let lhsData = try? getData(obj: lhsComponents),
+            let rhsData = try? getData(obj: rhsComponents) else {
+            return false
+        }
+        
+        guard lhsData == rhsData else {
+            return false
+        }
+
+        return true
     }
 }
 
