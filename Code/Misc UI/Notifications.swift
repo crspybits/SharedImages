@@ -47,18 +47,26 @@ class Notifications {
     static func checkForNotificationAuthorization(usingViewController viewController:UIViewController) {
         
         if Notifications.askedUserAboutNotifications.boolValue {
-            Notifications.session.register()
+            if Notifications.notificationsAuthorized.boolValue {
+                Notifications.session.register()
+            }
         }
         else {
             Notifications.askedUserAboutNotifications.boolValue = true
             
-            let alert = UIAlertController(title: "Would you like notifications about new images and discussion comments?", message: "Then, answer `Allow` on thse next prompt!", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: "Would you like notifications about new images and discussion comments?", message: "Then, answer `Allow` on the next prompt!", preferredStyle: Alert.prominentStyle())
             alert.popoverPresentationController?.sourceView = viewController.view
             Alert.styleForIPad(alert)
 
-            alert.addAction(UIAlertAction(title: "Continue", style: .cancel) {alert in
+            alert.addAction(UIAlertAction(title: "OK", style: .default) { alert in
                 Notifications.session.register()
             })
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { alert in
+                // TODO: Eventually, we may want to have a Settings UI feature that reverses this-- otherwise, allowing notifications in the Apple Settings app will have no effect. OR-- is it possible to get an NSNotification about this user change?
+                Notifications.notificationsAuthorized.boolValue = false
+            })
+            
             viewController.present(alert, animated: true, completion: nil)
         }
     }

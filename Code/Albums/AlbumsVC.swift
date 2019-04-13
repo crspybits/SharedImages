@@ -11,6 +11,7 @@ import SMCoreLib
 import SyncServer
 import ODRefreshControl
 import NVActivityIndicatorView
+import SDCAlertView
 
 private class FlowLayout: UICollectionViewFlowLayout {
     var viewSize: CGSize!
@@ -142,10 +143,13 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
             return
         }
         
-        let alert = UIAlertController(title: "Confirmation", message: "Do you want to create a new album?", preferredStyle: .actionSheet)
+        let alert = AlertController(title: "Confirmation", message: "Do you want to create a new album?", preferredStyle: AlertController.prominentStyle())
         alert.popoverPresentationController?.barButtonItem = addAlbum
-    
-        alert.addAction(UIAlertAction(title: "Create", style: .default) { alert in
+        alert.behaviors = [.dismissOnOutsideTap]
+        alert.addAction(AlertAction(title: "Cancel", style: .preferred) {[unowned self] alert in
+            self.dismiss(animated: true, completion: nil)
+        })
+        alert.addAction(AlertAction(title: "Create", style: .normal) { alert in
             let newSharingGroupUUID = UUID().uuidString
             do {
                 try SyncServer.session.createSharingGroup(sharingGroupUUID: newSharingGroupUUID)
@@ -154,9 +158,6 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
                 Log.info("\(error)")
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not add album. Please try again later.")
             }
-        })
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { alert in
         })
         
         present(alert, animated: true, completion: nil)
@@ -330,8 +331,8 @@ extension AlbumsVC : UICollectionViewDataSource {
             if sharingOn {
                 if sharingReallyOn {
                     // Before starting the sharing process, briefly flash the sharing icon to show user that they're selecting the specific album.
-                    albumCell.flashSharingIcon {
-                        unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self)
+                    albumCell.flashSharingIcon { [unowned self] in
+                        unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self, sharingButton: self.shareAlbums)
                         unownedSelf.sharingOn = false
                         unownedSelf.collectionView.reloadData()
                         unownedSelf.shareAlbum.start()

@@ -29,7 +29,7 @@ class SharingInviteDelegate : SharingInvitationDelegate {
 
         // Creating a user.
         let userFriendlyText = invite.permission.userFriendlyText()
-        let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: Alert.prominentStyle())
         Alert.styleForIPad(alert)
         alert.popoverPresentationController?.sourceView = vc.view
 

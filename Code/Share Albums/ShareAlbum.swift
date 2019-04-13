@@ -16,11 +16,13 @@ class ShareAlbum {
     private let sharingGroup: SyncServer.SharingGroup
     private weak var viewController: (UIViewController & NVActivityIndicatorViewable)!
     private let view: UIView
+    private let sharingButton: UIBarButtonItem
     
-    init(sharingGroup: SyncServer.SharingGroup, fromView view: UIView, viewController: UIViewController & NVActivityIndicatorViewable) {
+    init(sharingGroup: SyncServer.SharingGroup, fromView view: UIView, viewController: UIViewController & NVActivityIndicatorViewable, sharingButton: UIBarButtonItem) {
         self.sharingGroup = sharingGroup
         self.viewController = viewController
         self.view = view
+        self.sharingButton = sharingButton
     }
     
     func start() {
@@ -32,11 +34,11 @@ class ShareAlbum {
         }
         else {
             let alert = UIAlertController(title: "Please sign in first!", message: "There is no signed in user.", preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "OK", style: .cancel){alert in
+            alert.addAction(UIAlertAction(title: "OK", style: .default){alert in
             })
             
             Alert.styleForIPad(alert)
-            alert.popoverPresentationController?.sourceView = view
+            alert.popoverPresentationController?.barButtonItem = self.sharingButton
             viewController.present(alert, animated: true, completion: nil)
         }
     }
@@ -80,7 +82,7 @@ class ShareAlbum {
                 }
             }
             else {
-                let alert = UIAlertController(title: "Error creating sharing invitation!", message: "\(error!)", preferredStyle: .actionSheet)
+                let alert = UIAlertController(title: "Error creating sharing invitation!", message: "\(error!)", preferredStyle: .alert)
                 alert.popoverPresentationController?.sourceView = self.view
                 Alert.styleForIPad(alert)
 

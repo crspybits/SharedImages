@@ -114,7 +114,7 @@ extension SignInVC : GenericSignInDelegate {
                 title = "You were previously signed in as \(SignInManager.currentUIDisplayName.stringValue) but you are now signing in as a different user."
             }
             
-            let alert = UIAlertController(title: title, message: "The Neebla app doesn't allow this (yet).", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: title, message: "The Neebla app doesn't allow this (yet).", preferredStyle: Alert.prominentStyle())
             alert.popoverPresentationController?.sourceView = navigationController?.navigationBar
             Alert.styleForIPad(alert)
 

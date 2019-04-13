@@ -353,7 +353,7 @@ extension ImagesVC : UICollectionViewDelegate {
                 title += ": " + details
             }
             
-            let alert = UIAlertController(title: title, message: "Do you want to retry synchronizing this album?", preferredStyle: .actionSheet)
+            let alert = UIAlertController(title: title, message: "Do you want to retry synchronizing this album?", preferredStyle: .alert)
             alert.popoverPresentationController?.sourceView = cell
             Alert.styleForIPad(alert)
 

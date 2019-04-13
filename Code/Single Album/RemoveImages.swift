@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import SMCoreLib
 import SyncServer
+import SDCAlertView
 
 class RemoveImages {
     private let images: [Image]!
@@ -34,17 +35,32 @@ class RemoveImages {
             imageTerm += "s"
         }
         
-        let alert = UIAlertController(title: "Delete selected \(imageTerm)?", message: nil, preferredStyle: .actionSheet)
+        let alert = AlertController(title: "Delete selected \(imageTerm)?", message: nil, preferredStyle: .alert)
+        alert.behaviors = [.dismissOnOutsideTap]
         alert.popoverPresentationController?.sourceView = parentVC.view
-    
-        alert.addAction(UIAlertAction(title: "OK", style: .destructive) {[unowned self] _ in
+
+        alert.addAction(AlertAction(title: "Cancel", style: .normal) { _ in
+        })
+        
+        alert.addAction(AlertAction(title: "Delete", style: .destructive) {[unowned self] _ in
             self.removeImages()
         })
         
+        parentVC.present(alert, animated: true, completion: nil)
+        
+#if false
+        let alert = UIAlertController(title: "Delete selected \(imageTerm)?", message: nil, preferredStyle: .alert)
+        alert.popoverPresentationController?.sourceView = parentVC.view
+
         alert.addAction(UIAlertAction(title: "Cancel", style: .default) { _ in
         })
-
+        
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) {[unowned self] _ in
+            self.removeImages()
+        })
+        
         parentVC.present(alert, animated: true, completion: nil)
+#endif
     }
     
     private func removeImages() {

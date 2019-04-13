@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import SyncServer
 import SMCoreLib
+import SDCAlertView
 
 class RemoveUserFromAlbumVC: UIViewController {
     @IBOutlet private weak var tableView: UITableView!
@@ -42,15 +43,15 @@ class RemoveUserFromAlbumVC: UIViewController {
             album = " '\(name)'"
         }
         
-        let alert = UIAlertController(title: "Remove you from the\(album) album?", message: "This will permanently remove the album from the Neebla app on your device(s). Other users (if any) can still use the album, but they won't have access to your images. If images have been stored in your cloud storage, they will still be in your cloud storage.", preferredStyle: .actionSheet)
+        let alert = AlertController(title: "Remove you from the\(album) album?", message: "This will permanently remove the album from the Neebla app on your device(s). Other users (if any) can still use the album, but they won't have access to your images. If images have been stored in your cloud storage, they will still be in your cloud storage.", preferredStyle: AlertController.prominentStyle())
         alert.popoverPresentationController?.sourceView = self.view
-        Alert.styleForIPad(alert)
+        alert.behaviors = [.dismissOnOutsideTap]
 
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default) {alert in
+        alert.addAction(AlertAction(title: "Cancel", style: .preferred) {alert in
             completion()
         })
         
-        alert.addAction(UIAlertAction(title: "OK", style: .destructive) {alert in
+        alert.addAction(AlertAction(title: "Remove", style: .destructive) {alert in
             do {
                 try SyncServer.session.removeFromSharingGroup(sharingGroupUUID: sharingGroup.sharingGroupUUID)
                 try SyncServer.session.sync(sharingGroupUUID: sharingGroup.sharingGroupUUID)
