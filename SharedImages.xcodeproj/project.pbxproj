@@ -47,6 +47,7 @@
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
 		8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8380D2672161A6DC008D6231 /* Badge+Extras.swift */; };
 		838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */; };
+		8391A62222618F7D009ED960 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8391A62122618F7D009ED960 /* TestProgressIndicator.swift */; };
 		83A2E6AB1F76F84500A2E303 /* C.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A71F76F83300A2E303 /* C.json */; };
 		83A2E6AC1F76F84500A2E303 /* D.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A81F76F83300A2E303 /* D.json */; };
 		83A2E6AD1F76F84500A2E303 /* N.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A91F76F83300A2E303 /* N.json */; };
@@ -160,6 +161,7 @@
 		8380D2672161A6DC008D6231 /* Badge+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Badge+Extras.swift"; sourceTree = "<group>"; };
 		8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages4.xcdatamodel; sourceTree = "<group>"; };
 		838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscussionVC.swift; sourceTree = "<group>"; };
+		8391A62122618F7D009ED960 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestProgressIndicator.swift; sourceTree = "<group>"; };
 		83A2E6A71F76F83300A2E303 /* C.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = C.json; sourceTree = "<group>"; };
 		83A2E6A81F76F83300A2E303 /* D.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = D.json; sourceTree = "<group>"; };
 		83A2E6A91F76F83300A2E303 /* N.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = N.json; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 				8314992822615A5500AD6244 /* FileGroupTests.swift */,
 				8314992722615A5500AD6244 /* FixedObjects.swift */,
 				8314992922615A5500AD6244 /* SharedImagesTests.swift */,
+				8391A62122618F7D009ED960 /* TestProgressIndicator.swift */,
 				83149920226159C200AD6244 /* Info.plist */,
 			);
 			path = NeeblaTests;
@@ -882,6 +885,7 @@
 				8314992A22615A5500AD6244 /* AppMetaData.swift in Sources */,
 				8314992B22615A5500AD6244 /* FixedObjects.swift in Sources */,
 				8314992D22615A5500AD6244 /* SharedImagesTests.swift in Sources */,
+				8391A62222618F7D009ED960 /* TestProgressIndicator.swift in Sources */,
 				8314992C22615A5500AD6244 /* FileGroupTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
