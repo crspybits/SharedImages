@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import SharedImages
+@testable import Neebla
 
 class CacheTests: XCTestCase {
     var numberEvicted = 0
@@ -261,6 +261,7 @@ class CacheTests: XCTestCase {
 }
 
 extension CacheTests : CacheDataSource {
+
     func keyFor(args:Int) -> String {
         return "\(args)"
     }

@@ -7,7 +7,7 @@
 //
 
 /*
-Provides upport for a special type of file to reduce conflicts with SyncServer:
+Provides support for a special type of file to reduce conflicts with SyncServer:
 
 - JSON format
 - Top level structure is a dictionary where the main element is an array of JSON dict objects
@@ -18,6 +18,24 @@ Provides upport for a special type of file to reduce conflicts with SyncServer:
 - Objects are simply ordered-- in the order added; e.g., first added is first.
 
 So, in terms of SyncServer and conflicts, resolving a conflict between a file download and a file upload for the same file will amount to ignoring the file download and ignoring the current file upload, but creating a new file upload containing all of the objects across upload and download. Those will be easily identified due to their unique id's. We won't have to worry about resolving conflicts within any object because they can't change.
+
+Example:
+{
+    "imageUUID": "D5FEDC37-2B7C-47FC-B1A1-A8BB3C6E76E3",
+    "imageTitle": "Christopher G. Prince",
+    "elements": [
+        {
+            "senderId": "1",
+            "id": "F5E48A66-36EA-42FF-B6F9-016882ACD495",
+            "senderDisplayName": "Christopher G. Prince",
+            "sendDate": "2019-03-25T02:25:09Z",
+            "sendTimezone": "America\/Denver",
+            "messageString": "Ta Da!"
+        }
+    ]
+}
+
+In terms of the members of the FixedObjects structure below, the `mainDictionary` is the overall object above. In this example, its keys are imageUUID, imageTitle, and elements. The first two keys (imageUUID, imageTitle) are caller selected-- i.e., the FixedObjects user/caller sets these. The `elements` key is special (only for internal use) and supports the properties as described above for simplifying conflict resolution.
 */
 
 import Foundation
@@ -37,10 +55,12 @@ struct FixedObjects: Sequence, Equatable {
     fileprivate var ids = Set<String>()
     static let idKey = "id"
     
+    // The number of `elements`s.
     var count: Int {
         return elements.count
     }
     
+    // Get one of the components of `elements`. This assumes that the index is within range of count (above).
     subscript(index: Int) -> FixedObject {
         get {
             return elements[index]

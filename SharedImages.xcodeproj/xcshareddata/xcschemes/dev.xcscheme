@@ -38,6 +38,16 @@
                ReferencedContainer = "container:SharedImages.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8314991B226159C200AD6244"
+               BuildableName = "NeeblaTests.xctest"
+               BlueprintName = "NeeblaTests"
+               ReferencedContainer = "container:SharedImages.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

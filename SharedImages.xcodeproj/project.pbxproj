@@ -8,9 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		2732DEE9F55439017415A76A /* Pods_SharedImages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B908205C67FEB8F896E15398 /* Pods_SharedImages.framework */; };
-		2987D796FBECCBAD42606057 /* Pods_SharedImagesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */; };
 		830B1DF11EFCAB8B0022FCC7 /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */; };
-		830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */; };
+		8314991F226159C200AD6244 /* NeeblaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314991E226159C200AD6244 /* NeeblaTests.swift */; };
+		8314992A22615A5500AD6244 /* AppMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314992622615A5500AD6244 /* AppMetaData.swift */; };
+		8314992B22615A5500AD6244 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314992722615A5500AD6244 /* FixedObjects.swift */; };
+		8314992C22615A5500AD6244 /* FileGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314992822615A5500AD6244 /* FileGroupTests.swift */; };
+		8314992D22615A5500AD6244 /* SharedImagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314992922615A5500AD6244 /* SharedImagesTests.swift */; };
 		831521712206CC9000CA773D /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831521702206CC9000CA773D /* Notifications.swift */; };
 		831A759E20279C76004F330A /* DiscussionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831A759D20279C76004F330A /* DiscussionMessage.swift */; };
 		831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831EEC4B2002D76B001821B9 /* DebugDashboardData.swift */; };
@@ -42,18 +45,14 @@
 		835A8AB62245BD4D0000FEA0 /* ImagesTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = 835A8AB52245BD4D0000FEA0 /* ImagesTitle.xib */; };
 		835A8AB82245BD6F0000FEA0 /* ImagesTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AB72245BD6F0000FEA0 /* ImagesTitle.swift */; };
 		836E0C142260185B00BA4BC6 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 836E0C132260185B00BA4BC6 /* Settings.bundle */; };
-		837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */; };
 		837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */; };
 		8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8380D2672161A6DC008D6231 /* Badge+Extras.swift */; };
-		8389B1D120A9171300B3D87A /* FileGroupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8389B1D020A9171300B3D87A /* FileGroupTests.swift */; };
 		838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */; };
 		83A2E6AB1F76F84500A2E303 /* C.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A71F76F83300A2E303 /* C.json */; };
 		83A2E6AC1F76F84500A2E303 /* D.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A81F76F83300A2E303 /* D.json */; };
 		83A2E6AD1F76F84500A2E303 /* N.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A91F76F83300A2E303 /* N.json */; };
 		83A2E6AE1F76F84500A2E303 /* R.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6AA1F76F83300A2E303 /* R.json */; };
 		83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34070201D58C500DAD865 /* FixedObjects.swift */; };
-		83C34073201D5B5600DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34072201D5B5600DAD865 /* FixedObjects.swift */; };
-		83C34078201D939100DAD865 /* AppMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34077201D939100DAD865 /* AppMetaData.swift */; };
 		83C34081201E42C400DAD865 /* Discussion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* Discussion.swift */; };
 		83C34082201E42C400DAD865 /* Discussion+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */; };
 		83CE2F092254592900E6EFD7 /* ShareAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */; };
@@ -102,10 +101,11 @@
 		83F882611E749C18008F644A /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882601E749C18008F644A /* Consts.swift */; };
 		83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882641E74A3C5008F644A /* GoogleService-Info.plist */; };
 		83F882671E74A600008F644A /* Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882661E74A600008F644A /* Server.plist */; };
+		AA5F5883AFFEFD22ED447A41 /* Pods_NeeblaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D41485B287C3303E5E4A0862 /* Pods_NeeblaTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		830B1DFB1EFCC03E0022FCC7 /* PBXContainerItemProxy */ = {
+		83149921226159C200AD6244 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83F882171E711600008F644A /* Project object */;
 			proxyType = 1;
@@ -117,9 +117,13 @@
 /* Begin PBXFileReference section */
 		3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SharedImagesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		830B1DF01EFCAB8B0022FCC7 /* LRUCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
-		830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharedImagesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedImagesTests.swift; sourceTree = "<group>"; };
-		830B1DFA1EFCC03E0022FCC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8314991C226159C200AD6244 /* NeeblaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NeeblaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8314991E226159C200AD6244 /* NeeblaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeeblaTests.swift; sourceTree = "<group>"; };
+		83149920226159C200AD6244 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8314992622615A5500AD6244 /* AppMetaData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMetaData.swift; sourceTree = "<group>"; };
+		8314992722615A5500AD6244 /* FixedObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
+		8314992822615A5500AD6244 /* FileGroupTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileGroupTests.swift; sourceTree = "<group>"; };
+		8314992922615A5500AD6244 /* SharedImagesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedImagesTests.swift; sourceTree = "<group>"; };
 		831521702206CC9000CA773D /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		831A759D20279C76004F330A /* DiscussionMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscussionMessage.swift; sourceTree = "<group>"; };
 		831EEC4B2002D76B001821B9 /* DebugDashboardData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugDashboardData.swift; sourceTree = "<group>"; };
@@ -154,20 +158,16 @@
 		835A8AB72245BD6F0000FEA0 /* ImagesTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesTitle.swift; sourceTree = "<group>"; };
 		836E0C132260185B00BA4BC6 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = Resources/Settings.bundle; sourceTree = "<group>"; };
 		8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages7.xcdatamodel; sourceTree = "<group>"; };
-		837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestProgressIndicator.swift; path = Code/TestProgressIndicator.swift; sourceTree = SOURCE_ROOT; };
 		837F3FC51F6B763400EB7609 /* ProgressIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
 		8380D2672161A6DC008D6231 /* Badge+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Badge+Extras.swift"; sourceTree = "<group>"; };
 		8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages4.xcdatamodel; sourceTree = "<group>"; };
-		8389B1D020A9171300B3D87A /* FileGroupTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileGroupTests.swift; sourceTree = "<group>"; };
 		838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscussionVC.swift; sourceTree = "<group>"; };
 		83A2E6A71F76F83300A2E303 /* C.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = C.json; sourceTree = "<group>"; };
 		83A2E6A81F76F83300A2E303 /* D.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = D.json; sourceTree = "<group>"; };
 		83A2E6A91F76F83300A2E303 /* N.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = N.json; sourceTree = "<group>"; };
 		83A2E6AA1F76F83300A2E303 /* R.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = R.json; sourceTree = "<group>"; };
 		83C34070201D58C500DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
-		83C34072201D5B5600DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
 		83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages3.xcdatamodel; sourceTree = "<group>"; };
-		83C34077201D939100DAD865 /* AppMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetaData.swift; sourceTree = "<group>"; };
 		83C3407E201E42C400DAD865 /* Discussion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Discussion.swift; path = "Core Data/Discussion.swift"; sourceTree = "<group>"; };
 		83C3407F201E42C400DAD865 /* Discussion+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discussion+CoreDataProperties.swift"; path = "Core Data/Discussion+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareAlbumVC.swift; sourceTree = "<group>"; };
@@ -222,19 +222,22 @@
 		83F882601E749C18008F644A /* Consts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		83F882641E74A3C5008F644A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Resources/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		83F882661E74A600008F644A /* Server.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Server.plist; path = Resources/Server.plist; sourceTree = "<group>"; };
+		854FB9347E2A443E983D7504 /* Pods-NeeblaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NeeblaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NeeblaTests/Pods-NeeblaTests.release.xcconfig"; sourceTree = "<group>"; };
 		A1A9F2364274678096FAE708 /* Pods-SharedImages.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImages.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages.release.xcconfig"; sourceTree = "<group>"; };
 		AB86EA543F8CCCC9287144E0 /* Pods-SharedImagesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImagesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests.release.xcconfig"; sourceTree = "<group>"; };
 		B3A75F4AAE01ABAA5CEA09A0 /* Pods-SharedImagesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImagesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B908205C67FEB8F896E15398 /* Pods_SharedImages.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SharedImages.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6274CDA252B1BF2F84D7D7D /* Pods-SharedImages.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImages.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages.debug.xcconfig"; sourceTree = "<group>"; };
+		D41485B287C3303E5E4A0862 /* Pods_NeeblaTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NeeblaTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5A3947436165D7329EA56BC /* Pods-NeeblaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NeeblaTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NeeblaTests/Pods-NeeblaTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		830B1DF31EFCC03E0022FCC7 /* Frameworks */ = {
+		83149919226159C200AD6244 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2987D796FBECCBAD42606057 /* Pods_SharedImagesTests.framework in Frameworks */,
+				AA5F5883AFFEFD22ED447A41 /* Pods_NeeblaTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +261,7 @@
 				83E13B2420318366005A0A18 /* GameKit.framework */,
 				B908205C67FEB8F896E15398 /* Pods_SharedImages.framework */,
 				3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */,
+				D41485B287C3303E5E4A0862 /* Pods_NeeblaTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -269,21 +273,23 @@
 				A1A9F2364274678096FAE708 /* Pods-SharedImages.release.xcconfig */,
 				B3A75F4AAE01ABAA5CEA09A0 /* Pods-SharedImagesTests.debug.xcconfig */,
 				AB86EA543F8CCCC9287144E0 /* Pods-SharedImagesTests.release.xcconfig */,
+				F5A3947436165D7329EA56BC /* Pods-NeeblaTests.debug.xcconfig */,
+				854FB9347E2A443E983D7504 /* Pods-NeeblaTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		830B1DF71EFCC03E0022FCC7 /* SharedImagesTests */ = {
+		8314991D226159C200AD6244 /* NeeblaTests */ = {
 			isa = PBXGroup;
 			children = (
-				8389B1D020A9171300B3D87A /* FileGroupTests.swift */,
-				83C34077201D939100DAD865 /* AppMetaData.swift */,
-				83C34072201D5B5600DAD865 /* FixedObjects.swift */,
-				837F3FC31F6B752D00EB7609 /* TestProgressIndicator.swift */,
-				830B1DF81EFCC03E0022FCC7 /* SharedImagesTests.swift */,
-				830B1DFA1EFCC03E0022FCC7 /* Info.plist */,
+				8314991E226159C200AD6244 /* NeeblaTests.swift */,
+				8314992622615A5500AD6244 /* AppMetaData.swift */,
+				8314992822615A5500AD6244 /* FileGroupTests.swift */,
+				8314992722615A5500AD6244 /* FixedObjects.swift */,
+				8314992922615A5500AD6244 /* SharedImagesTests.swift */,
+				83149920226159C200AD6244 /* Info.plist */,
 			);
-			path = SharedImagesTests;
+			path = NeeblaTests;
 			sourceTree = "<group>";
 		};
 		831EEC4A2002D76B001821B9 /* Developer */ = {
@@ -491,7 +497,7 @@
 				8324EE431E7781AD000656AF /* BridgingHeader.h */,
 				83F8824A1E712004008F644A /* Code */,
 				83F8823C1E711F80008F644A /* Resources */,
-				830B1DF71EFCC03E0022FCC7 /* SharedImagesTests */,
+				8314991D226159C200AD6244 /* NeeblaTests */,
 				83F882201E711600008F644A /* Products */,
 				5A2E26FA8EB6BCDEC7439E57 /* Pods */,
 				3533DE1430916FFEEF396932 /* Frameworks */,
@@ -502,7 +508,7 @@
 			isa = PBXGroup;
 			children = (
 				83F8821F1E711600008F644A /* Neebla.app */,
-				830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */,
+				8314991C226159C200AD6244 /* NeeblaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -559,23 +565,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		830B1DF51EFCC03E0022FCC7 /* SharedImagesTests */ = {
+		8314991B226159C200AD6244 /* NeeblaTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 830B1DFD1EFCC03E0022FCC7 /* Build configuration list for PBXNativeTarget "SharedImagesTests" */;
+			buildConfigurationList = 83149923226159C200AD6244 /* Build configuration list for PBXNativeTarget "NeeblaTests" */;
 			buildPhases = (
-				18A33E4BA3CF880E3AC4364B /* [CP] Check Pods Manifest.lock */,
-				830B1DF21EFCC03E0022FCC7 /* Sources */,
-				830B1DF31EFCC03E0022FCC7 /* Frameworks */,
-				830B1DF41EFCC03E0022FCC7 /* Resources */,
+				2FB44972BCE344EB24EA9912 /* [CP] Check Pods Manifest.lock */,
+				83149918226159C200AD6244 /* Sources */,
+				83149919226159C200AD6244 /* Frameworks */,
+				8314991A226159C200AD6244 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				830B1DFC1EFCC03E0022FCC7 /* PBXTargetDependency */,
+				83149922226159C200AD6244 /* PBXTargetDependency */,
 			);
-			name = SharedImagesTests;
-			productName = SharedImagesTests;
-			productReference = 830B1DF61EFCC03E0022FCC7 /* SharedImagesTests.xctest */;
+			name = NeeblaTests;
+			productName = NeeblaTests;
+			productReference = 8314991C226159C200AD6244 /* NeeblaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		83F8821E1E711600008F644A /* SharedImages */ = {
@@ -606,14 +612,14 @@
 		83F882171E711600008F644A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0830;
+				DefaultBuildSystemTypeForWorkspace = Original;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Spastic Muffin, LLC";
 				TargetAttributes = {
-					830B1DF51EFCC03E0022FCC7 = {
-						CreatedOnToolsVersion = 8.3.2;
+					8314991B226159C200AD6244 = {
+						CreatedOnToolsVersion = 10.2;
 						DevelopmentTeam = BH68R29JBE;
-						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 83F8821E1E711600008F644A;
 					};
@@ -650,13 +656,13 @@
 			projectRoot = "";
 			targets = (
 				83F8821E1E711600008F644A /* SharedImages */,
-				830B1DF51EFCC03E0022FCC7 /* SharedImagesTests */,
+				8314991B226159C200AD6244 /* NeeblaTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		830B1DF41EFCC03E0022FCC7 /* Resources */ = {
+		8314991A226159C200AD6244 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -695,24 +701,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		18A33E4BA3CF880E3AC4364B /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-SharedImagesTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		22C7F4E644D323C383DB3EF8 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -729,6 +717,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SharedImages/Pods-SharedImages-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2FB44972BCE344EB24EA9912 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NeeblaTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		83611DEC1F3802C700464E49 /* ShellScript */ = {
@@ -868,15 +878,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		830B1DF21EFCC03E0022FCC7 /* Sources */ = {
+		83149918226159C200AD6244 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				837F3FC41F6B752D00EB7609 /* TestProgressIndicator.swift in Sources */,
-				83C34073201D5B5600DAD865 /* FixedObjects.swift in Sources */,
-				83C34078201D939100DAD865 /* AppMetaData.swift in Sources */,
-				8389B1D120A9171300B3D87A /* FileGroupTests.swift in Sources */,
-				830B1DF91EFCC03E0022FCC7 /* SharedImagesTests.swift in Sources */,
+				8314992A22615A5500AD6244 /* AppMetaData.swift in Sources */,
+				8314992B22615A5500AD6244 /* FixedObjects.swift in Sources */,
+				8314991F226159C200AD6244 /* NeeblaTests.swift in Sources */,
+				8314992D22615A5500AD6244 /* SharedImagesTests.swift in Sources */,
+				8314992C22615A5500AD6244 /* FileGroupTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -954,10 +964,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		830B1DFC1EFCC03E0022FCC7 /* PBXTargetDependency */ = {
+		83149922226159C200AD6244 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 83F8821E1E711600008F644A /* SharedImages */;
-			targetProxy = 830B1DFB1EFCC03E0022FCC7 /* PBXContainerItemProxy */;
+			targetProxy = 83149921226159C200AD6244 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -981,39 +991,54 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		830B1DFE1EFCC03E0022FCC7 /* Debug */ = {
+		83149924226159C200AD6244 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3A75F4AAE01ABAA5CEA09A0 /* Pods-SharedImagesTests.debug.xcconfig */;
+			baseConfigurationReference = F5A3947436165D7329EA56BC /* Pods-NeeblaTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BH68R29JBE;
-				INFOPLIST_FILE = SharedImagesTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = NeeblaTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImagesTests;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SpasticMuffin.NeeblaTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.2;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SharedImages.app/SharedImages";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Neebla.app/Neebla";
 			};
 			name = Debug;
 		};
-		830B1DFF1EFCC03E0022FCC7 /* Release */ = {
+		83149925226159C200AD6244 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AB86EA543F8CCCC9287144E0 /* Pods-SharedImagesTests.release.xcconfig */;
+			baseConfigurationReference = 854FB9347E2A443E983D7504 /* Pods-NeeblaTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BH68R29JBE;
-				INFOPLIST_FILE = SharedImagesTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = NeeblaTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImagesTests;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SpasticMuffin.NeeblaTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.2;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SharedImages.app/SharedImages";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Neebla.app/Neebla";
 			};
 			name = Release;
 		};
@@ -1181,11 +1206,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		830B1DFD1EFCC03E0022FCC7 /* Build configuration list for PBXNativeTarget "SharedImagesTests" */ = {
+		83149923226159C200AD6244 /* Build configuration list for PBXNativeTarget "NeeblaTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				830B1DFE1EFCC03E0022FCC7 /* Debug */,
-				830B1DFF1EFCC03E0022FCC7 /* Release */,
+				83149924226159C200AD6244 /* Debug */,
+				83149925226159C200AD6244 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

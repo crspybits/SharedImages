@@ -19,9 +19,9 @@ PODS:
     - FacebookCore (~> 0.5)
     - FBSDKCoreKit (~> 4.37)
     - FBSDKLoginKit (~> 4.37)
-  - FBSDKCoreKit (4.44.0):
+  - FBSDKCoreKit (4.44.1):
     - Bolts (~> 1.9)
-  - FBSDKLoginKit (4.44.0):
+  - FBSDKLoginKit (4.44.1):
     - FBSDKCoreKit
   - FileMD5Hash (2.0.0)
   - HPTextViewTapGestureRecognizer (0.2.2)
@@ -185,8 +185,8 @@ SPEC CHECKSUMS:
   Fabric: f988e33c97f08930a413e08123064d2e5f68d655
   FacebookCore: 74288d0add931d361b1596beae787ab72c438249
   FacebookLogin: ebcf34714a1cb9f0759d9f071cfb01ed500996cf
-  FBSDKCoreKit: 8bcd4503afe43f28823c2175a6142a7f50f1bf28
-  FBSDKLoginKit: 93c5a407ab1a6a17b1b38cff57e89991f714d878
+  FBSDKCoreKit: a823ae35bdb60ebb8d7a7e51abe7c5d87d2bfced
+  FBSDKLoginKit: 54ae59987f2a8703021557c90a9aebb9e5c2bef6
   FileMD5Hash: 3ed69cc19a21ff4d30ae8833fc104275ad2c7de0
   HPTextViewTapGestureRecognizer: 8b0c0edc2b40e619ec644db11c648b7b567e1789
   Karte: 970fa8f7349f70433b4b9f5134e1c10d3ec61296
@@ -215,6 +215,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: a24b6f0de8cda11c6a65a4582a4260e81539b7eb
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 939e1c97caabcc477e1ed60c9036c040970b07a8
+PODFILE CHECKSUM: 53f7fc151f736b3116cd3323966d69729a10f7ee
 
 COCOAPODS: 1.6.1

@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7BC5789DE507F3F72BDB9FA641D88E05"
+               BlueprintIdentifier = "1B88473FCEA4AC985062911A02996104"
                BuildableName = "SDCAlertView.bundle"
                BlueprintName = "SDCAlertView-SDCAlertView"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7BC5789DE507F3F72BDB9FA641D88E05"
+            BlueprintIdentifier = "1B88473FCEA4AC985062911A02996104"
             BuildableName = "SDCAlertView.bundle"
             BlueprintName = "SDCAlertView-SDCAlertView"
             ReferencedContainer = "container:Pods.xcodeproj">

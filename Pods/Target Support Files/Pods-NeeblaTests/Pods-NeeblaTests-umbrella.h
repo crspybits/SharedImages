@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double Pods_SharedImagesTestsVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_SharedImagesTestsVersionString[];
+FOUNDATION_EXPORT double Pods_NeeblaTestsVersionNumber;
+FOUNDATION_EXPORT const unsigned char Pods_NeeblaTestsVersionString[];
 

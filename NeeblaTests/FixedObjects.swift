@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import SharedImages
+@testable import Neebla
 import SMCoreLib
 
 class FixedObjectsTests: XCTestCase {
@@ -560,3 +560,4 @@ class FixedObjectsTests: XCTestCase {
         XCTAssert(result3 == value2)
     }
 }
+

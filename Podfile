@@ -70,7 +70,7 @@ target 'SharedImages' do
 	
 	pod 'LMGeocoderUniversal', '~> 1.2'
     
-	target 'SharedImagesTests' do
+	target 'NeeblaTests' do
     	inherit! :search_paths
   	end
 end

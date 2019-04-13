@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import SharedImages
+@testable import Neebla
 import SMCoreLib
 
 class FileGroupTests: XCTestCase {
@@ -45,3 +45,4 @@ class FileGroupTests: XCTestCase {
         }
     }
 }
+

@@ -134,12 +134,12 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-SharedImages.xcscheme</key>
+		<key>Pods-NeeblaTests.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Pods-SharedImagesTests.xcscheme</key>
+		<key>Pods-SharedImages.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
