@@ -29,13 +29,13 @@ class SharingInviteDelegate : SharingInvitationDelegate {
 
         // Creating a user.
         let userFriendlyText = invite.permission.userFriendlyText()
-        let alert = UIAlertController(title: "Do you want to share the images (\(userFriendlyText)) in the invitation?", message: nil, preferredStyle: Alert.prominentStyle())
+        let alert = UIAlertController(title: "Do you want to accept the invitation and share the images (\(userFriendlyText))?", message: nil, preferredStyle: Alert.prominentStyle())
         Alert.styleForIPad(alert)
         alert.popoverPresentationController?.sourceView = vc.view
 
         alert.addAction(UIAlertAction(title: "Not now", style: .cancel) {alert in
         })
-        alert.addAction(UIAlertAction(title: "Share", style: .default) {[unowned self] alert in
+        alert.addAction(UIAlertAction(title: "Accept", style: .default) {[unowned self] alert in
             SharingInviteDelegate.redeem(invitationCode: invite.code, success: {
                 SharingInviteDelegate.invitationRedeemed = true
             }, failure: { failure in

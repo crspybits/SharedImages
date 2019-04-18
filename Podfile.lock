@@ -59,22 +59,22 @@ PODS:
   - SwiftyDropbox (5.0.0):
     - Alamofire (~> 4.7.3)
   - SwiftyUserDefaults (3.0.1)
-  - SyncServer (19.2.1):
+  - SyncServer (19.3.0):
     - FileMD5Hash (~> 2.0)
     - PersistentValue (~> 0.3)
     - SMCoreLib (~> 2.0)
     - SyncServer-Shared (~> 10.0)
-    - SyncServer/Lite (= 19.2.1)
+    - SyncServer/Lite (= 19.3.0)
     - XCGLogger (~> 6.1)
-  - SyncServer-Shared (10.1.0)
-  - SyncServer/Dropbox (19.2.1):
+  - SyncServer-Shared (10.2.0)
+  - SyncServer/Dropbox (19.3.0):
     - FileMD5Hash (~> 2.0)
     - PersistentValue (~> 0.3)
     - SMCoreLib (~> 2.0)
     - SwiftyDropbox (~> 5.0)
     - SyncServer-Shared (~> 10.0)
     - XCGLogger (~> 6.1)
-  - SyncServer/Facebook (19.2.1):
+  - SyncServer/Facebook (19.3.0):
     - FacebookCore (= 0.5.0)
     - FacebookLogin (= 0.5.0)
     - FileMD5Hash (~> 2.0)
@@ -82,14 +82,14 @@ PODS:
     - SMCoreLib (~> 2.0)
     - SyncServer-Shared (~> 10.0)
     - XCGLogger (~> 6.1)
-  - SyncServer/Google (19.2.1):
+  - SyncServer/Google (19.3.0):
     - FileMD5Hash (~> 2.0)
     - PersistentValue (~> 0.3)
     - SMCoreLib (~> 2.0)
     - SMGoogleSignIn (~> 1.1)
     - SyncServer-Shared (~> 10.0)
     - XCGLogger (~> 6.1)
-  - SyncServer/Lite (19.2.1):
+  - SyncServer/Lite (19.3.0):
     - FileMD5Hash (~> 2.0)
     - PersistentValue (~> 0.3)
     - SMCoreLib (~> 2.0)
@@ -117,10 +117,10 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 9.0)
   - SMCoreLib (~> 2.0)
-  - SyncServer (~> 19.2.1)
-  - SyncServer/Dropbox (~> 19.2.1)
-  - SyncServer/Facebook (~> 19.2.1)
-  - SyncServer/Google (~> 19.2.1)
+  - SyncServer (~> 19.3.0)
+  - SyncServer/Dropbox (~> 19.3.0)
+  - SyncServer/Facebook (~> 19.3.0)
+  - SyncServer/Google (~> 19.3.0)
   - XCGLogger (~> 6.1)
 
 SPEC REPOS:
@@ -211,10 +211,10 @@ SPEC CHECKSUMS:
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
   SwiftyDropbox: 378b4425a2e8d0cb24c7b0f2e3af72bfbaaf1e73
   SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
-  SyncServer: 01afb23603025ae940da66136888dfeda021b863
-  SyncServer-Shared: a24b6f0de8cda11c6a65a4582a4260e81539b7eb
+  SyncServer: 4b7e7c7641147db33aa3bdfdfec3f6bac50301f5
+  SyncServer-Shared: 3bce6222b4a6cee43445c7f9c446aeb6d4437926
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 53f7fc151f736b3116cd3323966d69729a10f7ee
+PODFILE CHECKSUM: f5c2881665d27d4e5fa3751651d660cc46ff250d
 
 COCOAPODS: 1.6.1

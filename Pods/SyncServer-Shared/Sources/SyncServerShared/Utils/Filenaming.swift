@@ -12,6 +12,10 @@ public enum MimeType: String {
     case text = "text/plain"
     case jpeg = "image/jpeg"
     
+    // A file with a .url extension with the format https://fileinfo.com/extension/url
+    // A more standard url mime type is https://tools.ietf.org/html/rfc2483#section-5 but I want to use a file format that can easily be launched in Windows and Mac OS.
+    case url = "application/x-url"
+    
     // This is really an error state. Use it with care.
     case unknown = "unknown"
 }
@@ -28,6 +32,9 @@ public struct Extension {
             return "txt"
         case .jpeg:
             return "jpg"
+        case .url:
+            return "url"
+            
         case .unknown:
             return "unknown"
         }

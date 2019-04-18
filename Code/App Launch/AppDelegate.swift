@@ -63,8 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Call this as soon as possible in your launch sequence.
-        // Version 0.23.0 of the server is the first with the get sharing invitation info endpoint.
-        SyncServer.session.appLaunchSetup(withServerURL: serverURL, logger: Log, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.23.0"), failoverMessageURL: failoverURL)
+        // Version 0.24.0 of the server is the first with the url mime type.
+        SyncServer.session.appLaunchSetup(withServerURL: serverURL, logger: Log, cloudFolderName:cloudFolderName, minimumServerVersion: ServerVersion(rawValue: "0.24.0"), failoverMessageURL: failoverURL)
     
         // Used by SMEmail in messages where email isn't allowed.
         SMUIMessages.session().appName = "Neebla"

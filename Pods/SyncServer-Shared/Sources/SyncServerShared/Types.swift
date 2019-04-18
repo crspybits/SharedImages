@@ -73,7 +73,7 @@ public enum Permission : String, Codable {
 }
 
 public enum UserType : String {
-    case sharing // user doesn't own cloud storage (e.g., Facebook user)
+    case sharing // user doesn't own cloud storage (e.g., Facebook user); aka. social user or social account
     case owning // user owns cloud storage (e.g., Google user)
 
     public static func maxStringLength() -> Int {
