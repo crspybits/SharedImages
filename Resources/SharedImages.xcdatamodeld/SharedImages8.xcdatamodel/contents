@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18D109" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Discussion" representedClassName="Discussion" parentEntity="FileObject" syncable="YES">
+        <attribute name="unreadCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="image" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FileMediaObject" inverseName="discussion" inverseEntity="FileMediaObject" syncable="YES"/>
+    </entity>
+    <entity name="FileMediaObject" representedClassName="FileMediaObject" isAbstract="YES" parentEntity="FileObject" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="discussionUUID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="discussion" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Discussion" inverseName="image" inverseEntity="Discussion" syncable="YES"/>
+    </entity>
+    <entity name="FileObject" representedClassName="FileObject" isAbstract="YES" syncable="YES">
+        <attribute name="fileGroupUUID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="goneReasonInternal" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mimeType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="readProblem" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sharingGroupUUID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="urlInternal" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="uuid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Image" representedClassName="Image" parentEntity="FileMediaObject" syncable="YES">
+        <attribute name="originalHeight" optional="YES" attributeType="Float" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="originalWidth" optional="YES" attributeType="Float" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="URLMediaObject" representedClassName="URLMediaObject" parentEntity="FileMediaObject" syncable="YES"/>
+    <elements>
+        <element name="Discussion" positionX="-63" positionY="54" width="128" height="75"/>
+        <element name="Image" positionX="-63" positionY="-18" width="128" height="75"/>
+        <element name="FileObject" positionX="-45" positionY="99" width="128" height="150"/>
+        <element name="FileMediaObject" positionX="-36" positionY="108" width="128" height="105"/>
+        <element name="URLMediaObject" positionX="-18" positionY="117" width="128" height="45"/>
+    </elements>
+</model>

@@ -15,43 +15,20 @@ import SMCoreLib
 import SyncServer_Shared
 
 @objc(Discussion)
-public class Discussion: NSManagedObject {
+public class Discussion: FileObject {
     static let UUID_KEY = "uuid"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     
-    var url:SMRelativeLocalURL? {
-        get {
-            return CoreData.getSMRelativeLocalURL(fromCoreDataProperty: urlInternal as Data?)
-        }
-        
+    // 4/18/19; `Discussion+CoreDataProperties.swift` has an "image" property. This is an old name. Really, discussions have `FileMediaObject`'s. (Previously, when we only had Image FileMediaObject's, discussions could only reference Images. Now, discussions can reference multiple kinds of media objects. E.g., an image or a url).
+    var mediaObject: FileMediaObject? {
         set {
-            if newValue == nil {
-                urlInternal = nil
-            }
-            else {
-                urlInternal = NSKeyedArchiver.archivedData(withRootObject: newValue!) as NSData?
-            }
+            image = newValue
         }
-    }
-    
-    var gone:GoneReason? {
         get {
-            if let goneReasonInternal = goneReasonInternal {
-                return GoneReason(rawValue: goneReasonInternal)
-            }
-            else {
-                return nil
-            }
-        }
-        
-        set {
-            goneReasonInternal = newValue?.rawValue
+            return image
         }
     }
-    
-    var hasError: Bool {
-        return gone != nil || readProblem
-    }
+
     
     class func entityName() -> String {
         return "Discussion"

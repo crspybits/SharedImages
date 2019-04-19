@@ -14,7 +14,7 @@ import SyncServer_Shared
 // 5/13/18-- The discussionUUID is old as of today. The fileGroupUUID property is the new way to connect discussion and image.
 
 @objc(Image)
-public class Image: NSManagedObject {
+public class Image: FileMediaObject {
     static let CREATION_DATE_KEY = "creationDate"
     static let UUID_KEY = "uuid"
     static let DISCUSSION_UUID_KEY = "discussionUUID"
@@ -46,40 +46,6 @@ public class Image: NSManagedObject {
         }
         
         return originalImageSize
-    }
-    
-    var url:SMRelativeLocalURL? {
-        get {
-            return CoreData.getSMRelativeLocalURL(fromCoreDataProperty: urlInternal as Data?)
-        }
-        
-        set {            
-            if newValue == nil {
-                urlInternal = nil
-            }
-            else {
-                urlInternal = NSKeyedArchiver.archivedData(withRootObject: newValue!) as NSData?
-            }
-        }
-    }
-    
-    var gone:GoneReason? {
-        get {
-            if let goneReasonInternal = goneReasonInternal {
-                return GoneReason(rawValue: goneReasonInternal)
-            }
-            else {
-                return nil
-            }
-        }
-        
-        set {
-            goneReasonInternal = newValue?.rawValue
-        }
-    }
-    
-    var hasError: Bool {
-        return gone != nil || readProblem
     }
     
     // Either image or associated discussion
