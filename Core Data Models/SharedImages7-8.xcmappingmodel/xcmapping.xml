@@ -125,11 +125,11 @@ cBIAAYagrxECKgAHAAgAFwAzADQANQBFAEYARwBIAEkASgBlAGYAZwBtAG4AegCQAJEAkgCTAJQAlQCW
     <object type="XDDEVENTITYMAPPING" id="z119">
         <attribute name="sourcename" type="string">Image</attribute>
         <attribute name="mappingtypename" type="string">Undefined</attribute>
-        <attribute name="mappingnumber" type="int16">3</attribute>
+        <attribute name="mappingnumber" type="int16">2</attribute>
         <attribute name="destinationname" type="string">ImageMediaObject</attribute>
         <attribute name="autogenerateexpression" type="bool">1</attribute>
         <relationship name="mappingmodel" type="1/1" destination="XDDEVMAPPINGMODEL" idrefs="z112"></relationship>
-        <relationship name="attributemappings" type="0/0" destination="XDDEVATTRIBUTEMAPPING" idrefs="z120 z133 z136 z102 z124 z109 z134 z110 z114 z107 z125 z122"></relationship>
+        <relationship name="attributemappings" type="0/0" destination="XDDEVATTRIBUTEMAPPING" idrefs="z133 z107 z136 z125 z124 z102 z122 z109 z134 z110 z120 z114"></relationship>
         <relationship name="relationshipmappings" type="0/0" destination="XDDEVRELATIONSHIPMAPPING" idrefs="z140"></relationship>
     </object>
     <object type="XDDEVATTRIBUTEMAPPING" id="z120">

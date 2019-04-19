@@ -13,7 +13,7 @@ import SyncServer_Shared
 
 // 5/13/18-- The discussionUUID is old as of today. The fileGroupUUID property is the new way to connect discussion and image.
 
-@objc(Image)
+@objc(ImageMediaObject)
 public class ImageMediaObject: FileMediaObject {
     static let CREATION_DATE_KEY = "creationDate"
     static let UUID_KEY = "uuid"
