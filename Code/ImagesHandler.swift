@@ -37,22 +37,22 @@ class ImagesHandler {
     }
     
     @discardableResult
-    func addOrUpdateLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> Image {
-        var theImage:Image!
+    func addOrUpdateLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> ImageMediaObject {
+        var theImage:ImageMediaObject!
         
         if newImageData.file.fileUUID == nil {
             // We're creating a new image at the local user's request.
-            theImage = Image.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? Image
+            theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? ImageMediaObject
         }
         else {
             /* This is a download from the server. There are two cases:
                 1) The main download use case: Creating a new image downloaded from the server (also, possibly "gone" or a read problem).
                 2) An error use case: Previously, with "gone" or a read problem, an image was downloaded another time.
             */
-            theImage = Image.fetchObjectWithUUID(newImageData.file.fileUUID!)
+            theImage = ImageMediaObject.fetchObjectWithUUID(newImageData.file.fileUUID!)
             if theImage == nil {
                 // No existing local image. Must be a first download case from the server.
-                theImage = Image.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? Image
+                theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? ImageMediaObject
                 theImage.uuid = newImageData.file.fileUUID
             }
 
@@ -93,14 +93,14 @@ class ImagesHandler {
         
         // Lookup the Discussion and connect it if we have it.
         
-        var discussion:Discussion?
+        var discussion:DiscussionFileObject?
         
         if let discussionUUID = newImageData.discussionUUID {
-            discussion = Discussion.fetchObjectWithUUID(discussionUUID)
+            discussion = DiscussionFileObject.fetchObjectWithUUID(discussionUUID)
         }
         
         if discussion == nil, let fileGroupUUID = newImageData.fileGroupUUID {
-            discussion = Discussion.fetchObjectWithFileGroupUUID(fileGroupUUID)
+            discussion = DiscussionFileObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
         
         theImage.discussion = discussion
@@ -130,8 +130,8 @@ class ImagesHandler {
     
     // Three cases: 1) new discussion added locally (uuid of the FileData will be nil), 2) update to existing local discussion (with data from server), and 3) new discussion from server.
     @discardableResult
-    func addToLocalDiscussion(discussionData: FileData, type: AddToDiscussion, fileGroupUUID: String?) -> Discussion {
-        var localDiscussion: Discussion!
+    func addToLocalDiscussion(discussionData: FileData, type: AddToDiscussion, fileGroupUUID: String?) -> DiscussionFileObject {
+        var localDiscussion: DiscussionFileObject!
         var imageTitle: String?
         
         func newDiscussion() {
@@ -155,14 +155,14 @@ class ImagesHandler {
         switch type {
         case .newLocalDiscussion:
             // 1)
-            localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
+            localDiscussion = (DiscussionFileObject.newObjectAndMakeUUID(makeUUID: false) as! DiscussionFileObject)
             localDiscussion.uuid = discussionData.fileUUID
             localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
             
             // This is a new *local* discussion. Shouldn't have problems with file corruption.
 
         case .fromServer:
-            if let existingLocalDiscussion = Discussion.fetchObjectWithUUID(discussionData.fileUUID!) {
+            if let existingLocalDiscussion = DiscussionFileObject.fetchObjectWithUUID(discussionData.fileUUID!) {
                 // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
                 
                 localDiscussion = existingLocalDiscussion
@@ -205,7 +205,7 @@ class ImagesHandler {
             }
             else {
                 // 3) New discussion downloaded from server.
-                localDiscussion = (Discussion.newObjectAndMakeUUID(makeUUID: false) as! Discussion)
+                localDiscussion = (DiscussionFileObject.newObjectAndMakeUUID(makeUUID: false) as! DiscussionFileObject)
                 localDiscussion.uuid = discussionData.fileUUID
                 localDiscussion.sharingGroupUUID = discussionData.sharingGroupUUID
                 localDiscussion.gone = nil
@@ -219,20 +219,20 @@ class ImagesHandler {
         localDiscussion.fileGroupUUID = fileGroupUUID
 
         // Look up and connect the Image if we have one.
-        var image:Image?
+        var image:ImageMediaObject?
         
         // The two means of getting the image reflect different strategies for doing this over time in SharedImages/SyncServer development.
         
         // See if the image has an asssociated discussionUUID
-        image = Image.fetchObjectWithDiscussionUUID(localDiscussion.uuid!)
+        image = ImageMediaObject.fetchObjectWithDiscussionUUID(localDiscussion.uuid!)
 
         // If not, see if a fileGroupUUID connects the discussion and image.
         if image == nil, let fileGroupUUID = localDiscussion.fileGroupUUID {
-            image = Image.fetchObjectWithFileGroupUUID(fileGroupUUID)
+            image = ImageMediaObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
         
         if image != nil {
-            localDiscussion.image = image
+            localDiscussion.mediaObject = image
             
             // 4/17/18; If this discussion has the image title, set the image title from that.
             if let imageTitle = imageTitle {
@@ -255,7 +255,7 @@ extension ImagesHandler: SyncControllerDelegate {
         var numberErrors = 0
         var numberDeletions = 0
         
-        if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID) {
+        if let images = ImageMediaObject.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID) {
             for image in images {
                 do {
                     // This also removes the associated discussion and image file.
@@ -310,7 +310,7 @@ extension ImagesHandler: SyncControllerDelegate {
     
     func updateUploadedImageDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
         // We provided the content for the image, but the server establishes its date of creation. So, update our local image date/time with the creation date from the server.
-        if let image = Image.fetchObjectWithUUID(uuid) {
+        if let image = ImageMediaObject.fetchObjectWithUUID(uuid) {
             image.creationDate = creationDate as NSDate
             image.save()
         }
@@ -326,7 +326,7 @@ extension ImagesHandler: SyncControllerDelegate {
         if let fileType = fileType {
             switch fileType {
                 case .discussion:
-                if let discussion = Discussion.fetchObjectWithUUID(uuid) {
+                if let discussion = DiscussionFileObject.fetchObjectWithUUID(uuid) {
                     discussion.gone = reason
                     discussion.save()
                 }
@@ -343,7 +343,7 @@ extension ImagesHandler: SyncControllerDelegate {
         }
 
         if doImage {
-            if let image = Image.fetchObjectWithUUID(uuid) {
+            if let image = ImageMediaObject.fetchObjectWithUUID(uuid) {
                 image.gone = reason
                 image.save()
             }
@@ -366,12 +366,12 @@ extension ImagesHandler: SyncControllerDelegate {
     }
     
     func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
-        guard let discussion = Discussion.fetchObjectWithUUID(attr.fileUUID) else {
+        guard let discussion = DiscussionFileObject.fetchObjectWithUUID(attr.fileUUID) else {
             Log.error("Cannot find discussion for attempted image re-upload.")
             return
         }
         
-        guard let image = discussion.image, let imageURL = image.url, let imageUUID = image.uuid else {
+        guard let image = discussion.mediaObject, let imageURL = image.url, let imageUUID = image.uuid else {
             Log.error("Cannot find image for attempted image re-upload.")
             return
         }

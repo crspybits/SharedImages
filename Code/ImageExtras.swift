@@ -24,12 +24,12 @@ class ImageExtras {
     // For some idea of free RAM available: https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget
     static var minCostCache:UInt64 = 1000000
     static var maxCostCache:UInt64 = 10000000
-    static var imageCache = LRUCache<Image>(maxItems: 500, maxCost:maxCostCache)!
+    static var imageCache = LRUCache<ImageMediaObject>(maxItems: 500, maxCost:maxCostCache)!
 
     // Resets to smaller if not already at smaller size; only if reset is done will callback be called.
     static func resetToSmallerImageCache(didTheReset:()->()) {
         if imageCache.maxCost == maxCostCache {
-            imageCache = LRUCache<Image>(maxItems: 500, maxCost:minCostCache)!
+            imageCache = LRUCache<ImageMediaObject>(maxItems: 500, maxCost:minCostCache)!
             didTheReset()
         }
     }
@@ -67,7 +67,7 @@ class ImageExtras {
     // Also removes associated discussions.
     static func removeLocalImages(uuids:[String]) {        
         for uuid in uuids {
-            guard let image = Image.fetchObjectWithUUID(uuid) else {
+            guard let image = ImageMediaObject.fetchObjectWithUUID(uuid) else {
                 Log.error("Cannot find image with UUID: \(uuid)")
                 return
             }

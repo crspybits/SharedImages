@@ -16,7 +16,7 @@ class LargeImages : UIViewController {
     // Set these when creating an instance of this class.
     
     // This is an image instead of an index, because the IndexPath's vary from the small images screen to the large images screen-- the large images screen doesn't display images with errors.
-    var startImage: Image?
+    var startImage: ImageMediaObject?
     
     weak var imagesHandler:ImagesHandler?
     var sharingGroup: SyncServer.SharingGroup!
@@ -55,7 +55,7 @@ class LargeImages : UIViewController {
     typealias FirstTimeZoomed = Bool
     var zoomedCells = [IndexPath: FirstTimeZoomed]()
     
-    fileprivate var imageCache:LRUCache<Image>! {
+    fileprivate var imageCache:LRUCache<ImageMediaObject>! {
         return ImageExtras.imageCache
     }
     
@@ -172,8 +172,8 @@ class LargeImages : UIViewController {
 extension LargeImages : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: false)
-        return Image.fetchRequestForAllObjects(params: params)
+        let params = ImageMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: false)
+        return ImageMediaObject.fetchRequestForAllObjects(params: params)
     }
     
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
@@ -236,7 +236,7 @@ extension LargeImages : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
         
         if let syncController = imagesHandler?.syncController,
-            let image = self.coreDataSource.object(at: indexPath) as? Image {
+            let image = self.coreDataSource.object(at: indexPath) as? ImageMediaObject {
             cell.setProperties(image: image, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
                 self.showDiscussionIfPresent(image: image)
             })
@@ -245,7 +245,7 @@ extension LargeImages : UICollectionViewDataSource {
         return cell
     }
     
-    func showDiscussionIfPresent(image: Image) {
+    func showDiscussionIfPresent(image: ImageMediaObject) {
         guard let discussion = image.discussion else {
             return
         }
@@ -269,7 +269,7 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
         /* 2/13/18; Looks like this line caused a crash: https://github.com/crspybits/SharedImages/issues/80
         I assume this must have occurred with an unwrapping of `coreDataSource` when it was nil. I'm trying to fix this by using a getter which always sets the coreDataSource if nil.
         */
-        let image = self.coreDataSource.object(at: indexPath) as! Image
+        let image = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
         
         guard !image.hasError, let imageOriginalSize = image.originalSize else {
             return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + ImageCollectionVC.largeTitleHeight)
@@ -318,15 +318,15 @@ extension LargeImages : DiscussionVCDelegate {
         Progress.session.viewController = self
     }
     
-    func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion) {
+    func discussionVC(_ vc: DiscussionVC, changedDiscussion:DiscussionFileObject) {
         imagesHandler?.syncController.update(discussion: changedDiscussion)
     }
     
-    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion) {
+    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:DiscussionFileObject) {
         collectionView?.reloadData()
     }
     
-    func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?) {
+    func discussionVC(_ vc: DiscussionVC, discussion:DiscussionFileObject, refreshWithCompletion: (()->())?) {
         do {
             try imagesHandler?.syncController.sync(sharingGroupUUID: discussion.sharingGroupUUID!) {
                 // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.

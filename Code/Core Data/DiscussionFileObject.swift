@@ -1,5 +1,5 @@
 //
-//  Discussion+CoreDataClass.swift
+//  DiscussionFileObject.swift
 //  SharedImages
 //
 //  Created by Christopher G Prince on 1/28/18.
@@ -14,29 +14,18 @@ import CoreData
 import SMCoreLib
 import SyncServer_Shared
 
-@objc(Discussion)
-public class Discussion: FileObject {
+@objc(DiscussionFileObject)
+public class DiscussionFileObject: FileObject {
     static let UUID_KEY = "uuid"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
-    
-    // 4/18/19; `Discussion+CoreDataProperties.swift` has an "image" property. This is an old name. Really, discussions have `FileMediaObject`'s. (Previously, when we only had Image FileMediaObject's, discussions could only reference Images. Now, discussions can reference multiple kinds of media objects. E.g., an image or a url).
-    var mediaObject: FileMediaObject? {
-        set {
-            image = newValue
-        }
-        get {
-            return image
-        }
-    }
 
-    
     class func entityName() -> String {
-        return "Discussion"
+        return "DiscussionFileObject"
     }
 
     class func newObjectAndMakeUUID(makeUUID: Bool) -> NSManagedObject {
         let discussion = CoreData.sessionNamed(CoreDataExtras.sessionName).newObject(withEntityName:
-                self.entityName()) as! Discussion
+                self.entityName()) as! DiscussionFileObject
         
         if makeUUID {
             discussion.uuid = UUID.make()
@@ -52,22 +41,22 @@ public class Discussion: FileObject {
         return newObjectAndMakeUUID(makeUUID: false)
     }
 
-    class func fetchObjectWithUUID(_ uuid:String) -> Discussion? {
+    class func fetchObjectWithUUID(_ uuid:String) -> DiscussionFileObject? {
         let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
-        return managedObject as? Discussion
+        return managedObject as? DiscussionFileObject
     }
     
-    class func fetchObjectWithFileGroupUUID(_ fileGroupUUID:String) -> Discussion? {
+    class func fetchObjectWithFileGroupUUID(_ fileGroupUUID:String) -> DiscussionFileObject? {
         let managedObject = CoreData.fetchObjectWithUUID(fileGroupUUID, usingUUIDKey: FILE_GROUP_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
-        return managedObject as? Discussion
+        return managedObject as? DiscussionFileObject
     }
     
-    static func fetchAll() -> [Discussion] {
-        var discussions:[Discussion]!
+    static func fetchAll() -> [DiscussionFileObject] {
+        var discussions:[DiscussionFileObject]!
 
         do {
             discussions = try CoreData.sessionNamed(CoreDataExtras.sessionName).fetchAllObjects(
-                withEntityName: self.entityName()) as? [Discussion]
+                withEntityName: self.entityName()) as? [DiscussionFileObject]
         } catch (let error) {
             Log.error("Error: \(error)")
             assert(false)
@@ -77,7 +66,7 @@ public class Discussion: FileObject {
     }
     
     static func totalUnreadCount() -> Int {
-        let discussions = Discussion.fetchAll()
+        let discussions = DiscussionFileObject.fetchAll()
         let result = discussions.reduce(0) { current, discussion in
             return current + discussion.unreadCount
         }

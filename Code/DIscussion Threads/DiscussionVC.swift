@@ -13,9 +13,9 @@ import SyncServer
 import MessageInputBar
 
 protocol DiscussionVCDelegate {
-    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:Discussion)
-    func discussionVC(_ vc: DiscussionVC, changedDiscussion:Discussion)
-    func discussionVC(_ vc: DiscussionVC, discussion:Discussion, refreshWithCompletion: (()->())?)
+    func discussionVC(_ vc: DiscussionVC, resetUnreadCount:DiscussionFileObject)
+    func discussionVC(_ vc: DiscussionVC, changedDiscussion:DiscussionFileObject)
+    func discussionVC(_ vc: DiscussionVC, discussion:DiscussionFileObject, refreshWithCompletion: (()->())?)
     func discussionVCWillClose(_ vc: DiscussionVC)
 }
 
@@ -29,7 +29,7 @@ class DiscussionVC: MessagesViewController {
     private var senderUserDisplayName:String!
     private var senderUserId:String!
     private var delegate:DiscussionVCDelegate!
-    private var discussion: Discussion!
+    private var discussion: DiscussionFileObject!
     private var viewsLayedOut = false
     
     override func viewDidLoad() {
@@ -84,7 +84,7 @@ class DiscussionVC: MessagesViewController {
     // `closeHandler` gets called when the ModalVC gets closed.
     // Returns false iff the show failed.
     @discardableResult
-    func show(fromParentVC parentVC: UIViewController, discussion: Discussion, delegate:DiscussionVCDelegate, usingNavigationController: Bool = true, closeHandler:(()->())? = nil) -> Bool {
+    func show(fromParentVC parentVC: UIViewController, discussion: DiscussionFileObject, delegate:DiscussionVCDelegate, usingNavigationController: Bool = true, closeHandler:(()->())? = nil) -> Bool {
     
         self.parentVC = parentVC
         self.closeHandler = closeHandler

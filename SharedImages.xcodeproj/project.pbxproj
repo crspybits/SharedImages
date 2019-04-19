@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2732DEE9F55439017415A76A /* Pods_SharedImages.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B908205C67FEB8F896E15398 /* Pods_SharedImages.framework */; };
-		830386DE226949AF00DB598D /* Image+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386D6226949AF00DB598D /* Image+CoreDataProperties.swift */; };
-		830386E0226949AF00DB598D /* Discussion+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386D8226949AF00DB598D /* Discussion+CoreDataProperties.swift */; };
+		830386DE226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386D6226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift */; };
+		830386E0226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386D8226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift */; };
 		830386E1226949AF00DB598D /* FileObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386D9226949AF00DB598D /* FileObject.swift */; };
 		830386E2226949AF00DB598D /* FileObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386DA226949AF00DB598D /* FileObject+CoreDataProperties.swift */; };
 		830386E3226949AF00DB598D /* FileMediaObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830386DB226949AF00DB598D /* FileMediaObject.swift */; };
@@ -30,6 +30,7 @@
 		8324EE331E764907000656AF /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE321E764907000656AF /* SyncController.swift */; };
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
 		8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */; };
+		834A0CEB22696B9B00B42573 /* SharedImages7-8.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */; };
 		834A7E792037858800969B18 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6F2037858800969B18 /* Alert.swift */; };
 		834A7E7A2037858800969B18 /* XibBasics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E702037858800969B18 /* XibBasics.swift */; };
 		834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E712037858800969B18 /* SyncSpinner.swift */; };
@@ -61,7 +62,7 @@
 		83A2E6AD1F76F84500A2E303 /* N.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6A91F76F83300A2E303 /* N.json */; };
 		83A2E6AE1F76F84500A2E303 /* R.json in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E6AA1F76F83300A2E303 /* R.json */; };
 		83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34070201D58C500DAD865 /* FixedObjects.swift */; };
-		83C34081201E42C400DAD865 /* Discussion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* Discussion.swift */; };
+		83C34081201E42C400DAD865 /* DiscussionFileObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* DiscussionFileObject.swift */; };
 		83CE2F092254592900E6EFD7 /* ShareAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */; };
 		83CE2F1022550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CE2F0E22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift */; };
 		83CE2F1122550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F0F22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib */; };
@@ -103,7 +104,7 @@
 		83F882491E711FC6008F644A /* SharedImages.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */; };
 		83F882501E73A6F6008F644A /* ImageCollectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F8824F1E73A6F6008F644A /* ImageCollectionVC.swift */; };
 		83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882521E73B172008F644A /* CoreDataExtras.swift */; };
-		83F882561E73B2DC008F644A /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882541E73B2DC008F644A /* Image.swift */; };
+		83F882561E73B2DC008F644A /* ImageMediaObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882541E73B2DC008F644A /* ImageMediaObject.swift */; };
 		83F882611E749C18008F644A /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882601E749C18008F644A /* Consts.swift */; };
 		83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882641E74A3C5008F644A /* GoogleService-Info.plist */; };
 		83F882671E74A600008F644A /* Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882661E74A600008F644A /* Server.plist */; };
@@ -123,8 +124,8 @@
 /* Begin PBXFileReference section */
 		3038F6F57C4180ADED26DD5B /* Pods_SharedImagesTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SharedImagesTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		830386C42269409900DB598D /* SharedImages8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages8.xcdatamodel; sourceTree = "<group>"; };
-		830386D6226949AF00DB598D /* Image+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Image+CoreDataProperties.swift"; path = "Core Data/Image+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		830386D8226949AF00DB598D /* Discussion+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Discussion+CoreDataProperties.swift"; path = "Core Data/Discussion+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		830386D6226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ImageMediaObject+CoreDataProperties.swift"; path = "Core Data/ImageMediaObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		830386D8226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "DiscussionFileObject+CoreDataProperties.swift"; path = "Core Data/DiscussionFileObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		830386D9226949AF00DB598D /* FileObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FileObject.swift; path = "Core Data/FileObject.swift"; sourceTree = "<group>"; };
 		830386DA226949AF00DB598D /* FileObject+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "FileObject+CoreDataProperties.swift"; path = "Core Data/FileObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		830386DB226949AF00DB598D /* FileMediaObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FileMediaObject.swift; path = "Core Data/FileMediaObject.swift"; sourceTree = "<group>"; };
@@ -149,6 +150,7 @@
 		8324EE461E778623000656AF /* CALayer+MBAnimationPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MBAnimationPersistence.h"; sourceTree = "<group>"; };
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
 		8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ODRefreshControl+Extras.swift"; sourceTree = "<group>"; };
+		834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = "SharedImages7-8.xcmappingmodel"; sourceTree = "<group>"; };
 		834A7E6F2037858800969B18 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		834A7E702037858800969B18 /* XibBasics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XibBasics.swift; sourceTree = "<group>"; };
 		834A7E712037858800969B18 /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
@@ -183,7 +185,7 @@
 		83A2E6AA1F76F83300A2E303 /* R.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = R.json; sourceTree = "<group>"; };
 		83C34070201D58C500DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
 		83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages3.xcdatamodel; sourceTree = "<group>"; };
-		83C3407E201E42C400DAD865 /* Discussion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Discussion.swift; path = "Core Data/Discussion.swift"; sourceTree = "<group>"; };
+		83C3407E201E42C400DAD865 /* DiscussionFileObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DiscussionFileObject.swift; path = "Core Data/DiscussionFileObject.swift"; sourceTree = "<group>"; };
 		83CE2F082254592900E6EFD7 /* ShareAlbumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareAlbumVC.swift; sourceTree = "<group>"; };
 		83CE2F0E22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareAlbumNumberInviteesCell.swift; sourceTree = "<group>"; };
 		83CE2F0F22550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShareAlbumNumberInviteesCell.xib; sourceTree = "<group>"; };
@@ -231,7 +233,7 @@
 		83F882441E711FC6008F644A /* SharedImages.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages.xcdatamodel; sourceTree = "<group>"; };
 		83F8824F1E73A6F6008F644A /* ImageCollectionVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCollectionVC.swift; sourceTree = "<group>"; };
 		83F882521E73B172008F644A /* CoreDataExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CoreDataExtras.swift; path = "Core Data/CoreDataExtras.swift"; sourceTree = "<group>"; };
-		83F882541E73B2DC008F644A /* Image.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Image.swift; path = "Core Data/Image.swift"; sourceTree = "<group>"; };
+		83F882541E73B2DC008F644A /* ImageMediaObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ImageMediaObject.swift; path = "Core Data/ImageMediaObject.swift"; sourceTree = "<group>"; };
 		83F882601E749C18008F644A /* Consts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		83F882641E74A3C5008F644A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Resources/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		83F882661E74A600008F644A /* Server.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Server.plist; path = Resources/Server.plist; sourceTree = "<group>"; };
@@ -360,6 +362,15 @@
 				8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */,
 			);
 			path = "CALayer+MBAnimationPersistence";
+			sourceTree = "<group>";
+		};
+		834A0CE5226963FA00B42573 /* Core Data Models */ = {
+			isa = PBXGroup;
+			children = (
+				83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */,
+				834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */,
+			);
+			path = "Core Data Models";
 			sourceTree = "<group>";
 		};
 		834A7E6D2037858800969B18 /* Misc UI */ = {
@@ -538,7 +549,7 @@
 				83F882421E711FC6008F644A /* Info.plist */,
 				83F882641E74A3C5008F644A /* GoogleService-Info.plist */,
 				83F882661E74A600008F644A /* Server.plist */,
-				83F882431E711FC6008F644A /* SharedImages.xcdatamodeld */,
+				834A0CE5226963FA00B42573 /* Core Data Models */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -567,14 +578,14 @@
 			isa = PBXGroup;
 			children = (
 				830386E622694E3A00DB598D /* URLMediaObject+CoreDataProperties.swift */,
-				830386D6226949AF00DB598D /* Image+CoreDataProperties.swift */,
-				830386D8226949AF00DB598D /* Discussion+CoreDataProperties.swift */,
+				830386D6226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift */,
+				830386D8226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift */,
 				830386DC226949AF00DB598D /* FileMediaObject+CoreDataProperties.swift */,
 				830386DA226949AF00DB598D /* FileObject+CoreDataProperties.swift */,
 				830386D9226949AF00DB598D /* FileObject.swift */,
 				830386DB226949AF00DB598D /* FileMediaObject.swift */,
-				83C3407E201E42C400DAD865 /* Discussion.swift */,
-				83F882541E73B2DC008F644A /* Image.swift */,
+				83C3407E201E42C400DAD865 /* DiscussionFileObject.swift */,
+				83F882541E73B2DC008F644A /* ImageMediaObject.swift */,
 				830386E522694E3A00DB598D /* URLMediaObject.swift */,
 				83F882521E73B172008F644A /* CoreDataExtras.swift */,
 			);
@@ -914,7 +925,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8324EE331E764907000656AF /* SyncController.swift in Sources */,
-				83C34081201E42C400DAD865 /* Discussion.swift in Sources */,
+				83C34081201E42C400DAD865 /* DiscussionFileObject.swift in Sources */,
 				834A7E802037858800969B18 /* Types.swift in Sources */,
 				83F5CB552246D938006DBB2F /* SideMenu.swift in Sources */,
 				837F3FC61F6B763400EB7609 /* ProgressIndicator.swift in Sources */,
@@ -931,13 +942,14 @@
 				83D0BE2620B39C7000555B73 /* SegmentedControl.swift in Sources */,
 				830386E722694E3A00DB598D /* URLMediaObject.swift in Sources */,
 				830386E3226949AF00DB598D /* FileMediaObject.swift in Sources */,
+				834A0CEB22696B9B00B42573 /* SharedImages7-8.xcmappingmodel in Sources */,
 				83F5CB572246EDA9006DBB2F /* LeftMenuVC.swift in Sources */,
 				835A8A9F223F40300000FEA0 /* AppDelegate.swift in Sources */,
 				83F882531E73B172008F644A /* CoreDataExtras.swift in Sources */,
 				83D0BE2520B39C7000555B73 /* SortControl.swift in Sources */,
 				8324EE301E75EC62000656AF /* SignInVC.swift in Sources */,
 				835A8A9E223F40300000FEA0 /* Migrations.swift in Sources */,
-				83F882561E73B2DC008F644A /* Image.swift in Sources */,
+				83F882561E73B2DC008F644A /* ImageMediaObject.swift in Sources */,
 				83D0BE2120B3817800555B73 /* Parameters.swift in Sources */,
 				831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */,
 				830386E4226949AF00DB598D /* FileMediaObject+CoreDataProperties.swift in Sources */,
@@ -972,8 +984,8 @@
 				83F5CB502246CCA2006DBB2F /* RemoveImages.swift in Sources */,
 				83F5CB592247FCA6006DBB2F /* SideMenuItem.swift in Sources */,
 				834A7E792037858800969B18 /* Alert.swift in Sources */,
-				830386DE226949AF00DB598D /* Image+CoreDataProperties.swift in Sources */,
-				830386E0226949AF00DB598D /* Discussion+CoreDataProperties.swift in Sources */,
+				830386DE226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift in Sources */,
+				830386E0226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift in Sources */,
 				834A7E7A2037858800969B18 /* XibBasics.swift in Sources */,
 				838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */,
 				834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */,
@@ -1274,8 +1286,7 @@
 				83F882441E711FC6008F644A /* SharedImages.xcdatamodel */,
 			);
 			currentVersion = 830386C42269409900DB598D /* SharedImages8.xcdatamodel */;
-			name = SharedImages.xcdatamodeld;
-			path = Resources/SharedImages.xcdatamodeld;
+			path = SharedImages.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

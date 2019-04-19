@@ -13,13 +13,13 @@ import SyncServer
 import SDCAlertView
 
 class RemoveImages {
-    private let images: [Image]!
+    private let images: [ImageMediaObject]!
     private weak var parentVC: UIViewController!
     private let syncController: SyncController!
     private let sharingGroup: SyncServer.SharingGroup!
     private var completion:(()->())?
     
-    init(_ images: [Image], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
+    init(_ images: [ImageMediaObject], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
         self.images = images
         self.parentVC = parentVC
         self.syncController = syncController

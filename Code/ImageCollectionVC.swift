@@ -34,9 +34,9 @@ class ImageCollectionVC : UICollectionViewCell {
     @IBOutlet weak var errorImageView: UIImageView!
     @IBOutlet weak var selectedIcon: UIImageView!
     
-    private(set) var image:Image!
+    private(set) var image:ImageMediaObject!
     private(set) weak var syncController:SyncController!
-    weak var imageCache:LRUCache<Image>?
+    weak var imageCache:LRUCache<ImageMediaObject>?
     
     weak var delegate:LargeImageCellDelegate?
     var originalSize:CGSize!
@@ -92,7 +92,7 @@ class ImageCollectionVC : UICollectionViewCell {
         badge.removeFromSuperview()
     }
     
-    func setProperties(image:Image, syncController:SyncController, cache: LRUCache<Image>, imageTapBehavior:(()->())? = nil) {
+    func setProperties(image:ImageMediaObject, syncController:SyncController, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
         selectedState = nil
         self.image = image
         self.syncController = syncController

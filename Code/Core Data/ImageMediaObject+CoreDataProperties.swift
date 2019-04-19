@@ -1,5 +1,5 @@
 //
-//  Image+CoreDataProperties.swift
+//  ImageURLMediaObject+CoreDataProperties.swift
 //  SharedImages
 //
 //  Created by Christopher G Prince on 4/18/19.
@@ -11,10 +11,10 @@ import Foundation
 import CoreData
 
 
-extension Image {
+extension ImageMediaObject {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Image> {
-        return NSFetchRequest<Image>(entityName: "Image")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<ImageMediaObject> {
+        return NSFetchRequest<ImageMediaObject>(entityName: "ImageMediaObject")
     }
 
     @NSManaged public var originalHeight: Float

@@ -28,13 +28,13 @@ class Migrations {
         if !Migrations.v0_18_3.boolValue {
             Migrations.v0_18_3.boolValue = true
             
-            let discussions = Discussion.fetchAll()
+            let discussions = DiscussionFileObject.fetchAll()
             discussions.forEach { discussion in
                 discussion.gone = nil
                 discussion.readProblem = false
             }
             
-            let images = Image.fetchAll()
+            let images = ImageMediaObject.fetchAll()
             images.forEach { image in
                 image.gone = nil
                 image.readProblem = false

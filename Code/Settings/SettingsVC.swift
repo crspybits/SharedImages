@@ -76,7 +76,7 @@ class SettingsVC : UIViewController {
     
     @IBAction func resetUnreadCountsAction(_ sender: Any) {
         SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Really reset all discussion thread unread counts (across all albums)?", allowCancel: true, okCompletion: {
-            let discussions = Discussion.fetchAll()
+            let discussions = DiscussionFileObject.fetchAll()
             discussions.forEach { discussion in
                 discussion.unreadCount = 0
             }

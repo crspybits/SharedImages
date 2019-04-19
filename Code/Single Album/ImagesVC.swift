@@ -31,7 +31,7 @@ class ImagesVC: UIViewController {
     
     fileprivate var navigatedToLargeImages = false
     
-    fileprivate var imageCache:LRUCache<Image>! {
+    fileprivate var imageCache:LRUCache<ImageMediaObject>! {
         return ImageExtras.imageCache
     }
 
@@ -132,9 +132,9 @@ class ImagesVC: UIViewController {
     }
     
     @objc private func removeImagesAction() {
-        var images = [Image]()
+        var images = [ImageMediaObject]()
         for uuidString in selectedImages {
-            if let imageObj = Image.fetchObjectWithUUID(uuidString) {
+            if let imageObj = ImageMediaObject.fetchObjectWithUUID(uuidString) {
                 images.append(imageObj)
             }
         }
@@ -157,7 +157,7 @@ class ImagesVC: UIViewController {
         selectionOn = !selectionOn
         
         for indexPath in collectionView.indexPathsForVisibleItems {
-            let imageObj = coreDataSource.object(at: indexPath) as! Image
+            let imageObj = coreDataSource.object(at: indexPath) as! ImageMediaObject
             let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
             showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
         }
@@ -290,7 +290,7 @@ class ImagesVC: UIViewController {
         refresh()
     }
     
-    private func createEmptyDiscussion(image:Image, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
+    private func createEmptyDiscussion(image:ImageMediaObject, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
         let newDiscussionFileURL = ImageExtras.newJSONFile()
         var fixedObjects = FixedObjects()
         
@@ -341,7 +341,7 @@ extension ImagesVC : UICollectionViewDelegate {
             return
         }
         
-        let imageObj = self.coreDataSource.object(at: indexPath) as! Image
+        let imageObj = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
         if imageObj.eitherHasError {
             let cell = collectionView.cellForItem(at: indexPath)
             
@@ -358,14 +358,14 @@ extension ImagesVC : UICollectionViewDelegate {
             Alert.styleForIPad(alert)
 
             alert.addAction(UIAlertAction(title: "Retry", style: .default) {alert in
-                let images = Image.fetchAll()
+                let images = ImageMediaObject.fetchAll()
                 images.forEach { image in
                     if self.sharingGroup.sharingGroupUUID == image.sharingGroupUUID && image.readProblem {
                         try! SyncServer.session.requestDownload(forFileUUID: image.uuid!)
                     }
                 }
                 
-                let discussions = Discussion.fetchAll()
+                let discussions = DiscussionFileObject.fetchAll()
                 discussions.forEach { discussion in
                     if self.sharingGroup.sharingGroupUUID == discussion.sharingGroupUUID && discussion.readProblem {
                         try! SyncServer.session.requestDownload(forFileUUID: discussion.uuid!)
@@ -380,7 +380,7 @@ extension ImagesVC : UICollectionViewDelegate {
         }
         else {
             let largeImages = LargeImages.create()
-            largeImages.startImage = coreDataSource.object(at: indexPath) as? Image
+            largeImages.startImage = coreDataSource.object(at: indexPath) as? ImageMediaObject
             largeImages.imagesHandler = imagesHandler
             largeImages.sharingGroup = sharingGroup
             navigatedToLargeImages = true
@@ -406,7 +406,7 @@ extension ImagesVC : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
-        let imageObj = self.coreDataSource.object(at: indexPath) as! Image
+        let imageObj = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
         cell.setProperties(image: imageObj, syncController: imagesHandler.syncController, cache: imageCache)
         
         showSelectedState(imageUUID: imageObj.uuid!, cell: cell, error: imageObj.eitherHasError)
@@ -427,7 +427,7 @@ extension ImagesVC : AcquireImagesDelegate {
             Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
         }
         
-        var imageAndDiscussions = [(image: Image, discussion: Discussion)]()
+        var imageAndDiscussions = [(image: ImageMediaObject, discussion: DiscussionFileObject)]()
         
         func cleanup() {
             for current in imageAndDiscussions {
@@ -460,7 +460,7 @@ extension ImagesVC : AcquireImagesDelegate {
         imagesHandler.syncController.add(imageAndDiscussions: imageAndDiscussions, errorCleanup: cleanup)
     }
     
-    private func createImageAndDiscussion(newImageURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (image: Image, discussion: Discussion)? {
+    private func createImageAndDiscussion(newImageURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (image: ImageMediaObject, discussion: DiscussionFileObject)? {
         guard let mimeTypeEnum = MimeType(rawValue: mimeType) else {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Unknown mime type: \(mimeType)")
             return nil
@@ -494,8 +494,8 @@ extension ImagesVC : AcquireImagesDelegate {
 extension ImagesVC : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = Image.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: true)
-        return Image.fetchRequestForAllObjects(params: params)
+        let params = ImageMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: true)
+        return ImageMediaObject.fetchRequestForAllObjects(params: params)
     }
     
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
@@ -595,7 +595,7 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
         
         // And then figure out how big the image will be.
         // Seems like the crash Dany was getting was here: https://github.com/crspybits/SharedImages/issues/123
-        let image = self.coreDataSource.object(at: indexPath) as! Image
+        let image = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
         
         guard let imageOriginalSize = image.originalSize else {
             return boundingCellSize
@@ -618,7 +618,7 @@ extension ImagesVC {
         // Create an array containing both UIImage's and Image's. The UIActivityViewController will use the UIImage's. The TrashActivity will use the Image's.
         var images = [Any]()
         for uuidString in selectedImages {
-            if let imageObj = Image.fetchObjectWithUUID(uuidString) {
+            if let imageObj = ImageMediaObject.fetchObjectWithUUID(uuidString) {
                 if !imageObj.readProblem, let url = imageObj.url {
                     let uiImage = ImageExtras.fullSizedImage(url: url as URL)
                     images.append(uiImage)
@@ -651,7 +651,7 @@ extension ImagesVC {
     }
     
     private func selectImage(atIndexPath indexPath: IndexPath) {
-        let imageObj = coreDataSource.object(at: indexPath) as! Image
+        let imageObj = coreDataSource.object(at: indexPath) as! ImageMediaObject
         
         // Allowing selection of an image even when there is an error, such as image.hasError -- e.g., so that deletion can be allowed. Will have to, downstream, disable certain operations-- such as sending the image to someone, if there is no image.
         

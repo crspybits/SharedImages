@@ -20,6 +20,6 @@ extension FileMediaObject {
     @NSManaged public var creationDate: NSDate?
     @NSManaged public var discussionUUID: String?
     @NSManaged public var title: String?
-    @NSManaged public var discussion: Discussion?
+    @NSManaged public var discussion: DiscussionFileObject?
 
 }

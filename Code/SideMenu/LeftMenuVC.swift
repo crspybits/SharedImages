@@ -47,7 +47,7 @@ class LeftMenuVC: UIViewController {
     
     private func setup() {
         let numberUnreadDiscussions:()->(Int?) = {
-            let total = Discussion.totalUnreadCount()
+            let total = DiscussionFileObject.totalUnreadCount()
             if total == 0 {
                 return nil
             }
@@ -156,7 +156,7 @@ class LeftMenuVC: UIViewController {
     // If there are no images in the app, and no albums, and not signed, then don't allow navigation away from SignIn screen --> Don't want them them getting the "allow notifications" questions in that case.
     private func canUseOtherMenus() -> Bool {
         let sharingGroups = SyncServer.session.sharingGroups
-        return SignInManager.session.userIsSignedIn || (sharingGroups.count > 1 || Image.fetchAll().count > 0)
+        return SignInManager.session.userIsSignedIn || (sharingGroups.count > 1 || ImageMediaObject.fetchAll().count > 0)
     }
     
     @objc private func leftMenuWillShow() {

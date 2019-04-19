@@ -54,7 +54,7 @@ class AlbumCell: UIView, XibBasics {
         self.image.image = nil
         unreadCountBadge.removeFromSuperview()
         
-        if let images = Image.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
+        if let images = ImageMediaObject.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
             self.getImageForCell(images: images)
             self.setUnreadCount(images: images)
         }
@@ -92,7 +92,7 @@ class AlbumCell: UIView, XibBasics {
         albumSyncNeeded.isHidden = !sharingGroup.syncNeeded!
     }
     
-    private func getImageForCell(images: [Image]) {
+    private func getImageForCell(images: [ImageMediaObject]) {
         if let imageURL = images[0].url {
             var image: UIImage!
             do {
@@ -107,7 +107,7 @@ class AlbumCell: UIView, XibBasics {
         }
     }
     
-    private func setUnreadCount(images: [Image]) {
+    private func setUnreadCount(images: [ImageMediaObject]) {
         var unreadCount = 0
         images.forEach { image in
             if let discussion = image.discussion {

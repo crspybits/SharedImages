@@ -152,7 +152,7 @@ class SyncController {
     }
     
     // Add new images and discussions
-    func add(imageAndDiscussions:[(image: Image, discussion: Discussion)], errorCleanup: ()->()) {
+    func add(imageAndDiscussions:[(image: ImageMediaObject, discussion: DiscussionFileObject)], errorCleanup: ()->()) {
         guard imageAndDiscussions.count > 0 else {
             return
         }
@@ -188,7 +188,7 @@ class SyncController {
         }
     }
     
-    private func queueUploadImageAndDiscussion(image: Image, discussion: Discussion) -> Bool {
+    private func queueUploadImageAndDiscussion(image: ImageMediaObject, discussion: DiscussionFileObject) -> Bool {
         guard let imageMimeTypeEnum = MimeType(rawValue: image.mimeType!) else {
             SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown image mime type: \(image.mimeType!)")
             return false
@@ -248,7 +248,7 @@ class SyncController {
         return true
     }
     
-    func update(discussion: Discussion) {
+    func update(discussion: DiscussionFileObject) {
         guard let discussionMimeTypeEnum = MimeType(rawValue: discussion.mimeType!) else {
             SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown discussion mime type: \(discussion.mimeType!)")
             return
@@ -267,7 +267,7 @@ class SyncController {
     }
     
     // Also removes associated discussions, on the server. The images must be in the same sharing group.
-    func remove(images:[Image], sharingGroupUUID: String) -> Bool {
+    func remove(images:[ImageMediaObject], sharingGroupUUID: String) -> Bool {
         let imageUuids = images.map({$0.uuid!})
         let imagesWithDiscussions = images.filter({$0.discussion != nil && $0.discussion!.uuid != nil})
         let discussionUuids = imagesWithDiscussions.map({$0.discussion!.uuid!})
@@ -325,7 +325,7 @@ extension SyncController : SyncServerDelegate {
                 
             case .file(let downloadedFile):
                 // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
-                guard let discussion = Discussion.fetchObjectWithUUID(downloadedContentAttributes.fileUUID),
+                guard let discussion = DiscussionFileObject.fetchObjectWithUUID(downloadedContentAttributes.fileUUID),
                     let discussionURL = discussion.url as URL?,
                     let localDiscussion = FixedObjects(withFile: discussionURL),
                     let serverDiscussion = FixedObjects(withFile: downloadedFile as URL) else {

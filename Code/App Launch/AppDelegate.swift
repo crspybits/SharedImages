@@ -97,8 +97,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             SideMenu.session.setRootViewController(signIn, animation: false)
         }
         
-        let imageUUIDs = Image.fetchAll().map { $0.uuid!}
-        let discussionUUIDs = Discussion.fetchAll().map { $0.uuid!}
+        let imageUUIDs = ImageMediaObject.fetchAll().map { $0.uuid!}
+        let discussionUUIDs = DiscussionFileObject.fetchAll().map { $0.uuid!}
         do {
             if let results = try SyncServer.session.localConsistencyCheck(clientFiles: imageUUIDs + discussionUUIDs) {
                 let missing = Array(results.clientMissingAndDeleted)
