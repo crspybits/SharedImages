@@ -20,7 +20,6 @@ class ImagesVC: UIViewController {
     var initialSync = false
     
     let reuseIdentifier = "ImageIcon"
-    var acquireImages: AcquireImages!
     var addImagesButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
     
@@ -60,6 +59,7 @@ class ImagesVC: UIViewController {
     
     private var removeImages:RemoveImages!
     private var selectImages:UIButton!
+    private var mediaSelector:MediaSelectorVC!
     
     static func create() -> ImagesVC {
         return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ImagesVC") as! ImagesVC
@@ -76,9 +76,6 @@ class ImagesVC: UIViewController {
 
         collectionView.dataSource = self
         collectionView.delegate = self
-
-        acquireImages = AcquireImages(withParentViewController: self)
-        acquireImages.delegate = self
         
         coreDataSource = CoreDataSource(delegate: self)
         
@@ -150,7 +147,7 @@ class ImagesVC: UIViewController {
             return
         }
         
-        acquireImages.showAlert(fromBarButton: addImagesButton)
+        mediaSelector = MediaSelectorVC.show(fromParentVC: self, using: self)
     }
     
     @objc private func selectImagesAction() {

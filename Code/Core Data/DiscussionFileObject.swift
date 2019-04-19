@@ -80,8 +80,4 @@ public class DiscussionFileObject: FileObject {
         
         CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
     }
-    
-    func save() {
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-    }
 }

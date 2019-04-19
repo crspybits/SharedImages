@@ -47,4 +47,8 @@ public class FileObject: NSManagedObject {
     var hasError: Bool {
         return gone != nil || readProblem
     }
+    
+    func save() {
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+    }
 }

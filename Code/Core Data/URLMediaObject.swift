@@ -12,5 +12,7 @@ import CoreData
 
 @objc(URLMediaObject)
 public class URLMediaObject: FileMediaObject {
-
+    class func entityName() -> String {
+        return "URLMediaObject"
+    }
 }

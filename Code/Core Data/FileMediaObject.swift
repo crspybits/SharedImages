@@ -9,8 +9,20 @@
 
 import Foundation
 import CoreData
+import SMCoreLib
 
 @objc(FileMediaObject)
 public class FileMediaObject: FileObject {
-
+    // Also removes associated discussion.
+    func remove() throws {
+        if let discussion = discussion {
+            try discussion.remove()
+        }
+        
+        if let url = url {
+            try FileManager.default.removeItem(at: url as URL)
+        }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
+    }
 }

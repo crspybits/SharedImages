@@ -31,6 +31,8 @@
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
 		8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */; };
 		834A0CEB22696B9B00B42573 /* SharedImages7-8.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */; };
+		834A0CEF2269869100B42573 /* MediaSelectorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A0CED2269869100B42573 /* MediaSelectorVC.swift */; };
+		834A0CF02269869100B42573 /* MediaSelectorVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 834A0CEE2269869100B42573 /* MediaSelectorVC.xib */; };
 		834A7E792037858800969B18 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E6F2037858800969B18 /* Alert.swift */; };
 		834A7E7A2037858800969B18 /* XibBasics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E702037858800969B18 /* XibBasics.swift */; };
 		834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A7E712037858800969B18 /* SyncSpinner.swift */; };
@@ -151,6 +153,8 @@
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
 		8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ODRefreshControl+Extras.swift"; sourceTree = "<group>"; };
 		834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = "SharedImages7-8.xcmappingmodel"; sourceTree = "<group>"; };
+		834A0CED2269869100B42573 /* MediaSelectorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaSelectorVC.swift; sourceTree = "<group>"; };
+		834A0CEE2269869100B42573 /* MediaSelectorVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MediaSelectorVC.xib; sourceTree = "<group>"; };
 		834A7E6F2037858800969B18 /* Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		834A7E702037858800969B18 /* XibBasics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XibBasics.swift; sourceTree = "<group>"; };
 		834A7E712037858800969B18 /* SyncSpinner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSpinner.swift; sourceTree = "<group>"; };
@@ -373,6 +377,15 @@
 			path = "Core Data Models";
 			sourceTree = "<group>";
 		};
+		834A0CEC2269865F00B42573 /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				834A0CED2269869100B42573 /* MediaSelectorVC.swift */,
+				834A0CEE2269869100B42573 /* MediaSelectorVC.xib */,
+			);
+			path = Media;
+			sourceTree = "<group>";
+		};
 		834A7E6D2037858800969B18 /* Misc UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -560,6 +573,7 @@
 				835A8A99223F3FEC0000FEA0 /* App Launch */,
 				8324EE2A1E74ABCE000656AF /* SetupSignIn.swift */,
 				83F882601E749C18008F644A /* Consts.swift */,
+				834A0CEC2269865F00B42573 /* Media */,
 				83F5CB532246D919006DBB2F /* SideMenu */,
 				834A7E6D2037858800969B18 /* Misc UI */,
 				8324EE2C1E74ABD4000656AF /* SignIn */,
@@ -716,6 +730,7 @@
 				83CE2F1122550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.xib in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
 				83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */,
+				834A0CF02269869100B42573 /* MediaSelectorVC.xib in Resources */,
 				83CE2F1F225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
@@ -974,6 +989,7 @@
 				831521712206CC9000CA773D /* Notifications.swift in Sources */,
 				835A8AA8224478BC0000FEA0 /* AlbumsVC.swift in Sources */,
 				83F5CB5F2247FF64006DBB2F /* Menu.swift in Sources */,
+				834A0CEF2269869100B42573 /* MediaSelectorVC.swift in Sources */,
 				8324EE2B1E74ABCE000656AF /* SetupSignIn.swift in Sources */,
 				830386E2226949AF00DB598D /* FileObject+CoreDataProperties.swift in Sources */,
 				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,

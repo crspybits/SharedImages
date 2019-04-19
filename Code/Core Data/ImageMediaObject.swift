@@ -176,23 +176,6 @@ public class ImageMediaObject: FileMediaObject {
         
         return images
     }
-    
-    func save() {
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-    }
-    
-    // Also removes associated discussion.
-    func remove() throws {
-        if let discussion = discussion {
-            try discussion.remove()
-        }
-        
-        if let url = url {
-            try FileManager.default.removeItem(at: url as URL)
-        }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
-    }
 }
 
 extension ImageMediaObject : CacheDataSource {

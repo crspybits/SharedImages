@@ -11,6 +11,7 @@ import UIKit
 import NohanaImagePicker
 import Photos
 import SMCoreLib
+import SDCAlertView
 
 public protocol AcquireImagesDelegate : class {
     // Called imediately before each image is acquired to obtain a URL for an image. A file shouldn't already exist at this URL when this returns.
@@ -32,19 +33,19 @@ public class AcquireImages: NSObject {
         self.parentViewController = parentViewController
     }
     
-    private enum ShowFromType {
-        case barButton(UIBarButtonItem)
-        case view(UIView)
+    enum ImageType {
+        case camera
+        case photoLibrary
     }
     
-    private func showAlert(fromType type: ShowFromType) {
+    func acquire(type: ImageType) {
         switch PHPhotoLibrary.authorizationStatus() {
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization {[weak self] status in
                 DispatchQueue.main.async {
                     switch status {
                     case .authorized:
-                        self?.showAlertAux(fromType: type)
+                        self?.acquireAux(type: type)
                     default:
                         break
                     }
@@ -53,52 +54,25 @@ public class AcquireImages: NSObject {
         case .restricted, .denied:
             break
         case .authorized:
-            self.showAlertAux(fromType: type)
+            self.acquireAux(type: type)
         }
     }
     
-    private func showAlertAux(fromType type: ShowFromType) {
-        let alert = UIAlertController(title: "Get image(s)?", message: nil, preferredStyle: .actionSheet)
-        
+    private func acquireAux(type: ImageType) {
         switch type {
-        case .barButton(let barButton):
-            alert.popoverPresentationController?.barButtonItem = barButton
-        
-        case .view(let view):
-            alert.popoverPresentationController?.sourceView = view
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { alert in
-        })
-        
-        if UIImagePickerController.isSourceTypeAvailable(
-            UIImagePickerController.SourceType.camera) {
-            alert.addAction(UIAlertAction(title: "Camera", style: .default) { alert in
-                let imagePicker = UIImagePickerController()
-                imagePicker.sourceType = .camera
-                imagePicker.allowsEditing = false
-                imagePicker.delegate = self
-                self.parentViewController.present(imagePicker, animated: true, completion: nil)
-            })
-        }
-
-        alert.addAction(UIAlertAction(title: "Photo Library", style: .default) { alert in
+        case .camera:
+            let imagePicker = UIImagePickerController()
+            imagePicker.sourceType = .camera
+            imagePicker.allowsEditing = false
+            imagePicker.delegate = self
+            self.parentViewController.present(imagePicker, animated: true, completion: nil)
+        case .photoLibrary:
             let picker = NohanaImagePickerController()
             picker.cellMainAction = .longPressShowLargeImage
             picker.maximumNumberOfSelection = 10
             picker.delegate = self
             self.parentViewController.present(picker, animated: true, completion: nil)
-        })
-        
-        self.parentViewController.present(alert, animated: true, completion: nil)
-    }
-    
-    open func showAlert(fromView view:UIView) {
-        showAlert(fromType: .view(view))
-    }
-
-    open func showAlert(fromBarButton barButton:UIBarButtonItem) {
-        showAlert(fromType: .barButton(barButton))
+        }
     }
     
     private func writeImageToFile(image: UIImage) -> URL? {
