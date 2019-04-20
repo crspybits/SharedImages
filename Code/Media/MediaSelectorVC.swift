@@ -69,6 +69,7 @@ class MediaSelectorVC: UIViewController {
     }
     
     @IBAction func urlAction(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
     }
     
     @IBAction func cameraAction(_ sender: Any) {
