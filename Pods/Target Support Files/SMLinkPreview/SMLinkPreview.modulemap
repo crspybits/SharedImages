@@ -1,0 +1,6 @@
+framework module SMLinkPreview {
+  umbrella header "SMLinkPreview-umbrella.h"
+
+  export *
+  module * { export * }
+}

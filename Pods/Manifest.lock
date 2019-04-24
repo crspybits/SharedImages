@@ -55,6 +55,7 @@ PODS:
     - Reachability
     - SwiftyBeaver
   - SMGoogleSignIn (1.1.0)
+  - SMLinkPreview (0.1.0)
   - SwiftyBeaver (1.7.0)
   - SwiftyDropbox (5.0.0):
     - Alamofire (~> 4.7.3)
@@ -117,6 +118,7 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 9.0)
   - SMCoreLib (~> 2.0)
+  - SMLinkPreview (from `../SMLinkPreview`)
   - SyncServer (~> 19.3.0)
   - SyncServer/Dropbox (~> 19.3.0)
   - SyncServer/Facebook (~> 19.3.0)
@@ -167,6 +169,8 @@ EXTERNAL SOURCES:
     :git: https://github.com/crspybits/NohanaImagePicker.git
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
+  SMLinkPreview:
+    :path: "../SMLinkPreview"
 
 CHECKOUT OPTIONS:
   NohanaImagePicker:
@@ -208,6 +212,7 @@ SPEC CHECKSUMS:
   SDCAlertView: f24c447279278dca39d41562b414276980b066d8
   SMCoreLib: d0f23c31acc266eb56f8cc18a5a20a8e5065a9aa
   SMGoogleSignIn: de1b8302583b61df51b71b81e349cbe487cbbda3
+  SMLinkPreview: 196ea069d59b608e1d18808b33a0c8eba45f7bc6
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
   SwiftyDropbox: 378b4425a2e8d0cb24c7b0f2e3af72bfbaaf1e73
   SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
@@ -215,6 +220,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: 3bce6222b4a6cee43445c7f9c446aeb6d4437926
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: f5c2881665d27d4e5fa3751651d660cc46ff250d
+PODFILE CHECKSUM: 3beafa8b02c66d5f9f5fdf92915384c5619a595f
 
 COCOAPODS: 1.6.1

@@ -69,6 +69,9 @@ target 'SharedImages' do
 	pod 'Karte', '~> 2.2'
 	
 	pod 'LMGeocoderUniversal', '~> 1.2'
+	
+	# pod 'SMLinkPreview', :git => 'https://github.com/crspybits/SMLinkPreview.git'
+    pod 'SMLinkPreview', :path => '../SMLinkPreview'
     
 	target 'NeeblaTests' do
     	inherit! :search_paths

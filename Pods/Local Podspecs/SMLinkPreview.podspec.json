@@ -1,0 +1,23 @@
+{
+  "name": "SMLinkPreview",
+  "version": "0.1.0",
+  "summary": "A short description of SMLinkPreview.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/crspybits/SMLinkPreview",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "crspybits": "chris@SpasticMuffin.biz"
+  },
+  "source": {
+    "git": "https://github.com/crspybits/SMLinkPreview.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "10.0"
+  },
+  "source_files": "SMLinkPreview/Classes/**/*",
+  "swift_version": "5.0"
+}

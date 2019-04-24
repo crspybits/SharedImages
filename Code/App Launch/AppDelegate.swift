@@ -15,6 +15,7 @@ import Crashlytics
 import rosterdev
 import UserNotifications
 import XCGLogger
+import SMLinkPreview
 
 let Log = Logger.setup()
 
@@ -97,6 +98,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             SideMenu.session.setRootViewController(signIn, animation: false)
         }
         
+#if DEBUG
+        let images = ImageMediaObject.fetchAll()
+        for image in images {
+            Log.debug("image: goneReason: \(String(describing: image.goneReasonInternal)); readProblem: \(image.readProblem); image.discussion: \(String(describing: image.discussion)); discussion.goneReason: \(String(describing: image.discussion?.gone)); discussion.readProblem: \(String(describing: image.discussion?.readProblem))")
+        }
+        
+        let discussions = DiscussionFileObject.fetchAll()
+        for discussion in discussions {
+            Log.debug("discussion: mediaObject: \(String(describing: discussion.mediaObject))")
+        }
+#endif
+        
         let imageUUIDs = ImageMediaObject.fetchAll().map { $0.uuid!}
         let discussionUUIDs = DiscussionFileObject.fetchAll().map { $0.uuid!}
         do {
@@ -121,6 +134,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Migrations.session.launch()
         ImagesHandler.setup()
+        PreviewManager.setup()
         
         // For [2] below.
         UNUserNotificationCenter.current().delegate = self

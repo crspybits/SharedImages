@@ -69,7 +69,9 @@ class MediaSelectorVC: UIViewController {
     }
     
     @IBAction func urlAction(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true) {[unowned self] in
+            URLPickerVC.show(fromParentVC: self.parentVC)
+        }
     }
     
     @IBAction func cameraAction(_ sender: Any) {
