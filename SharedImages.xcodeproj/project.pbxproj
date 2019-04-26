@@ -30,6 +30,9 @@
 		8324EE331E764907000656AF /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE321E764907000656AF /* SyncController.swift */; };
 		8324EE4E1E778623000656AF /* CALayer+MBAnimationPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */; };
 		8334896F22701564002DC2E9 /* PreviewManager+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8334896E22701564002DC2E9 /* PreviewManager+Extras.swift */; };
+		833489712272967A002DC2E9 /* APIKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 833489702272967A002DC2E9 /* APIKeys.plist */; };
+		83348973227297FA002DC2E9 /* URLIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83348972227297FA002DC2E9 /* URLIcon.swift */; };
+		833489752272980D002DC2E9 /* URLIcon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 833489742272980D002DC2E9 /* URLIcon.xib */; };
 		8343F03A2166E973005F2EDC /* ODRefreshControl+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */; };
 		834A0CEB22696B9B00B42573 /* SharedImages7-8.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */; };
 		834A0CEF2269869100B42573 /* MediaSelectorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834A0CED2269869100B42573 /* MediaSelectorVC.swift */; };
@@ -155,6 +158,9 @@
 		8324EE461E778623000656AF /* CALayer+MBAnimationPersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+MBAnimationPersistence.h"; sourceTree = "<group>"; };
 		8324EE471E778623000656AF /* CALayer+MBAnimationPersistence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+MBAnimationPersistence.m"; sourceTree = "<group>"; };
 		8334896E22701564002DC2E9 /* PreviewManager+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreviewManager+Extras.swift"; sourceTree = "<group>"; };
+		833489702272967A002DC2E9 /* APIKeys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = APIKeys.plist; path = Resources/APIKeys.plist; sourceTree = "<group>"; };
+		83348972227297FA002DC2E9 /* URLIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLIcon.swift; sourceTree = "<group>"; };
+		833489742272980D002DC2E9 /* URLIcon.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = URLIcon.xib; sourceTree = "<group>"; };
 		8343F0392166E973005F2EDC /* ODRefreshControl+Extras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ODRefreshControl+Extras.swift"; sourceTree = "<group>"; };
 		834A0CEA22696B9B00B42573 /* SharedImages7-8.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = "SharedImages7-8.xcmappingmodel"; sourceTree = "<group>"; };
 		834A0CED2269869100B42573 /* MediaSelectorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaSelectorVC.swift; sourceTree = "<group>"; };
@@ -393,6 +399,8 @@
 				834A0CEE2269869100B42573 /* MediaSelectorVC.xib */,
 				834A0CF1226A9DB700B42573 /* URLPickerVC.swift */,
 				834A0CF2226A9DB700B42573 /* URLPickerVC.xib */,
+				83348972227297FA002DC2E9 /* URLIcon.swift */,
+				833489742272980D002DC2E9 /* URLIcon.xib */,
 			);
 			path = Media;
 			sourceTree = "<group>";
@@ -573,6 +581,7 @@
 				83F882421E711FC6008F644A /* Info.plist */,
 				83F882641E74A3C5008F644A /* GoogleService-Info.plist */,
 				83F882661E74A600008F644A /* Server.plist */,
+				833489702272967A002DC2E9 /* APIKeys.plist */,
 				834A0CE5226963FA00B42573 /* Core Data Models */,
 			);
 			name = Resources;
@@ -744,11 +753,13 @@
 				83D0BE1F20B37D6F00555B73 /* SortyFilter.xib in Resources */,
 				834A0CF02269869100B42573 /* MediaSelectorVC.xib in Resources */,
 				83CE2F1F225686BE00E6EFD7 /* ShareAlbumAllowSocialCell.xib in Resources */,
+				833489752272980D002DC2E9 /* URLIcon.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
 				83CE2F1922556DAA00E6EFD7 /* ShareAlbumHelpCell.xib in Resources */,
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
 				835A8AAA224478BC0000FEA0 /* AlbumCell.xib in Resources */,
+				833489712272967A002DC2E9 /* APIKeys.plist in Resources */,
 				83F5CB612247FF71006DBB2F /* Menu.xib in Resources */,
 				836E0C142260185B00BA4BC6 /* Settings.bundle in Resources */,
 				83F5CB5B2247FCB8006DBB2F /* SideMenuItem.xib in Resources */,
@@ -998,6 +1009,7 @@
 				8380D2682161A6DC008D6231 /* Badge+Extras.swift in Sources */,
 				835A8AAF22448BB90000FEA0 /* SettingsVC.swift in Sources */,
 				835A8AA9224478BC0000FEA0 /* AlbumCell.swift in Sources */,
+				83348973227297FA002DC2E9 /* URLIcon.swift in Sources */,
 				835A8AA1223F40460000FEA0 /* Logger.swift in Sources */,
 				83CE2F1022550D9400E6EFD7 /* ShareAlbumNumberInviteesCell.swift in Sources */,
 				835A8AB1224566590000FEA0 /* RemoveUserFromAlbumVC.swift in Sources */,

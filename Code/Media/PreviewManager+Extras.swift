@@ -11,7 +11,6 @@ import SMLinkPreview
 
 extension PreviewManager {
     static func setup() {
-        /*
         guard let requestKeyName = MicrosoftURLPreview.requestKeyName,
             let microsoftKey = APIKey.getFromPlist(plistKeyName: "MicrosoftURLPreview", requestKeyName: requestKeyName, plistName: "APIKeys") else {
             return
@@ -20,19 +19,19 @@ extension PreviewManager {
         guard let msPreview = MicrosoftURLPreview(apiKey: microsoftKey) else {
             return
         }
-        */
         
         guard let adaPreview = AdaSupportPreview(apiKey: nil) else {
             return
         }
         
-        
         guard let mPreview = MicrolinkPreview(apiKey: nil) else {
             return
         }
 
-        //PreviewManager.session.add(source: msPreview)
+        PreviewManager.session.add(source: msPreview)
         PreviewManager.session.add(source: adaPreview)
         PreviewManager.session.add(source: mPreview)
+        
+        PreviewManager.session.config = PreviewConfiguration(maxNumberTitleLines: 3)
     }
 }

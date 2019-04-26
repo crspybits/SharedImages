@@ -13,11 +13,9 @@ import SMLinkPreview
 class URLPickerVC: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var linkPreviewContainer: UIView!
-    @IBOutlet weak var linkPreviewHeight: NSLayoutConstraint!
-    @IBOutlet weak var linkPreviewWidth: NSLayoutConstraint!
     @IBOutlet weak var marginView: UIView!
     @IBOutlet weak var acceptButton: UIButton!
-    @IBOutlet weak var useHttpsSwitch: UISwitch!
+    @IBOutlet weak var linkPreview: UIView!
     
     private let presenter: Presentr = {
         let customPresenter = Presentr(presentationType: URLPickerVC.customType)
@@ -38,8 +36,9 @@ class URLPickerVC: UIViewController {
             return customType
         }
         else {
-            let customType = PresentationType.custom(width: .full, height: .custom(size: height), center: .center)
-            return customType
+            let height = min(UIScreen.main.bounds.height, UIScreen.main.bounds.width)
+            let customType = PresentationType.custom(width: .full, height: .custom(size: Float(height)), center: .center)
+            return .fullScreen
         }
     }()
     
@@ -85,13 +84,6 @@ class URLPickerVC: UIViewController {
             return nil
         }
     
-        if useHttpsSwitch.isOn {
-            components.scheme = "https"
-        }
-        else {
-            components.scheme = "http"
-        }
-    
         return components.url?.absoluteString
     }
     
@@ -116,12 +108,18 @@ class URLPickerVC: UIViewController {
         
         PreviewManager.session.getLinkData(url: url) { linkData in
             if let linkData = linkData {
-                self.linkPreviewContainer.removeAllSubviews()
+                self.linkPreview.removeAllSubviews()
                 self.linkPreviewContainer.isHidden = false
+                
                 let preview = LinkPreview.create(with: linkData)
-                self.linkPreviewHeight.constant = preview.frame.height
-                self.linkPreviewWidth.constant = preview.frame.width
-                self.linkPreviewContainer.addSubview(preview)
+                self.linkPreview.addSubview(preview)
+                preview.centerXAnchor.constraint(equalTo: self.linkPreview.centerXAnchor).isActive = true
+                preview.centerYAnchor.constraint(equalTo: self.linkPreview.centerYAnchor).isActive = true
+                preview.heightAnchor.constraint(equalToConstant: self.linkPreview.frameHeight).isActive = true
+                preview.widthAnchor.constraint(equalToConstant: self.linkPreview.frameWidth).isActive = true
+                preview.size = self.linkPreview.frame.size
+                preview.translatesAutoresizingMaskIntoConstraints = false
+                
                 self.view.layoutIfNeeded()
             }
         }
