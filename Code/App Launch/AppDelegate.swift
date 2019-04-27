@@ -101,7 +101,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 #if DEBUG
         let images = ImageMediaObject.fetchAll()
         for image in images {
-            Log.debug("image: goneReason: \(String(describing: image.goneReasonInternal)); readProblem: \(image.readProblem); image.discussion: \(String(describing: image.discussion)); discussion.goneReason: \(String(describing: image.discussion?.gone)); discussion.readProblem: \(String(describing: image.discussion?.readProblem))")
+            Log.debug("image: goneReason: \(String(describing: image.goneReasonInternal)); readProblem: \(image.readProblem); image.discussion: \(String(describing: image.discussion)); discussion.goneReason: \(String(describing: image.discussion?.gone)); discussion.readProblem: \(String(describing: image.discussion?.readProblem)); image.discussionUUID: \(String(describing: image.discussionUUID)); image.title: \(String(describing: image.title)); image.creationDate: \(String(describing: image.creationDate)); image.fileGroupUUID: \(String(describing: image.fileGroupUUID)); image.uuid: \(String(describing: image.uuid));")
         }
         
         let discussions = DiscussionFileObject.fetchAll()

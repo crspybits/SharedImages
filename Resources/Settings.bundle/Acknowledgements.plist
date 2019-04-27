@@ -468,6 +468,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Icon made by Viktor Vorobyev (https://thenounproject.com/search/?q=url&amp;i=534668)</string>
+			<key>Title</key>
+			<string>Link</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>Icon made by Marina Reut (https://www.iconfinder.com/icons/372205/lock_login_password_icon#size=128)</string>
 			<key>Title</key>
 			<string>Lock</string>

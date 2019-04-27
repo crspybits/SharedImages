@@ -20,6 +20,9 @@ class Migrations {
 
     private static let v0_18_3 = SMPersistItemBool(name: "Migrations.v0_18_3", initialBoolValue: false, persistType: .userDefaults)
     
+    // The CoreData migration for v1.5 messed up the discussion/image relations. Going to fix this manually, here.
+    private static let v1_5 = SMPersistItemBool(name: "Migrations.v1_5", initialBoolValue: false, persistType: .userDefaults)
+    
     private init() {
     }
     
@@ -41,6 +44,31 @@ class Migrations {
             }
             
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        }
+        
+        if !Migrations.v1_5.boolValue {
+            Migrations.v1_5.boolValue = true
+            
+            let images = ImageMediaObject.fetchAll()
+            for image in images {
+                guard image.discussion == nil else {
+                    // Not an error, just don't need to populate.
+                    continue
+                }
+                
+                guard let fileGroupUUID = image.fileGroupUUID else {
+                    Log.error("No fileGroupUUID for image: \(String(describing: image.uuid))")
+                    continue
+                }
+                
+                guard let discussion = DiscussionFileObject.fetchObjectWithFileGroupUUID(fileGroupUUID) else {
+                    Log.error("Could not find discussion for image: fileGroupUUID: \(fileGroupUUID)")
+                    continue
+                }
+                
+                image.discussion = discussion
+                image.save()
+            }
         }
     }
 }

@@ -190,7 +190,7 @@ const NSString *CoreDataLightWeightMigration = @"CoreDataLightWeightMigration";
         }
 #endif
 
-        if (dictionary[COREDATA_LIGHTWEIGHT_MIGRATION]) {
+        if ([dictionary[COREDATA_LIGHTWEIGHT_MIGRATION] boolValue]) {
             [self migrationSetup];
         }
         else {

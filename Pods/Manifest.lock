@@ -50,7 +50,7 @@ PODS:
   - Reachability (3.2)
   - rosterdev (0.1.0)
   - SDCAlertView (9.0.1)
-  - SMCoreLib (2.0.1):
+  - SMCoreLib (2.0.2):
     - HPTextViewTapGestureRecognizer (~> 0.2)
     - Reachability
     - SwiftyBeaver
@@ -210,7 +210,7 @@ SPEC CHECKSUMS:
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   rosterdev: 2a7b69c5d01133bd714161e1e80deea1da9cb90f
   SDCAlertView: f24c447279278dca39d41562b414276980b066d8
-  SMCoreLib: d0f23c31acc266eb56f8cc18a5a20a8e5065a9aa
+  SMCoreLib: bd3abc52cf9e0e30827da9b8a7cdbdf06a2944eb
   SMGoogleSignIn: de1b8302583b61df51b71b81e349cbe487cbbda3
   SMLinkPreview: 196ea069d59b608e1d18808b33a0c8eba45f7bc6
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
