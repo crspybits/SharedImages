@@ -16,13 +16,14 @@ protocol LargeMediaCellDelegate : class {
 }
 
 class MediaCollectionViewCell : UICollectionViewCell {
-    // For large images only, the imageView's are embedded in a scroll view to enable pinch/zoom. Because these only apply to large images, referenced as scrollView? below.
+    // For large images only, the mediaView's are embedded in a scroll view to enable pinch/zoom. Because these only apply to large images, referenced as scrollView? below.
     @IBOutlet weak var scrollView: UIScrollView!
     
     // Also only applies to large scale images, because will only be used when scroll view is used.
     fileprivate var switchedToFullScaleImageForZooming = false
 
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var mediaViewContainer: MediaViewContainer!
+    var mediaView: MediaView!
     
     // These are oversized to give space for padding.
     static let smallTitleHeight:CGFloat = 15
@@ -44,7 +45,7 @@ class MediaCollectionViewCell : UICollectionViewCell {
     var tapGesture: UITapGestureRecognizer?
     var imageTapBehavior:(()->())?
     
-    // Only for small images.
+    // Only for small media.
     enum SelectedState {
         case notSelected
         case selected
@@ -62,13 +63,13 @@ class MediaCollectionViewCell : UICollectionViewCell {
                 switch self.selectedState {
                 case .none:
                     self.selectedIcon?.alpha = 0
-                    self.imageView.alpha = 1
+                    self.mediaViewContainer.alpha = 1
                 case .some(.selected):
                     self.selectedIcon?.alpha = 1
-                    self.imageView.alpha = 1
+                    self.mediaViewContainer.alpha = 1
                 case .some(.notSelected):
                     self.selectedIcon?.alpha = 0.5
-                    self.imageView.alpha = 0.8
+                    self.mediaViewContainer.alpha = 0.8
                 }
             }, completion: { _ in
                 switch self.selectedState {
@@ -99,6 +100,25 @@ class MediaCollectionViewCell : UICollectionViewCell {
         title.text = media.title
         imageCache = cache
         
+        switch media {
+        case is ImageMediaObject:
+            let imageMedia:ImageMediaView
+            if let imv = mediaViewContainer.mediaView as? ImageMediaView {
+                imageMedia = imv
+            }
+            else {
+                imageMedia = ImageMediaView()
+                mediaViewContainer.mediaView = imageMedia
+            }
+            
+            if let imageCache = imageCache {
+                imageMedia.setupWith(media: media as! ImageMediaObject, imageCache: imageCache)
+            }
+            self.mediaView = imageMedia
+        default:
+            assert(false)
+        }
+        
         if let _ = errorImageView {
             var showError = false
             if let _ = self.media.url {
@@ -109,8 +129,8 @@ class MediaCollectionViewCell : UICollectionViewCell {
             else if self.media.eitherHasError {
                 showError = true
                 
-                // No url, and thus no image contents on the image view -- it looks odd if there is no color/image on the imageView. Give it some color.
-                imageView.backgroundColor = .lightGray
+                // No url, and thus no contents on the media view -- it looks odd if there is no color/image on the media view. Give it some color.
+                mediaViewContainer.backgroundColor = .lightGray
             }
             
             errorImageView?.isHidden = !showError
@@ -129,13 +149,13 @@ class MediaCollectionViewCell : UICollectionViewCell {
             if let _ = imageTapBehavior, tapGesture == nil {
                 tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapGestureAction))
                 
-                // Putting this on the scrollView and not the imageView because the tap is not recognized if I put it on the imageView.
+                // Putting this on the scrollView and not the mediaView because the tap is not recognized if I put it on the mediaView.
                 scrollView?.addGestureRecognizer(tapGesture!)
             }
 
             if discussion.unreadCount > 0 {
                 badge.format(withUnreadCount: Int(discussion.unreadCount))
-                imageView.addSubview(badge)
+                mediaViewContainer.addSubview(badge)
             }
         }
         else {
@@ -150,69 +170,45 @@ class MediaCollectionViewCell : UICollectionViewCell {
     
     // I had problems knowing when the cell was sized correctly so that I could call `ImageStorage.getImage`. `layoutSubviews` seems to not be the right place. And neither is `setProperties` (which gets called by cellForItemAt). When the UICollectionView is first displayed, I get small sizes (less than 1/2 of correct sizes) at least on iPad. Odd.
     func cellSizeHasBeenChanged() {
-        guard let imageCache = imageCache else {
-            return
-        }
-        
-        // For some reason, when I get here, the cell is sized correctly, but it's subviews are not. And more specifically, the image view subview is not sized correctly all the time. And since I'm basing my image fetch/resize on the image view size, I need it correctly sized right now.
+        // For some reason, when I get here, the cell is sized correctly, but it's subviews are not. And more specifically, the image view subview is not sized correctly all the time. And since I'm basing my media fetch/resize on the media view size, I need it correctly sized right now.
         layoutIfNeeded()
         
-        // 8/29/17; In some edge cases, the `imageView.frame.size` can have a dimension that is too small-- e.g., 0 for height. This can happen with a really wide image that is short.
-        let minimumImageDimension:CGFloat = 15
-        var size = imageView.frame.size
-        size.height = max(size.height, minimumImageDimension)
-        size.width = max(size.width, minimumImageDimension)
-        imageView.frameSize = size
+        // 8/29/17; In some edge cases, the `mediaViewContainer.frame.size` can have a dimension that is too small-- e.g., 0 for height. This can happen with a really wide image that is short.
+        let minimumMediaDimension:CGFloat = 15
+        var size = mediaViewContainer.frame.size
+        size.height = max(size.height, minimumMediaDimension)
+        size.width = max(size.width, minimumMediaDimension)
+        mediaViewContainer.frameSize = size
         
         scrollView?.contentSize = size
 
-        // TODO: Generalize this to use multiple media types.
-        assert(false)
-#if false
-        // Don't use image.hasError here only because on an upload/gone case, we do have a valid URL and can render the image.
-        guard let imageOriginalSize = media.originalSize else {
+        // Don't use media.hasError here only because on an upload/gone case, we do have a valid URL and can render the media.
+        guard let mediaOriginalSize = mediaView.originalSize else {
             originalSize = size
             return
         }
         
-        let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: size)
+        let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: size)
         
-        DispatchQueue.global().async {[weak self] in
-            if let self = self {
-                let cachedImage = imageCache.getItem(from: self.image, with: smallerSize)
-                
-                DispatchQueue.main.async {
-                    // Apparent crash here on 10/17/17-- iPhone 6, reported via Apple/Xcode
-                    // 11/29/17; I just got it again, while running attached to the debugger. In this case, `imageCache` was nil. I added a guard statement above to deal with this.
-                    self.imageView.image = cachedImage
-                }
-            }
-        }
-        
+        mediaView.showWith(size: smallerSize)
+
         originalSize = smallerSize
-#endif
     }
 }
 
 extension MediaCollectionViewCell : UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imageView
+        return mediaViewContainer
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        delegate?.cellZoomed(cell: self, toZoomSize: imageView.frame.size, withOriginalSize: originalSize)
-        //Log.msg("imageView.frame.size: \(imageView.frame.size)")
+        delegate?.cellZoomed(cell: self, toZoomSize: mediaViewContainer.frame.size, withOriginalSize: originalSize)
         
         if !switchedToFullScaleImageForZooming {
             switchedToFullScaleImageForZooming = true
 
-            // TODO: Generalize this to use multiple media types.
-            assert(false)
-#if false
-            // Load the full scale image to give the user better resolution when zooming in.
-            let uiImage = ImageExtras.fullSizedImage(url: image.url! as URL)
-            imageView.image = uiImage
-#endif
+            // Load full scale media to give the user better resolution when zooming in.
+            mediaView.changeToFullsizedMediaForZooming()
         }
     }
 }

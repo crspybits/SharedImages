@@ -12,7 +12,7 @@
         <!--MediaVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController storyboardIdentifier="ImagesVC" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="MediaVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MediaVC" automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="MediaVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -38,14 +38,10 @@
                                             <rect key="frame" x="0.0" y="0.0" width="75" height="97"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vcQ-vb-COV" userLabel="Media View Container">
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vcQ-vb-COV" userLabel="Media View Container" customClass="MediaViewContainer" customModule="Neebla" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="75" height="85"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </view>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="p10-SC-T2M" userLabel="imageView">
-                                                    <rect key="frame" x="0.0" y="0.0" width="75" height="85"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                                </imageView>
                                                 <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="errorNote" translatesAutoresizingMaskIntoConstraints="NO" id="1v8-aI-ffe" userLabel="Error Image View">
                                                     <rect key="frame" x="12.5" y="23.5" width="50" height="50"/>
                                                     <constraints>
@@ -77,22 +73,18 @@
                                             <constraint firstAttribute="trailing" secondItem="vcQ-vb-COV" secondAttribute="trailing" id="0iK-s3-kfM"/>
                                             <constraint firstAttribute="bottom" secondItem="nlX-iC-FAf" secondAttribute="bottom" id="5mS-Rh-yeM"/>
                                             <constraint firstItem="1v8-aI-ffe" firstAttribute="centerY" secondItem="GHm-lm-kQ4" secondAttribute="centerY" id="78z-Hu-JBM"/>
-                                            <constraint firstItem="nlX-iC-FAf" firstAttribute="top" secondItem="p10-SC-T2M" secondAttribute="bottom" id="BDP-Yb-hvC"/>
-                                            <constraint firstItem="p10-SC-T2M" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="FZq-DT-1ra"/>
                                             <constraint firstItem="1v8-aI-ffe" firstAttribute="centerX" secondItem="GHm-lm-kQ4" secondAttribute="centerX" id="HCw-2u-6Tb"/>
-                                            <constraint firstItem="p10-SC-T2M" firstAttribute="top" secondItem="GHm-lm-kQ4" secondAttribute="top" id="TSW-dI-kUC"/>
                                             <constraint firstAttribute="trailing" secondItem="2L4-Ia-MsB" secondAttribute="trailing" constant="2" id="Wbh-gO-2KU"/>
                                             <constraint firstItem="nlX-iC-FAf" firstAttribute="top" secondItem="vcQ-vb-COV" secondAttribute="bottom" id="X8E-lW-Vy5"/>
                                             <constraint firstItem="vcQ-vb-COV" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="aNQ-si-xYE"/>
                                             <constraint firstItem="nlX-iC-FAf" firstAttribute="leading" secondItem="GHm-lm-kQ4" secondAttribute="leading" id="cTj-rL-df1"/>
                                             <constraint firstItem="nlX-iC-FAf" firstAttribute="top" secondItem="2L4-Ia-MsB" secondAttribute="bottom" constant="2" id="czt-QM-Hpj"/>
-                                            <constraint firstAttribute="trailing" secondItem="p10-SC-T2M" secondAttribute="trailing" id="gPY-rR-do2"/>
                                             <constraint firstAttribute="trailing" secondItem="nlX-iC-FAf" secondAttribute="trailing" id="qzX-je-mKO"/>
                                             <constraint firstItem="vcQ-vb-COV" firstAttribute="top" secondItem="GHm-lm-kQ4" secondAttribute="top" id="xXH-hF-j7y"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="errorImageView" destination="1v8-aI-ffe" id="Yyj-73-a58"/>
-                                            <outlet property="imageView" destination="p10-SC-T2M" id="Q4Y-a1-JBB"/>
+                                            <outlet property="mediaViewContainer" destination="vcQ-vb-COV" id="qT2-eJ-1hC"/>
                                             <outlet property="selectedIcon" destination="2L4-Ia-MsB" id="7uR-y5-E8a"/>
                                             <outlet property="title" destination="nlX-iC-FAf" id="Jmz-UH-Zqo"/>
                                         </connections>
@@ -364,7 +356,7 @@
         <!--Large MediaVC-->
         <scene sceneID="efv-cU-CzA">
             <objects>
-                <viewController storyboardIdentifier="LargeImages" automaticallyAdjustsScrollViewInsets="NO" id="7QN-xT-tOc" customClass="LargeMediaVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LargeMediaVC" automaticallyAdjustsScrollViewInsets="NO" id="7QN-xT-tOc" customClass="LargeMediaVC" customModule="Neebla" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="ASX-tC-PLm"/>
                         <viewControllerLayoutGuide type="bottom" id="xtK-xN-Iu2"/>
@@ -393,18 +385,18 @@
                                                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="p1e-vt-Zhp">
                                                     <rect key="frame" x="0.0" y="20" width="375" height="374"/>
                                                     <subviews>
-                                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ehS-fV-uhh">
+                                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="utr-Ac-YeU" userLabel="Media View Container" customClass="MediaViewContainer" customModule="Neebla" customModuleProvider="target">
                                                             <rect key="frame" x="0.0" y="0.0" width="375" height="407"/>
-                                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                                        </imageView>
+                                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        </view>
                                                     </subviews>
                                                     <constraints>
-                                                        <constraint firstItem="ehS-fV-uhh" firstAttribute="centerX" secondItem="p1e-vt-Zhp" secondAttribute="centerX" id="AFX-lk-4yA"/>
-                                                        <constraint firstAttribute="trailing" secondItem="ehS-fV-uhh" secondAttribute="trailing" id="CcS-sL-Krz"/>
-                                                        <constraint firstItem="ehS-fV-uhh" firstAttribute="leading" secondItem="p1e-vt-Zhp" secondAttribute="leading" id="Rfj-Oo-c7V"/>
-                                                        <constraint firstAttribute="bottom" secondItem="ehS-fV-uhh" secondAttribute="bottom" constant="-33" id="UZZ-hh-lck"/>
-                                                        <constraint firstItem="ehS-fV-uhh" firstAttribute="centerY" secondItem="p1e-vt-Zhp" secondAttribute="centerY" constant="16.5" id="xEC-uy-Cuv"/>
-                                                        <constraint firstItem="ehS-fV-uhh" firstAttribute="top" secondItem="p1e-vt-Zhp" secondAttribute="top" id="yIi-lm-bbs"/>
+                                                        <constraint firstItem="utr-Ac-YeU" firstAttribute="centerY" secondItem="p1e-vt-Zhp" secondAttribute="centerY" constant="16.5" id="678-3r-be2"/>
+                                                        <constraint firstAttribute="trailing" secondItem="utr-Ac-YeU" secondAttribute="trailing" id="JRN-kZ-cnQ"/>
+                                                        <constraint firstItem="utr-Ac-YeU" firstAttribute="leading" secondItem="p1e-vt-Zhp" secondAttribute="leading" id="L5a-jM-LY7"/>
+                                                        <constraint firstAttribute="bottom" secondItem="utr-Ac-YeU" secondAttribute="bottom" constant="-33" id="ReG-qJ-E6D"/>
+                                                        <constraint firstItem="utr-Ac-YeU" firstAttribute="centerX" secondItem="p1e-vt-Zhp" secondAttribute="centerX" id="Z7r-dt-kR6"/>
+                                                        <constraint firstItem="utr-Ac-YeU" firstAttribute="top" secondItem="p1e-vt-Zhp" secondAttribute="top" id="qyf-DQ-loN"/>
                                                     </constraints>
                                                 </scrollView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v3d-KG-LOK">
@@ -429,7 +421,7 @@
                                             <constraint firstItem="p1e-vt-Zhp" firstAttribute="leading" secondItem="jFk-xt-pcJ" secondAttribute="leading" id="tPE-Fl-e0Q"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="imageView" destination="ehS-fV-uhh" id="g9M-2t-2An"/>
+                                            <outlet property="mediaViewContainer" destination="utr-Ac-YeU" id="xA4-XJ-81Q"/>
                                             <outlet property="scrollView" destination="p1e-vt-Zhp" id="MTN-Eq-yjk"/>
                                             <outlet property="title" destination="v3d-KG-LOK" id="Yjw-nK-UwS"/>
                                         </connections>
@@ -452,7 +444,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Pt9-uX-zAW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2690" y="161"/>
+            <point key="canvasLocation" x="2688.8000000000002" y="160.56971514242881"/>
         </scene>
         <!--Sign InVC-->
         <scene sceneID="VPd-vH-GDK">
