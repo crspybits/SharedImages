@@ -1,5 +1,5 @@
 //
-//  LargeImages.swift
+//  LargeMediaVC.swift
 //  SharedImages
 //
 //  Created by Christopher Prince on 4/21/17.
@@ -12,11 +12,11 @@ import SyncServer
 
 // http://stackoverflow.com/questions/18087073/start-uicollectionview-at-a-specific-indexpath
 
-class LargeImages : UIViewController {
+class LargeMediaVC : UIViewController {
     // Set these when creating an instance of this class.
     
-    // This is an image instead of an index, because the IndexPath's vary from the small images screen to the large images screen-- the large images screen doesn't display images with errors.
-    var startImage: ImageMediaObject?
+    // This is a media object instead of an index, because the IndexPath's vary from the small media screen to the large media screen-- the large media screen doesn't display media with errors.
+    var startMedia: FileMediaObject?
     
     weak var imagesHandler:ImagesHandler?
     var sharingGroup: SyncServer.SharingGroup!
@@ -36,8 +36,8 @@ class LargeImages : UIViewController {
                 _coreDataSource.fetchData()
                 
                 seekToIndexPath = nil
-                if let startImage = startImage,
-                    let indexPath = _coreDataSource.indexPath(for: startImage) {
+                if let startMedia = startMedia,
+                    let indexPath = _coreDataSource.indexPath(for: startMedia) {
                     seekToIndexPath = indexPath
                 }
             }
@@ -59,8 +59,8 @@ class LargeImages : UIViewController {
         return ImageExtras.imageCache
     }
     
-    static func create() -> LargeImages {
-        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LargeImages") as! LargeImages
+    static func create() -> LargeMediaVC {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LargeMediaVC") as! LargeMediaVC
     }
     
     override func viewDidLoad() {
@@ -169,17 +169,11 @@ class LargeImages : UIViewController {
     }
 }
 
-extension LargeImages : CoreDataSourceDelegate {
-/*
-    func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = ImageMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: true)
-        return ImageMediaObject.fetchRequestForAllObjects(params: params)
-    }
-*/
+extension LargeMediaVC : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = ImageMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: false)
-        return ImageMediaObject.fetchRequestForAllObjects(params: params)
+        let params = FileMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: false)
+        return FileMediaObject.fetchRequestForAllObjects(params: params)
     }
     
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
@@ -209,10 +203,10 @@ extension LargeImages : CoreDataSourceDelegate {
 }
 
 // MARK: UICollectionViewDelegate
-extension LargeImages : UICollectionViewDelegate {
+extension LargeMediaVC : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
     
-        let cell = cell as! ImageCollectionVC
+        let cell = cell as! MediaCollectionViewCell
         cell.cellSizeHasBeenChanged()
         cell.delegate = self
     }
@@ -228,7 +222,7 @@ extension LargeImages : UICollectionViewDelegate {
 }
 
 // MARK: UICollectionViewDataSource
-extension LargeImages : UICollectionViewDataSource {
+extension LargeMediaVC : UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -239,20 +233,20 @@ extension LargeImages : UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
         if let syncController = imagesHandler?.syncController,
-            let image = self.coreDataSource.object(at: indexPath) as? ImageMediaObject {
-            cell.setProperties(image: image, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
-                self.showDiscussionIfPresent(image: image)
+            let media = self.coreDataSource.object(at: indexPath) as? FileMediaObject {
+            cell.setProperties(media: media, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
+                self.showDiscussionIfPresent(media: media)
             })
         }
         
         return cell
     }
     
-    func showDiscussionIfPresent(image: ImageMediaObject) {
-        guard let discussion = image.discussion else {
+    func showDiscussionIfPresent(media: FileMediaObject) {
+        guard let discussion = media.discussion else {
             return
         }
         
@@ -265,7 +259,7 @@ extension LargeImages : UICollectionViewDataSource {
 }
 
 // MARK: UICollectionViewDelegateFlowLayout
-extension LargeImages : UICollectionViewDelegateFlowLayout {
+extension LargeMediaVC : UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     
         // Because we can scroll horizontally, let the width be large
@@ -278,7 +272,7 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
         let image = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
         
         guard !image.hasError, let imageOriginalSize = image.originalSize else {
-            return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + ImageCollectionVC.largeTitleHeight)
+            return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + MediaCollectionViewCell.largeTitleHeight)
         }
         
         var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: boundingCellSize)
@@ -289,12 +283,12 @@ extension LargeImages : UICollectionViewDelegateFlowLayout {
             boundedImageSize.height = collectionView.frame.height
         }
         
-        return CGSize(width: boundedImageSize.width + IMAGE_WIDTH_PADDING, height: boundedImageSize.height + ImageCollectionVC.largeTitleHeight)
+        return CGSize(width: boundedImageSize.width + IMAGE_WIDTH_PADDING, height: boundedImageSize.height + MediaCollectionViewCell.largeTitleHeight)
     }
 }
 
-extension LargeImages : LargeImageCellDelegate {
-    func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize) {
+extension LargeMediaVC : LargeMediaCellDelegate {
+    func cellZoomed(cell: MediaCollectionViewCell, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize) {
     
         if let indexPath = collectionView?.indexPath(for: cell) {
             // Don't let the cell shrink too small-- get odd effects here. The cell can get so small it shrinks out of sight. Don't know why that is. I thought the minimum scaling I put in the collection view cell would handle it.
@@ -319,7 +313,7 @@ extension LargeImages : LargeImageCellDelegate {
     }
 }
 
-extension LargeImages : DiscussionVCDelegate {
+extension LargeMediaVC : DiscussionVCDelegate {
     func discussionVCWillClose(_ vc: DiscussionVC) {
         Progress.session.viewController = self
     }

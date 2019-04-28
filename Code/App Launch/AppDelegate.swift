@@ -108,6 +108,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         for discussion in discussions {
             Log.debug("discussion: mediaObject: \(String(describing: discussion.mediaObject))")
         }
+        
+        let abstractObjects = FileMediaObject.fetchAllAbstractObjects()
+        Log.debug("abstractObjects.count: \(abstractObjects.count)")
 #endif
         
         let imageUUIDs = ImageMediaObject.fetchAll().map { $0.uuid!}

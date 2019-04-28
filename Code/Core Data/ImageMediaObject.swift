@@ -15,16 +15,9 @@ import SyncServer_Shared
 
 @objc(ImageMediaObject)
 public class ImageMediaObject: FileMediaObject {
-    static let CREATION_DATE_KEY = "creationDate"
     static let UUID_KEY = "uuid"
     static let DISCUSSION_UUID_KEY = "discussionUUID"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
-    static let UNREAD_COUNT = "discussion.unreadCount"
-    static let SHARING_GROUP_UUID_KEY = "sharingGroupUUID"
-    static let GONE_KEY = "goneReasonInternal"
-    static let READ_PROBLEM_KEY = "readProblem"
-    static let DISCUSSION_GONE_KEY = "discussion.goneReasonInternal"
-    static let DISCUSSION_READ_PROBLEM_KEY = "discussion.readProblem"
     
     var originalSize:CGSize? {
         var originalImageSize = CGSize()
@@ -46,12 +39,6 @@ public class ImageMediaObject: FileMediaObject {
         }
         
         return originalImageSize
-    }
-    
-    // Either image or associated discussion
-    var eitherHasError: Bool {
-        let discussionError = discussion?.hasError ?? false
-        return hasError || discussionError
     }
 
     class func entityName() -> String {
@@ -80,60 +67,7 @@ public class ImageMediaObject: FileMediaObject {
     class func newObject() -> NSManagedObject {
         return newObjectAndMakeUUID(makeUUID: false)
     }
-    
-    struct SortFilterParams {
-        let sortingOrder: Parameters.SortOrder
-        let isAscending: Bool
-        let unreadCounts: Parameters.UnreadCounts
-        let sharingGroupUUID: String
-        
-        // Errors include "gone" and read problem images/related discussions.
-        let includeErrors: Bool
-    }
-    
-    class func fetchRequestForAllObjects(params:SortFilterParams) -> NSFetchRequest<NSFetchRequestResult>? {
-        var fetchRequest: NSFetchRequest<NSFetchRequestResult>?
-        fetchRequest = CoreData.sessionNamed(CoreDataExtras.sessionName).fetchRequest(withEntityName: self.entityName(), modifyingFetchRequestWith: { request in
-            
-            var subpredicates = [NSPredicate]()
-            
-            switch params.unreadCounts {
-            case .all:
-                break
-                
-            case .unread:
-                subpredicates += [NSPredicate(format: "(%K > 0)", UNREAD_COUNT)]
-            }
-            
-            subpredicates += [NSPredicate(format: "(%K == %@)", SHARING_GROUP_UUID_KEY, params.sharingGroupUUID)]
-            
-            if !params.includeErrors {
-                subpredicates += [NSPredicate(format: "(%K == nil)", GONE_KEY)]
-                subpredicates += [NSPredicate(format: "(%K == false)", READ_PROBLEM_KEY)]
-                subpredicates += [NSPredicate(format: "(%K == nil)", DISCUSSION_GONE_KEY)]
-                subpredicates += [NSPredicate(format: "(%K == false)", DISCUSSION_READ_PROBLEM_KEY)]
-            }
-            
-            if subpredicates.count > 0 {
-                let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subpredicates)
-                request.predicate = compoundPredicate
-            }
-        })
-        
-        if fetchRequest != nil {
-            var sortDescriptor:NSSortDescriptor!
-            
-            switch params.sortingOrder {
-            case .creationDate:
-                sortDescriptor = NSSortDescriptor(key: CREATION_DATE_KEY, ascending: params.isAscending)
-            }
-            
-            fetchRequest!.sortDescriptors = [sortDescriptor]
-        }
-        
-        return fetchRequest
-    }
-    
+
     class func fetchObjectsWithSharingGroupUUID(_ sharingGroupUUID:String) -> [ImageMediaObject]? {
         var result:[ImageMediaObject]?
         do {

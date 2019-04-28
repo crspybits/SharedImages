@@ -1,5 +1,5 @@
 //
-//  ImageCollectionVC.swift
+//  MediaCollectionViewCell.swift
 //  SharedImages
 //
 //  Created by Christopher Prince on 3/10/17.
@@ -11,11 +11,11 @@ import UIKit
 import SMCoreLib
 import BadgeSwift
 
-protocol LargeImageCellDelegate : class {
-    func cellZoomed(cell: ImageCollectionVC, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize)
+protocol LargeMediaCellDelegate : class {
+    func cellZoomed(cell: MediaCollectionViewCell, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize)
 }
 
-class ImageCollectionVC : UICollectionViewCell {
+class MediaCollectionViewCell : UICollectionViewCell {
     // For large images only, the imageView's are embedded in a scroll view to enable pinch/zoom. Because these only apply to large images, referenced as scrollView? below.
     @IBOutlet weak var scrollView: UIScrollView!
     
@@ -34,11 +34,11 @@ class ImageCollectionVC : UICollectionViewCell {
     @IBOutlet weak var errorImageView: UIImageView!
     @IBOutlet weak var selectedIcon: UIImageView!
     
-    private(set) var image:ImageMediaObject!
+    private(set) var media:FileMediaObject!
     private(set) weak var syncController:SyncController!
     weak var imageCache:LRUCache<ImageMediaObject>?
     
-    weak var delegate:LargeImageCellDelegate?
+    weak var delegate:LargeMediaCellDelegate?
     var originalSize:CGSize!
     let badge = BadgeSwift()
     var tapGesture: UITapGestureRecognizer?
@@ -92,21 +92,21 @@ class ImageCollectionVC : UICollectionViewCell {
         badge.removeFromSuperview()
     }
     
-    func setProperties(image:ImageMediaObject, syncController:SyncController, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
+    func setProperties(media:FileMediaObject, syncController:SyncController, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
         selectedState = nil
-        self.image = image
+        self.media = media
         self.syncController = syncController
-        title.text = image.title
+        title.text = media.title
         imageCache = cache
         
         if let _ = errorImageView {
             var showError = false
-            if let _ = self.image.url {
-                if self.image.eitherHasError {
+            if let _ = self.media.url {
+                if self.media.eitherHasError {
                     showError = true
                 }
             }
-            else if self.image.eitherHasError {
+            else if self.media.eitherHasError {
                 showError = true
                 
                 // No url, and thus no image contents on the image view -- it looks odd if there is no color/image on the imageView. Give it some color.
@@ -122,7 +122,7 @@ class ImageCollectionVC : UICollectionViewCell {
         
         self.imageTapBehavior = imageTapBehavior
 
-        if let discussion = image.discussion {
+        if let discussion = media.discussion {
             // Color from http://www.tayloredmktg.com/rgb/
             title.textColor = UIColor(red: 30.0/255.0, green: 144.0/255.0, blue: 255.0/255.0, alpha: 1.0)
             
@@ -165,9 +165,12 @@ class ImageCollectionVC : UICollectionViewCell {
         imageView.frameSize = size
         
         scrollView?.contentSize = size
-        
+
+        // TODO: Generalize this to use multiple media types.
+        assert(false)
+#if false
         // Don't use image.hasError here only because on an upload/gone case, we do have a valid URL and can render the image.
-        guard let imageOriginalSize = image.originalSize else {
+        guard let imageOriginalSize = media.originalSize else {
             originalSize = size
             return
         }
@@ -186,12 +189,12 @@ class ImageCollectionVC : UICollectionViewCell {
             }
         }
         
-        
         originalSize = smallerSize
+#endif
     }
 }
 
-extension ImageCollectionVC : UIScrollViewDelegate {
+extension MediaCollectionViewCell : UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
@@ -202,10 +205,14 @@ extension ImageCollectionVC : UIScrollViewDelegate {
         
         if !switchedToFullScaleImageForZooming {
             switchedToFullScaleImageForZooming = true
-            
+
+            // TODO: Generalize this to use multiple media types.
+            assert(false)
+#if false
             // Load the full scale image to give the user better resolution when zooming in.
             let uiImage = ImageExtras.fullSizedImage(url: image.url! as URL)
             imageView.image = uiImage
+#endif
         }
     }
 }

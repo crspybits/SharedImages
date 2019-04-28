@@ -1,5 +1,5 @@
 //
-//  ImagesVC.swift
+//  MediaVC.swift
 //  SharedImages
 //
 //  Created by Christopher Prince on 3/8/17.
@@ -13,7 +13,7 @@ import ODRefreshControl
 import LottiesBottom
 import SyncServer_Shared
 
-class ImagesVC: UIViewController {
+class MediaVC: UIViewController {
     // Set these before showing screen.
     var sharingGroup: SyncServer.SharingGroup!
     var imagesHandler: ImagesHandler!
@@ -61,8 +61,8 @@ class ImagesVC: UIViewController {
     private var selectImages:UIButton!
     private var mediaSelector:MediaSelectorVC!
     
-    static func create() -> ImagesVC {
-        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ImagesVC") as! ImagesVC
+    static func create() -> MediaVC {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MediaVC") as! MediaVC
     }
     
     override func viewDidLoad() {
@@ -154,9 +154,9 @@ class ImagesVC: UIViewController {
         selectionOn = !selectionOn
         
         for indexPath in collectionView.indexPathsForVisibleItems {
-            let imageObj = coreDataSource.object(at: indexPath) as! ImageMediaObject
-            let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
-            showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+            let mediaObj = coreDataSource.object(at: indexPath) as! FileMediaObject
+            let cell = self.collectionView.cellForItem(at: indexPath) as! MediaCollectionViewCell
+            showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell)
         }
     }
     
@@ -311,7 +311,7 @@ class ImagesVC: UIViewController {
     }
 }
 
-extension ImagesVC : UICollectionViewDelegate {
+extension MediaVC : UICollectionViewDelegate {
     private func errorDetails(readProblem: Bool, gone: GoneReason?) -> String? {
         var details: String?
         
@@ -376,22 +376,22 @@ extension ImagesVC : UICollectionViewDelegate {
             self.present(alert, animated: true, completion: nil)
         }
         else {
-            let largeImages = LargeImages.create()
-            largeImages.startImage = coreDataSource.object(at: indexPath) as? ImageMediaObject
-            largeImages.imagesHandler = imagesHandler
-            largeImages.sharingGroup = sharingGroup
+            let largeMedia = LargeMediaVC.create()
+            largeMedia.startMedia = coreDataSource.object(at: indexPath) as? FileMediaObject
+            largeMedia.imagesHandler = imagesHandler
+            largeMedia.sharingGroup = sharingGroup
             navigatedToLargeImages = true
-            navigationController!.pushViewController(largeImages, animated: true)
+            navigationController!.pushViewController(largeMedia, animated: true)
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as! ImageCollectionVC).cellSizeHasBeenChanged()
+        (cell as! MediaCollectionViewCell).cellSizeHasBeenChanged()
     }
 }
 
 // MARK: UICollectionViewDataSource
-extension ImagesVC : UICollectionViewDataSource {
+extension MediaVC : UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -402,17 +402,19 @@ extension ImagesVC : UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionVC
-        let imageObj = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
-        cell.setProperties(image: imageObj, syncController: imagesHandler.syncController, cache: imageCache)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
-        showSelectedState(imageUUID: imageObj.uuid!, cell: cell, error: imageObj.eitherHasError)
+        let mediaObj = self.coreDataSource.object(at: indexPath) as! FileMediaObject
+        
+        cell.setProperties(media: mediaObj, syncController: imagesHandler.syncController, cache: imageCache)
+        
+        showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell, error: mediaObj.eitherHasError)
 
         return cell
     }
 }
 
-extension ImagesVC : AcquireImagesDelegate {
+extension MediaVC : AcquireImagesDelegate {
     func acquireImagesURLForNewImage(_ acquireImages: AcquireImages) -> URL {
         return FileExtras().newURLForImage() as URL
     }
@@ -488,11 +490,11 @@ extension ImagesVC : AcquireImagesDelegate {
     }
 }
 
-extension ImagesVC : CoreDataSourceDelegate {
+extension MediaVC : CoreDataSourceDelegate {
     // This must have sort descriptor(s) because that is required by the NSFetchedResultsController, which is used internally by this class.
     func coreDataSourceFetchRequest(_ cds: CoreDataSource!) -> NSFetchRequest<NSFetchRequestResult>! {
-        let params = ImageMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: true)
-        return ImageMediaObject.fetchRequestForAllObjects(params: params)
+        let params = FileMediaObject.SortFilterParams(sortingOrder: Parameters.sortingOrder, isAscending: Parameters.sortingOrderIsAscending, unreadCounts: Parameters.unreadCounts, sharingGroupUUID: sharingGroup.sharingGroupUUID, includeErrors: true)
+        return FileMediaObject.fetchRequestForAllObjects(params: params)
     }
     
     func coreDataSourceContext(_ cds: CoreDataSource!) -> NSManagedObjectContext! {
@@ -536,7 +538,7 @@ extension ImagesVC : CoreDataSourceDelegate {
     }
 }
 
-extension ImagesVC /* ImagesHandler */ {
+extension MediaVC /* ImagesHandler */ {
     func syncEvent(event:SyncControllerEvent) {
         switch event {
         case .syncDelayed:
@@ -582,7 +584,7 @@ extension ImagesVC /* ImagesHandler */ {
     }
 }
 
-extension ImagesVC : UICollectionViewDelegateFlowLayout {
+extension MediaVC : UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     
         let proportion:CGFloat = 0.30
@@ -600,7 +602,7 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
         
         let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: boundingCellSize)
 
-        return CGSize(width: boundedImageSize.width, height: boundedImageSize.height + ImageCollectionVC.smallTitleHeight)
+        return CGSize(width: boundedImageSize.width, height: boundedImageSize.height + MediaCollectionViewCell.smallTitleHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -609,7 +611,7 @@ extension ImagesVC : UICollectionViewDelegateFlowLayout {
 }
 
 // MARK: Sharing and deletion activity.
-extension ImagesVC {
+extension MediaVC {
     // For sharing images via email, text messages, and for deleting images.
     @objc fileprivate func actionButtonAction() {
         // Create an array containing both UIImage's and Image's. The UIActivityViewController will use the UIImage's. The TrashActivity will use the Image's.
@@ -648,17 +650,17 @@ extension ImagesVC {
     }
     
     private func selectImage(atIndexPath indexPath: IndexPath) {
-        let imageObj = coreDataSource.object(at: indexPath) as! ImageMediaObject
+        let mediaObj = coreDataSource.object(at: indexPath) as! FileMediaObject
         
         // Allowing selection of an image even when there is an error, such as image.hasError -- e.g., so that deletion can be allowed. Will have to, downstream, disable certain operations-- such as sending the image to someone, if there is no image.
         
-        if selectedImages.contains(imageObj.uuid!) {
+        if selectedImages.contains(mediaObj.uuid!) {
             // Deselect image
-            selectedImages.remove(imageObj.uuid!)
+            selectedImages.remove(mediaObj.uuid!)
         }
         else {
             // Select image
-            selectedImages.insert(imageObj.uuid!)
+            selectedImages.insert(mediaObj.uuid!)
         }
         
         if selectedImages.count > 0 {
@@ -672,17 +674,16 @@ extension ImagesVC {
             }
         }
         
-
-        let cell = self.collectionView.cellForItem(at: indexPath) as! ImageCollectionVC
-        showSelectedState(imageUUID: imageObj.uuid!, cell: cell)
+        let cell = self.collectionView.cellForItem(at: indexPath) as! MediaCollectionViewCell
+        showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell)
     }
     
-    fileprivate func showSelectedState(imageUUID:String, cell:UICollectionViewCell, error: Bool = false) {
-        if let cell = cell as? ImageCollectionVC {
+    fileprivate func showSelectedState(mediaUUID:String, cell:UICollectionViewCell, error: Bool = false) {
+        if let cell = cell as? MediaCollectionViewCell {
             if error || !selectionOn {
                 cell.selectedState = nil
             }
-            else if selectedImages.contains(imageUUID) {
+            else if selectedImages.contains(mediaUUID) {
                 cell.selectedState = .selected
             }
             else {
@@ -692,7 +693,7 @@ extension ImagesVC {
     }
 }
 
-extension ImagesVC : SortyFilterDelegate {
+extension MediaVC : SortyFilterDelegate {
     func sortyFilter(sortFilterByParameters: SortyFilter) {
         coreDataSource.fetchData()
         titleLabel.updateCaret()

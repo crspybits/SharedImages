@@ -25,20 +25,20 @@ class FileGroupTests: XCTestCase {
     func testGroupUUID() {
         let sharingGroupUUID = UUID().uuidString
         let fileGroupUUID = UUID.make()!
-        let newDiscussion = Discussion.newObjectAndMakeUUID(makeUUID: true) as! Discussion
+        let newDiscussion = DiscussionFileObject.newObjectAndMakeUUID(makeUUID: true) as! DiscussionFileObject
         newDiscussion.fileGroupUUID = fileGroupUUID
         newDiscussion.sharingGroupUUID = sharingGroupUUID
-        let newImage = Image.newObjectAndMakeUUID(makeUUID: true) as! Image
+        let newImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: true) as! ImageMediaObject
         newImage.fileGroupUUID = fileGroupUUID
         newImage.sharingGroupUUID = sharingGroupUUID
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
 
-        guard let discussion = Discussion.fetchObjectWithFileGroupUUID(fileGroupUUID), discussion.uuid == newDiscussion.uuid else {
+        guard let discussion = DiscussionFileObject.fetchObjectWithFileGroupUUID(fileGroupUUID), discussion.uuid == newDiscussion.uuid else {
             XCTFail()
             return
         }
         
-        guard let image = Image.fetchObjectWithFileGroupUUID(fileGroupUUID),
+        guard let image = ImageMediaObject.fetchObjectWithFileGroupUUID(fileGroupUUID),
             image.uuid == newImage.uuid else {
             XCTFail()
             return

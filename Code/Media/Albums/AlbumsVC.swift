@@ -365,7 +365,7 @@ extension AlbumsVC : UICollectionViewDataSource {
     }
     
     private func gotoAlbum(sharingGroup: SyncServer.SharingGroup, initialSync: Bool=false) {
-        let vc = ImagesVC.create()
+        let vc = MediaVC.create()
         vc.sharingGroup = sharingGroup
         vc.imagesHandler = self.imagesHandler
         vc.initialSync = initialSync
