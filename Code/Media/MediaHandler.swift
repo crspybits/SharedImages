@@ -1,5 +1,5 @@
 //
-//  ImagesHandler.swift
+//  MediaHandler.swift
 //  SharedImages
 //
 //  Created by Christopher G Prince on 9/29/18.
@@ -11,8 +11,8 @@ import SyncServer
 import SMCoreLib
 import SyncServer_Shared
 
-class ImagesHandler {
-    static let session = ImagesHandler()
+class MediaHandler {
+    static let session = MediaHandler()
     
     var syncController = SyncController()
 
@@ -25,7 +25,7 @@ class ImagesHandler {
     
     static func setup() {
         // Force the lazy session to be created (see also https://stackoverflow.com/questions/34667134/implicitly-lazy-static-members-in-swift). s
-        _ = ImagesHandler.session
+        _ = MediaHandler.session
     }
     
     func appWillEnterForeground() {
@@ -37,27 +37,28 @@ class ImagesHandler {
     }
     
     @discardableResult
-    func addOrUpdateLocalImage(newImageData: ImageData, fileGroupUUID: String?) -> ImageMediaObject {
+    // TODO: Generalize this to multiple media types.
+    func addOrUpdateLocalMedia(newMediaData: MediaData, fileGroupUUID: String?) -> ImageMediaObject {
         var theImage:ImageMediaObject!
         
-        if newImageData.file.fileUUID == nil {
+        if newMediaData.file.fileUUID == nil {
             // We're creating a new image at the local user's request.
-            theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: true, creationDate: newImageData.creationDate) as? ImageMediaObject
+            theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: true, creationDate: newMediaData.creationDate) as? ImageMediaObject
         }
         else {
             /* This is a download from the server. There are two cases:
                 1) The main download use case: Creating a new image downloaded from the server (also, possibly "gone" or a read problem).
                 2) An error use case: Previously, with "gone" or a read problem, an image was downloaded another time.
             */
-            theImage = ImageMediaObject.fetchObjectWithUUID(newImageData.file.fileUUID!)
+            theImage = ImageMediaObject.fetchObjectWithUUID(newMediaData.file.fileUUID!)
             if theImage == nil {
                 // No existing local image. Must be a first download case from the server.
-                theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: false, creationDate: newImageData.creationDate) as? ImageMediaObject
-                theImage.uuid = newImageData.file.fileUUID
+                theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: false, creationDate: newMediaData.creationDate) as? ImageMediaObject
+                theImage.uuid = newMediaData.file.fileUUID
             }
 
             // Test the image file we got from the server, if any. Make sure the file is valid and not corrupted in some way.
-            if let imageFilePath = newImageData.file.url?.path {
+            if let imageFilePath = newMediaData.file.url?.path {
                 let image = UIImage(contentsOfFile: imageFilePath)
                 theImage.readProblem = image == nil
             }
@@ -73,19 +74,19 @@ class ImagesHandler {
         }
         else {
             // With download/gone cases, the url will be nil. But, with upload/gone cases, we'll have a valid url.
-            theImage.url = newImageData.file.url
+            theImage.url = newMediaData.file.url
         }
         
-        theImage.gone = newImageData.file.gone
+        theImage.gone = newMediaData.file.gone
         
-        theImage.mimeType = newImageData.file.mimeType.rawValue
-        theImage.title = newImageData.title
-        theImage.discussionUUID = newImageData.discussionUUID
+        theImage.mimeType = newMediaData.file.mimeType.rawValue
+        theImage.title = newMediaData.title
+        theImage.discussionUUID = newMediaData.discussionUUID
         theImage.fileGroupUUID = fileGroupUUID
-        theImage.sharingGroupUUID = newImageData.file.sharingGroupUUID
+        theImage.sharingGroupUUID = newMediaData.file.sharingGroupUUID
         
         if !theImage.readProblem,
-            let imageFileName = newImageData.file.url?.lastPathComponent {
+            let imageFileName = newMediaData.file.url?.lastPathComponent {
             let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
             theImage.originalHeight = Float(size.height)
             theImage.originalWidth = Float(size.width)
@@ -95,11 +96,11 @@ class ImagesHandler {
         
         var discussion:DiscussionFileObject?
         
-        if let discussionUUID = newImageData.discussionUUID {
+        if let discussionUUID = newMediaData.discussionUUID {
             discussion = DiscussionFileObject.fetchObjectWithUUID(discussionUUID)
         }
         
-        if discussion == nil, let fileGroupUUID = newImageData.fileGroupUUID {
+        if discussion == nil, let fileGroupUUID = newMediaData.fileGroupUUID {
             discussion = DiscussionFileObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
         
@@ -107,7 +108,7 @@ class ImagesHandler {
         
         if let discussion = discussion {
             // 4/17/18; If that discussion has the image title, get that too.
-            if newImageData.title == nil {
+            if newMediaData.title == nil {
                 if let url = discussion.url,
                     let fixedObjects = FixedObjects(withFile: url as URL) {
                     theImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
@@ -250,7 +251,7 @@ class ImagesHandler {
     }
 }
 
-extension ImagesHandler: SyncControllerDelegate {
+extension MediaHandler: SyncControllerDelegate {
     func userRemovedFromAlbum(syncController: SyncController, sharingGroup: SyncServer.SharingGroup) {
         var numberErrors = 0
         var numberDeletions = 0
@@ -299,16 +300,16 @@ extension ImagesHandler: SyncControllerDelegate {
         }
     }
     
-    func addOrUpdateLocalImage(syncController: SyncController, imageData: ImageData, attr: SyncAttributes) {
-        // We're making an image for which there is already a UUID on the server (initial download case), or updating a local image (error case).
-        addOrUpdateLocalImage(newImageData: imageData, fileGroupUUID: attr.fileGroupUUID)
+    func addOrUpdateLocalMedia(syncController: SyncController, mediaData: MediaData, attr: SyncAttributes) {
+        // We're making an media object for which there is already a UUID on the server (initial download case), or updating a local media object (error case).
+        addOrUpdateLocalMedia(newMediaData: mediaData, fileGroupUUID: attr.fileGroupUUID)
     }
     
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes) {
         addToLocalDiscussion(discussionData: discussionData, type: .fromServer, fileGroupUUID: attr.fileGroupUUID)
     }
     
-    func updateUploadedImageDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
+    func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
         // We provided the content for the image, but the server establishes its date of creation. So, update our local image date/time with the creation date from the server.
         if let image = ImageMediaObject.fetchObjectWithUUID(uuid) {
             image.creationDate = creationDate as NSDate
@@ -325,7 +326,7 @@ extension ImagesHandler: SyncControllerDelegate {
         
         if let fileType = fileType {
             switch fileType {
-                case .discussion:
+            case .discussion:
                 if let discussion = DiscussionFileObject.fetchObjectWithUUID(uuid) {
                     discussion.gone = reason
                     discussion.save()
@@ -333,6 +334,15 @@ extension ImagesHandler: SyncControllerDelegate {
                 else {
                     Log.error("Could not find discussion for UUID: \(uuid)")
                 }
+                
+            case .urlPreviewImages:
+                // TODO: Fix this
+                break
+                
+            case .url:
+                // TODO: Fix this
+                break
+                
             case .image:
                 doImage = true
             }
@@ -353,7 +363,7 @@ extension ImagesHandler: SyncControllerDelegate {
         }
     }
 
-    func removeLocalImages(syncController: SyncController, uuids: [String]) {
+    func removeLocalMedia(syncController: SyncController, uuids: [String]) {
         removeLocalImages(uuids: uuids)
     }
     
@@ -361,11 +371,11 @@ extension ImagesHandler: SyncControllerDelegate {
         syncEventAction?(event)
     }
     
-    func completedAddingOrUpdatingLocalImages(syncController: SyncController) {
+    func completedAddingOrUpdatingLocalMedia(syncController: SyncController) {
         completedAddingOrUpdatingLocalImagesAction?()
     }
     
-    func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
+    func redoMediaUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
         guard let discussion = DiscussionFileObject.fetchObjectWithUUID(attr.fileUUID) else {
             Log.error("Cannot find discussion for attempted image re-upload.")
             return

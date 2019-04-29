@@ -136,7 +136,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         Migrations.session.launch()
-        ImagesHandler.setup()
+        MediaHandler.setup()
         PreviewManager.setup()
         
         // For [2] below.
@@ -201,11 +201,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        ImagesHandler.session.appDidEnterBackground()
+        MediaHandler.session.appDidEnterBackground()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
-        ImagesHandler.session.appWillEnterForeground()
+        MediaHandler.session.appWillEnterForeground()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {

@@ -16,7 +16,7 @@ import SyncServer_Shared
 class MediaVC: UIViewController {
     // Set these before showing screen.
     var sharingGroup: SyncServer.SharingGroup!
-    var imagesHandler: ImagesHandler!
+    var mediaHandler: MediaHandler!
     var initialSync = false
     
     let reuseIdentifier = "ImageIcon"
@@ -121,7 +121,7 @@ class MediaVC: UIViewController {
         bottomRefresh = BottomRefresh(withScrollView: collectionView, scrollViewParent: view, refreshAction: { [unowned self] in
             Log.info("bottomRefresh: starting sync")
             do {
-                try self.imagesHandler.syncController.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
+                try self.mediaHandler.syncController.sync(sharingGroupUUID: self.sharingGroup.sharingGroupUUID)
             } catch (let error) {
                 SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
             }
@@ -136,7 +136,7 @@ class MediaVC: UIViewController {
             }
         }
         
-        removeImages = RemoveImages(images, syncController: imagesHandler.syncController, sharingGroup: sharingGroup, withParentVC: self)
+        removeImages = RemoveImages(images, syncController: mediaHandler.syncController, sharingGroup: sharingGroup, withParentVC: self)
         removeImages.start() {[unowned self] in
             self.selectionOn = false
         }
@@ -161,8 +161,8 @@ class MediaVC: UIViewController {
     }
     
     @objc private func setupHandlers() {
-        imagesHandler.syncEventAction = syncEvent
-        imagesHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
+        mediaHandler.syncEventAction = syncEvent
+        mediaHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
     }
     
     @objc private func backAction() {
@@ -275,7 +275,7 @@ class MediaVC: UIViewController {
         self.refreshControl.endRefreshing()
         
         do {
-            try imagesHandler.syncController.sync(sharingGroupUUID: sharingGroup.sharingGroupUUID)
+            try mediaHandler.syncController.sync(sharingGroupUUID: sharingGroup.sharingGroupUUID)
         } catch (let error) {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Could not sync", message: "\(error)")
         }
@@ -288,7 +288,7 @@ class MediaVC: UIViewController {
     }
     
     private func createEmptyDiscussion(image:ImageMediaObject, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
-        let newDiscussionFileURL = ImageExtras.newJSONFile()
+        let newDiscussionFileURL = NewFiles.newJSONFile()
         var fixedObjects = FixedObjects()
         
         // This is so that we have the possibility of reconstructing the image/discussions if we lose the server data. This will explicitly connect the discussion to the image.
@@ -378,7 +378,7 @@ extension MediaVC : UICollectionViewDelegate {
         else {
             let largeMedia = LargeMediaVC.create()
             largeMedia.startMedia = coreDataSource.object(at: indexPath) as? FileMediaObject
-            largeMedia.imagesHandler = imagesHandler
+            largeMedia.mediaHandler = mediaHandler
             largeMedia.sharingGroup = sharingGroup
             navigatedToLargeImages = true
             navigationController!.pushViewController(largeMedia, animated: true)
@@ -406,7 +406,7 @@ extension MediaVC : UICollectionViewDataSource {
         
         let mediaObj = self.coreDataSource.object(at: indexPath) as! FileMediaObject
         
-        cell.setProperties(media: mediaObj, syncController: imagesHandler.syncController, cache: imageCache)
+        cell.setProperties(media: mediaObj, syncController: mediaHandler.syncController, cache: imageCache)
         
         showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell, error: mediaObj.eitherHasError)
 
@@ -416,7 +416,7 @@ extension MediaVC : UICollectionViewDataSource {
 
 extension MediaVC : AcquireImagesDelegate {
     func acquireImagesURLForNewImage(_ acquireImages: AcquireImages) -> URL {
-        return FileExtras().newURLForImage() as URL
+        return NewFiles.newURLForImage() as URL
     }
     
     func acquireImages(_ acquireImages: AcquireImages, images: [(newImageURL: URL, mimeType: String)]) {
@@ -456,7 +456,7 @@ extension MediaVC : AcquireImagesDelegate {
         scrollIfNeeded(animated:true)
         
         // Sync these new images & discussions with the server.
-        imagesHandler.syncController.add(imageAndDiscussions: imageAndDiscussions, errorCleanup: cleanup)
+        mediaHandler.syncController.add(imageAndDiscussions: imageAndDiscussions, errorCleanup: cleanup)
     }
     
     private func createImageAndDiscussion(newImageURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (image: ImageMediaObject, discussion: DiscussionFileObject)? {
@@ -471,10 +471,10 @@ extension MediaVC : AcquireImagesDelegate {
         }
         
         let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID, gone: nil)
-        let imageData = ImageData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
+        let imageData = MediaData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
-        let newImage = imagesHandler.addOrUpdateLocalImage(newImageData: imageData, fileGroupUUID:fileGroupUUID)
+        let newImage = mediaHandler.addOrUpdateLocalMedia(newMediaData: imageData, fileGroupUUID:fileGroupUUID)
         newImage.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
         guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
@@ -483,7 +483,7 @@ extension MediaVC : AcquireImagesDelegate {
             return nil
         }
         
-        let newDiscussion = imagesHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
+        let newDiscussion = mediaHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
         newDiscussion.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
         return (newImage, newDiscussion)

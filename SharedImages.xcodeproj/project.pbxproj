@@ -61,7 +61,7 @@
 		83C1D58B22754A6600C91867 /* SortyFilter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83C1D56A22754A6600C91867 /* SortyFilter.xib */; };
 		83C1D58C22754A6600C91867 /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D56B22754A6600C91867 /* LRUCache.swift */; };
 		83C1D58D22754A6600C91867 /* ImageExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D56C22754A6600C91867 /* ImageExtras.swift */; };
-		83C1D58E22754A6600C91867 /* ImagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D56D22754A6600C91867 /* ImagesHandler.swift */; };
+		83C1D58E22754A6600C91867 /* MediaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D56D22754A6600C91867 /* MediaHandler.swift */; };
 		83C1D58F22754A6600C91867 /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D56E22754A6600C91867 /* SyncController.swift */; };
 		83C1D59022754A6600C91867 /* PreviewManager+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D56F22754A6600C91867 /* PreviewManager+Extras.swift */; };
 		83C1D59122754A6600C91867 /* URLPickerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83C1D57122754A6600C91867 /* URLPickerVC.xib */; };
@@ -96,6 +96,7 @@
 		83C1D5D522754C8100C91867 /* SetupSignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D5D322754C8100C91867 /* SetupSignIn.swift */; };
 		83C1D5D722754CBD00C91867 /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D5D622754CBD00C91867 /* ProgressIndicator.swift */; };
 		83C1D5D922754F7F00C91867 /* ImageMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D5D822754F7F00C91867 /* ImageMediaView.swift */; };
+		83C1D5DB22757DED00C91867 /* NewFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D5DA22757DEC00C91867 /* NewFiles.swift */; };
 		83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C34070201D58C500DAD865 /* FixedObjects.swift */; };
 		83C34081201E42C400DAD865 /* DiscussionFileObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C3407E201E42C400DAD865 /* DiscussionFileObject.swift */; };
 		83CE2F1B2255740600E6EFD7 /* SharingInvitationHelp.html in Resources */ = {isa = PBXBuildFile; fileRef = 83CE2F1A2255740500E6EFD7 /* SharingInvitationHelp.html */; };
@@ -195,7 +196,7 @@
 		83C1D56A22754A6600C91867 /* SortyFilter.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SortyFilter.xib; sourceTree = "<group>"; };
 		83C1D56B22754A6600C91867 /* LRUCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
 		83C1D56C22754A6600C91867 /* ImageExtras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageExtras.swift; sourceTree = "<group>"; };
-		83C1D56D22754A6600C91867 /* ImagesHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagesHandler.swift; sourceTree = "<group>"; };
+		83C1D56D22754A6600C91867 /* MediaHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHandler.swift; sourceTree = "<group>"; };
 		83C1D56E22754A6600C91867 /* SyncController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
 		83C1D56F22754A6600C91867 /* PreviewManager+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PreviewManager+Extras.swift"; sourceTree = "<group>"; };
 		83C1D57122754A6600C91867 /* URLPickerVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = URLPickerVC.xib; sourceTree = "<group>"; };
@@ -230,6 +231,7 @@
 		83C1D5D322754C8100C91867 /* SetupSignIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupSignIn.swift; sourceTree = "<group>"; };
 		83C1D5D622754CBD00C91867 /* ProgressIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
 		83C1D5D822754F7F00C91867 /* ImageMediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageMediaView.swift; sourceTree = "<group>"; };
+		83C1D5DA22757DEC00C91867 /* NewFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFiles.swift; sourceTree = "<group>"; };
 		83C34070201D58C500DAD865 /* FixedObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedObjects.swift; sourceTree = "<group>"; };
 		83C34074201D90E300DAD865 /* SharedImages3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages3.xcdatamodel; sourceTree = "<group>"; };
 		83C3407E201E42C400DAD865 /* DiscussionFileObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DiscussionFileObject.swift; path = "Core Data/DiscussionFileObject.swift"; sourceTree = "<group>"; };
@@ -435,13 +437,14 @@
 				83C1D56422754A6600C91867 /* Sorting and Filtering */,
 				83C1D56B22754A6600C91867 /* LRUCache.swift */,
 				83C1D56C22754A6600C91867 /* ImageExtras.swift */,
-				83C1D56D22754A6600C91867 /* ImagesHandler.swift */,
+				83C1D56D22754A6600C91867 /* MediaHandler.swift */,
 				83C1D56E22754A6600C91867 /* SyncController.swift */,
 				83C1D56F22754A6600C91867 /* PreviewManager+Extras.swift */,
 				83C1D57022754A6600C91867 /* Pickers */,
 				83C1D57522754A6600C91867 /* Albums */,
 				83C1D57A22754A6600C91867 /* Single Album */,
 				83C1D58022754A6600C91867 /* LargeMediaVC.swift */,
+				83C1D5DA22757DEC00C91867 /* NewFiles.swift */,
 			);
 			path = Media;
 			sourceTree = "<group>";
@@ -1032,6 +1035,7 @@
 				835A8AA1223F40460000FEA0 /* Logger.swift in Sources */,
 				835A8AB1224566590000FEA0 /* RemoveUserFromAlbumVC.swift in Sources */,
 				831521712206CC9000CA773D /* Notifications.swift in Sources */,
+				83C1D5DB22757DED00C91867 /* NewFiles.swift in Sources */,
 				83C1D59C22754A6600C91867 /* AcquireImages.swift in Sources */,
 				83C1D5C422754BAC00C91867 /* ShareAlbumHelpCell.swift in Sources */,
 				83F5CB5F2247FF64006DBB2F /* Menu.swift in Sources */,
@@ -1048,7 +1052,7 @@
 				834A7E7A2037858800969B18 /* XibBasics.swift in Sources */,
 				838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */,
 				83C1D5C222754BAC00C91867 /* ShareAlbumAllowSocialCell.swift in Sources */,
-				83C1D58E22754A6600C91867 /* ImagesHandler.swift in Sources */,
+				83C1D58E22754A6600C91867 /* MediaHandler.swift in Sources */,
 				834A7E7B2037858800969B18 /* SyncSpinner.swift in Sources */,
 				834A7E7C2037858800969B18 /* AppBadge.swift in Sources */,
 				83C1D5CE22754BFA00C91867 /* Badge+Extras.swift in Sources */,

@@ -18,7 +18,7 @@ class LargeMediaVC : UIViewController {
     // This is a media object instead of an index, because the IndexPath's vary from the small media screen to the large media screen-- the large media screen doesn't display media with errors.
     var startMedia: FileMediaObject?
     
-    weak var imagesHandler:ImagesHandler?
+    weak var mediaHandler:MediaHandler?
     var sharingGroup: SyncServer.SharingGroup!
     
     private var seekToIndexPath:IndexPath?
@@ -235,7 +235,7 @@ extension LargeMediaVC : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
-        if let syncController = imagesHandler?.syncController,
+        if let syncController = mediaHandler?.syncController,
             let media = self.coreDataSource.object(at: indexPath) as? FileMediaObject {
             cell.setProperties(media: media, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
                 self.showDiscussionIfPresent(media: media)
@@ -319,7 +319,7 @@ extension LargeMediaVC : DiscussionVCDelegate {
     }
     
     func discussionVC(_ vc: DiscussionVC, changedDiscussion:DiscussionFileObject) {
-        imagesHandler?.syncController.update(discussion: changedDiscussion)
+        mediaHandler?.syncController.update(discussion: changedDiscussion)
     }
     
     func discussionVC(_ vc: DiscussionVC, resetUnreadCount:DiscussionFileObject) {
@@ -328,7 +328,7 @@ extension LargeMediaVC : DiscussionVCDelegate {
     
     func discussionVC(_ vc: DiscussionVC, discussion:DiscussionFileObject, refreshWithCompletion: (()->())?) {
         do {
-            try imagesHandler?.syncController.sync(sharingGroupUUID: discussion.sharingGroupUUID!) {
+            try mediaHandler?.syncController.sync(sharingGroupUUID: discussion.sharingGroupUUID!) {
                 // If you receive discussion messages for a thread, and are *in* that discussion-- i.e., you are using the "refresh"-- mark that unread count as 0. Literally, we've read any new content-- so don't need the reminder.
                 discussion.unreadCount = 0
                 discussion.save()

@@ -20,7 +20,7 @@ enum SyncControllerEvent {
     case syncServerDown
 }
 
-struct ImageData {
+struct MediaData {
     let file: FileData
     let title:String?
     let creationDate: NSDate?
@@ -46,23 +46,23 @@ struct FileData {
 protocol SyncControllerDelegate : class {
     func userRemovedFromAlbum(syncController:SyncController, sharingGroup: SyncServer.SharingGroup)
     
-    // Adding or updating a image-- the update part is for errors that occurred on an original image download (read problem or "gone" errors).
-    func addOrUpdateLocalImage(syncController:SyncController, imageData: ImageData, attr: SyncAttributes)
+    // Adding or updating media-- the update part is for errors that occurred on an original media download (read problem or "gone" errors).
+    func addOrUpdateLocalMedia(syncController:SyncController, mediaData: MediaData, attr: SyncAttributes)
     
     // This will either be for a new discussion (corresponding to a new image) or it will be additional data for an existing discussion (with an existing image).
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes)
     
-    func updateUploadedImageDate(syncController:SyncController, uuid: String, creationDate: NSDate)
-    func completedAddingOrUpdatingLocalImages(syncController:SyncController)
+    func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate)
+    func completedAddingOrUpdatingLocalMedia(syncController:SyncController)
     
     // fileType is optional ony because in early versions of the app, we didn't have fileType in the appMetaData on the server.
     func fileGoneDuringUpload(syncController:SyncController, uuid: String, fileType: ImageExtras.FileType?, reason: GoneReason)
 
     // Including removing any discussion thread.
-    func removeLocalImages(syncController:SyncController, uuids:[String])
+    func removeLocalMedia(syncController:SyncController, uuids:[String])
     
     // For handling deletion conflicts.
-    func redoImageUpload(syncController: SyncController, forDiscussion attr: SyncAttributes)
+    func redoMediaUpload(syncController: SyncController, forDiscussion attr: SyncAttributes)
     
     func syncEvent(syncController:SyncController, event:SyncControllerEvent)
 }
@@ -338,7 +338,7 @@ extension SyncController : SyncServerDelegate {
                 let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, sharingGroupUUID: discussion.sharingGroupUUID!, mimeType: downloadedContentAttributes.mimeType)
                 
                 // I'm going to use a new file, just in case we have an error writing.
-                let mergeURL = ImageExtras.newJSONFile()
+                let mergeURL = NewFiles.newJSONFile()
                 
                 do {
                     try mergedDiscussion.save(toFile: mergeURL as URL)
@@ -374,14 +374,14 @@ extension SyncController : SyncServerDelegate {
                 // We're using appMetaData only for file type info, which is established when a new image/discussion is uploaded. We shouldn't generally get appMetaData updates/downloads.
                 Log.warning("appMetaData download!")
             case .deletion:
-                // Conditioning this by image because deleting an image deletes the associated discussion also.
-                if isImage(attr: operation.attr) {
-                    delegate.removeLocalImages(syncController: self, uuids: [operation.attr.fileUUID])
+                // Conditioning this by media because deleting a media object deletes the associated discussion also.
+                if isMedia(attr: operation.attr) {
+                    delegate.removeLocalMedia(syncController: self, uuids: [operation.attr.fileUUID])
                 }
                 Progress.session.next(count: 1)
 
             case .file(let url, contentsChanged: let contentsChanged):
-                // Just checking this, for debugging. It turns out this flag isn't very useful at least in SharedImages-- the real test for this app is whether or not the (a) image file or (b) discussion thread file can be read and parsed properly.
+                // Just checking this, for debugging. It turns out this flag isn't very useful at least in SharedImages-- the real test for this app is whether or not the (a) media file or (b) discussion thread file can be read and parsed properly.
                 Log.info("contentsChanged: \(contentsChanged)")
                 
                 singleFileDownloadComplete(.success(url: url, attr: operation.attr))
@@ -415,7 +415,7 @@ extension SyncController : SyncServerDelegate {
         return (nil, nil)
     }
     
-    func isImage(attr: SyncAttributes) -> Bool {
+    func isMedia(attr: SyncAttributes) -> Bool {
         let (fileTypeString, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
         if let fileTypeString = fileTypeString {
             guard let fileType = fileType else {
@@ -427,7 +427,10 @@ extension SyncController : SyncServerDelegate {
             case .discussion:
                 return false
                 
-            case .image:
+            case .urlPreviewImages:
+                return false
+                
+            case .image, .url:
                 break
             }
         }
@@ -462,20 +465,23 @@ extension SyncController : SyncServerDelegate {
             switch fileType {
             case .discussion:
                 discussionDownloadComplete(file)
+            
+            case .urlPreviewImages:
+                break
                 
-            case .image:
-                imageDownloadComplete(file)
+            case .image, .url:
+                mediaDownloadComplete(file, mediaType: fileType)
             }
             
             return
         }
         
         // We don't have type info in the appMetaData-- too early of a file version. Assume it's an image.
-        imageDownloadComplete(file)
+        mediaDownloadComplete(file, mediaType: .image)
     }
     
-    // For a) first downloads and b) updates (error cases) of the same image file.
-    private func imageDownloadComplete(_ file: FileDownloadComplete) {
+    // For a) first downloads and b) updates (error cases) of the same media file.
+    private func mediaDownloadComplete(_ file: FileDownloadComplete, mediaType: ImageExtras.FileType) {
         var attr: SyncAttributes!
         var url: SMRelativeLocalURL?
         
@@ -486,10 +492,21 @@ extension SyncController : SyncServerDelegate {
             attr = successAttr
 
             // The files we get back from the SyncServer are in a temporary location. We own them though, so can move them.
-            let newImageURL = FileExtras().newURLForImage()
+            var newURL:SMRelativeLocalURL!
+            
+            switch mediaType {
+            case .image:
+                newURL = NewFiles.newURLForImage()
+            case .url:
+                newURL = NewFiles.newURLForURLFile()
+                
+            case .discussion, .urlPreviewImages:
+                assert(false)
+            }
+            
             do {
-                try FileManager.default.moveItem(at: successURL as URL, to: newImageURL as URL)
-                url = newImageURL
+                try FileManager.default.moveItem(at: successURL as URL, to: newURL as URL)
+                url = newURL
             } catch (let error) {
                 Log.error("An error occurred moving a file: \(error)")
             }
@@ -511,12 +528,12 @@ extension SyncController : SyncServerDelegate {
             discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
         }
 
-        let imageFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
-        let imageData = ImageData(file: imageFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
+        let mediaFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
+        let mediaData = MediaData(file: mediaFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
 
-        delegate.addOrUpdateLocalImage(syncController: self, imageData: imageData, attr: attr)
+        delegate.addOrUpdateLocalMedia(syncController: self, mediaData: mediaData, attr: attr)
         
-        delegate.completedAddingOrUpdatingLocalImages(syncController: self)
+        delegate.completedAddingOrUpdatingLocalMedia(syncController: self)
         Progress.session.next()
     }
     
@@ -532,7 +549,7 @@ extension SyncController : SyncServerDelegate {
             attr = successAttr
             
             // The files we get back from the SyncServer are in a temporary location. We own them though so can move it.
-            let newJSONFileURL = ImageExtras.newJSONFile()
+            let newJSONFileURL = NewFiles.newJSONFile()
             do {
                 try FileManager.default.moveItem(at: successURL as URL, to: newJSONFileURL as URL)
                 url = newJSONFileURL
@@ -564,7 +581,7 @@ extension SyncController : SyncServerDelegate {
                 
                 // I'm not sure if this is going to work embedded in the conflict resolution callback. I'm going to run it on the main thread to be safe.
                 DispatchQueue.main.async {
-                    self.delegate.redoImageUpload(syncController: self, forDiscussion: downloadDeletion)
+                    self.delegate.redoMediaUpload(syncController: self, forDiscussion: downloadDeletion)
                 }
             }
         }
@@ -709,7 +726,7 @@ extension SyncController : SyncServerDelegate {
             if fileType == nil || fileType == .image {
                 // Include the nil case because files without types are images-- i.e., they were created before we started typing files in the meta data.
                 Log.info("fileType: \(String(describing: fileType))")
-                delegate.updateUploadedImageDate(syncController: self, uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
+                delegate.updateUploadedMediaDate(syncController: self, uuid: attr.fileUUID, creationDate: attr.creationDate! as NSDate)
             }
             
             Progress.session.next()

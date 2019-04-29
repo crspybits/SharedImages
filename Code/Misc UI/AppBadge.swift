@@ -23,7 +23,7 @@ class AppBadge {
         if Notifications.notificationsAuthorized.boolValue &&
             SignInManager.session.userIsSignedIn {
             self.completionHandler = completionHandler
-            ImagesHandler.session.syncEventAction = syncEvent
+            MediaHandler.session.syncEventAction = syncEvent
             
             Log.info("About to do setBadge sync")
             do {
@@ -32,7 +32,7 @@ class AppBadge {
                 Log.error("\(error)")
                 completionHandler?(.failed)
                 self.completionHandler = nil
-                ImagesHandler.session.syncEventAction = nil
+                MediaHandler.session.syncEventAction = nil
             }
         }
         else {
@@ -55,7 +55,7 @@ extension AppBadge {
         func finish() {
             completionHandler?(.noData)
             completionHandler = nil
-            ImagesHandler.session.syncEventAction = nil
+            MediaHandler.session.syncEventAction = nil
         }
         
         switch event {

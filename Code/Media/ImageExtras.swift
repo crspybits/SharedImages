@@ -14,12 +14,10 @@ case newerAtTop
 case newerAtBottom
 }
 
-class ImageExtras {    
-    static let discussionsDirectoryPath = "Discussions"
-
+class ImageExtras {
     static let iconDirectory = "SmallImages"
     static let iconDirectoryURL = FileStorage.url(ofItem: iconDirectory)
-    static let largeImageDirectoryURL = FileStorage.url(ofItem: FileExtras.defaultDirectoryPath)
+    static let largeImageDirectoryURL = FileStorage.url(ofItem: NewFiles.largeImagesDirectoryPath)
 
     // For some idea of free RAM available: https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget
     static var minCostCache:UInt64 = 1000000
@@ -39,7 +37,13 @@ class ImageExtras {
     static let appMetaDataFileTypeKey = "fileType"
     
     enum FileType : String {
+        // Media file objects-- these have associated discussions.
         case image
+        case url
+        
+        // Optional supplementary file for url media
+        case urlPreviewImages
+        
         case discussion
     }
 
@@ -85,12 +89,5 @@ class ImageExtras {
             
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         }
-    }
-    
-    static func newJSONFile() -> SMRelativeLocalURL {
-        let directoryURL = FileStorage.url(ofItem: ImageExtras.discussionsDirectoryPath)
-        FileStorage.createDirectoryIfNeeded(directoryURL)
-        let newFileName = FileStorage.createTempFileName(inDirectory: directoryURL?.path, withPrefix: "FileObjects", andExtension: "json")
-        return SMRelativeLocalURL(withRelativePath: ImageExtras.discussionsDirectoryPath + "/" + newFileName!, toBaseURLType: .documentsDirectory)!
     }
 }

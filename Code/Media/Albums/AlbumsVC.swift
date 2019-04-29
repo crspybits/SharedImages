@@ -24,8 +24,8 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     private var sharingGroups:[SyncServer.SharingGroup]!
 
     // Sets up delegate for SyncServer also.
-    private var imagesHandler:ImagesHandler {
-        return ImagesHandler.session
+    private var mediaHandler:MediaHandler {
+        return MediaHandler.session
     }
     
     private var shouldLayoutSubviews = true
@@ -92,8 +92,8 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     }
     
     @objc private func setupHandlers() {
-        imagesHandler.syncEventAction = syncEvent
-        imagesHandler.completedAddingOrUpdatingLocalImagesAction = nil
+        mediaHandler.syncEventAction = syncEvent
+        mediaHandler.completedAddingOrUpdatingLocalImagesAction = nil
     }
     
     @objc private func refresh() {
@@ -367,7 +367,7 @@ extension AlbumsVC : UICollectionViewDataSource {
     private func gotoAlbum(sharingGroup: SyncServer.SharingGroup, initialSync: Bool=false) {
         let vc = MediaVC.create()
         vc.sharingGroup = sharingGroup
-        vc.imagesHandler = self.imagesHandler
+        vc.mediaHandler = self.mediaHandler
         vc.initialSync = initialSync
         self.navigationController?.pushViewController(vc, animated: true)
     }
