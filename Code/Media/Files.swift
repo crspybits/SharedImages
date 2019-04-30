@@ -9,7 +9,18 @@
 import Foundation
 import SMCoreLib
 
-open class NewFiles {
+struct Files {
+    enum FileType : String {
+        // Media file objects-- these have associated discussions.
+        case image
+        case url
+        
+        // Optional supplementary file for url media
+        case urlPreviewImage
+        
+        case discussion
+    }
+    
     static let discussionsDirectoryPath = "Discussions"
 
     public static let largeImagesDirectoryPath = "LargeImages"

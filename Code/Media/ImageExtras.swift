@@ -17,7 +17,7 @@ case newerAtBottom
 class ImageExtras {
     static let iconDirectory = "SmallImages"
     static let iconDirectoryURL = FileStorage.url(ofItem: iconDirectory)
-    static let largeImageDirectoryURL = FileStorage.url(ofItem: NewFiles.largeImagesDirectoryPath)
+    static let largeImageDirectoryURL = FileStorage.url(ofItem: Files.largeImagesDirectoryPath)
 
     // For some idea of free RAM available: https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget
     static var minCostCache:UInt64 = 1000000
@@ -30,21 +30,6 @@ class ImageExtras {
             imageCache = LRUCache<ImageMediaObject>(maxItems: 500, maxCost:minCostCache)!
             didTheReset()
         }
-    }
-
-    static let appMetaDataTitleKey = "title"
-    static let appMetaDataDiscussionUUIDKey = "discussionUUID"
-    static let appMetaDataFileTypeKey = "fileType"
-    
-    enum FileType : String {
-        // Media file objects-- these have associated discussions.
-        case image
-        case url
-        
-        // Optional supplementary file for url media
-        case urlPreviewImages
-        
-        case discussion
     }
 
     static func imageFileName(url:URL) -> String {
@@ -66,28 +51,5 @@ class ImageExtras {
         let aspectRatio = min(aspectWidth, aspectHeight)
 
         return CGSize(width: originalSize.width * aspectRatio, height: originalSize.height * aspectRatio)
-    }
-    
-    // Also removes associated discussions.
-    static func removeLocalImages(uuids:[String]) {        
-        for uuid in uuids {
-            guard let image = ImageMediaObject.fetchObjectWithUUID(uuid) else {
-                Log.error("Cannot find image with UUID: \(uuid)")
-                return
-            }
-            
-            Log.info("Deleting image with uuid: \(uuid)")
-            
-            // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
-            do {
-                // This also removes the associated discussion.
-                try image.remove()
-            }
-            catch (let error) {
-                Log.error("Error removing image: \(error)")
-            }
-            
-            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        }
     }
 }

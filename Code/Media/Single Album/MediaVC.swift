@@ -132,7 +132,7 @@ class MediaVC: UIViewController {
         var images = [ImageMediaObject]()
         for uuidString in selectedImages {
             if let imageObj = ImageMediaObject.fetchObjectWithUUID(uuidString) {
-                images.append(imageObj)
+                images.append(imageObj as! ImageMediaObject)
             }
         }
         
@@ -162,7 +162,7 @@ class MediaVC: UIViewController {
     
     @objc private func setupHandlers() {
         mediaHandler.syncEventAction = syncEvent
-        mediaHandler.completedAddingOrUpdatingLocalImagesAction = completedAddingOrUpdatingLocalImages
+        mediaHandler.completedAddingOrUpdatingLocalMediaAction = completedAddingOrUpdatingLocalImages
     }
     
     @objc private func backAction() {
@@ -288,15 +288,15 @@ class MediaVC: UIViewController {
     }
     
     private func createEmptyDiscussion(image:ImageMediaObject, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
-        let newDiscussionFileURL = NewFiles.newJSONFile()
+        let newDiscussionFileURL = Files.newJSONFile()
         var fixedObjects = FixedObjects()
         
         // This is so that we have the possibility of reconstructing the image/discussions if we lose the server data. This will explicitly connect the discussion to the image.
         // [1] It is important to note that we are *never* depending on this UUID value in app operation. This is more of a comment. While unlikely, it is possible that a user could modify this value in a discussion JSON file in cloud storage. Thus, it has unreliable contents in some real sense. See also https://github.com/crspybits/SharedImages/issues/145
-        fixedObjects[DiscussionKeys.imageUUIDKey] = image.uuid
+        fixedObjects[DiscussionKeys.mediaUUIDKey] = image.uuid
         
         // 4/17/18; Image titles are now stored in the "discussion" file. This may reduce the amount of data we need store in the server database.
-        fixedObjects[DiscussionKeys.imageTitleKey] = imageTitle
+        fixedObjects[DiscussionKeys.mediaTitleKey] = imageTitle
 
         do {
             try fixedObjects.save(toFile: newDiscussionFileURL as URL)
@@ -416,7 +416,7 @@ extension MediaVC : UICollectionViewDataSource {
 
 extension MediaVC : AcquireImagesDelegate {
     func acquireImagesURLForNewImage(_ acquireImages: AcquireImages) -> URL {
-        return NewFiles.newURLForImage() as URL
+        return Files.newURLForImage() as URL
     }
     
     func acquireImages(_ acquireImages: AcquireImages, images: [(newImageURL: URL, mimeType: String)]) {
@@ -466,18 +466,18 @@ extension MediaVC : AcquireImagesDelegate {
         }
         
         guard let newDiscussionUUID = UUID.make(), let fileGroupUUID = UUID.make() else {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not create  UUID(s)")
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not create UUID(s)")
             return nil
         }
         
         let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID, gone: nil)
-        let imageData = MediaData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID)
+        let imageData = MediaData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID, mediaType: ImageMediaObject.self)
         
         // We're making an image that the user of the app added-- we'll generate a new UUID.
         let newImage = mediaHandler.addOrUpdateLocalMedia(newMediaData: imageData, fileGroupUUID:fileGroupUUID)
         newImage.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
-        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
+        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage as! ImageMediaObject, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
             try? newImage.remove()
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
             return nil
@@ -486,7 +486,7 @@ extension MediaVC : AcquireImagesDelegate {
         let newDiscussion = mediaHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
         newDiscussion.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
-        return (newImage, newDiscussion)
+        return (newImage, newDiscussion) as? (image: ImageMediaObject, discussion: DiscussionFileObject)
     }
 }
 

@@ -14,6 +14,8 @@ import SyncServer_Shared
 
 @objc(FileObject)
 public class FileObject: NSManagedObject {
+    static let UUID_KEY = "uuid"
+
     var url:SMRelativeLocalURL? {
         get {
             return CoreData.getSMRelativeLocalURL(fromCoreDataProperty: urlInternal as Data?)

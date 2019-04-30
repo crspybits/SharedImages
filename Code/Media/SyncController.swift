@@ -26,6 +26,7 @@ struct MediaData {
     let creationDate: NSDate?
     let discussionUUID:String?
     let fileGroupUUID:String?
+    let mediaType: MediaType.Type
 }
 
 struct FileData {
@@ -56,10 +57,10 @@ protocol SyncControllerDelegate : class {
     func completedAddingOrUpdatingLocalMedia(syncController:SyncController)
     
     // fileType is optional ony because in early versions of the app, we didn't have fileType in the appMetaData on the server.
-    func fileGoneDuringUpload(syncController:SyncController, uuid: String, fileType: ImageExtras.FileType?, reason: GoneReason)
+    func fileGoneDuringUpload(syncController:SyncController, uuid: String, fileType: Files.FileType?, reason: GoneReason)
 
     // Including removing any discussion thread.
-    func removeLocalMedia(syncController:SyncController, uuids:[String])
+    func removeLocalMedia(syncController:SyncController, uuid:String)
     
     // For handling deletion conflicts.
     func redoMediaUpload(syncController: SyncController, forDiscussion attr: SyncAttributes)
@@ -212,7 +213,7 @@ class SyncController {
         // 5/13/18; Only storing file type in appMetaData for new files.
         // imageAppMetaData[ImageExtras.appMetaDataDiscussionUUIDKey] = discussion.uuid
     
-        imageAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.image.rawValue
+        imageAppMetaData[AppMetaDataKey.fileType.rawValue] = Files.FileType.image.rawValue
 
         imageAttr.appMetaData = dictToJSONString(imageAppMetaData)
         assert(imageAttr.appMetaData != nil)
@@ -221,7 +222,7 @@ class SyncController {
         discussionAttr.fileGroupUUID = discussion.fileGroupUUID
     
         var discussionAppMetaData = [String: Any]()
-        discussionAppMetaData[ImageExtras.appMetaDataFileTypeKey] = ImageExtras.FileType.discussion.rawValue
+        discussionAppMetaData[AppMetaDataKey.fileType.rawValue] = Files.FileType.discussion.rawValue
         discussionAttr.appMetaData = dictToJSONString(discussionAppMetaData)
         assert(discussionAttr.appMetaData != nil)
 
@@ -338,7 +339,7 @@ extension SyncController : SyncServerDelegate {
                 let attr = SyncAttributes(fileUUID: downloadedContentAttributes.fileUUID, sharingGroupUUID: discussion.sharingGroupUUID!, mimeType: downloadedContentAttributes.mimeType)
                 
                 // I'm going to use a new file, just in case we have an error writing.
-                let mergeURL = NewFiles.newJSONFile()
+                let mergeURL = Files.newJSONFile()
                 
                 do {
                     try mergedDiscussion.save(toFile: mergeURL as URL)
@@ -376,7 +377,7 @@ extension SyncController : SyncServerDelegate {
             case .deletion:
                 // Conditioning this by media because deleting a media object deletes the associated discussion also.
                 if isMedia(attr: operation.attr) {
-                    delegate.removeLocalMedia(syncController: self, uuids: [operation.attr.fileUUID])
+                    delegate.removeLocalMedia(syncController: self, uuid: operation.attr.fileUUID)
                 }
                 Progress.session.next(count: 1)
 
@@ -400,12 +401,12 @@ extension SyncController : SyncServerDelegate {
         handleGroupDownload(group: group)
     }
     
-    func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, ImageExtras.FileType?) {
+    func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, Files.FileType?) {
         if let appMetaData = appMetaData,
             let jsonDict = jsonStringToDict(appMetaData),
-            let fileTypeString = jsonDict[ImageExtras.appMetaDataFileTypeKey] as? String {
+            let fileTypeString = jsonDict[AppMetaDataKey.fileType.rawValue] as? String {
             
-            if let fileType = ImageExtras.FileType(rawValue: fileTypeString) {
+            if let fileType = Files.FileType(rawValue: fileTypeString) {
                 return (fileTypeString, fileType)
             }
             
@@ -427,7 +428,7 @@ extension SyncController : SyncServerDelegate {
             case .discussion:
                 return false
                 
-            case .urlPreviewImages:
+            case .urlPreviewImage:
                 return false
                 
             case .image, .url:
@@ -466,7 +467,7 @@ extension SyncController : SyncServerDelegate {
             case .discussion:
                 discussionDownloadComplete(file)
             
-            case .urlPreviewImages:
+            case .urlPreviewImage:
                 break
                 
             case .image, .url:
@@ -481,9 +482,11 @@ extension SyncController : SyncServerDelegate {
     }
     
     // For a) first downloads and b) updates (error cases) of the same media file.
-    private func mediaDownloadComplete(_ file: FileDownloadComplete, mediaType: ImageExtras.FileType) {
+    private func mediaDownloadComplete(_ file: FileDownloadComplete, mediaType: Files.FileType) {
         var attr: SyncAttributes!
         var url: SMRelativeLocalURL?
+        
+        var type: MediaType.Type!
         
         switch file {
         case .gone(attr: let goneAttr):
@@ -496,11 +499,12 @@ extension SyncController : SyncServerDelegate {
             
             switch mediaType {
             case .image:
-                newURL = NewFiles.newURLForImage()
+                newURL = Files.newURLForImage()
+                type = ImageMediaObject.self
             case .url:
-                newURL = NewFiles.newURLForURLFile()
-                
-            case .discussion, .urlPreviewImages:
+                newURL = Files.newURLForURLFile()
+                type = URLMediaObject.self
+            case .discussion, .urlPreviewImage:
                 assert(false)
             }
             
@@ -522,14 +526,14 @@ extension SyncController : SyncServerDelegate {
             let jsonDict = jsonStringToDict(appMetaData) {
             
             // Early files in the system won't give a title in the appMetaData, and later files won't either. Later files put the title into the "discussion" file.
-            title = jsonDict[ImageExtras.appMetaDataTitleKey] as? String
+            title = jsonDict[AppMetaDataKey.title.rawValue] as? String
             
             // Similarly, early files in the system won't have this. And later one's won't either-- discussion threads are connected to images in that case by the fileGroupUUID in the SyncAttributes.
-            discussionUUID = jsonDict[ImageExtras.appMetaDataDiscussionUUIDKey] as? String
+            discussionUUID = jsonDict[AppMetaDataKey.discussionUUID.rawValue] as? String
         }
 
         let mediaFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
-        let mediaData = MediaData(file: mediaFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID)
+        let mediaData = MediaData(file: mediaFileData, title: title, creationDate: attr.creationDate as NSDate?, discussionUUID: discussionUUID, fileGroupUUID: attr.fileGroupUUID, mediaType: type)
 
         delegate.addOrUpdateLocalMedia(syncController: self, mediaData: mediaData, attr: attr)
         
@@ -549,7 +553,7 @@ extension SyncController : SyncServerDelegate {
             attr = successAttr
             
             // The files we get back from the SyncServer are in a temporary location. We own them though so can move it.
-            let newJSONFileURL = NewFiles.newJSONFile()
+            let newJSONFileURL = Files.newJSONFile()
             do {
                 try FileManager.default.moveItem(at: successURL as URL, to: newJSONFileURL as URL)
                 url = newJSONFileURL

@@ -93,7 +93,7 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     
     @objc private func setupHandlers() {
         mediaHandler.syncEventAction = syncEvent
-        mediaHandler.completedAddingOrUpdatingLocalImagesAction = nil
+        mediaHandler.completedAddingOrUpdatingLocalMediaAction = nil
     }
     
     @objc private func refresh() {

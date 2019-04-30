@@ -17,7 +17,7 @@ class MediaHandler {
     var syncController = SyncController()
 
     var syncEventAction:((SyncControllerEvent)->())?
-    var completedAddingOrUpdatingLocalImagesAction:(()->())?
+    var completedAddingOrUpdatingLocalMediaAction:(()->())?
 
     private init() {
         syncController.delegate = self
@@ -37,60 +37,45 @@ class MediaHandler {
     }
     
     @discardableResult
-    // TODO: Generalize this to multiple media types.
-    func addOrUpdateLocalMedia(newMediaData: MediaData, fileGroupUUID: String?) -> ImageMediaObject {
-        var theImage:ImageMediaObject!
+    func addOrUpdateLocalMedia(newMediaData: MediaData, fileGroupUUID: String?) -> FileMediaObject {
+        var theMedia:MediaType!
         
         if newMediaData.file.fileUUID == nil {
             // We're creating a new image at the local user's request.
-            theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: true, creationDate: newMediaData.creationDate) as? ImageMediaObject
+            theMedia = newMediaData.mediaType.newObjectAndMakeUUID(makeUUID: true, creationDate: newMediaData.creationDate) as? MediaType
         }
         else {
             /* This is a download from the server. There are two cases:
-                1) The main download use case: Creating a new image downloaded from the server (also, possibly "gone" or a read problem).
-                2) An error use case: Previously, with "gone" or a read problem, an image was downloaded another time.
+                1) The main download use case: Creating a new media object downloaded from the server (also, possibly "gone" or a read problem).
+                2) An error use case: Previously, with "gone" or a read problem, a media object was downloaded another time.
             */
-            theImage = ImageMediaObject.fetchObjectWithUUID(newMediaData.file.fileUUID!)
-            if theImage == nil {
+            theMedia = newMediaData.mediaType.fetchObjectWithUUID(newMediaData.file.fileUUID!) as? MediaType
+            if theMedia == nil {
                 // No existing local image. Must be a first download case from the server.
-                theImage = ImageMediaObject.newObjectAndMakeUUID(makeUUID: false, creationDate: newMediaData.creationDate) as? ImageMediaObject
-                theImage.uuid = newMediaData.file.fileUUID
+                theMedia = newMediaData.mediaType.newObjectAndMakeUUID(makeUUID: false, creationDate: newMediaData.creationDate) as? MediaType
+                theMedia.uuid = newMediaData.file.fileUUID
             }
 
-            // Test the image file we got from the server, if any. Make sure the file is valid and not corrupted in some way.
-            if let imageFilePath = newMediaData.file.url?.path {
-                let image = UIImage(contentsOfFile: imageFilePath)
-                theImage.readProblem = image == nil
-            }
-            else {
-                // Image is gone, but we don't have a read problem.
-                theImage.readProblem = false
-            }
+            theMedia.readProblem = theMedia.checkForReadProblem(mediaData: newMediaData)
         }
 
-        if theImage.readProblem {
+        if theMedia.readProblem {
             // With a read problem, the url is effectively invalid.
-            theImage.url = nil
+            theMedia.url = nil
         }
         else {
             // With download/gone cases, the url will be nil. But, with upload/gone cases, we'll have a valid url.
-            theImage.url = newMediaData.file.url
+            theMedia.url = newMediaData.file.url
         }
         
-        theImage.gone = newMediaData.file.gone
+        theMedia.gone = newMediaData.file.gone
         
-        theImage.mimeType = newMediaData.file.mimeType.rawValue
-        theImage.title = newMediaData.title
-        theImage.discussionUUID = newMediaData.discussionUUID
-        theImage.fileGroupUUID = fileGroupUUID
-        theImage.sharingGroupUUID = newMediaData.file.sharingGroupUUID
-        
-        if !theImage.readProblem,
-            let imageFileName = newMediaData.file.url?.lastPathComponent {
-            let size = ImageStorage.size(ofImage: imageFileName, withPath: ImageExtras.largeImageDirectoryURL)
-            theImage.originalHeight = Float(size.height)
-            theImage.originalWidth = Float(size.width)
-        }
+        theMedia.mimeType = newMediaData.file.mimeType.rawValue
+        theMedia.title = newMediaData.title
+        theMedia.discussionUUID = newMediaData.discussionUUID
+        theMedia.fileGroupUUID = fileGroupUUID
+        theMedia.sharingGroupUUID = newMediaData.file.sharingGroupUUID
+        theMedia.setup(mediaData: newMediaData)
         
         // Lookup the Discussion and connect it if we have it.
         
@@ -104,14 +89,14 @@ class MediaHandler {
             discussion = DiscussionFileObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
         
-        theImage.discussion = discussion
+        theMedia.discussion = discussion
         
         if let discussion = discussion {
             // 4/17/18; If that discussion has the image title, get that too.
             if newMediaData.title == nil {
                 if let url = discussion.url,
                     let fixedObjects = FixedObjects(withFile: url as URL) {
-                    theImage.title = fixedObjects[DiscussionKeys.imageTitleKey] as? String
+                    theMedia.title = fixedObjects[DiscussionKeys.mediaTitleKey] as? String
                 }
                 else {
                     Log.error("Could not load discussion!")
@@ -121,7 +106,7 @@ class MediaHandler {
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         
-        return theImage
+        return theMedia
     }
     
     enum AddToDiscussion {
@@ -133,7 +118,7 @@ class MediaHandler {
     @discardableResult
     func addToLocalDiscussion(discussionData: FileData, type: AddToDiscussion, fileGroupUUID: String?) -> DiscussionFileObject {
         var localDiscussion: DiscussionFileObject!
-        var imageTitle: String?
+        var mediaTitle: String?
         
         func newDiscussion() {
             // This is a new discussion, downloaded from the server. We can update the unread count on the discussion with the total discussion content size.
@@ -143,7 +128,7 @@ class MediaHandler {
             else if let discussionDataURL = discussionData.url,
                 let fixedObjects = FixedObjects(withFile: discussionDataURL as URL) {
                 localDiscussion.unreadCount = Int32(fixedObjects.count)
-                imageTitle = fixedObjects[DiscussionKeys.imageTitleKey] as? String
+                mediaTitle = fixedObjects[DiscussionKeys.mediaTitleKey] as? String
                 localDiscussion.gone = nil
                 localDiscussion.readProblem = false
             }
@@ -192,7 +177,7 @@ class MediaHandler {
                             Log.error("Error removing old discussion file: \(error)")
                         }
                         
-                        imageTitle = newFixedObjects[DiscussionKeys.imageTitleKey] as? String
+                        mediaTitle = newFixedObjects[DiscussionKeys.mediaTitleKey] as? String
                     }
                     else {
                         // Recovering from an error condition: A discussion object exists already, but the file could not previously be downloaded.
@@ -213,31 +198,31 @@ class MediaHandler {
                 
                 newDiscussion()
             }
-        }
+        } // end switch
         
         localDiscussion.mimeType = discussionData.mimeType.rawValue
         localDiscussion.url = discussionData.url
         localDiscussion.fileGroupUUID = fileGroupUUID
 
-        // Look up and connect the Image if we have one.
-        var image:ImageMediaObject?
+        // Look up and connect the media object if we have one.
+        var media:FileMediaObject?
         
-        // The two means of getting the image reflect different strategies for doing this over time in SharedImages/SyncServer development.
+        // The two means of getting the media reflect different strategies for doing this over time in SharedImages/SyncServer development.
         
-        // See if the image has an asssociated discussionUUID
-        image = ImageMediaObject.fetchObjectWithDiscussionUUID(localDiscussion.uuid!)
+        // See if the media has an asssociated discussionUUID (this is the old style).
+        media = FileMediaObject.fetchObjectWithDiscussionUUID(localDiscussion.uuid!)
 
         // If not, see if a fileGroupUUID connects the discussion and image.
-        if image == nil, let fileGroupUUID = localDiscussion.fileGroupUUID {
-            image = ImageMediaObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
+        if media == nil, let fileGroupUUID = localDiscussion.fileGroupUUID {
+            media = FileMediaObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
         
-        if image != nil {
-            localDiscussion.mediaObject = image
+        if media != nil {
+            localDiscussion.mediaObject = media
             
             // 4/17/18; If this discussion has the image title, set the image title from that.
-            if let imageTitle = imageTitle {
-                image!.title = imageTitle
+            if let mediaTitle = mediaTitle {
+                media!.title = mediaTitle
             }
         }
         
@@ -246,8 +231,12 @@ class MediaHandler {
         return localDiscussion
     }
     
-    func removeLocalImages(uuids:[String]) {
-        ImageExtras.removeLocalImages(uuids:uuids)
+    func removeLocalMedia(uuid:String) {
+        guard let mediaType = MediaTypeExtras.mediaType(forUUID: uuid) else {
+            return
+        }
+        
+        _ = mediaType.removeLocalMedia(uuid: uuid)
     }
 }
 
@@ -256,11 +245,11 @@ extension MediaHandler: SyncControllerDelegate {
         var numberErrors = 0
         var numberDeletions = 0
         
-        if let images = ImageMediaObject.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID) {
-            for image in images {
+        if let media = FileMediaObject.fetchAbstractObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID) {
+            for mediaObj in media {
                 do {
-                    // This also removes the associated discussion and image file.
-                    try image.remove()
+                    // This also removes the associated discussion and media file.
+                    try mediaObj.remove()
                     numberDeletions += 1
                 } catch (let error) {
                     Log.error("\(error)")
@@ -271,10 +260,10 @@ extension MediaHandler: SyncControllerDelegate {
             var message = ""
             if numberDeletions > 0 {
                 if numberDeletions == 1 {
-                    message = "\(numberDeletions) image deleted"
+                    message = "\(numberDeletions) media object deleted"
                 }
                 else {
-                    message = "\(numberDeletions) images deleted"
+                    message = "\(numberDeletions) media objects deleted"
                 }
             }
             
@@ -310,19 +299,19 @@ extension MediaHandler: SyncControllerDelegate {
     }
     
     func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
-        // We provided the content for the image, but the server establishes its date of creation. So, update our local image date/time with the creation date from the server.
-        if let image = ImageMediaObject.fetchObjectWithUUID(uuid) {
-            image.creationDate = creationDate as NSDate
-            image.save()
+        // We provided the content for the media object, but the server establishes its date of creation. So, update our local media object date/time with the creation date from the server.
+        if let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) {
+            media.creationDate = creationDate as NSDate
+            media.save()
         }
         else {
-            Log.error("Could not find image for UUID: \(uuid)")
+            Log.error("Could not find media object for UUID: \(uuid)")
         }
     }
     
-    func fileGoneDuringUpload(syncController: SyncController, uuid: String, fileType: ImageExtras.FileType?, reason: GoneReason) {
+    func fileGoneDuringUpload(syncController: SyncController, uuid: String, fileType: Files.FileType?, reason: GoneReason) {
         
-        var doImage = false
+        var doMedia = false
         
         if let fileType = fileType {
             switch fileType {
@@ -335,36 +324,33 @@ extension MediaHandler: SyncControllerDelegate {
                     Log.error("Could not find discussion for UUID: \(uuid)")
                 }
                 
-            case .urlPreviewImages:
+            case .urlPreviewImage:
                 // TODO: Fix this
+                assert(false)
                 break
                 
-            case .url:
-                // TODO: Fix this
-                break
-                
-            case .image:
-                doImage = true
+            case .url, .image:
+                doMedia = true
             }
         }
         else {
             // Older files from the original server don't have file type appMetaData. They are images.
-            doImage = true
+            doMedia = true
         }
 
-        if doImage {
-            if let image = ImageMediaObject.fetchObjectWithUUID(uuid) {
-                image.gone = reason
-                image.save()
+        if doMedia {
+            if let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) {
+                media.gone = reason
+                media.save()
             }
             else {
-                Log.error("Could not find image for UUID: \(uuid)")
+                Log.error("Could not find media for UUID: \(uuid)")
             }
         }
     }
 
-    func removeLocalMedia(syncController: SyncController, uuids: [String]) {
-        removeLocalImages(uuids: uuids)
+    func removeLocalMedia(syncController: SyncController, uuid: String) {
+        removeLocalMedia(uuid: uuid)
     }
     
     func syncEvent(syncController:SyncController, event:SyncControllerEvent) {
@@ -372,27 +358,30 @@ extension MediaHandler: SyncControllerDelegate {
     }
     
     func completedAddingOrUpdatingLocalMedia(syncController: SyncController) {
-        completedAddingOrUpdatingLocalImagesAction?()
+        completedAddingOrUpdatingLocalMediaAction?()
     }
-    
+
     func redoMediaUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
         guard let discussion = DiscussionFileObject.fetchObjectWithUUID(attr.fileUUID) else {
-            Log.error("Cannot find discussion for attempted image re-upload.")
+            Log.error("Cannot find discussion for attempted media re-upload.")
             return
         }
         
-        guard let image = discussion.mediaObject, let imageURL = image.url, let imageUUID = image.uuid else {
-            Log.error("Cannot find image for attempted image re-upload.")
+        guard let media = discussion.mediaObject,
+            let mediaURL = media.url, let mediaUUID = media.uuid,
+            let mimeTypeRaw = media.mimeType,
+            let mimeType = MimeType(rawValue: mimeTypeRaw)  else {
+            Log.error("Cannot find media for attempted media re-upload.")
             return
         }
         
-        let attr = SyncAttributes(fileUUID: imageUUID, sharingGroupUUID: attr.sharingGroupUUID, mimeType: .jpeg)
+        let attr = SyncAttributes(fileUUID: mediaUUID, sharingGroupUUID: attr.sharingGroupUUID, mimeType: mimeType)
         do {
-            try SyncServer.session.uploadImmutable(localFile: imageURL, withAttributes: attr)
+            try SyncServer.session.uploadImmutable(localFile: mediaURL, withAttributes: attr)
             try SyncServer.session.sync(sharingGroupUUID: attr.sharingGroupUUID)
         }
         catch (let error) {
-            Log.error("Could not do uploadImmutable for image re-upload: \(error)")
+            Log.error("Could not do uploadImmutable for media re-upload: \(error)")
             return
         }
     }

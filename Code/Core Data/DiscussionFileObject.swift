@@ -16,7 +16,6 @@ import SyncServer_Shared
 
 @objc(DiscussionFileObject)
 public class DiscussionFileObject: FileObject {
-    static let UUID_KEY = "uuid"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
 
     class func entityName() -> String {

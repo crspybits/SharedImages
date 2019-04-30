@@ -119,7 +119,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if let results = try SyncServer.session.localConsistencyCheck(clientFiles: imageUUIDs + discussionUUIDs) {
                 let missing = Array(results.clientMissingAndDeleted)
                 // Somehow these were deleted in the SyncServer meta data, but not deleted from the Shared Images client. Delete them now.
-                ImageExtras.removeLocalImages(uuids: missing)
+                for uuid in missing {
+                    _ = ImageMediaObject.removeLocalMedia(uuid:uuid)
+                }
             }
         } catch (let error) {
             Log.error("Error doing local consistency check: \(error)")
