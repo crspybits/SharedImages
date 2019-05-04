@@ -8,6 +8,8 @@
 
 import UIKit
 import SMCoreLib
+import SyncServer_Shared
+import SyncServer
 
 extension ImageMediaObject: MediaType {    
     func checkForReadProblem(mediaData: MediaData) -> Bool {
@@ -32,26 +34,6 @@ extension ImageMediaObject: MediaType {
     
     // Also removes associated discussion.
     static func removeLocalMedia(uuid:String) -> Bool {
-        guard let image = ImageMediaObject.fetchObjectWithUUID(uuid) else {
-            Log.error("Cannot find image with UUID: \(uuid)")
-            return false
-        }
-        
-        Log.info("Deleting image with uuid: \(uuid)")
-        
-        var result: Bool = true
-        
-        // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
-        do {
-            // This also removes the associated discussion.
-            try image.remove()
-        }
-        catch (let error) {
-            Log.error("Error removing image: \(error)")
-            result = false
-        }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-        return result
+        return FileMediaObject.remove(uuid: uuid)
     }
 }

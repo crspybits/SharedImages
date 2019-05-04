@@ -129,51 +129,28 @@ class SyncController {
         try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
     }
     
-    private func dictToJSONString(_ dict: [String: Any]) -> String? {
-        guard let data = try? JSONSerialization.data(withJSONObject: dict, options: JSONSerialization.WritingOptions(rawValue: 0)) else {
-            return nil
-        }
-        
-        guard let jsonString = String(data: data, encoding: String.Encoding.utf8) else {
-            return nil
-        }
-        
-        return jsonString
-    }
-    
-    private func jsonStringToDict(_ jsonString: String) -> [String: Any]? {
-        if let jsonData = jsonString.data(using: String.Encoding.utf8, allowLossyConversion: false) {
-        
-            if let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
-                return json
-            }
-        }
-        
-        return nil
-    }
-    
-    // Add new images and discussions
-    func add(imageAndDiscussions:[(image: ImageMediaObject, discussion: DiscussionFileObject)], errorCleanup: ()->()) {
-        guard imageAndDiscussions.count > 0 else {
+    // All media and discussions are assumed to be in the same sharing group.
+    func add(mediaAndDiscussions:[(media: FileMediaObject, discussion: DiscussionFileObject)], errorCleanup: ()->()) {
+        guard mediaAndDiscussions.count > 0 else {
             return
         }
         
-        let sharingGroupUUID = imageAndDiscussions[0].image.sharingGroupUUID!
+        let sharingGroupUUID = mediaAndDiscussions[0].media.sharingGroupUUID!
         
-        for curr in imageAndDiscussions {
-            guard queueUploadImageAndDiscussion(image: curr.image, discussion: curr.discussion) else {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when preparing to sync your image(s).")
+        for curr in mediaAndDiscussions {
+            guard queueUploadMediaAndDiscussion(media: curr.media, discussion: curr.discussion) else {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when preparing to sync your media.")
                 errorCleanup()
                 return
             }
         }
         
         var pnMessage: String
-        if imageAndDiscussions.count == 1 {
-            pnMessage = "Added an image."
+        if mediaAndDiscussions.count == 1 {
+            pnMessage = "Added media."
         }
         else {
-            pnMessage = "Added \(imageAndDiscussions.count) images."
+            pnMessage = "Added \(mediaAndDiscussions.count) media."
         }
         
         // Separate out the sync so that we can, later, dequeue syncs should we fail.
@@ -183,15 +160,16 @@ class SyncController {
             errorCleanup()
             // Similar hack like the above.
             TimedCallback.withDuration(2.0) {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to sync your image(s).")
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to sync your media.")
             }
             Log.error("An error occurred: \(error)")
         }
     }
     
-    private func queueUploadImageAndDiscussion(image: ImageMediaObject, discussion: DiscussionFileObject) -> Bool {
-        guard let imageMimeTypeEnum = MimeType(rawValue: image.mimeType!) else {
-            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown image mime type: \(image.mimeType!)")
+    private func queueUploadMediaAndDiscussion(media: FileMediaObject, discussion: DiscussionFileObject) -> Bool {
+        guard let rawMimeType = media.mimeType,
+            let mediaMimeTypeEnum = MimeType(rawValue: rawMimeType) else {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown media mime type: \(media.mimeType ?? "")")
             return false
         }
     
@@ -199,13 +177,17 @@ class SyncController {
             SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown discussion mime type: \(discussion.mimeType!)")
             return false
         }
+        
+        guard let fileType = Files.FileType.from(object: media) else {
+            return false
+        }
     
         // 12/27/17; Not sending dates to the server-- it establishes the dates.
-        var imageAttr = SyncAttributes(fileUUID:image.uuid!, sharingGroupUUID: image.sharingGroupUUID!, mimeType:imageMimeTypeEnum)
+        var mediaAttr = SyncAttributes(fileUUID:media.uuid!, sharingGroupUUID: media.sharingGroupUUID!, mimeType:mediaMimeTypeEnum)
     
-        imageAttr.fileGroupUUID = image.fileGroupUUID
+        mediaAttr.fileGroupUUID = media.fileGroupUUID
     
-        var imageAppMetaData = [String: Any]()
+        var mediaAppMetaData = [String: Any]()
     
         // 4/17/18; Image titles, for new images, are stored in the "discussion" file.
         // imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
@@ -213,33 +195,33 @@ class SyncController {
         // 5/13/18; Only storing file type in appMetaData for new files.
         // imageAppMetaData[ImageExtras.appMetaDataDiscussionUUIDKey] = discussion.uuid
     
-        imageAppMetaData[AppMetaDataKey.fileType.rawValue] = Files.FileType.image.rawValue
+        mediaAppMetaData[AppMetaDataKey.fileType.rawValue] = fileType.rawValue
 
-        imageAttr.appMetaData = dictToJSONString(imageAppMetaData)
-        assert(imageAttr.appMetaData != nil)
+        mediaAttr.appMetaData = String.dictToJSONString(mediaAppMetaData)
+        assert(mediaAttr.appMetaData != nil)
     
-        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupUUID: image.sharingGroupUUID!, mimeType:discussionMimeTypeEnum)
+        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupUUID: media.sharingGroupUUID!, mimeType:discussionMimeTypeEnum)
         discussionAttr.fileGroupUUID = discussion.fileGroupUUID
     
         var discussionAppMetaData = [String: Any]()
         discussionAppMetaData[AppMetaDataKey.fileType.rawValue] = Files.FileType.discussion.rawValue
-        discussionAttr.appMetaData = dictToJSONString(discussionAppMetaData)
+        discussionAttr.appMetaData = String.dictToJSONString(discussionAppMetaData)
         assert(discussionAttr.appMetaData != nil)
 
         do {
-            // Make sure to enqueue both the image and discussion for upload without an intervening sync -- they are in the same file group, and this will enable other clients to download them together.
+            // Make sure to enqueue both the media and discussion for upload without an intervening sync -- they are in the same file group, and this will enable other clients to download them together.
     
-            try SyncServer.session.uploadImmutable(localFile: image.url!, withAttributes: imageAttr)
+            try SyncServer.session.uploadImmutable(localFile: media.url!, withAttributes: mediaAttr)
     
             // Using uploadCopy for discussions in case the discussion gets updated locally before we complete this sync operation. i.e., discussions are mutable.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
         } catch (let error) {
-            // TODO: Need to dequeue the image enqueue if it was the discussion enqueue that failed. See https://github.com/crspybits/SyncServer-iOSClient/issues/62 I'm going to do this really crudely right now.
+            // TODO: Need to dequeue the media enqueue if it was the discussion enqueue that failed. See https://github.com/crspybits/SyncServer-iOSClient/issues/62 I'm going to do this really crudely right now.
             try? SyncServer.session.reset(type: .tracking)
     
             // A hack because otherwise the VC we ned to show the alert is not present: Instead, the UI for image selection is still present.
             TimedCallback.withDuration(2.0) {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to start the upload of your image(s).")
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when trying to start the upload of your media.")
             }
     
             Log.error("An error occurred: \(error)")
@@ -261,28 +243,24 @@ class SyncController {
             // Like before, since discussions are mutable, use uploadCopy.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
             
-            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!, pushNotificationMessage: "Updated image discussion.")
+            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!, pushNotificationMessage: "Updated media discussion.")
         } catch (let error) {
             Log.error("An error occurred: \(error)")
         }
     }
     
-    // Also removes associated discussions, on the server. The images must be in the same sharing group.
-    func remove(images:[ImageMediaObject], sharingGroupUUID: String) -> Bool {
-        let imageUuids = images.map({$0.uuid!})
-        let imagesWithDiscussions = images.filter({$0.discussion != nil && $0.discussion!.uuid != nil})
-        let discussionUuids = imagesWithDiscussions.map({$0.discussion!.uuid!})
+    // Also removes associated discussions, on the server. The media must be in the same sharing group.
+    func remove(media:[FileMediaObject], sharingGroupUUID: String) -> Bool {
+        let mediaUuids = media.map({$0.uuid!})
+        let mediaWithDiscussions = media.filter({$0.discussion != nil && $0.discussion!.uuid != nil})
+        let discussionUuids = mediaWithDiscussions.map({$0.discussion!.uuid!})
         
         // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
-        
-        var message = "Removed \(images.count) image"
-        if images.count > 1 {
-            message += "s"
-        }
-        message += "."
+
+        let message = "Removed \(media.count) media."
         
         do {
-            try SyncServer.session.delete(filesWithUUIDs: imageUuids + discussionUuids)
+            try SyncServer.session.delete(filesWithUUIDs: mediaUuids + discussionUuids)
             try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: message)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
@@ -376,7 +354,7 @@ extension SyncController : SyncServerDelegate {
                 Log.warning("appMetaData download!")
             case .deletion:
                 // Conditioning this by media because deleting a media object deletes the associated discussion also.
-                if isMedia(attr: operation.attr) {
+                if Files.FileType.isMedia(attr: operation.attr) {
                     delegate.removeLocalMedia(syncController: self, uuid: operation.attr.fileUUID)
                 }
                 Progress.session.next(count: 1)
@@ -401,44 +379,6 @@ extension SyncController : SyncServerDelegate {
         handleGroupDownload(group: group)
     }
     
-    func fileTypeFrom(appMetaData:String?) -> (fileTypeString: String?, Files.FileType?) {
-        if let appMetaData = appMetaData,
-            let jsonDict = jsonStringToDict(appMetaData),
-            let fileTypeString = jsonDict[AppMetaDataKey.fileType.rawValue] as? String {
-            
-            if let fileType = Files.FileType(rawValue: fileTypeString) {
-                return (fileTypeString, fileType)
-            }
-            
-            return (fileTypeString, nil)
-        }
-        
-        return (nil, nil)
-    }
-    
-    func isMedia(attr: SyncAttributes) -> Bool {
-        let (fileTypeString, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
-        if let fileTypeString = fileTypeString {
-            guard let fileType = fileType else {
-                Log.error("Unknown file type: \(fileTypeString)")
-                return false
-            }
-            
-            switch fileType {
-            case .discussion:
-                return false
-                
-            case .urlPreviewImage:
-                return false
-                
-            case .image, .url:
-                break
-            }
-        }
-        
-        return true
-    }
-    
     enum FileDownloadComplete {
         case success(url:SMRelativeLocalURL, attr: SyncAttributes)
         case gone(attr: SyncAttributes)
@@ -455,7 +395,7 @@ extension SyncController : SyncServerDelegate {
             attr = successAttr
         }
         
-        let (fileTypeString, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
+        let (fileTypeString, fileType) = Files.FileType.from(appMetaData: attr.appMetaData)
         
         if let fileTypeString = fileTypeString {
             guard let fileType = fileType else {
@@ -523,7 +463,7 @@ extension SyncController : SyncServerDelegate {
     
         // If present, the appMetaData will be a JSON string
         if let appMetaData = attr.appMetaData,
-            let jsonDict = jsonStringToDict(appMetaData) {
+            let jsonDict = appMetaData.jsonStringToDict() {
             
             // Early files in the system won't give a title in the appMetaData, and later files won't either. Later files put the title into the "discussion" file.
             title = jsonDict[AppMetaDataKey.title.rawValue] as? String
@@ -682,7 +622,7 @@ extension SyncController : SyncServerDelegate {
                     message = "Please update it using the App Store"
                 #endif
                 
-                SMCoreLib.Alert.show(withTitle: "The SharedImages app needs to be updated.", message: message, okCompletion: {[unowned self] in
+                SMCoreLib.Alert.show(withTitle: "The Neebla app needs to be updated.", message: message, okCompletion: {[unowned self] in
                     #if DEBUG
                         self.openTestFlight()
                     #else
@@ -726,7 +666,7 @@ extension SyncController : SyncServerDelegate {
             }
             
         case .singleFileUploadComplete(attr: let attr):
-            let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
+            let (_, fileType) = Files.FileType.from(appMetaData: attr.appMetaData)
             if fileType == nil || fileType == .image {
                 // Include the nil case because files without types are images-- i.e., they were created before we started typing files in the meta data.
                 Log.info("fileType: \(String(describing: fileType))")
@@ -736,7 +676,7 @@ extension SyncController : SyncServerDelegate {
             Progress.session.next()
             
         case .singleFileUploadGone(attr: let attr):
-            let (_, fileType) = fileTypeFrom(appMetaData: attr.appMetaData)
+            let (_, fileType) = Files.FileType.from(appMetaData: attr.appMetaData)
             delegate.fileGoneDuringUpload(syncController: self, uuid: attr.fileUUID, fileType: fileType, reason: attr.gone!)
             Progress.session.next()
             

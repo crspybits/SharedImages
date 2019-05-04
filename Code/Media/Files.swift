@@ -8,8 +8,10 @@
 
 import Foundation
 import SMCoreLib
+import SyncServer
 
 struct Files {
+    // The specific names of these enum cases are critical: They are stored in appMetaData on the server. Be EXTREMELY careful changing these.
     enum FileType : String {
         // Media file objects-- these have associated discussions.
         case image
@@ -19,6 +21,56 @@ struct Files {
         case urlPreviewImage
         
         case discussion
+        
+        static func from(object: FileMediaObject) -> Files.FileType? {
+            switch object {
+            case is ImageMediaObject:
+                return .image
+            case is URLMediaObject:
+                return .url
+            default:
+                Log.error("Unknown FileMediaObject type: \(object.self)")
+                return nil
+            }
+        }
+        
+        static func from(appMetaData:String?) -> (fileTypeString: String?, Files.FileType?) {
+            if let appMetaData = appMetaData,
+                let jsonDict = appMetaData.jsonStringToDict(),
+                let fileTypeString = jsonDict[AppMetaDataKey.fileType.rawValue] as? String {
+                
+                if let fileType = Files.FileType(rawValue: fileTypeString) {
+                    return (fileTypeString, fileType)
+                }
+                
+                return (fileTypeString, nil)
+            }
+            
+            return (nil, nil)
+        }
+        
+        static func isMedia(attr: SyncAttributes) -> Bool {
+            let (fileTypeString, fileType) = from(appMetaData: attr.appMetaData)
+            if let fileTypeString = fileTypeString {
+                guard let fileType = fileType else {
+                    Log.error("Unknown file type: \(fileTypeString)")
+                    return false
+                }
+                
+                switch fileType {
+                case .discussion:
+                    return false
+                    
+                case .urlPreviewImage:
+                    return false
+                    
+                case .image, .url:
+                    break
+                }
+            }
+            
+            return true
+        }
     }
     
     static let discussionsDirectoryPath = "Discussions"

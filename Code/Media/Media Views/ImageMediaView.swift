@@ -12,10 +12,6 @@ class ImageMediaView: UIImageView, MediaView {
     private weak var imageCache:LRUCache<ImageMediaObject>?
     private var media: ImageMediaObject!
     
-    var originalSize: CGSize? {
-        return media.originalSize
-    }
-    
     func setupWith(media: ImageMediaObject, imageCache: LRUCache<ImageMediaObject>) {
         self.imageCache = imageCache
         self.media = media

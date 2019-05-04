@@ -28,7 +28,7 @@ class MediaVC: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
     
-    fileprivate var navigatedToLargeImages = false
+    fileprivate var navigatedToLargeMedia = false
     
     fileprivate var imageCache:LRUCache<ImageMediaObject>! {
         return ImageExtras.imageCache
@@ -147,7 +147,7 @@ class MediaVC: UIViewController {
             return
         }
         
-        mediaSelector = MediaSelectorVC.show(fromParentVC: self, using: self)
+        mediaSelector = MediaSelectorVC.show(fromParentVC: self, imageDelegate: self, urlPickerDelegate: self)
     }
     
     @objc private func selectImagesAction() {
@@ -248,9 +248,9 @@ class MediaVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        // If we navigated to the large images and are just coming back now, don't bother with the scrolling.
-        if navigatedToLargeImages {
-            navigatedToLargeImages = false
+        // If we navigated to the large media and are just coming back now, don't bother with the scrolling.
+        if navigatedToLargeMedia {
+            navigatedToLargeMedia = false
         }
         else {
             scrollIfNeeded(animated: true)
@@ -287,16 +287,16 @@ class MediaVC: UIViewController {
         refresh()
     }
     
-    private func createEmptyDiscussion(image:ImageMediaObject, discussionUUID: String, sharingGroupUUID: String, imageTitle: String?) -> FileData? {
+    func createEmptyDiscussion(media:FileMediaObject, discussionUUID: String, sharingGroupUUID: String, mediaTitle: String?) -> FileData? {
         let newDiscussionFileURL = Files.newJSONFile()
         var fixedObjects = FixedObjects()
         
-        // This is so that we have the possibility of reconstructing the image/discussions if we lose the server data. This will explicitly connect the discussion to the image.
+        // This is so that we have the possibility of reconstructing the media/discussions if we lose the server data. This will explicitly connect the discussion to the media.
         // [1] It is important to note that we are *never* depending on this UUID value in app operation. This is more of a comment. While unlikely, it is possible that a user could modify this value in a discussion JSON file in cloud storage. Thus, it has unreliable contents in some real sense. See also https://github.com/crspybits/SharedImages/issues/145
-        fixedObjects[DiscussionKeys.mediaUUIDKey] = image.uuid
+        fixedObjects[DiscussionKeys.mediaUUIDKey] = media.uuid
         
-        // 4/17/18; Image titles are now stored in the "discussion" file. This may reduce the amount of data we need store in the server database.
-        fixedObjects[DiscussionKeys.mediaTitleKey] = imageTitle
+        // 4/17/18; Media titles are now stored in the "discussion" file. This may reduce the amount of data we need store in the server database.
+        fixedObjects[DiscussionKeys.mediaTitleKey] = mediaTitle
 
         do {
             try fixedObjects.save(toFile: newDiscussionFileURL as URL)
@@ -308,6 +308,16 @@ class MediaVC: UIViewController {
         }
         
         return FileData(url: newDiscussionFileURL, mimeType: .text, fileUUID: discussionUUID, sharingGroupUUID: sharingGroupUUID, gone: nil)
+    }
+    
+    func getUsername() -> String? {
+        // There was a crash here when I force unwrapped both of these. Not sure how. I've changed to to optional chaining. See https://github.com/crspybits/SharedImages/issues/57 We'll get an empty/nil title in that case.
+        let userName = SignInManager.session.currentSignIn?.credentials?.username
+        if userName == nil {
+            Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
+        }
+        
+        return userName
     }
 }
 
@@ -338,15 +348,19 @@ extension MediaVC : UICollectionViewDelegate {
             return
         }
         
-        let imageObj = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
-        if imageObj.eitherHasError {
+        guard let mediaObj = self.coreDataSource.object(at: indexPath) as? FileMediaObject else {
+            return
+        }
+        
+        if mediaObj.eitherHasError {
             let cell = collectionView.cellForItem(at: indexPath)
             
             var title = "A file had an error when synchronizing"
-            if let details = errorDetails(readProblem: imageObj.readProblem, gone:  imageObj.gone) {
+            if let details = errorDetails(readProblem: mediaObj.readProblem, gone:  mediaObj.gone) {
                 title += ": " + details
             }
-            else if let discussion = imageObj.discussion, let details = errorDetails(readProblem: discussion.readProblem, gone:  discussion.gone) {
+            else if let discussion = mediaObj.discussion,
+                let details = errorDetails(readProblem: discussion.readProblem, gone:  discussion.gone) {
                 title += ": " + details
             }
             
@@ -355,10 +369,11 @@ extension MediaVC : UICollectionViewDelegate {
             Alert.styleForIPad(alert)
 
             alert.addAction(UIAlertAction(title: "Retry", style: .default) {alert in
-                let images = ImageMediaObject.fetchAll()
-                images.forEach { image in
-                    if self.sharingGroup.sharingGroupUUID == image.sharingGroupUUID && image.readProblem {
-                        try! SyncServer.session.requestDownload(forFileUUID: image.uuid!)
+                // TODO: This seems inefficient...
+                let media = FileMediaObject.fetchAllAbstractObjects()
+                media.forEach { aMedia in
+                    if self.sharingGroup.sharingGroupUUID == aMedia.sharingGroupUUID && aMedia.readProblem {
+                        try! SyncServer.session.requestDownload(forFileUUID: aMedia.uuid!)
                     }
                 }
                 
@@ -380,7 +395,7 @@ extension MediaVC : UICollectionViewDelegate {
             largeMedia.startMedia = coreDataSource.object(at: indexPath) as? FileMediaObject
             largeMedia.mediaHandler = mediaHandler
             largeMedia.sharingGroup = sharingGroup
-            navigatedToLargeImages = true
+            navigatedToLargeMedia = true
             navigationController!.pushViewController(largeMedia, animated: true)
         }
     }
@@ -404,11 +419,10 @@ extension MediaVC : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
-        let mediaObj = self.coreDataSource.object(at: indexPath) as! FileMediaObject
-        
-        cell.setProperties(media: mediaObj, syncController: mediaHandler.syncController, cache: imageCache)
-        
-        showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell, error: mediaObj.eitherHasError)
+        if let mediaObj = self.coreDataSource.object(at: indexPath) as? MediaType {
+            cell.setProperties(media: mediaObj, syncController: mediaHandler.syncController, cache: imageCache)
+            showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell, error: mediaObj.eitherHasError)
+        }
 
         return cell
     }
@@ -419,19 +433,15 @@ extension MediaVC : AcquireImagesDelegate {
         return Files.newURLForImage() as URL
     }
     
+    // TODO: Having problems showing alerts from here. Conflicting with possible present image capture screen.
     func acquireImages(_ acquireImages: AcquireImages, images: [(newImageURL: URL, mimeType: String)]) {
-        // There was a crash here when I force unwrapped both of these. Not sure how. I've changed to to optional chaining. See https://github.com/crspybits/SharedImages/issues/57 We'll get an empty/nil title in that case.
-        let userName = SignInManager.session.currentSignIn?.credentials?.username
-        if userName == nil {
-            Log.error("userName was nil: SignInManager.session.currentSignIn: \(String(describing: SignInManager.session.currentSignIn)); SignInManager.session.currentSignIn?.credentials: \(String(describing: SignInManager.session.currentSignIn?.credentials))")
-        }
-        
-        var imageAndDiscussions = [(image: ImageMediaObject, discussion: DiscussionFileObject)]()
+        let userName = getUsername()
+        var mediaAndDiscussions = [(media: FileMediaObject, discussion: DiscussionFileObject)]()
         
         func cleanup() {
-            for current in imageAndDiscussions {
+            for current in mediaAndDiscussions {
                 // Also removes discussion.
-                try? current.image.remove()
+                try? current.media.remove()
             }
             
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
@@ -450,43 +460,16 @@ extension MediaVC : AcquireImagesDelegate {
                 return
             }
             
-            imageAndDiscussions += [imageAndDiscussion]
+            let mediaAndDiscussion = (imageAndDiscussion.image as FileMediaObject,
+                    imageAndDiscussion.discussion)
+            
+            mediaAndDiscussions += [mediaAndDiscussion]
         }
         
         scrollIfNeeded(animated:true)
         
         // Sync these new images & discussions with the server.
-        mediaHandler.syncController.add(imageAndDiscussions: imageAndDiscussions, errorCleanup: cleanup)
-    }
-    
-    private func createImageAndDiscussion(newImageURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (image: ImageMediaObject, discussion: DiscussionFileObject)? {
-        guard let mimeTypeEnum = MimeType(rawValue: mimeType) else {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Unknown mime type: \(mimeType)")
-            return nil
-        }
-        
-        guard let newDiscussionUUID = UUID.make(), let fileGroupUUID = UUID.make() else {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Could not create UUID(s)")
-            return nil
-        }
-        
-        let imageFileData = FileData(url: newImageURL, mimeType: mimeTypeEnum, fileUUID: nil, sharingGroupUUID: sharingGroup.sharingGroupUUID, gone: nil)
-        let imageData = MediaData(file: imageFileData, title: userName, creationDate: nil, discussionUUID: newDiscussionUUID, fileGroupUUID: fileGroupUUID, mediaType: ImageMediaObject.self)
-        
-        // We're making an image that the user of the app added-- we'll generate a new UUID.
-        let newImage = mediaHandler.addOrUpdateLocalMedia(newMediaData: imageData, fileGroupUUID:fileGroupUUID)
-        newImage.sharingGroupUUID = sharingGroup.sharingGroupUUID
-        
-        guard let newDiscussionFileData = createEmptyDiscussion(image: newImage as! ImageMediaObject, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, imageTitle: userName) else {
-            try? newImage.remove()
-            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
-            return nil
-        }
-        
-        let newDiscussion = mediaHandler.addToLocalDiscussion(discussionData: newDiscussionFileData, type: .newLocalDiscussion, fileGroupUUID: fileGroupUUID)
-        newDiscussion.sharingGroupUUID = sharingGroup.sharingGroupUUID
-        
-        return (newImage, newDiscussion) as? (image: ImageMediaObject, discussion: DiscussionFileObject)
+        mediaHandler.syncController.add(mediaAndDiscussions: mediaAndDiscussions, errorCleanup: cleanup)
     }
 }
 
@@ -592,17 +575,16 @@ extension MediaVC : UICollectionViewDelegateFlowLayout {
         let size = collectionView.frame.width * proportion
         let boundingCellSize = CGSize(width: size, height: size)
         
-        // And then figure out how big the image will be.
-        // Seems like the crash Dany was getting was here: https://github.com/crspybits/SharedImages/issues/123
-        let image = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
-        
-        guard let imageOriginalSize = image.originalSize else {
+        // And then figure out how big the media will be.
+        // Seems like the crash Dany was getting was here: https://github.com/crspybits/SharedImages/issues/123        
+        guard let media = self.coreDataSource.object(at: indexPath) as? MediaType,
+            let mediaOriginalSize = media.originalSize else {
             return boundingCellSize
         }
         
-        let boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: boundingCellSize)
+        let boundedMediaSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: boundingCellSize)
 
-        return CGSize(width: boundedImageSize.width, height: boundedImageSize.height + MediaCollectionViewCell.smallTitleHeight)
+        return CGSize(width: boundedMediaSize.width, height: boundedMediaSize.height + MediaCollectionViewCell.smallTitleHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -698,5 +680,48 @@ extension MediaVC : SortyFilterDelegate {
         coreDataSource.fetchData()
         titleLabel.updateCaret()
         collectionView.reloadData()
+    }
+}
+
+extension MediaVC: URLPickerDelegate {
+    func urlPicker(_ picker: URLPickerVC, urlSelected: URLPickerVC.SelectedURL) {
+        let userName = getUsername()
+
+        // Need to create .url file
+        let mediaURL = Files.newURLForURLFile()
+        let mediaURLContents = "[InternetShortcut]\nURL=\(urlSelected.data.url)\n"
+        guard let data = mediaURLContents.data(using: .utf8) else {
+            // TODO: Show error to user.
+            Log.error("Could not convert url data into string.")
+            return
+        }
+        
+        do {
+            try data.write(to: mediaURL as URL)
+        }
+        catch (let error) {
+            // TODO: Show error to user.
+            Log.error("Could not write URL media to file.")
+            return
+        }
+        
+        guard let urlMediaAndDiscussion = createURLMediaAndDiscussion(newMediaURL: mediaURL, mimeType: MimeType.url.rawValue, userName: userName) else {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating url media and discussion!")
+            return
+        }
+        
+        let mediaAndDiscussion = (media: urlMediaAndDiscussion.urlMedia as FileMediaObject, discussion: urlMediaAndDiscussion.discussion)
+        
+        scrollIfNeeded(animated:true)
+        
+        func cleanup() {
+            // Also removes discussion.
+            try? urlMediaAndDiscussion.urlMedia.remove()
+            
+            CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        }
+        
+        // Sync this new url media & discussion with the server.
+        mediaHandler.syncController.add(mediaAndDiscussions: [mediaAndDiscussion], errorCleanup: cleanup)
     }
 }

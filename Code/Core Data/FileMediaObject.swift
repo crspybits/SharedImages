@@ -160,7 +160,6 @@ public class FileMediaObject: FileObject {
         return fetchRequest
     }
     
-    
     // Also removes associated discussion.
     func remove() throws {
         if let discussion = discussion {
@@ -172,5 +171,29 @@ public class FileMediaObject: FileObject {
         }
         
         CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
+    }
+    
+    static func remove(uuid:String) -> Bool {
+        guard let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) else {
+            Log.error("Cannot find file media object with UUID: \(uuid)")
+            return false
+        }
+        
+        Log.info("Deleting file media object with uuid: \(uuid)")
+        
+        var result: Bool = true
+        
+        // 12/2/17; It's important that the saveContext follow each remove-- See https://github.com/crspybits/SharedImages/issues/61
+        do {
+            // This also removes the associated discussion.
+            try media.remove()
+        }
+        catch (let error) {
+            Log.error("Error removing media: \(error)")
+            result = false
+        }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
+        return result
     }
 }

@@ -9,7 +9,9 @@
 import Foundation
 
 protocol MediaType: FileMediaObjectProtocol where Self: FileMediaObject  {
-    // Test the media file we got from the server, if any. Make sure the file is valid and not corrupted in some way.
+    var originalSize: CGSize? {get}
+
+    // Test the media file we got from the server, if any. Make sure the file is valid and not corrupted in some way. Return true iff there is a read problem.
     func checkForReadProblem(mediaData: MediaData) -> Bool
     
     func setup(mediaData: MediaData)

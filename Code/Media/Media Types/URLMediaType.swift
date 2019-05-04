@@ -9,8 +9,13 @@
 import Foundation
 
 extension URLMediaObject: MediaType {
+    var originalSize: CGSize? {
+        return nil
+    }
+    
     func checkForReadProblem(mediaData: MediaData) -> Bool {
-        return true
+        // TODO: Need to read file and see if have a read problem.
+        return false
     }
     
     func setup(mediaData: MediaData) {
@@ -18,7 +23,6 @@ extension URLMediaObject: MediaType {
     
     // Also removes associated discussions.
     static func removeLocalMedia(uuid:String) -> Bool {
-        assert(false)
-        return false
+        return FileMediaObject.remove(uuid: uuid)
     }
 }

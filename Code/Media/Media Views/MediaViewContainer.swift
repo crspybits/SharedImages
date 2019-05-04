@@ -9,8 +9,9 @@
 import UIKit
 
 protocol MediaView where Self: UIView {
-    var originalSize: CGSize? {get}
+    // Only called if the media has a non-nil originalSize
     func showWith(size: CGSize)
+    
     func changeToFullsizedMediaForZooming()
 }
 

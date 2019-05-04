@@ -17,6 +17,7 @@ class MediaSelectorVC: UIViewController {
     @IBOutlet weak var cameraButton: UIButton!
     private weak var parentVC: UIViewController!
     private weak var imageDelegate: AcquireImagesDelegate!
+    private weak var urlPickerDelegate: URLPickerDelegate!
     private var acquireImages:AcquireImages!
     
     private let presenter: Presentr = {
@@ -60,17 +61,21 @@ class MediaSelectorVC: UIViewController {
             UIImagePickerController.SourceType.camera)
     }
     
-    static func show(fromParentVC parentVC: UIViewController, using imageDelegate: AcquireImagesDelegate) -> MediaSelectorVC {
+    static func show(fromParentVC parentVC: UIViewController,
+        imageDelegate: AcquireImagesDelegate,
+        urlPickerDelegate: URLPickerDelegate) -> MediaSelectorVC {
         let vc = MediaSelectorVC.create()
         vc.parentVC = parentVC
         vc.imageDelegate = imageDelegate
+        vc.urlPickerDelegate = urlPickerDelegate
         parentVC.customPresentViewController(vc.presenter, viewController: vc, animated: true, completion: nil)
         return vc
     }
     
     @IBAction func urlAction(_ sender: Any) {
-        dismiss(animated: true) {[unowned self] in
-            URLPickerVC.show(fromParentVC: self.parentVC)
+        dismiss(animated: true) {[weak self] in
+            guard let self = self else {return}
+            URLPickerVC.show(fromParentVC: self.parentVC, withDelegate: self.urlPickerDelegate)
         }
     }
     

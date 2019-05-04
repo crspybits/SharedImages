@@ -361,6 +361,7 @@ extension MediaHandler: SyncControllerDelegate {
         completedAddingOrUpdatingLocalMediaAction?()
     }
 
+    // QUESTION: Does the immutable assumption below apply for all media types?
     func redoMediaUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
         guard let discussion = DiscussionFileObject.fetchObjectWithUUID(attr.fileUUID) else {
             Log.error("Cannot find discussion for attempted media re-upload.")

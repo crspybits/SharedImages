@@ -67,7 +67,7 @@ class RemoveImages {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
         
         // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
-        if !syncController.remove(images: images, sharingGroupUUID: sharingGroup.sharingGroupUUID) {
+        if !syncController.remove(media: images, sharingGroupUUID: sharingGroup.sharingGroupUUID) {
             var message = "Image"
             if images.count > 1 {
                 message += "s"

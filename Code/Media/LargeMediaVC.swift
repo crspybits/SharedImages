@@ -236,7 +236,7 @@ extension LargeMediaVC : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
         if let syncController = mediaHandler?.syncController,
-            let media = self.coreDataSource.object(at: indexPath) as? FileMediaObject {
+            let media = self.coreDataSource.object(at: indexPath) as? MediaType {
             cell.setProperties(media: media, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
                 self.showDiscussionIfPresent(media: media)
             })
@@ -269,21 +269,20 @@ extension LargeMediaVC : UICollectionViewDelegateFlowLayout {
         /* 2/13/18; Looks like this line caused a crash: https://github.com/crspybits/SharedImages/issues/80
         I assume this must have occurred with an unwrapping of `coreDataSource` when it was nil. I'm trying to fix this by using a getter which always sets the coreDataSource if nil.
         */
-        let image = self.coreDataSource.object(at: indexPath) as! ImageMediaObject
-        
-        guard !image.hasError, let imageOriginalSize = image.originalSize else {
+        guard let media = self.coreDataSource.object(at: indexPath) as? MediaType,
+            !media.hasError, let mediaOriginalSize = media.originalSize else {
             return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + MediaCollectionViewCell.largeTitleHeight)
         }
         
-        var boundedImageSize = ImageExtras.boundingImageSizeFor(originalSize: imageOriginalSize, boundingSize: boundingCellSize)
+        var boundedMediaSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: boundingCellSize)
         
         if let firstTimeZoomed = zoomedCells[indexPath], firstTimeZoomed {
             // I first tried zooming the item size along with the image. That didn't work very well, oddly enough. I get the item size growing far too large. Instead, what works better, is the first time I get zooming, just expand out the size of the item.
-            boundedImageSize.width = maxWidth
-            boundedImageSize.height = collectionView.frame.height
+            boundedMediaSize.width = maxWidth
+            boundedMediaSize.height = collectionView.frame.height
         }
         
-        return CGSize(width: boundedImageSize.width + IMAGE_WIDTH_PADDING, height: boundedImageSize.height + MediaCollectionViewCell.largeTitleHeight)
+        return CGSize(width: boundedMediaSize.width + IMAGE_WIDTH_PADDING, height: boundedMediaSize.height + MediaCollectionViewCell.largeTitleHeight)
     }
 }
 

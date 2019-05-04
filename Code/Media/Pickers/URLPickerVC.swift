@@ -10,12 +10,24 @@ import UIKit
 import Presentr
 import SMLinkPreview
 
+protocol URLPickerDelegate: AnyObject {
+    // Called when "Add" method on the picker is tapped.
+    func urlPicker(_ picker: URLPickerVC, urlSelected: URLPickerVC.SelectedURL)
+}
+
 class URLPickerVC: UIViewController {
+    struct SelectedURL {
+        let data: LinkData
+        let image: LinkPreview.LoadedImage?
+    }
+    
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var linkPreviewContainer: UIView!
     @IBOutlet weak var marginView: UIView!
     @IBOutlet weak var acceptButton: UIButton!
     @IBOutlet weak var linkPreview: UIView!
+    private weak var delegate: URLPickerDelegate!
+    private var selectedURL: URLPickerVC.SelectedURL?
     
     private let presenter: Presentr = {
         let customPresenter = Presentr(presentationType: URLPickerVC.customType)
@@ -61,8 +73,9 @@ class URLPickerVC: UIViewController {
         marginView.clipsToBounds = true
     }
     
-    static func show(fromParentVC parentVC: UIViewController) {
+    static func show(fromParentVC parentVC: UIViewController, withDelegate delegate: URLPickerDelegate) {
         let vc = URLPickerVC.create()
+        vc.delegate = delegate
         parentVC.customPresentViewController(vc.presenter, viewController: vc, animated: true, completion: nil)
     }
     
@@ -71,7 +84,10 @@ class URLPickerVC: UIViewController {
     }
     
     @IBAction func acceptAction(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        if let selectedURL = selectedURL {
+            self.delegate.urlPicker(self, urlSelected: selectedURL)
+            dismiss(animated: true, completion: nil)
+        }
     }
 
     @IBAction func useHttpsSwitchAction(_ sender: Any) {
@@ -80,7 +96,7 @@ class URLPickerVC: UIViewController {
     
     private func updateScheme(urlString: String) -> String? {
         guard let url = URL(string: urlString),
-            var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             return nil
         }
     
@@ -111,7 +127,11 @@ class URLPickerVC: UIViewController {
                 self.linkPreview.removeAllSubviews()
                 self.linkPreviewContainer.isHidden = false
                 
-                let preview = LinkPreview.create(with: linkData)
+                let preview = LinkPreview.create(with: linkData) {[weak self] image in
+                    guard let self = self else {return}
+                    self.selectedURL = URLPickerVC.SelectedURL(data: linkData, image: image)
+                }
+                
                 self.linkPreview.addSubview(preview)
                 preview.centerXAnchor.constraint(equalTo: self.linkPreview.centerXAnchor).isActive = true
                 preview.centerYAnchor.constraint(equalTo: self.linkPreview.centerYAnchor).isActive = true

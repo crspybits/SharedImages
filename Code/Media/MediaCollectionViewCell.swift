@@ -35,7 +35,7 @@ class MediaCollectionViewCell : UICollectionViewCell {
     @IBOutlet weak var errorImageView: UIImageView!
     @IBOutlet weak var selectedIcon: UIImageView!
     
-    private(set) var media:FileMediaObject!
+    private(set) var media:MediaType!
     private(set) weak var syncController:SyncController!
     weak var imageCache:LRUCache<ImageMediaObject>?
     
@@ -93,7 +93,7 @@ class MediaCollectionViewCell : UICollectionViewCell {
         badge.removeFromSuperview()
     }
     
-    func setProperties(media:FileMediaObject, syncController:SyncController, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
+    func setProperties(media:MediaType, syncController:SyncController, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
         selectedState = nil
         self.media = media
         self.syncController = syncController
@@ -102,19 +102,33 @@ class MediaCollectionViewCell : UICollectionViewCell {
         
         switch media {
         case is ImageMediaObject:
-            let imageMedia:ImageMediaView
+            let imageView:ImageMediaView
             if let imv = mediaViewContainer.mediaView as? ImageMediaView {
-                imageMedia = imv
+                imageView = imv
             }
             else {
-                imageMedia = ImageMediaView()
-                mediaViewContainer.mediaView = imageMedia
+                imageView = ImageMediaView()
+                mediaViewContainer.mediaView = imageView
             }
             
             if let imageCache = imageCache {
-                imageMedia.setupWith(media: media as! ImageMediaObject, imageCache: imageCache)
+                imageView.setupWith(media: media as! ImageMediaObject, imageCache: imageCache)
             }
-            self.mediaView = imageMedia
+            self.mediaView = imageView
+            
+        case is URLMediaObject:
+            let urlView:URLMediaView
+            if let umv = mediaViewContainer.mediaView as? URLMediaView {
+                urlView = umv
+            }
+            else {
+                urlView = URLMediaView()
+                mediaViewContainer.mediaView = urlView
+            }
+            
+            urlView.setupWith(media: media as! URLMediaObject)
+            self.mediaView = urlView
+            
         default:
             assert(false)
         }
@@ -183,7 +197,7 @@ class MediaCollectionViewCell : UICollectionViewCell {
         scrollView?.contentSize = size
 
         // Don't use media.hasError here only because on an upload/gone case, we do have a valid URL and can render the media.
-        guard let mediaOriginalSize = mediaView.originalSize else {
+        guard let mediaOriginalSize = media.originalSize else {
             originalSize = size
             return
         }
@@ -212,5 +226,3 @@ extension MediaCollectionViewCell : UIScrollViewDelegate {
         }
     }
 }
-
-
