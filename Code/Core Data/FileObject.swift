@@ -50,6 +50,14 @@ public class FileObject: NSManagedObject {
         return gone != nil || readProblem
     }
     
+    func remove() throws {
+        if let url = url {
+            try FileManager.default.removeItem(at: url as URL)
+        }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
+    }
+    
     func save() {
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
     }

@@ -29,8 +29,13 @@ public class AcquireImages: NSObject {
     
     private weak var parentViewController:UIViewController!
     
+    // Using this init method, you can then call the `acquire` method.
     public init(withParentViewController parentViewController:UIViewController) {
         self.parentViewController = parentViewController
+    }
+    
+    // Using this init method, you can call `write(image:, to:)`
+    public override init() {
     }
     
     enum ImageType {
@@ -39,6 +44,8 @@ public class AcquireImages: NSObject {
     }
     
     func acquire(type: ImageType) {
+        assert(parentViewController != nil)
+        
         switch PHPhotoLibrary.authorizationStatus() {
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization {[weak self] status in
@@ -75,22 +82,29 @@ public class AcquireImages: NSObject {
         }
     }
     
-    private func writeImageToFile(image: UIImage) -> URL? {
-        let newFileURL = self.delegate?.acquireImagesURLForNewImage(self)
-        
+    // Returns true iff write succeeds.
+    func write(image: UIImage, to newFileURL: URL) -> Bool {
         if let imageData = image.jpegData(compressionQuality: self.compressionQuality) {
             do {
-                try imageData.write(to: newFileURL! as URL, options: .atomicWrite)
+                try imageData.write(to: newFileURL, options: .atomicWrite)
             } catch {
                 Log.error("Error writing file: \(error)")
-                return nil
+                return false
             }
         }
         else {
             Log.error("Couldn't convert image to JPEG!")
-            return nil
+            return false
         }
         
+        return true
+    }
+    
+    private func writeImageToFile(image: UIImage) -> URL? {
+        let newFileURL = self.delegate?.acquireImagesURLForNewImage(self)
+        guard write(image: image, to: newFileURL!) else {
+            return nil
+        }
         return newFileURL
     }
 }

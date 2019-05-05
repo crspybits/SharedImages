@@ -436,12 +436,11 @@ extension MediaVC : AcquireImagesDelegate {
     // TODO: Having problems showing alerts from here. Conflicting with possible present image capture screen.
     func acquireImages(_ acquireImages: AcquireImages, images: [(newImageURL: URL, mimeType: String)]) {
         let userName = getUsername()
-        var mediaAndDiscussions = [(media: FileMediaObject, discussion: DiscussionFileObject)]()
+        var fileObjects = [FileObject]()
         
         func cleanup() {
-            for current in mediaAndDiscussions {
-                // Also removes discussion.
-                try? current.media.remove()
+            for object in fileObjects {
+                try? object.remove()
             }
             
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
@@ -460,16 +459,14 @@ extension MediaVC : AcquireImagesDelegate {
                 return
             }
             
-            let mediaAndDiscussion = (imageAndDiscussion.image as FileMediaObject,
-                    imageAndDiscussion.discussion)
-            
-            mediaAndDiscussions += [mediaAndDiscussion]
+            fileObjects += [imageAndDiscussion.image]
+            fileObjects += [imageAndDiscussion.discussion]
         }
         
         scrollIfNeeded(animated:true)
         
         // Sync these new images & discussions with the server.
-        mediaHandler.syncController.add(mediaAndDiscussions: mediaAndDiscussions, errorCleanup: cleanup)
+        mediaHandler.syncController.add(objects:fileObjects, errorCleanup: cleanup)
     }
 }
 
@@ -686,42 +683,61 @@ extension MediaVC : SortyFilterDelegate {
 extension MediaVC: URLPickerDelegate {
     func urlPicker(_ picker: URLPickerVC, urlSelected: URLPickerVC.SelectedURL) {
         let userName = getUsername()
-
-        // Need to create .url file
-        let mediaURL = Files.newURLForURLFile()
-        let mediaURLContents = "[InternetShortcut]\nURL=\(urlSelected.data.url)\n"
-        guard let data = mediaURLContents.data(using: .utf8) else {
-            // TODO: Show error to user.
-            Log.error("Could not convert url data into string.")
+        
+        var imageType: URLMediaObject.URLFileContents.ImageType?
+        var image: UIImage?
+        
+        if let selectedImage = urlSelected.image {
+            switch selectedImage {
+            case .icon(let iconImage):
+                imageType = .icon
+                image = iconImage
+            case .large(let largeImage):
+                imageType = .large
+                image = largeImage
+            }
+        }
+        
+        let contents = URLMediaObject.URLFileContents(url: urlSelected.data.url, title: urlSelected.data.title, imageType: imageType)
+        guard let localFileURL = URLMediaObject.createLocalURLFile(contents: contents) else {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating local url file!")
             return
         }
         
-        do {
-            try data.write(to: mediaURL as URL)
-        }
-        catch (let error) {
-            // TODO: Show error to user.
-            Log.error("Could not write URL media to file.")
-            return
-        }
-        
-        guard let urlMediaAndDiscussion = createURLMediaAndDiscussion(newMediaURL: mediaURL, mimeType: MimeType.url.rawValue, userName: userName) else {
+        guard let urlMediaAndDiscussion = createURLMediaAndDiscussion(newMediaURL: localFileURL, mimeType: MimeType.url.rawValue, userName: userName) else {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating url media and discussion!")
             return
         }
         
-        let mediaAndDiscussion = (media: urlMediaAndDiscussion.urlMedia as FileMediaObject, discussion: urlMediaAndDiscussion.discussion)
+        if let image = image {
+            let imageLocalURL = Files.newURLForImage()
+            if AcquireImages().write(image: image, to: imageLocalURL as URL) {
+                let imagePreviewObject = URLPreviewImageObject.newObjectAndMakeUUID(makeUUID: true) as! URLPreviewImageObject
+                urlMediaAndDiscussion.urlMedia.previewImage = imagePreviewObject
+                imagePreviewObject.fileGroupUUID = urlMediaAndDiscussion.urlMedia.fileGroupUUID
+                imagePreviewObject.gone = nil
+                imagePreviewObject.mimeType = MimeType.jpeg.rawValue
+                imagePreviewObject.sharingGroupUUID = urlMediaAndDiscussion.urlMedia.sharingGroupUUID
+                imagePreviewObject.url = imageLocalURL
+                imagePreviewObject.save()
+            }
+        }
         
         scrollIfNeeded(animated:true)
         
         func cleanup() {
-            // Also removes discussion.
+            // Also removes discussion & image preview
             try? urlMediaAndDiscussion.urlMedia.remove()
             
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         }
         
-        // Sync this new url media & discussion with the server.
-        mediaHandler.syncController.add(mediaAndDiscussions: [mediaAndDiscussion], errorCleanup: cleanup)
+        var fileObjects:[FileObject] = [urlMediaAndDiscussion.urlMedia, urlMediaAndDiscussion.discussion]
+        if let imagePreview = urlMediaAndDiscussion.urlMedia.previewImage {
+            fileObjects += [imagePreview]
+        }
+        
+        // Sync this new url media, discussion, & image preview with the server.
+        mediaHandler.syncController.add(objects: fileObjects, errorCleanup: cleanup)
     }
 }

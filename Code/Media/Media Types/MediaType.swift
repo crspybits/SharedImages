@@ -8,7 +8,15 @@
 
 import Foundation
 
+enum MediaTypeSize {
+    // Fit to containing cell
+    case fit
+    
+    case large
+}
+
 protocol MediaType: FileMediaObjectProtocol where Self: FileMediaObject  {
+    var mediaTypeSize: MediaTypeSize {get}
     var originalSize: CGSize? {get}
 
     // Test the media file we got from the server, if any. Make sure the file is valid and not corrupted in some way. Return true iff there is a read problem.
@@ -16,9 +24,10 @@ protocol MediaType: FileMediaObjectProtocol where Self: FileMediaObject  {
     
     func setup(mediaData: MediaData)
     
-    // Also removes associated discussion. Returns true iff removal was successful.
+    // Removed based on UUID for media. Also removes associated discussion. Returns true iff removal was successful.
     static func removeLocalMedia(uuid:String) -> Bool
     
+    // Remove given a reference to the media object.
     func remove() throws
 }
 

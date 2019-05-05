@@ -11,7 +11,9 @@ import SMCoreLib
 import SyncServer_Shared
 import SyncServer
 
-extension ImageMediaObject: MediaType {    
+extension ImageMediaObject: MediaType {
+    var mediaTypeSize: MediaTypeSize {return .large}
+
     func checkForReadProblem(mediaData: MediaData) -> Bool {
         if let imageFilePath = mediaData.file.url?.path {
             let image = UIImage(contentsOfFile: imageFilePath)

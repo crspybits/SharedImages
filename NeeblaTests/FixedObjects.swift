@@ -64,7 +64,7 @@ class FixedObjectsTests: XCTestCase {
     func saveToFileWithJustId() -> (FixedObjects, URL)? {
         var fixedObjects = FixedObjects()
 
-        let url = ImageExtras.newJSONFile()
+        let url = Files.newJSONFile()
         print("url: \(url)")
         do {
             try fixedObjects.add(newFixedObject: [FixedObjects.idKey: "1"])
@@ -85,7 +85,7 @@ class FixedObjectsTests: XCTestCase {
     func saveToFileWithIdAndOherContents() -> (FixedObjects, URL)? {
         var fixedObjects = FixedObjects()
 
-        let url = ImageExtras.newJSONFile()
+        let url = Files.newJSONFile()
         print("url: \(url)")
         do {
             try fixedObjects.add(newFixedObject: [
@@ -113,7 +113,7 @@ class FixedObjectsTests: XCTestCase {
         let quote1 = "\""
         let quote2 = "'"
         
-        let url = ImageExtras.newJSONFile()
+        let url = Files.newJSONFile()
         print("url: \(url)")
         do {
             try fixedObjects.add(newFixedObject: [
@@ -435,7 +435,7 @@ class FixedObjectsTests: XCTestCase {
         let value2 = 42
         example[key2] = value2
         
-        let url = ImageExtras.newJSONFile()
+        let url = Files.newJSONFile()
         print("url: \(url)")
         do {
             try example.save(toFile: url as URL)
@@ -475,7 +475,7 @@ class FixedObjectsTests: XCTestCase {
             return
         }
         
-        let url = ImageExtras.newJSONFile()
+        let url = Files.newJSONFile()
         print("url: \(url)")
         do {
             try example.save(toFile: url as URL)

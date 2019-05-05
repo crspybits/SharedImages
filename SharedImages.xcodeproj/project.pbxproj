@@ -41,6 +41,7 @@
 		835A8AA1223F40460000FEA0 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AA0223F40460000FEA0 /* Logger.swift */; };
 		835A8AAF22448BB90000FEA0 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AAE22448BB90000FEA0 /* SettingsVC.swift */; };
 		835A8AB1224566590000FEA0 /* RemoveUserFromAlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835A8AB0224566590000FEA0 /* RemoveUserFromAlbumVC.swift */; };
+		8361FF36227E270F000BB851 /* URLMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8361FF35227E270F000BB851 /* URLMedia.swift */; };
 		836E0C142260185B00BA4BC6 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 836E0C132260185B00BA4BC6 /* Settings.bundle */; };
 		838C2DC020217F3000AB1F26 /* DiscussionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 838C2DBF20217F3000AB1F26 /* DiscussionVC.swift */; };
 		8391A62222618F7D009ED960 /* TestProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8391A62122618F7D009ED960 /* TestProgressIndicator.swift */; };
@@ -125,6 +126,8 @@
 		83F882611E749C18008F644A /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F882601E749C18008F644A /* Consts.swift */; };
 		83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882641E74A3C5008F644A /* GoogleService-Info.plist */; };
 		83F882671E74A600008F644A /* Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882661E74A600008F644A /* Server.plist */; };
+		83FA7730227E59EE00F193E1 /* URLPreviewImageObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA772C227E59EE00F193E1 /* URLPreviewImageObject.swift */; };
+		83FA7731227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA772D227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift */; };
 		AA5F5883AFFEFD22ED447A41 /* Pods_NeeblaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D41485B287C3303E5E4A0862 /* Pods_NeeblaTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -179,6 +182,7 @@
 		835A8AA0223F40460000FEA0 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		835A8AAE22448BB90000FEA0 /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		835A8AB0224566590000FEA0 /* RemoveUserFromAlbumVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveUserFromAlbumVC.swift; sourceTree = "<group>"; };
+		8361FF35227E270F000BB851 /* URLMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLMedia.swift; sourceTree = "<group>"; };
 		836E0C132260185B00BA4BC6 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = Resources/Settings.bundle; sourceTree = "<group>"; };
 		8373952A21A4AC090057E693 /* SharedImages7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages7.xcdatamodel; sourceTree = "<group>"; };
 		8389B1CB20A8FDF800B3D87A /* SharedImages4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedImages4.xcdatamodel; sourceTree = "<group>"; };
@@ -272,6 +276,8 @@
 		83F882601E749C18008F644A /* Consts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		83F882641E74A3C5008F644A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Resources/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		83F882661E74A600008F644A /* Server.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Server.plist; path = Resources/Server.plist; sourceTree = "<group>"; };
+		83FA772C227E59EE00F193E1 /* URLPreviewImageObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = URLPreviewImageObject.swift; path = "Core Data/URLPreviewImageObject.swift"; sourceTree = "<group>"; };
+		83FA772D227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "URLPreviewImageObject+CoreDataProperties.swift"; path = "Core Data/URLPreviewImageObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		854FB9347E2A443E983D7504 /* Pods-NeeblaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NeeblaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NeeblaTests/Pods-NeeblaTests.release.xcconfig"; sourceTree = "<group>"; };
 		A1A9F2364274678096FAE708 /* Pods-SharedImages.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImages.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages.release.xcconfig"; sourceTree = "<group>"; };
 		AB86EA543F8CCCC9287144E0 /* Pods-SharedImagesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImagesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -332,6 +338,7 @@
 		8314991D226159C200AD6244 /* NeeblaTests */ = {
 			isa = PBXGroup;
 			children = (
+				8361FF35227E270F000BB851 /* URLMedia.swift */,
 				8314992622615A5500AD6244 /* AppMetaData.swift */,
 				8314992822615A5500AD6244 /* FileGroupTests.swift */,
 				8314992722615A5500AD6244 /* FixedObjects.swift */,
@@ -670,11 +677,13 @@
 		83F882511E73B156008F644A /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
+				83FA772D227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift */,
 				830386E622694E3A00DB598D /* URLMediaObject+CoreDataProperties.swift */,
 				830386D6226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift */,
 				830386D8226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift */,
 				830386DC226949AF00DB598D /* FileMediaObject+CoreDataProperties.swift */,
 				830386DA226949AF00DB598D /* FileObject+CoreDataProperties.swift */,
+				83FA772C227E59EE00F193E1 /* URLPreviewImageObject.swift */,
 				830386D9226949AF00DB598D /* FileObject.swift */,
 				830386DB226949AF00DB598D /* FileMediaObject.swift */,
 				83C3407E201E42C400DAD865 /* DiscussionFileObject.swift */,
@@ -1014,6 +1023,7 @@
 			files = (
 				8314992A22615A5500AD6244 /* AppMetaData.swift in Sources */,
 				8314992B22615A5500AD6244 /* FixedObjects.swift in Sources */,
+				8361FF36227E270F000BB851 /* URLMedia.swift in Sources */,
 				8314992D22615A5500AD6244 /* SharedImagesTests.swift in Sources */,
 				8391A62222618F7D009ED960 /* TestProgressIndicator.swift in Sources */,
 				8314992C22615A5500AD6244 /* FileGroupTests.swift in Sources */,
@@ -1062,6 +1072,7 @@
 				831EEC4D2002D76B001821B9 /* DebugDashboardData.swift in Sources */,
 				83C1D59522754A6600C91867 /* AlbumsVC.swift in Sources */,
 				83C1D5E72279389200C91867 /* String+Extras.swift in Sources */,
+				83FA7731227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift in Sources */,
 				83C1D58622754A6600C91867 /* Parameters.swift in Sources */,
 				830386E4226949AF00DB598D /* FileMediaObject+CoreDataProperties.swift in Sources */,
 				83C1D58122754A6600C91867 /* MediaViewContainer.swift in Sources */,
@@ -1087,6 +1098,7 @@
 				834A7E7E2037858800969B18 /* ProgressView.swift in Sources */,
 				83F5CB592247FCA6006DBB2F /* SideMenuItem.swift in Sources */,
 				834A7E792037858800969B18 /* Alert.swift in Sources */,
+				83FA7730227E59EE00F193E1 /* URLPreviewImageObject.swift in Sources */,
 				830386DE226949AF00DB598D /* ImageMediaObject+CoreDataProperties.swift in Sources */,
 				830386E0226949AF00DB598D /* DiscussionFileObject+CoreDataProperties.swift in Sources */,
 				83C1D5D522754C8100C91867 /* SetupSignIn.swift in Sources */,

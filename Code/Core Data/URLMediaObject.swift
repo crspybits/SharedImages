@@ -25,4 +25,12 @@ public class URLMediaObject: FileMediaObject, FileMediaObjectProtocol {
         let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
         return managedObject as? URLMediaObject
     }
+    
+    override func remove() throws {
+        if let previewImage = previewImage {
+            try previewImage.remove()
+        }
+        
+        try super.remove()
+    }
 }

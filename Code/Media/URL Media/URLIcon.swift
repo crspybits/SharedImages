@@ -8,6 +8,7 @@
 
 import UIKit
 
-class URLIcon: UIView {
+class URLIcon: UIView, XibBasics {
+    typealias ViewType = URLIcon
     @IBOutlet weak var image: UIImageView!
 }

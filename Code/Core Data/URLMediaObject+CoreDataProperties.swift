@@ -2,7 +2,7 @@
 //  URLMediaObject+CoreDataProperties.swift
 //  SharedImages
 //
-//  Created by Christopher G Prince on 4/18/19.
+//  Created by Christopher G Prince on 5/4/19.
 //  Copyright © 2019 Spastic Muffin, LLC. All rights reserved.
 //
 //
@@ -17,5 +17,6 @@ extension URLMediaObject {
         return NSFetchRequest<URLMediaObject>(entityName: "URLMediaObject")
     }
 
+    @NSManaged public var previewImage: URLPreviewImageObject?
 
 }

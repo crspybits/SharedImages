@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18D109" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.99" systemVersion="18D109" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="DiscussionFileObject" representedClassName="DiscussionFileObject" parentEntity="FileObject" syncable="YES">
         <attribute name="unreadCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="mediaObject" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FileMediaObject" inverseName="discussion" inverseEntity="FileMediaObject" syncable="YES"/>
@@ -23,12 +23,18 @@
         <attribute name="originalHeight" optional="YES" attributeType="Float" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="originalWidth" optional="YES" attributeType="Float" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
     </entity>
-    <entity name="URLMediaObject" representedClassName="URLMediaObject" parentEntity="FileMediaObject" syncable="YES"/>
+    <entity name="URLMediaObject" representedClassName="URLMediaObject" parentEntity="FileMediaObject" syncable="YES">
+        <relationship name="previewImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="URLPreviewImageObject" inverseName="urlMedia" inverseEntity="URLPreviewImageObject" syncable="YES"/>
+    </entity>
+    <entity name="URLPreviewImageObject" representedClassName="URLPreviewImageObject" parentEntity="FileObject" syncable="YES">
+        <relationship name="urlMedia" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="URLMediaObject" inverseName="previewImage" inverseEntity="URLMediaObject" syncable="YES"/>
+    </entity>
     <elements>
         <element name="DiscussionFileObject" positionX="-63" positionY="54" width="128" height="75"/>
         <element name="FileMediaObject" positionX="-36" positionY="108" width="128" height="105"/>
         <element name="FileObject" positionX="-45" positionY="99" width="128" height="150"/>
         <element name="ImageMediaObject" positionX="-63" positionY="-18" width="128" height="75"/>
-        <element name="URLMediaObject" positionX="-18" positionY="117" width="128" height="45"/>
+        <element name="URLMediaObject" positionX="-18" positionY="117" width="128" height="60"/>
+        <element name="URLPreviewImageObject" positionX="-36" positionY="108" width="128" height="60"/>
     </elements>
 </model>

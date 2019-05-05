@@ -260,21 +260,48 @@ extension LargeMediaVC : UICollectionViewDataSource {
 
 // MARK: UICollectionViewDelegateFlowLayout
 extension LargeMediaVC : UICollectionViewDelegateFlowLayout {
+    // the item height must be less than the height of the UICollectionView minus the section insets top and bottom values, minus the content insets top and bottom values.
+    func maxCellHeight(for collectionView: UICollectionView, section: Int) -> CGFloat {
+        var height = collectionView.frame.height
+        
+        let contentInset = collectionView.contentInset
+        height -= contentInset.top - contentInset.bottom
+        
+        let sectionInset = (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionInset ?? UIEdgeInsets.zero
+        height -= sectionInset.top - sectionInset.bottom
+
+        return height
+    }
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    
+        let maxHeight = maxCellHeight(for: collectionView, section: indexPath.section)
+        let fitSize = CGSize(width: collectionView.frame.width, height: maxHeight)
     
         // Because we can scroll horizontally, let the width be large
         let maxWidth = max(collectionView.frame.height, collectionView.frame.width)
-        let boundingCellSize = CGSize(width: maxWidth, height: collectionView.frame.height)
+        let largeSize = CGSize(width: maxWidth, height: maxHeight)
+ 
+        // let boundingSize = CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + MediaCollectionViewCell.largeTitleHeight)
         
         /* 2/13/18; Looks like this line caused a crash: https://github.com/crspybits/SharedImages/issues/80
         I assume this must have occurred with an unwrapping of `coreDataSource` when it was nil. I'm trying to fix this by using a getter which always sets the coreDataSource if nil.
         */
         guard let media = self.coreDataSource.object(at: indexPath) as? MediaType,
-            !media.hasError, let mediaOriginalSize = media.originalSize else {
-            return CGSize(width: boundingCellSize.width + IMAGE_WIDTH_PADDING, height: boundingCellSize.height + MediaCollectionViewCell.largeTitleHeight)
+            !media.hasError else {
+            return fitSize
         }
         
-        var boundedMediaSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: boundingCellSize)
+        guard let mediaOriginalSize = media.originalSize else {
+            switch media.mediaTypeSize {
+            case .fit:
+                return fitSize
+            case .large:
+                return largeSize
+            }
+        }
+        
+        var boundedMediaSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: largeSize)
         
         if let firstTimeZoomed = zoomedCells[indexPath], firstTimeZoomed {
             // I first tried zooming the item size along with the image. That didn't work very well, oddly enough. I get the item size growing far too large. Instead, what works better, is the first time I get zooming, just expand out the size of the item.
@@ -282,7 +309,8 @@ extension LargeMediaVC : UICollectionViewDelegateFlowLayout {
             boundedMediaSize.height = collectionView.frame.height
         }
         
-        return CGSize(width: boundedMediaSize.width + IMAGE_WIDTH_PADDING, height: boundedMediaSize.height + MediaCollectionViewCell.largeTitleHeight)
+        // return CGSize(width: boundedMediaSize.width + IMAGE_WIDTH_PADDING, height: boundedMediaSize.height + MediaCollectionViewCell.largeTitleHeight)
+        return boundedMediaSize
     }
 }
 

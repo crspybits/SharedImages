@@ -23,17 +23,17 @@ public class DiscussionFileObject: FileObject {
     }
 
     class func newObjectAndMakeUUID(makeUUID: Bool) -> NSManagedObject {
-        let discussion = CoreData.sessionNamed(CoreDataExtras.sessionName).newObject(withEntityName:
+        let object = CoreData.sessionNamed(CoreDataExtras.sessionName).newObject(withEntityName:
                 self.entityName()) as! DiscussionFileObject
         
         if makeUUID {
-            discussion.uuid = UUID.make()
+            object.uuid = UUID.make()
         }
         
-        discussion.unreadCount = 0
-        discussion.readProblem = false
+        object.unreadCount = 0
+        object.readProblem = false
         
-        return discussion
+        return object
     }
     
     class func newObject() -> NSManagedObject {
@@ -70,13 +70,5 @@ public class DiscussionFileObject: FileObject {
             return current + discussion.unreadCount
         }
         return Int(result)
-    }
-    
-    func remove() throws {
-        if let url = url {
-            try FileManager.default.removeItem(at: url as URL)
-        }
-        
-        CoreData.sessionNamed(CoreDataExtras.sessionName).remove(self)
     }
 }

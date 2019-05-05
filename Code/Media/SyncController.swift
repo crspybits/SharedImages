@@ -129,28 +129,25 @@ class SyncController {
         try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID)
     }
     
-    // All media and discussions are assumed to be in the same sharing group.
-    func add(mediaAndDiscussions:[(media: FileMediaObject, discussion: DiscussionFileObject)], errorCleanup: ()->()) {
-        guard mediaAndDiscussions.count > 0 else {
+    // All objects are assumed to be in the same sharing group.
+    func add(objects:[FileObject], errorCleanup: ()->()) {
+        guard objects.count > 0 else {
             return
         }
         
-        let sharingGroupUUID = mediaAndDiscussions[0].media.sharingGroupUUID!
+        let sharingGroupUUID = objects[0].sharingGroupUUID!
         
-        for curr in mediaAndDiscussions {
-            guard queueUploadMediaAndDiscussion(media: curr.media, discussion: curr.discussion) else {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "An error occurred when preparing to sync your media.")
-                errorCleanup()
-                return
-            }
+        guard queueFileObjects(objects: objects) else {
+            errorCleanup()
+            return
         }
         
         var pnMessage: String
-        if mediaAndDiscussions.count == 1 {
+        if objects.count == 1 {
             pnMessage = "Added media."
         }
         else {
-            pnMessage = "Added \(mediaAndDiscussions.count) media."
+            pnMessage = "Added \(objects.count) media."
         }
         
         // Separate out the sync so that we can, later, dequeue syncs should we fail.
@@ -165,29 +162,24 @@ class SyncController {
             Log.error("An error occurred: \(error)")
         }
     }
-    
-    private func queueUploadMediaAndDiscussion(media: FileMediaObject, discussion: DiscussionFileObject) -> Bool {
-        guard let rawMimeType = media.mimeType,
-            let mediaMimeTypeEnum = MimeType(rawValue: rawMimeType) else {
-                SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown media mime type: \(media.mimeType ?? "")")
-            return false
-        }
-    
-        guard let discussionMimeTypeEnum = MimeType(rawValue: discussion.mimeType!) else {
-            SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown discussion mime type: \(discussion.mimeType!)")
+
+    private func queueFileObject(_ fileObject: FileObject) -> Bool {
+        guard let rawMimeType = fileObject.mimeType,
+            let mimeType = MimeType(rawValue: rawMimeType) else {
+                SMCoreLib.Alert.show(withTitle: "Alert!", message: "Unknown mime type: \(fileObject.mimeType ?? "")")
             return false
         }
         
-        guard let fileType = Files.FileType.from(object: media) else {
+        guard let fileType = Files.FileType.from(object: fileObject) else {
             return false
         }
     
         // 12/27/17; Not sending dates to the server-- it establishes the dates.
-        var mediaAttr = SyncAttributes(fileUUID:media.uuid!, sharingGroupUUID: media.sharingGroupUUID!, mimeType:mediaMimeTypeEnum)
+        var syncAttr = SyncAttributes(fileUUID:fileObject.uuid!, sharingGroupUUID: fileObject.sharingGroupUUID!, mimeType:mimeType)
     
-        mediaAttr.fileGroupUUID = media.fileGroupUUID
+        syncAttr.fileGroupUUID = fileObject.fileGroupUUID
     
-        var mediaAppMetaData = [String: Any]()
+        var appMetaData = [String: Any]()
     
         // 4/17/18; Image titles, for new images, are stored in the "discussion" file.
         // imageAppMetaData[ImageExtras.appMetaDataTitleKey] = image.title
@@ -195,26 +187,18 @@ class SyncController {
         // 5/13/18; Only storing file type in appMetaData for new files.
         // imageAppMetaData[ImageExtras.appMetaDataDiscussionUUIDKey] = discussion.uuid
     
-        mediaAppMetaData[AppMetaDataKey.fileType.rawValue] = fileType.rawValue
-
-        mediaAttr.appMetaData = String.dictToJSONString(mediaAppMetaData)
-        assert(mediaAttr.appMetaData != nil)
-    
-        var discussionAttr = SyncAttributes(fileUUID:discussion.uuid!, sharingGroupUUID: media.sharingGroupUUID!, mimeType:discussionMimeTypeEnum)
-        discussionAttr.fileGroupUUID = discussion.fileGroupUUID
-    
-        var discussionAppMetaData = [String: Any]()
-        discussionAppMetaData[AppMetaDataKey.fileType.rawValue] = Files.FileType.discussion.rawValue
-        discussionAttr.appMetaData = String.dictToJSONString(discussionAppMetaData)
-        assert(discussionAttr.appMetaData != nil)
+        appMetaData[AppMetaDataKey.fileType.rawValue] = fileType.rawValue
+        syncAttr.appMetaData = String.dictToJSONString(appMetaData)
+        assert(syncAttr.appMetaData != nil)
 
         do {
-            // Make sure to enqueue both the media and discussion for upload without an intervening sync -- they are in the same file group, and this will enable other clients to download them together.
-    
-            try SyncServer.session.uploadImmutable(localFile: media.url!, withAttributes: mediaAttr)
-    
-            // Using uploadCopy for discussions in case the discussion gets updated locally before we complete this sync operation. i.e., discussions are mutable.
-            try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
+            let uploadSyncType = fileType.uploadSyncType
+            switch uploadSyncType {
+            case .copy:
+                try SyncServer.session.uploadCopy(localFile: fileObject.url!, withAttributes: syncAttr)
+            case .immutable:
+                try SyncServer.session.uploadImmutable(localFile: fileObject.url!, withAttributes: syncAttr)
+            }
         } catch (let error) {
             // TODO: Need to dequeue the media enqueue if it was the discussion enqueue that failed. See https://github.com/crspybits/SyncServer-iOSClient/issues/62 I'm going to do this really crudely right now.
             try? SyncServer.session.reset(type: .tracking)
@@ -228,6 +212,16 @@ class SyncController {
             return false
         }
         
+        return true
+    }
+    
+    private func queueFileObjects(objects: [FileObject]) -> Bool {
+        for object in objects {
+            if !queueFileObject(object) {
+                return false
+            }
+        }
+
         return true
     }
     

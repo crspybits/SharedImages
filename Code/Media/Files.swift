@@ -11,25 +11,48 @@ import SMCoreLib
 import SyncServer
 
 struct Files {
-    // The specific names of these enum cases are critical: They are stored in appMetaData on the server. Be EXTREMELY careful changing these.
+    // The specific names of these FileType enum cases are critical: They are stored in appMetaData on the server. Be EXTREMELY careful changing these.
     enum FileType : String {
         // Media file objects-- these have associated discussions.
         case image
         case url
         
-        // Optional supplementary file for url media
+        // Optional supplementary image file for url media
         case urlPreviewImage
         
+        // Every media file object has an associated discussion file.
         case discussion
         
-        static func from(object: FileMediaObject) -> Files.FileType? {
+        // MARK: Helper methods & types for enum
+        
+        enum SyncType {
+            case immutable
+            case copy
+        }
+        
+        var uploadSyncType:SyncType {
+            switch self {
+            case .image, .url, .urlPreviewImage:
+                return .immutable
+            
+            // Discussions can change; upload as copy.
+            case .discussion:
+                return .copy
+            }
+        }
+        
+        static func from(object: FileObject) -> Files.FileType? {
             switch object {
             case is ImageMediaObject:
                 return .image
             case is URLMediaObject:
                 return .url
+            case _ where object.gone == nil:
+                return .urlPreviewImage
+            case is DiscussionFileObject:
+                return .discussion
             default:
-                Log.error("Unknown FileMediaObject type: \(object.self)")
+                Log.error("Unknown FileObject type: \(object.self)")
                 return nil
             }
         }
@@ -75,7 +98,9 @@ struct Files {
     
     static let discussionsDirectoryPath = "Discussions"
 
+    // This directory is for various kinds of images, including media images and the images (including icons) for URL LinkPreviews. Really, "LargeImages" is a misnomer now (as of 5/4/19). It's really more "PersistentImages"-- images that are uploaded/downloaded to the server.
     public static let largeImagesDirectoryPath = "LargeImages"
+    
     public static let imageFileExtension = "jpg"
     public static let imageFilePrefix = "img"
     

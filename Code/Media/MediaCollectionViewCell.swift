@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import SMCoreLib
 import BadgeSwift
+import SMLinkPreview
 
 protocol LargeMediaCellDelegate : class {
     func cellZoomed(cell: MediaCollectionViewCell, toZoomSize zoomSize:CGSize, withOriginalSize originalSize:CGSize)
