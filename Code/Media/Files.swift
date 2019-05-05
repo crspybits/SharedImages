@@ -32,6 +32,7 @@ struct Files {
         
         var uploadSyncType:SyncType {
             switch self {
+            // So far, Neebla doesn't allow these media to change.
             case .image, .url, .urlPreviewImage:
                 return .immutable
             
@@ -41,13 +42,37 @@ struct Files {
             }
         }
         
+        func createNewURL() -> SMRelativeLocalURL {
+            switch self {
+            case .discussion:
+                return Files.newJSONFile()
+            case .image, .urlPreviewImage:
+                return Files.newURLForImage()
+            case .url:
+                return Files.newURLForURLFile()
+            }
+        }
+        
+        func toFileObjectType() -> FileObject.Type {
+            switch self {
+            case .discussion:
+                return DiscussionFileObject.self
+            case .image:
+                return ImageMediaObject.self
+            case .urlPreviewImage:
+                return URLPreviewImageObject.self
+            case .url:
+                return URLMediaObject.self
+            }
+        }
+        
         static func from(object: FileObject) -> Files.FileType? {
             switch object {
             case is ImageMediaObject:
                 return .image
             case is URLMediaObject:
                 return .url
-            case _ where object.gone == nil:
+            case is URLPreviewImageObject:
                 return .urlPreviewImage
             case is DiscussionFileObject:
                 return .discussion

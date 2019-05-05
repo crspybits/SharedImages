@@ -26,7 +26,6 @@ public class FileMediaObject: FileObject {
     static let DISCUSSION_GONE_KEY = "discussion.goneReasonInternal"
     static let CREATION_DATE_KEY = "creationDate"
     static let DISCUSSION_UUID_KEY = "discussionUUID"
-    static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
 
     // `private` so that inheriting classes don't use or inherit this.
     private class func entityName() -> String {

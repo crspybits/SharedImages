@@ -50,8 +50,10 @@ protocol SyncControllerDelegate : class {
     // Adding or updating media-- the update part is for errors that occurred on an original media download (read problem or "gone" errors).
     func addOrUpdateLocalMedia(syncController:SyncController, mediaData: MediaData, attr: SyncAttributes)
     
-    // This will either be for a new discussion (corresponding to a new image) or it will be additional data for an existing discussion (with an existing image).
+    // This will either be for a new discussion (corresponding to a new image or other media) or it will be additional data for an existing discussion (with an existing image or other media).
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes)
+    
+    func addLocalAuxillaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType)
     
     func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate)
     func completedAddingOrUpdatingLocalMedia(syncController:SyncController)
@@ -402,7 +404,7 @@ extension SyncController : SyncServerDelegate {
                 discussionDownloadComplete(file)
             
             case .urlPreviewImage:
-                break
+                auxillaryFileDownloadComplete(file, fileType: fileType)
                 
             case .image, .url:
                 mediaDownloadComplete(file, mediaType: fileType)
@@ -415,12 +417,45 @@ extension SyncController : SyncServerDelegate {
         mediaDownloadComplete(file, mediaType: .image)
     }
     
+    // For a) first downloads and b) updates (error cases and new content) of the same auxillary file.
+    private func auxillaryFileDownloadComplete(_ file: FileDownloadComplete, fileType: Files.FileType) {
+        var attr: SyncAttributes!
+        var url: SMRelativeLocalURL?
+        
+        switch file {
+        case .gone(attr: let goneAttr):
+            attr = goneAttr
+        case .success(url: let successURL, attr: let successAttr):
+            attr = successAttr
+
+            let newFileURL = fileType.createNewURL()
+
+            // The files we get back from the SyncServer are in a temporary location. We own them though so can move it.
+            do {
+                try FileManager.default.moveItem(at: successURL as URL, to: newFileURL as URL)
+                url = newFileURL
+            } catch (let error) {
+                Log.error("An error occurred moving a file: \(error)")
+            }
+        }
+
+        let auxFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
+        delegate.addLocalAuxillaryFile(syncController: self, fileData: auxFileData, attr: attr, fileType: fileType)
+        
+        Progress.session.next()
+    }
+    
     // For a) first downloads and b) updates (error cases) of the same media file.
     private func mediaDownloadComplete(_ file: FileDownloadComplete, mediaType: Files.FileType) {
         var attr: SyncAttributes!
         var url: SMRelativeLocalURL?
-        
         var type: MediaType.Type!
+
+        type = mediaType.toFileObjectType() as? MediaType.Type
+        guard type != nil else {
+            assert(false)
+            return
+        }
         
         switch file {
         case .gone(attr: let goneAttr):
@@ -429,18 +464,7 @@ extension SyncController : SyncServerDelegate {
             attr = successAttr
 
             // The files we get back from the SyncServer are in a temporary location. We own them though, so can move them.
-            var newURL:SMRelativeLocalURL!
-            
-            switch mediaType {
-            case .image:
-                newURL = Files.newURLForImage()
-                type = ImageMediaObject.self
-            case .url:
-                newURL = Files.newURLForURLFile()
-                type = URLMediaObject.self
-            case .discussion, .urlPreviewImage:
-                assert(false)
-            }
+            let newURL = mediaType.createNewURL()
             
             do {
                 try FileManager.default.moveItem(at: successURL as URL, to: newURL as URL)

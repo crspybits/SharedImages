@@ -12,7 +12,13 @@ import SMCoreLib
 
 class URLMediaView: UIView, MediaView {
     private var media: URLMediaObject!
-    private var content: UIView!
+    private var content: UIView! {
+        return iconView ?? linkPreview ?? nil
+    }
+    private var iconView:URLIcon!
+    private var linkPreview: LinkPreview!
+    private var linkPreviewHeight:NSLayoutConstraint!
+    private var linkPreviewWidth:NSLayoutConstraint!
 
     private enum ContentType {
         case icon
@@ -28,19 +34,22 @@ class URLMediaView: UIView, MediaView {
         }
     }
     
+    private var contentType:ContentType {
+        return min(frameSize.width, frameSize.height) <= 100 ? .icon : .preview
+    }
+    
     override var bounds: CGRect {
         didSet {
             // See https://stackoverflow.com/questions/4000664/is-there-a-uiview-resize-event for the reason for putting this here and not in layoutSubviews.
-            createContentIfNeeded()
+            loadContentIntoView(contentType: contentType)
         }
     }
     
     // This call is size dependent-- i.e., its effect is dependent on the size of the self's frame.
-    private func createContentIfNeeded() {
-        let contentType:ContentType =
-            min(frameSize.width, frameSize.height) <= 100 ? .icon : .preview
-        
+    private func createContentViewIfNeeded() {
+        let contentType = self.contentType
         if let content = content, type(of: content) == contentType.viewTypeOf() {
+            loadContentIntoView(contentType: contentType)
             return
         }
 
@@ -48,20 +57,37 @@ class URLMediaView: UIView, MediaView {
         
         switch contentType {
         case .icon:
-            let iconView = URLIcon.create()
-            
+            iconView = URLIcon.create()
+            addSubview(iconView)
+            iconView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
+            iconView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
+            iconView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+            iconView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        case .preview:
+            linkPreview = LinkPreview.create()
+            addSubview(linkPreview)
+            content.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+            content.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+            linkPreviewHeight = content.heightAnchor.constraint(equalToConstant: content.frameHeight)
+            linkPreviewWidth = content.widthAnchor.constraint(equalToConstant: content.frameWidth)
+            linkPreviewHeight.isActive = true
+            linkPreviewWidth.isActive = true
+        }
+        
+        content.translatesAutoresizingMaskIntoConstraints = false
+        
+        loadContentIntoView(contentType: contentType)
+    }
+    
+    private func loadContentIntoView(contentType: ContentType) {
+        switch contentType {
+        case .icon:
             if let previewImageURL = media.previewImage?.url,
                 let filePath = previewImageURL.path {
                 // TODO: Loading needs to be async
                 iconView?.image.image = UIImage(contentsOfFile: filePath)
             }
-            
-            content = iconView
-            addSubview(content)
-            content.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
-            content.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
-            content.topAnchor.constraint(equalTo: topAnchor).isActive = true
-            content.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+
         case .preview:
             guard let localMediaURL = media.url else {
                 return
@@ -88,21 +114,17 @@ class URLMediaView: UIView, MediaView {
             
             // TODO: Have image loading from file in here. Need to make async.
             let linkData = LinkData(url: contents.url, title: contents.title, description: nil, image: largeImageURL, icon: iconURL)
+            linkPreview.setup(with: linkData)
             
-            content = LinkPreview.create(with: linkData)
-            addSubview(content)
-            content.heightAnchor.constraint(equalToConstant: content.frameHeight).isActive = true
-            content.widthAnchor.constraint(equalToConstant: content.frameWidth).isActive = true
-            content.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-            content.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+            linkPreviewWidth.constant = linkPreview.frameWidth
+            linkPreviewHeight.constant = linkPreview.frameHeight
         }
-        
-        content.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func setupWith(media: URLMediaObject) {
         self.media = media
         backgroundColor = .white
+        createContentViewIfNeeded()
     }
     
     func showWith(size: CGSize) {

@@ -15,6 +15,11 @@ import SyncServer_Shared
 @objc(FileObject)
 public class FileObject: NSManagedObject {
     static let UUID_KEY = "uuid"
+    static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
+    
+    private class func entityName() -> String {
+        return "FileObject"
+    }
 
     var url:SMRelativeLocalURL? {
         get {

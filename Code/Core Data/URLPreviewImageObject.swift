@@ -29,4 +29,14 @@ public class URLPreviewImageObject: FileObject {
         
         return previewImage
     }
+    
+    class func fetchObjectWithUUID(_ uuid:String) -> URLPreviewImageObject? {
+        let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
+        return managedObject as? URLPreviewImageObject
+    }
+    
+    class func fetchObjectWithFileGroupUUID(_ fileGroupUUID:String) -> URLPreviewImageObject? {
+        let managedObject = CoreData.fetchObjectWithUUID(fileGroupUUID, usingUUIDKey: FILE_GROUP_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
+        return managedObject as? URLPreviewImageObject
+    }
 }

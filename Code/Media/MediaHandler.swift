@@ -103,6 +103,13 @@ class MediaHandler {
                 }
             }
         }
+        
+        // If this is URL media, connect to the image auxillary file if we have it.
+        if let urlMedia = theMedia as? URLMediaObject,
+            let fileGroupUUID = newMediaData.fileGroupUUID,
+            let imagePreview = URLPreviewImageObject.fetchObjectWithFileGroupUUID(fileGroupUUID) {
+            urlMedia.previewImage = imagePreview
+        }
 
         CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         
@@ -212,7 +219,7 @@ class MediaHandler {
         // See if the media has an asssociated discussionUUID (this is the old style).
         media = FileMediaObject.fetchObjectWithDiscussionUUID(localDiscussion.uuid!)
 
-        // If not, see if a fileGroupUUID connects the discussion and image.
+        // If not, see if a fileGroupUUID connects the discussion and image (or other media).
         if media == nil, let fileGroupUUID = localDiscussion.fileGroupUUID {
             media = FileMediaObject.fetchObjectWithFileGroupUUID(fileGroupUUID)
         }
@@ -298,6 +305,11 @@ extension MediaHandler: SyncControllerDelegate {
         addToLocalDiscussion(discussionData: discussionData, type: .fromServer, fileGroupUUID: attr.fileGroupUUID)
     }
     
+    func addLocalAuxillaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType) {
+        // TODO!!!
+        assert(false)
+    }
+    
     func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
         // We provided the content for the media object, but the server establishes its date of creation. So, update our local media object date/time with the creation date from the server.
         if let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) {
@@ -325,9 +337,13 @@ extension MediaHandler: SyncControllerDelegate {
                 }
                 
             case .urlPreviewImage:
-                // TODO: Fix this
-                assert(false)
-                break
+                if let imagePreview = URLPreviewImageObject.fetchObjectWithUUID(uuid) {
+                    imagePreview.gone = reason
+                    imagePreview.save()
+                }
+                else {
+                    Log.error("Could not find image preview for UUID: \(uuid)")
+                }
                 
             case .url, .image:
                 doMedia = true
