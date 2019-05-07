@@ -41,7 +41,7 @@ class URLMediaView: UIView, MediaView {
     override var bounds: CGRect {
         didSet {
             // See https://stackoverflow.com/questions/4000664/is-there-a-uiview-resize-event for the reason for putting this here and not in layoutSubviews.
-            loadContentIntoView(contentType: contentType)
+            createContentViewIfNeeded()
         }
     }
     
@@ -63,13 +63,15 @@ class URLMediaView: UIView, MediaView {
             iconView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
             iconView.topAnchor.constraint(equalTo: topAnchor).isActive = true
             iconView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+            iconView.translatesAutoresizingMaskIntoConstraints = false
         case .preview:
             linkPreview = LinkPreview.create()
             addSubview(linkPreview)
-            content.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-            content.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-            linkPreviewHeight = content.heightAnchor.constraint(equalToConstant: content.frameHeight)
-            linkPreviewWidth = content.widthAnchor.constraint(equalToConstant: content.frameWidth)
+            linkPreview.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+            linkPreview.topAnchor.constraint(equalTo: topAnchor, constant: 10)
+            linkPreviewHeight = linkPreview.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.40, constant: 1.0)
+            linkPreviewWidth = linkPreview.widthAnchor.constraint(equalToConstant: linkPreview.frameWidth)
+            linkPreview.translatesAutoresizingMaskIntoConstraints = false
             linkPreviewHeight.isActive = true
             linkPreviewWidth.isActive = true
         }

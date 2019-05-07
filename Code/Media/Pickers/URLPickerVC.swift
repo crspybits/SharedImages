@@ -137,7 +137,6 @@ class URLPickerVC: UIViewController {
                 preview.centerYAnchor.constraint(equalTo: self.linkPreview.centerYAnchor).isActive = true
                 preview.heightAnchor.constraint(equalToConstant: self.linkPreview.frameHeight).isActive = true
                 preview.widthAnchor.constraint(equalToConstant: self.linkPreview.frameWidth).isActive = true
-                preview.size = self.linkPreview.frame.size
                 preview.translatesAutoresizingMaskIntoConstraints = false
                 
                 self.view.layoutIfNeeded()
