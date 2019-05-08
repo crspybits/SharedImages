@@ -10,6 +10,7 @@ Version 1.5.0
 	* Cleaned up code and fixed some issues in FixedObjects
 	* Improved Alerts for iPad
 	* Adding URL type for "images". This includes various UI changes to enable a user to have a "URL media" type and internal (e.g., Core Data) changes to allow this.
+	* A core data migration that included an explicit mapping model and a manually programmed component to deal with migrating relations.
 
 Version 1.4.0 (4/12/19)
 	* Added number acceptors & social sharing acceptance options to sharing invitation creation-- as part of with, changed the UI to have these. Added "help" section on this UI also.

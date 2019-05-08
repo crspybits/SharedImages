@@ -12,13 +12,13 @@ import SMCoreLib
 
 class URLMediaView: UIView, MediaView {
     private var media: URLMediaObject!
+    private var iconView:URLIcon!
+
     private var content: UIView! {
         return iconView ?? linkPreview ?? nil
     }
-    private var iconView:URLIcon!
+    
     private var linkPreview: LinkPreview!
-    private var linkPreviewHeight:NSLayoutConstraint!
-    private var linkPreviewWidth:NSLayoutConstraint!
 
     private enum ContentType {
         case icon
@@ -34,8 +34,10 @@ class URLMediaView: UIView, MediaView {
         }
     }
     
+    let minimimPreviewSize: CGFloat = 150
+    
     private var contentType:ContentType {
-        return min(frameSize.width, frameSize.height) <= 100 ? .icon : .preview
+        return min(frameSize.width, frameSize.height) <= minimimPreviewSize ? .icon : .preview
     }
     
     override var bounds: CGRect {
@@ -54,6 +56,8 @@ class URLMediaView: UIView, MediaView {
         }
 
         content?.removeFromSuperview()
+        iconView = nil
+        linkPreview = nil
         
         switch contentType {
         case .icon:
@@ -68,15 +72,11 @@ class URLMediaView: UIView, MediaView {
             linkPreview = LinkPreview.create()
             addSubview(linkPreview)
             linkPreview.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-            linkPreview.topAnchor.constraint(equalTo: topAnchor, constant: 10)
-            linkPreviewHeight = linkPreview.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.40, constant: 1.0)
-            linkPreviewWidth = linkPreview.widthAnchor.constraint(equalToConstant: linkPreview.frameWidth)
+            linkPreview.topAnchor.constraint(equalTo: topAnchor, constant: 10).isActive = true
+            linkPreview.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.8).isActive = true
+            linkPreview.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.8).isActive = true
             linkPreview.translatesAutoresizingMaskIntoConstraints = false
-            linkPreviewHeight.isActive = true
-            linkPreviewWidth.isActive = true
         }
-        
-        content.translatesAutoresizingMaskIntoConstraints = false
         
         loadContentIntoView(contentType: contentType)
     }
@@ -117,9 +117,6 @@ class URLMediaView: UIView, MediaView {
             // TODO: Have image loading from file in here. Need to make async.
             let linkData = LinkData(url: contents.url, title: contents.title, description: nil, image: largeImageURL, icon: iconURL)
             linkPreview.setup(with: linkData)
-            
-            linkPreviewWidth.constant = linkPreview.frameWidth
-            linkPreviewHeight.constant = linkPreview.frameHeight
         }
     }
     
