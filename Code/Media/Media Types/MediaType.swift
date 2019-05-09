@@ -34,7 +34,7 @@ protocol MediaType: FileMediaObjectProtocol where Self: FileMediaObject  {
 // Change this when you add a new MediaType
 struct MediaTypeExtras {
     static func mediaType(forUUID uuid: String) -> MediaType.Type? {
-        guard let obj = FileMediaObject.fetchAbstractObjectWithUUID(uuid) else {
+        guard let obj = FileObject.fetchObjectWithUUID(uuid) else {
             return nil
         }
         

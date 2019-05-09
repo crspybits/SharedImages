@@ -300,7 +300,7 @@ extension SyncController : SyncServerDelegate {
                 
             case .file(let downloadedFile):
                 // We have discussion content we're trying to upload, and someone else added discussion content. Don't use either our upload or the download directly. Instead merge the content, and make a new upload with the result.
-                guard let discussion = DiscussionFileObject.fetchObjectWithUUID(downloadedContentAttributes.fileUUID),
+                guard let discussion = DiscussionFileObject.fetchObjectWithUUID(downloadedContentAttributes.fileUUID) as? DiscussionFileObject,
                     let discussionURL = discussion.url as URL?,
                     let localDiscussion = FixedObjects(withFile: discussionURL),
                     let serverDiscussion = FixedObjects(withFile: downloadedFile as URL) else {

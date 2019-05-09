@@ -82,7 +82,7 @@ class MediaHandler {
         var discussion:DiscussionFileObject?
         
         if let discussionUUID = newMediaData.discussionUUID {
-            discussion = DiscussionFileObject.fetchObjectWithUUID(discussionUUID)
+            discussion = DiscussionFileObject.fetchObjectWithUUID(discussionUUID) as? DiscussionFileObject
         }
         
         if discussion == nil, let fileGroupUUID = newMediaData.fileGroupUUID {
@@ -155,7 +155,7 @@ class MediaHandler {
             // This is a new *local* discussion. Shouldn't have problems with file corruption.
 
         case .fromServer:
-            if let existingLocalDiscussion = DiscussionFileObject.fetchObjectWithUUID(discussionData.fileUUID!) {
+            if let existingLocalDiscussion = DiscussionFileObject.fetchObjectWithUUID(discussionData.fileUUID!) as? DiscussionFileObject {
                 // 2) Update to existing local discussion-- this is a main use case. I.e., no conflict and we got new discussion message(s) from the server (i.e., from other users(s)).
                 
                 localDiscussion = existingLocalDiscussion
@@ -312,7 +312,7 @@ extension MediaHandler: SyncControllerDelegate {
     
     func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate) {
         // We provided the content for the media object, but the server establishes its date of creation. So, update our local media object date/time with the creation date from the server.
-        if let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) {
+        if let media = FileMediaObject.fetchObjectWithUUID(uuid) as? FileMediaObject {
             media.creationDate = creationDate as NSDate
             media.save()
         }
@@ -355,7 +355,7 @@ extension MediaHandler: SyncControllerDelegate {
         }
 
         if doMedia {
-            if let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) {
+            if let media = FileMediaObject.fetchObjectWithUUID(uuid) {
                 media.gone = reason
                 media.save()
             }
@@ -379,7 +379,7 @@ extension MediaHandler: SyncControllerDelegate {
 
     // QUESTION: Does the immutable assumption below apply for all media types?
     func redoMediaUpload(syncController: SyncController, forDiscussion attr: SyncAttributes) {
-        guard let discussion = DiscussionFileObject.fetchObjectWithUUID(attr.fileUUID) else {
+        guard let discussion = DiscussionFileObject.fetchObjectWithUUID(attr.fileUUID) as? DiscussionFileObject else {
             Log.error("Cannot find discussion for attempted media re-upload.")
             return
         }

@@ -113,19 +113,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Log.debug("abstractObjects.count: \(abstractObjects.count)")
 #endif
         
-        let imageUUIDs = ImageMediaObject.fetchAll().map { $0.uuid!}
-        let discussionUUIDs = DiscussionFileObject.fetchAll().map { $0.uuid!}
+        // It is important that the base class of all managed objects be fetched here otherwise, we may leave some references out in the consistency check.
+        let fileObjectUUIDs = FileObject.fetchAllObjects().map { $0.uuid!}
         do {
-            if let results = try SyncServer.session.localConsistencyCheck(clientFiles: imageUUIDs + discussionUUIDs) {
+            if let results = try SyncServer.session.localConsistencyCheck(clientFiles: fileObjectUUIDs) {
                 let missing = Array(results.clientMissingAndDeleted)
                 // Somehow these were deleted in the SyncServer meta data, but not deleted from the Shared Images client. Delete them now.
                 for uuid in missing {
-                    _ = ImageMediaObject.removeLocalMedia(uuid:uuid)
+                    if let obj = FileObject.fetchObjectWithUUID(uuid) {
+                        try obj.remove()
+                    }
                 }
             }
         } catch (let error) {
             Log.error("Error doing local consistency check: \(error)")
         }
+        
+        CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
         
         // 2/18/19; [3] Until I get issues with background fetching resolved.
         // let minimumBackgroundFetchIntervalOneHour:TimeInterval = 60 * 60

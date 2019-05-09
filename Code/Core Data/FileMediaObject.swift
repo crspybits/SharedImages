@@ -13,7 +13,7 @@ import SMCoreLib
 
 protocol FileMediaObjectProtocol {
     static func newObjectAndMakeUUID(makeUUID: Bool, creationDate:NSDate?) -> NSManagedObject
-    static func fetchObjectWithUUID(_ uuid:String) -> FileMediaObject?
+    //static func fetchObjectWithUUID(_ uuid:String) -> FileObject?
 }
 
 @objc(FileMediaObject)
@@ -28,7 +28,7 @@ public class FileMediaObject: FileObject {
     static let DISCUSSION_UUID_KEY = "discussionUUID"
 
     // `private` so that inheriting classes don't use or inherit this.
-    private class func entityName() -> String {
+    override class func entityName() -> String {
         return "FileMediaObject"
     }
     
@@ -56,11 +56,6 @@ public class FileMediaObject: FileObject {
     var eitherHasError: Bool {
         let discussionError = discussion?.hasError ?? false
         return hasError || discussionError
-    }
-    
-    class func fetchAbstractObjectWithUUID(_ uuid:String) -> FileMediaObject? {
-        let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
-        return managedObject as? FileMediaObject
     }
     
     static func fetchAllAbstractObjects() -> [FileMediaObject] {
@@ -169,7 +164,7 @@ public class FileMediaObject: FileObject {
     }
     
     static func remove(uuid:String) -> Bool {
-        guard let media = FileMediaObject.fetchAbstractObjectWithUUID(uuid) else {
+        guard let media = FileMediaObject.fetchObjectWithUUID(uuid) else {
             Log.error("Cannot find file media object with UUID: \(uuid)")
             return false
         }

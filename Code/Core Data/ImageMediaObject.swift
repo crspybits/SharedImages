@@ -37,7 +37,7 @@ public class ImageMediaObject: FileMediaObject, FileMediaObjectProtocol {
         return originalImageSize
     }
 
-    class func entityName() -> String {
+    override class func entityName() -> String {
         return "ImageMediaObject"
     }
     
@@ -48,14 +48,13 @@ public class ImageMediaObject: FileMediaObject, FileMediaObjectProtocol {
     class func newObjectAndMakeUUID(makeUUID: Bool, creationDate:NSDate? = nil) -> NSManagedObject {
         return newObjectAndMakeUUID(entityName: self.entityName(), makeUUID: makeUUID, creationDate:creationDate)
     }
+    
+    override class func fetchObjectWithUUID(_ uuid:String) -> FileObject? {
+        return fetchObjectWithUUID(uuid, entityName: entityName())
+    }
 
     class func fetchObjectsWithSharingGroupUUID(_ sharingGroupUUID:String) -> [ImageMediaObject]? {
         return fetchObjectsWithSharingGroupUUID(entityName: entityName(), sharingGroupUUID) as? [ImageMediaObject]
-    }
-    
-    class func fetchObjectWithUUID(_ uuid:String) -> FileMediaObject? {
-        let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
-        return managedObject as? ImageMediaObject
     }
     
     static func fetchAll() -> [ImageMediaObject] {

@@ -13,7 +13,7 @@ import SMCoreLib
 
 @objc(URLMediaObject)
 public class URLMediaObject: FileMediaObject, FileMediaObjectProtocol {
-    class func entityName() -> String {
+    override class func entityName() -> String {
         return "URLMediaObject"
     }
     
@@ -21,9 +21,8 @@ public class URLMediaObject: FileMediaObject, FileMediaObjectProtocol {
         return newObjectAndMakeUUID(entityName: self.entityName(), makeUUID: makeUUID, creationDate:creationDate)
     }
     
-    class func fetchObjectWithUUID(_ uuid:String) -> FileMediaObject? {
-        let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
-        return managedObject as? URLMediaObject
+    override class func fetchObjectWithUUID(_ uuid:String) -> FileObject? {
+        return fetchObjectWithUUID(uuid, entityName: entityName())
     }
     
     override func remove() throws {

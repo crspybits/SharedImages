@@ -16,7 +16,7 @@ import SyncServer_Shared
 
 @objc(DiscussionFileObject)
 public class DiscussionFileObject: FileObject {
-    class func entityName() -> String {
+    override class func entityName() -> String {
         return "DiscussionFileObject"
     }
 
@@ -40,11 +40,6 @@ public class DiscussionFileObject: FileObject {
     
     class func fetchObjectWithFileGroupUUID(_ fileGroupUUID:String) -> DiscussionFileObject? {
         let managedObject = CoreData.fetchObjectWithUUID(fileGroupUUID, usingUUIDKey: FILE_GROUP_UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
-        return managedObject as? DiscussionFileObject
-    }
-
-    class func fetchObjectWithUUID(_ uuid:String) -> DiscussionFileObject? {
-        let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: self.entityName(), coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
         return managedObject as? DiscussionFileObject
     }
     

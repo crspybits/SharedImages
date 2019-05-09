@@ -17,7 +17,7 @@ public class FileObject: NSManagedObject {
     static let UUID_KEY = "uuid"
     static let FILE_GROUP_UUID_KEY = "fileGroupUUID"
     
-    private class func entityName() -> String {
+    class func entityName() -> String {
         return "FileObject"
     }
 
@@ -53,6 +53,33 @@ public class FileObject: NSManagedObject {
     
     var hasError: Bool {
         return gone != nil || readProblem
+    }
+    
+    static func fetchAllObjects(entityName: String) -> [FileObject] {
+        var fileObjects:[FileObject]!
+
+        do {
+            fileObjects = try CoreData.sessionNamed(CoreDataExtras.sessionName).fetchAllObjects(
+                withEntityName: entityName) as? [FileObject]
+        } catch (let error) {
+            Log.error("Error: \(error)")
+            assert(false)
+        }
+        
+        return fileObjects
+    }
+    
+    static func fetchAllObjects() -> [FileObject] {
+        return fetchAllObjects(entityName: self.entityName())
+    }
+    
+    class func fetchObjectWithUUID(_ uuid:String, entityName: String) -> FileObject? {
+        let managedObject = CoreData.fetchObjectWithUUID(uuid, usingUUIDKey: UUID_KEY, fromEntityName: entityName, coreDataSession: CoreData.sessionNamed(CoreDataExtras.sessionName))
+        return managedObject as? FileObject
+    }
+    
+    class func fetchObjectWithUUID(_ uuid:String) -> FileObject? {
+        return fetchObjectWithUUID(uuid, entityName: entityName())
     }
     
     func remove() throws {
