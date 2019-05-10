@@ -29,6 +29,9 @@ protocol MediaType: FileMediaObjectProtocol where Self: FileMediaObject  {
     
     // Remove given a reference to the media object.
     func remove() throws
+    
+    // Some/all of the uuid's may be for other type objects
+    static func loadMediaForActivityViewController(uuids: [String]) -> [Any]
 }
 
 // Change this when you add a new MediaType
@@ -47,6 +50,9 @@ struct MediaTypeExtras {
             return nil
         }
     }
+    
+    // The terms for the `name`s must be pluralizable, e.g., "images".
+    static let mediaTypes:[(type: MediaType.Type, name: String)] = [(ImageMediaObject.self, "image"), (URLMediaObject.self, "url")]
 }
 
 enum AppMetaDataKey: String {

@@ -128,6 +128,9 @@ class MediaCollectionViewCell : UICollectionViewCell {
             }
             
             urlView.setupWith(media: media as! URLMediaObject)
+            urlView.linkTapAction = { url in
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
             self.mediaView = urlView
             
         default:

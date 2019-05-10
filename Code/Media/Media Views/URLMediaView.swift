@@ -35,6 +35,7 @@ class URLMediaView: UIView, MediaView {
     }
     
     let minimimPreviewSize: CGFloat = 150
+    var linkTapAction:((URL)->())?
     
     private var contentType:ContentType {
         return min(frameSize.width, frameSize.height) <= minimimPreviewSize ? .icon : .preview
@@ -117,6 +118,12 @@ class URLMediaView: UIView, MediaView {
             // TODO: Have image loading from file in here. Need to make async.
             let linkData = LinkData(url: contents.url, title: contents.title, description: nil, image: largeImageURL, icon: iconURL)
             linkPreview.setup(with: linkData)
+            linkPreview.textAndIconAction = {[weak self] in
+                guard let self = self else {
+                    return
+                }
+                self.linkTapAction?(contents.url)
+            }
         }
     }
     

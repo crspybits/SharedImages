@@ -13,7 +13,6 @@ import SMCoreLib
 
 protocol FileMediaObjectProtocol {
     static func newObjectAndMakeUUID(makeUUID: Bool, creationDate:NSDate?) -> NSManagedObject
-    //static func fetchObjectWithUUID(_ uuid:String) -> FileObject?
 }
 
 @objc(FileMediaObject)

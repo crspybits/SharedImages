@@ -20,7 +20,7 @@ class MediaVC: UIViewController {
     var initialSync = false
     
     let reuseIdentifier = "ImageIcon"
-    var addImagesButton:UIBarButtonItem!
+    var addMediaButton:UIBarButtonItem!
     var coreDataSource:CoreDataSource!
     
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
@@ -38,7 +38,7 @@ class MediaVC: UIViewController {
     
     // To allow user to select images for sending via text messages, email (etc), or for deletion.
     typealias UUIDString = String
-    fileprivate var selectedImages = Set<UUIDString>()
+    fileprivate var selectedMedia = Set<UUIDString>()
     
     private var deletedImages:[IndexPath]?
     private var noDownloadImageView:UIImageView!
@@ -47,18 +47,18 @@ class MediaVC: UIViewController {
     private var selectionOn = false {
         didSet {
             if selectionOn {
-                selectImages.tintColor = .lightGray
-                selectedImages.removeAll()
+                selectMedia.tintColor = .lightGray
+                selectedMedia.removeAll()
             }
             else {
-                selectImages.tintColor = nil
+                selectMedia.tintColor = nil
                 navigationController?.setToolbarHidden(true, animated: true)
             }
         }
     }
     
-    private var removeImages:RemoveImages!
-    private var selectImages:UIButton!
+    private var removeMedia:RemoveMedia!
+    private var selectMedia:UIButton!
     private var mediaSelector:MediaSelectorVC!
     
     static func create() -> MediaVC {
@@ -91,17 +91,17 @@ class MediaVC: UIViewController {
         titleLabel.updateCaret()
         navigationItem.titleView = titleLabel
         
-        selectImages = UIButton(type: .system)
-        selectImages.setImage(#imageLiteral(resourceName: "Select"), for: .normal)
-        selectImages.addTarget(self, action: #selector(selectImagesAction), for: .touchUpInside)
-        let selectImagesBarButton = UIBarButtonItem(customView: selectImages)
+        selectMedia = UIButton(type: .system)
+        selectMedia.setImage(#imageLiteral(resourceName: "Select"), for: .normal)
+        selectMedia.addTarget(self, action: #selector(selectMediaAction), for: .touchUpInside)
+        let selectMediaBarButton = UIBarButtonItem(customView: selectMedia)
         
         if sharingGroup.permission.hasMinimumPermission(.write) {
-            addImagesButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addImagesAction))
-            navigationItem.rightBarButtonItems = [addImagesButton, selectImagesBarButton]
+            addMediaButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addMediaAction))
+            navigationItem.rightBarButtonItems = [addMediaButton, selectMediaBarButton]
         }
         else {
-            navigationItem.rightBarButtonItems = [selectImagesBarButton]
+            navigationItem.rightBarButtonItems = [selectMediaBarButton]
         }
         
         let backButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back"), style: .plain, target: self, action: #selector(backAction))
@@ -129,20 +129,20 @@ class MediaVC: UIViewController {
     }
     
     @objc private func removeImagesAction() {
-        var images = [ImageMediaObject]()
-        for uuidString in selectedImages {
-            if let imageObj = ImageMediaObject.fetchObjectWithUUID(uuidString) {
-                images.append(imageObj as! ImageMediaObject)
+        var objects = [FileMediaObject]()
+        for uuidString in selectedMedia {
+            if let fileObj = FileMediaObject.fetchObjectWithUUID(uuidString) as? FileMediaObject {
+                objects.append(fileObj)
             }
         }
-        
-        removeImages = RemoveImages(images, syncController: mediaHandler.syncController, sharingGroup: sharingGroup, withParentVC: self)
-        removeImages.start() {[unowned self] in
+
+        removeMedia = RemoveMedia(objects, syncController: mediaHandler.syncController, sharingGroup: sharingGroup, withParentVC: self)
+        removeMedia.start() {[unowned self] in
             self.selectionOn = false
         }
     }
     
-    @objc private func addImagesAction() {
+    @objc private func addMediaAction() {
         guard !selectionOn else {
             return
         }
@@ -150,7 +150,7 @@ class MediaVC: UIViewController {
         mediaSelector = MediaSelectorVC.show(fromParentVC: self, imageDelegate: self, urlPickerDelegate: self)
     }
     
-    @objc private func selectImagesAction() {
+    @objc private func selectMediaAction() {
         selectionOn = !selectionOn
         
         for indexPath in collectionView.indexPathsForVisibleItems {
@@ -594,29 +594,25 @@ extension MediaVC {
     // For sharing images via email, text messages, and for deleting images.
     @objc fileprivate func actionButtonAction() {
         // Create an array containing both UIImage's and Image's. The UIActivityViewController will use the UIImage's. The TrashActivity will use the Image's.
-        var images = [Any]()
-        for uuidString in selectedImages {
-            if let imageObj = ImageMediaObject.fetchObjectWithUUID(uuidString) {
-                if !imageObj.readProblem, let url = imageObj.url {
-                    let uiImage = ImageExtras.fullSizedImage(url: url as URL)
-                    images.append(uiImage)
-                }
-                images.append(imageObj)
-            }
-        }
+        var activityItems = [Any]()
         
-        if images.count == 0 {
-            Log.warning("No images selected!")
-            SMCoreLib.Alert.show(withTitle:  "No usable images selected!")
+        for (mediaType, _) in MediaTypeExtras.mediaTypes {
+            let items = mediaType.loadMediaForActivityViewController(uuids: Array(selectedMedia))
+            activityItems += items
+        }
+
+        if activityItems.count == 0 {
+            Log.warning("No media selected!")
+            SMCoreLib.Alert.show(withTitle:  "No usable media selected!")
             return
         }
 
-        let activityViewController = UIActivityViewController(activityItems: images, applicationActivities: nil)
+        let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
         
         activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, error in
             if completed {
                 // Action has been carried out (e.g., image has been deleted), remove `Selected` icons.
-                self.selectedImages.removeAll()
+                self.selectedMedia.removeAll()
                 self.selectionOn = false
                 self.collectionView.reloadData()
             }
@@ -633,16 +629,16 @@ extension MediaVC {
         
         // Allowing selection of an image even when there is an error, such as image.hasError -- e.g., so that deletion can be allowed. Will have to, downstream, disable certain operations-- such as sending the image to someone, if there is no image.
         
-        if selectedImages.contains(mediaObj.uuid!) {
+        if selectedMedia.contains(mediaObj.uuid!) {
             // Deselect image
-            selectedImages.remove(mediaObj.uuid!)
+            selectedMedia.remove(mediaObj.uuid!)
         }
         else {
             // Select image
-            selectedImages.insert(mediaObj.uuid!)
+            selectedMedia.insert(mediaObj.uuid!)
         }
         
-        if selectedImages.count > 0 {
+        if selectedMedia.count > 0 {
             if navigationController?.isToolbarHidden == true {
                 navigationController?.setToolbarHidden(false, animated: true)
             }
@@ -662,7 +658,7 @@ extension MediaVC {
             if error || !selectionOn {
                 cell.selectedState = nil
             }
-            else if selectedImages.contains(mediaUUID) {
+            else if selectedMedia.contains(mediaUUID) {
                 cell.selectedState = .selected
             }
             else {

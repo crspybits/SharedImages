@@ -73,7 +73,7 @@
 		83C1D59822754A6600C91867 /* MediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57922754A6600C91867 /* MediaCollectionViewCell.swift */; };
 		83C1D59922754A6600C91867 /* ImagesTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57B22754A6600C91867 /* ImagesTitle.swift */; };
 		83C1D59A22754A6600C91867 /* ImagesTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83C1D57C22754A6600C91867 /* ImagesTitle.xib */; };
-		83C1D59B22754A6600C91867 /* RemoveImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57D22754A6600C91867 /* RemoveImages.swift */; };
+		83C1D59B22754A6600C91867 /* RemoveMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57D22754A6600C91867 /* RemoveMedia.swift */; };
 		83C1D59C22754A6600C91867 /* AcquireImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57E22754A6600C91867 /* AcquireImages.swift */; };
 		83C1D59D22754A6600C91867 /* MediaVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57F22754A6600C91867 /* MediaVC.swift */; };
 		83C1D59E22754A6600C91867 /* LargeMediaVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D58022754A6600C91867 /* LargeMediaVC.swift */; };
@@ -216,7 +216,7 @@
 		83C1D57922754A6600C91867 /* MediaCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		83C1D57B22754A6600C91867 /* ImagesTitle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagesTitle.swift; sourceTree = "<group>"; };
 		83C1D57C22754A6600C91867 /* ImagesTitle.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ImagesTitle.xib; sourceTree = "<group>"; };
-		83C1D57D22754A6600C91867 /* RemoveImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveImages.swift; sourceTree = "<group>"; };
+		83C1D57D22754A6600C91867 /* RemoveMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveMedia.swift; sourceTree = "<group>"; };
 		83C1D57E22754A6600C91867 /* AcquireImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcquireImages.swift; sourceTree = "<group>"; };
 		83C1D57F22754A6600C91867 /* MediaVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaVC.swift; sourceTree = "<group>"; };
 		83C1D58022754A6600C91867 /* LargeMediaVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LargeMediaVC.swift; sourceTree = "<group>"; };
@@ -526,7 +526,7 @@
 			children = (
 				83C1D57B22754A6600C91867 /* ImagesTitle.swift */,
 				83C1D57C22754A6600C91867 /* ImagesTitle.xib */,
-				83C1D57D22754A6600C91867 /* RemoveImages.swift */,
+				83C1D57D22754A6600C91867 /* RemoveMedia.swift */,
 				83C1D57E22754A6600C91867 /* AcquireImages.swift */,
 				83C1D5E8227A982600C91867 /* Media VC */,
 			);
@@ -1052,7 +1052,7 @@
 				83F882611E749C18008F644A /* Consts.swift in Sources */,
 				83C34071201D58C500DAD865 /* FixedObjects.swift in Sources */,
 				830386E722694E3A00DB598D /* URLMediaObject.swift in Sources */,
-				83C1D59B22754A6600C91867 /* RemoveImages.swift in Sources */,
+				83C1D59B22754A6600C91867 /* RemoveMedia.swift in Sources */,
 				83C1D5E022767D3900C91867 /* ImageMediaType.swift in Sources */,
 				83C1D59E22754A6600C91867 /* LargeMediaVC.swift in Sources */,
 				830386E3226949AF00DB598D /* FileMediaObject.swift in Sources */,

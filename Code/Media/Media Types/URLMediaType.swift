@@ -126,4 +126,21 @@ extension URLMediaObject: MediaType {
         
         return URLFileContents(url: contentsURL, title: contentTitle, imageType: contentImageType)
     }
+    
+    static func loadMediaForActivityViewController(uuids: [String]) -> [Any] {
+        var urlMedia = [Any]()
+        
+        for uuid in uuids {
+            if let urlObj = URLMediaObject.fetchObjectWithUUID(uuid) {
+                if !urlObj.readProblem, let url = urlObj.url {
+                    if let contents = parseURLFile(localURLFile: url as URL) {
+                        urlMedia += [contents.url]
+                    }
+                }
+                urlMedia.append(urlObj)
+            }
+        }
+        
+        return urlMedia
+    }
 }

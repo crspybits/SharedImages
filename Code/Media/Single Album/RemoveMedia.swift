@@ -1,5 +1,5 @@
 //
-//  RemoveImages.swift
+//  RemoveMedia.swift
 //  SharedImages
 //
 //  Created by Christopher G Prince on 8/16/17.
@@ -12,15 +12,15 @@ import SMCoreLib
 import SyncServer
 import SDCAlertView
 
-class RemoveImages {
-    private let images: [ImageMediaObject]!
+class RemoveMedia {
+    private let media: [FileMediaObject]!
     private weak var parentVC: UIViewController!
     private let syncController: SyncController!
     private let sharingGroup: SyncServer.SharingGroup!
     private var completion:(()->())?
     
-    init(_ images: [ImageMediaObject], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
-        self.images = images
+    init(_ media: [FileMediaObject], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
+        self.media = media
         self.parentVC = parentVC
         self.syncController = syncController
         self.sharingGroup = sharingGroup
@@ -29,13 +29,54 @@ class RemoveImages {
     // completion is called on successful deletion, not on cancellation.
     func start(completion:(()->())? = nil) {
         self.completion = completion
-        var imageTerm = "image"
         
-        if images.count > 1 {
-            imageTerm += "s"
+        let mediaTypes = self.media.compactMap {
+            MediaTypeExtras.mediaType(forUUID: $0.uuid!)
         }
         
-        let alert = AlertController(title: "Delete selected \(imageTerm)?", message: nil, preferredStyle: .alert)
+        var numberTypes = 0
+        for (mediaType, _) in MediaTypeExtras.mediaTypes {
+            let allOfType = mediaTypes.filter {$0 == mediaType}
+            if allOfType.isEmpty {
+                continue
+            }
+            
+            numberTypes += 1
+        }
+        
+        var description = ""
+        var count = 0
+        
+        for (mediaType, name) in MediaTypeExtras.mediaTypes {
+            let allOfType = mediaTypes.filter {$0 == mediaType}
+            if allOfType.isEmpty {
+                continue
+            }
+            
+            count += 1
+
+            var typeTerm = name
+            
+            if allOfType.count > 1 {
+                typeTerm += "s"
+            }
+            
+            if !description.isEmpty {
+                description += " "
+            }
+            
+            if count == numberTypes && count > 1 {
+                description += "and \(typeTerm)"
+            }
+            else if count > 2 {
+                description += "\(typeTerm),"
+            }
+            else {
+                description += "\(typeTerm)"
+            }
+        }
+
+        let alert = AlertController(title: "Delete selected \(description)?", message: nil, preferredStyle: .alert)
         alert.behaviors = [.dismissOnOutsideTap]
         alert.popoverPresentationController?.sourceView = parentVC.view
 
@@ -43,37 +84,19 @@ class RemoveImages {
         })
         
         alert.addAction(AlertAction(title: "Delete", style: .destructive) {[unowned self] _ in
-            self.removeImages()
+            self.removeMedia()
         })
         
         parentVC.present(alert, animated: true, completion: nil)
-        
-#if false
-        let alert = UIAlertController(title: "Delete selected \(imageTerm)?", message: nil, preferredStyle: .alert)
-        alert.popoverPresentationController?.sourceView = parentVC.view
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default) { _ in
-        })
-        
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) {[unowned self] _ in
-            self.removeImages()
-        })
-        
-        parentVC.present(alert, animated: true, completion: nil)
-#endif
     }
     
-    private func removeImages() {
+    private func removeMedia() {
         // The sync/remote remove must happen before the local remove-- or we lose the reference!
         
         // 11/26/17; I got an error here "fileAlreadyDeleted". https://github.com/crspybits/SharedImages/issues/56-- `syncController.remove` failed.
-        if !syncController.remove(media: images, sharingGroupUUID: sharingGroup.sharingGroupUUID) {
-            var message = "Image"
-            if images.count > 1 {
-                message += "s"
-            }
-            
-            message += " already deleted on server."
+        if !syncController.remove(media: media, sharingGroupUUID: sharingGroup.sharingGroupUUID) {
+
+            let message = "Media already deleted on server."
             
             SMCoreLib.Alert.show(withTitle: "Error", message: message)
             Log.error("Error: \(message)")
@@ -83,13 +106,13 @@ class RemoveImages {
         
         // 12/2/17, 12/25/17; This is tricky. See https://github.com/crspybits/SharedImages/issues/61 and https://stackoverflow.com/questions/47614583/delete-multiple-core-data-objects-issue-with-nsfetchedresultscontroller
         // I'm dealing with this below. See the reference to this SO issue below.
-        for image in images {
+        for mediaObj in media {
             // This also removes any associated discussion.
             do {
-                try image.remove()
+                try mediaObj.remove()
             }
             catch (let error) {
-                Log.error("Could not remove image: \(error)")
+                Log.error("Could not remove media: \(error)")
             }
         }
         

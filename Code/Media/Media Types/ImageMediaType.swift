@@ -38,4 +38,20 @@ extension ImageMediaObject: MediaType {
     static func removeLocalMedia(uuid:String) -> Bool {
         return FileMediaObject.remove(uuid: uuid)
     }
+    
+    static func loadMediaForActivityViewController(uuids: [String]) -> [Any] {
+        var images = [Any]()
+        
+        for uuid in uuids {
+            if let imageObj = ImageMediaObject.fetchObjectWithUUID(uuid) {
+                if !imageObj.readProblem, let url = imageObj.url {
+                    let uiImage = ImageExtras.fullSizedImage(url: url as URL)
+                    images.append(uiImage)
+                }
+                images.append(imageObj)
+            }
+        }
+        
+        return images
+    }
 }
