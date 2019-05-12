@@ -104,7 +104,7 @@ class MediaHandler {
             }
         }
         
-        // If this is URL media, connect to the image auxillary file if we have it.
+        // If this is URL media, connect to the image auxilary file if we have it.
         if let urlMedia = theMedia as? URLMediaObject,
             let fileGroupUUID = newMediaData.fileGroupUUID,
             let imagePreview = URLPreviewImageObject.fetchObjectWithFileGroupUUID(fileGroupUUID) {
@@ -252,7 +252,8 @@ extension MediaHandler: SyncControllerDelegate {
         var numberErrors = 0
         var numberDeletions = 0
         
-        if let media = FileMediaObject.fetchAbstractObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID) {
+        if let media = FileMediaObject.fetchAbstractObjectsWithSharingGroupUUID(
+            sharingGroup.sharingGroupUUID) {
             for mediaObj in media {
                 do {
                     // This also removes the associated discussion and media file.
@@ -305,7 +306,7 @@ extension MediaHandler: SyncControllerDelegate {
         addToLocalDiscussion(discussionData: discussionData, type: .fromServer, fileGroupUUID: attr.fileGroupUUID)
     }
     
-    func addLocalAuxillaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType) {
+    func addLocalAuxilaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType) {
         // TODO!!!
         assert(false)
     }

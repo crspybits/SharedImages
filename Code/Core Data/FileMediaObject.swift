@@ -81,6 +81,10 @@ public class FileMediaObject: FileObject {
         return managedObject as? FileMediaObject
     }
     
+    class func fetchObjectsWithSharingGroupUUID(_ sharingGroupUUID:String) -> [FileMediaObject]? {
+        return fetchObjectsWithSharingGroupUUID(entityName: entityName(), sharingGroupUUID)
+    }
+    
     class func fetchObjectsWithSharingGroupUUID(entityName: String, _ sharingGroupUUID:String) -> [FileMediaObject]? {
         var result:[FileMediaObject]?
         do {

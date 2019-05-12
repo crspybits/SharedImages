@@ -22,7 +22,7 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
-            <rect key="frame" x="0.0" y="0.0" width="350" height="305"/>
+            <rect key="frame" x="0.0" y="0.0" width="350" height="295"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OCC-MV-VNN" userLabel="Background">
@@ -88,7 +88,7 @@
                     </constraints>
                 </stackView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LS5-X5-Nmb">
-                    <rect key="frame" x="10" y="235" width="330" height="60"/>
+                    <rect key="frame" x="10" y="225" width="330" height="60"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="60" id="CFX-Ps-pOe"/>
@@ -106,7 +106,7 @@
                 <constraint firstItem="LS5-X5-Nmb" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="10" id="EUV-BU-TYn"/>
                 <constraint firstItem="OCC-MV-VNN" firstAttribute="top" secondItem="dRO-3L-0wr" secondAttribute="top" id="G1t-PU-CLt"/>
                 <constraint firstItem="dRO-3L-0wr" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="10" id="KlH-Jp-c4k"/>
-                <constraint firstItem="LS5-X5-Nmb" firstAttribute="top" secondItem="dRO-3L-0wr" secondAttribute="bottom" constant="20" id="R9T-nl-p9y"/>
+                <constraint firstItem="LS5-X5-Nmb" firstAttribute="top" secondItem="dRO-3L-0wr" secondAttribute="bottom" constant="10" id="R9T-nl-p9y"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="LS5-X5-Nmb" secondAttribute="bottom" constant="10" id="Uhq-UX-3bp"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="LS5-X5-Nmb" secondAttribute="trailing" constant="10" id="Uwa-F5-hg2"/>
                 <constraint firstItem="OCC-MV-VNN" firstAttribute="height" secondItem="dRO-3L-0wr" secondAttribute="height" id="ekT-je-RyP"/>

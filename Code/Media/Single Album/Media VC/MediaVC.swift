@@ -287,13 +287,19 @@ class MediaVC: UIViewController {
         refresh()
     }
     
-    func createEmptyDiscussion(media:FileMediaObject, discussionUUID: String, sharingGroupUUID: String, mediaTitle: String?) -> FileData? {
+    // auxilaryFileMap will be applied to the `fixedObjects` and thus also stored in the discussion file.
+    func createEmptyDiscussion(media:FileMediaObject, discussionUUID: String, sharingGroupUUID: String, mediaTitle: String?, auxilaryFileMap: [String: FixedObjects.ConvertableToJSON]) -> FileData? {
         let newDiscussionFileURL = Files.newJSONFile()
         var fixedObjects = FixedObjects()
         
         // This is so that we have the possibility of reconstructing the media/discussions if we lose the server data. This will explicitly connect the discussion to the media.
         // [1] It is important to note that we are *never* depending on this UUID value in app operation. This is more of a comment. While unlikely, it is possible that a user could modify this value in a discussion JSON file in cloud storage. Thus, it has unreliable contents in some real sense. See also https://github.com/crspybits/SharedImages/issues/145
         fixedObjects[DiscussionKeys.mediaUUIDKey] = media.uuid
+        
+        // Similarly, for these-- they act as comments.
+        for (key, value) in auxilaryFileMap {
+            fixedObjects[key] = value
+        }
         
         // 4/17/18; Media titles are now stored in the "discussion" file. This may reduce the amount of data we need store in the server database.
         fixedObjects[DiscussionKeys.mediaTitleKey] = mediaTitle
@@ -420,7 +426,7 @@ extension MediaVC : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
         if let mediaObj = self.coreDataSource.object(at: indexPath) as? MediaType {
-            cell.setProperties(media: mediaObj, syncController: mediaHandler.syncController, cache: imageCache)
+            cell.setProperties(media: mediaObj, cache: imageCache)
             showSelectedState(mediaUUID: mediaObj.uuid!, cell: cell, error: mediaObj.eitherHasError)
         }
 
@@ -700,23 +706,36 @@ extension MediaVC: URLPickerDelegate {
             return
         }
         
-        guard let urlMediaAndDiscussion = createURLMediaAndDiscussion(newMediaURL: localFileURL, mimeType: MimeType.url.rawValue, userName: userName) else {
-            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating url media and discussion!")
-            return
-        }
-        
+        var imagePreviewObject:URLPreviewImageObject!
+        var auxilaryFileMap = [String: FixedObjects.ConvertableToJSON]()
+
         if let image = image {
             let imageLocalURL = Files.newURLForImage()
             if AcquireImages().write(image: image, to: imageLocalURL as URL) {
-                let imagePreviewObject = URLPreviewImageObject.newObjectAndMakeUUID(makeUUID: true) as! URLPreviewImageObject
-                urlMediaAndDiscussion.urlMedia.previewImage = imagePreviewObject
-                imagePreviewObject.fileGroupUUID = urlMediaAndDiscussion.urlMedia.fileGroupUUID
-                imagePreviewObject.gone = nil
-                imagePreviewObject.mimeType = MimeType.jpeg.rawValue
-                imagePreviewObject.sharingGroupUUID = urlMediaAndDiscussion.urlMedia.sharingGroupUUID
-                imagePreviewObject.url = imageLocalURL
-                imagePreviewObject.save()
+                imagePreviewObject = URLPreviewImageObject.newObjectAndMakeUUID(makeUUID: true) as? URLPreviewImageObject
+                if let imagePreviewObject = imagePreviewObject {
+                    imagePreviewObject.url = imageLocalURL
+                    auxilaryFileMap[DiscussionKeys.urlPreviewImageUUIDKey] = imagePreviewObject.uuid
+                }
             }
+            else {
+                Log.error("Could not write image to file: \(imageLocalURL)")
+            }
+        }
+
+        guard let urlMediaAndDiscussion = createURLMediaAndDiscussion(newMediaURL: localFileURL, mimeType: MimeType.url.rawValue, userName: userName, auxilaryFileMap: auxilaryFileMap) else {
+            SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Problem creating url media and discussion!")
+            try? imagePreviewObject?.remove()
+            return
+        }
+
+        if imagePreviewObject != nil {
+            urlMediaAndDiscussion.urlMedia.previewImage = imagePreviewObject
+            imagePreviewObject.fileGroupUUID = urlMediaAndDiscussion.urlMedia.fileGroupUUID
+            imagePreviewObject.gone = nil
+            imagePreviewObject.mimeType = MimeType.jpeg.rawValue
+            imagePreviewObject.sharingGroupUUID = urlMediaAndDiscussion.urlMedia.sharingGroupUUID
+            imagePreviewObject.save()
         }
         
         scrollIfNeeded(animated:true)

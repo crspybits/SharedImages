@@ -12,7 +12,7 @@ import SyncServer_Shared
 
 extension MediaVC {
     // TODO: Need to return an enum, with errors as possible values. The Alerts being shown here don't always appear-- e.g., the photo selection window might still be showing. Have the caller show an error alert.
-    func createMediaAndDiscussion(newMediaURL: SMRelativeLocalURL, mimeType:String, mediaType: MediaType.Type, userName: String?) -> (media: FileMediaObject, discussion: DiscussionFileObject)? {
+    func createMediaAndDiscussion(newMediaURL: SMRelativeLocalURL, mimeType:String, mediaType: MediaType.Type, userName: String?, auxilaryFileMap: [String: FixedObjects.ConvertableToJSON]) -> (media: FileMediaObject, discussion: DiscussionFileObject)? {
         guard let mimeTypeEnum = MimeType(rawValue: mimeType) else {
             SMCoreLib.Alert.show(fromVC: self, withTitle: "Alert!", message: "Unknown mime type: \(mimeType)")
             return nil
@@ -30,7 +30,7 @@ extension MediaVC {
         let newMedia = mediaHandler.addOrUpdateLocalMedia(newMediaData: mediaData, fileGroupUUID:fileGroupUUID)
         newMedia.sharingGroupUUID = sharingGroup.sharingGroupUUID
         
-        guard let newDiscussionFileData = createEmptyDiscussion(media: newMedia, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, mediaTitle: userName) else {
+        guard let newDiscussionFileData = createEmptyDiscussion(media: newMedia, discussionUUID: newDiscussionUUID, sharingGroupUUID: sharingGroup.sharingGroupUUID, mediaTitle: userName, auxilaryFileMap: auxilaryFileMap) else {
             try? newMedia.remove()
             CoreData.sessionNamed(CoreDataExtras.sessionName).saveContext()
             return nil
@@ -43,10 +43,10 @@ extension MediaVC {
     }
     
     func createImageAndDiscussion(newImageURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (image: ImageMediaObject, discussion: DiscussionFileObject)? {
-        return createMediaAndDiscussion(newMediaURL: newImageURL, mimeType: mimeType, mediaType: ImageMediaObject.self, userName: userName) as? (ImageMediaObject, DiscussionFileObject)
+        return createMediaAndDiscussion(newMediaURL: newImageURL, mimeType: mimeType, mediaType: ImageMediaObject.self, userName: userName, auxilaryFileMap: [:]) as? (ImageMediaObject, DiscussionFileObject)
     }
     
-    func createURLMediaAndDiscussion(newMediaURL: SMRelativeLocalURL, mimeType:String, userName: String?) -> (urlMedia: URLMediaObject, discussion: DiscussionFileObject)? {
-        return createMediaAndDiscussion(newMediaURL: newMediaURL, mimeType: mimeType, mediaType: URLMediaObject.self, userName: userName) as? (URLMediaObject, DiscussionFileObject)
+    func createURLMediaAndDiscussion(newMediaURL: SMRelativeLocalURL, mimeType:String, userName: String?, auxilaryFileMap: [String: FixedObjects.ConvertableToJSON]) -> (urlMedia: URLMediaObject, discussion: DiscussionFileObject)? {
+        return createMediaAndDiscussion(newMediaURL: newMediaURL, mimeType: mimeType, mediaType: URLMediaObject.self, userName: userName, auxilaryFileMap: auxilaryFileMap) as? (URLMediaObject, DiscussionFileObject)
     }
 }

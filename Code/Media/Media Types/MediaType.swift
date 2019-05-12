@@ -53,6 +53,71 @@ struct MediaTypeExtras {
     
     // The terms for the `name`s must be pluralizable, e.g., "images".
     static let mediaTypes:[(type: MediaType.Type, name: String)] = [(ImageMediaObject.self, "image"), (URLMediaObject.self, "url")]
+    
+    static func mediaTypeName(`for` type: MediaType.Type) -> String {
+        for mediaType in mediaTypes {
+            if type == mediaType.type {
+                return mediaType.name
+            }
+        }
+        
+        return "media"
+    }
+    
+    // Gives a list of media terms summarizing the media. E.g., "urls and image"
+    // If includeCounts is true prefixes each term with a count. E.g., "2 urls and 1 image"
+    static func namesFor(media: [FileMediaObject], includeCounts: Bool = false) -> String {
+        let mediaTypes = media.compactMap {
+            MediaTypeExtras.mediaType(forUUID: $0.uuid!)
+        }
+        
+        var numberTypes = 0
+        for (mediaType, _) in MediaTypeExtras.mediaTypes {
+            let allOfType = mediaTypes.filter {$0 == mediaType}
+            if allOfType.isEmpty {
+                continue
+            }
+            
+            numberTypes += 1
+        }
+        
+        var description = ""
+        var count = 0
+        
+        for (mediaType, name) in MediaTypeExtras.mediaTypes {
+            let allOfType = mediaTypes.filter {$0 == mediaType}
+            if allOfType.isEmpty {
+                continue
+            }
+            
+            count += 1
+
+            var typeTerm = name
+            if includeCounts {
+                typeTerm = "\(allOfType.count) \(typeTerm)"
+            }
+            
+            if allOfType.count > 1 {
+                typeTerm += "s"
+            }
+            
+            if !description.isEmpty {
+                description += " "
+            }
+            
+            if count == numberTypes && count > 1 {
+                description += "and \(typeTerm)"
+            }
+            else if count > 2 {
+                description += "\(typeTerm),"
+            }
+            else {
+                description += "\(typeTerm)"
+            }
+        }
+        
+        return description
+    }
 }
 
 enum AppMetaDataKey: String {

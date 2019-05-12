@@ -53,7 +53,7 @@ protocol SyncControllerDelegate : class {
     // This will either be for a new discussion (corresponding to a new image or other media) or it will be additional data for an existing discussion (with an existing image or other media).
     func addToLocalDiscussion(syncController:SyncController, discussionData: FileData, attr: SyncAttributes)
     
-    func addLocalAuxillaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType)
+    func addLocalAuxilaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType)
     
     func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate)
     func completedAddingOrUpdatingLocalMedia(syncController:SyncController)
@@ -144,17 +144,16 @@ class SyncController {
             return
         }
         
-        var pnMessage: String
-        if objects.count == 1 {
-            pnMessage = "Added media."
-        }
-        else {
-            pnMessage = "Added \(objects.count) media."
+        var pushNotificationMessage: String?
+
+        if let media = (objects.filter {$0 is FileMediaObject} as? [FileMediaObject]),  !media.isEmpty {
+            let description = MediaTypeExtras.namesFor(media: media, includeCounts: true)
+            pushNotificationMessage = "Added \(description)."
         }
         
         // Separate out the sync so that we can, later, dequeue syncs should we fail.
         do {
-            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: pnMessage)
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: pushNotificationMessage)
         } catch (let error) {
             errorCleanup()
             // Similar hack like the above.
@@ -239,7 +238,12 @@ class SyncController {
             // Like before, since discussions are mutable, use uploadCopy.
             try SyncServer.session.uploadCopy(localFile: discussion.url!, withAttributes: discussionAttr)
             
-            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!, pushNotificationMessage: "Updated media discussion.")
+            var name = "media"
+            if let mediaObject = discussion.mediaObject as? MediaType {
+                name = MediaTypeExtras.mediaTypeName(for: type(of: mediaObject))
+            }
+
+            try SyncServer.session.sync(sharingGroupUUID: discussion.sharingGroupUUID!, pushNotificationMessage: "Updated \(name) discussion.")
         } catch (let error) {
             Log.error("An error occurred: \(error)")
         }
@@ -253,11 +257,12 @@ class SyncController {
         
         // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
 
-        let message = "Removed \(media.count) media."
+        let description = MediaTypeExtras.namesFor(media: media, includeCounts: true)
+        let pushNotificationMessage = "Removed \(description)."
         
         do {
             try SyncServer.session.delete(filesWithUUIDs: mediaUuids + discussionUuids)
-            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: message)
+            try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: pushNotificationMessage)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
             return false
@@ -404,7 +409,7 @@ extension SyncController : SyncServerDelegate {
                 discussionDownloadComplete(file)
             
             case .urlPreviewImage:
-                auxillaryFileDownloadComplete(file, fileType: fileType)
+                auxilaryFileDownloadComplete(file, fileType: fileType)
                 
             case .image, .url:
                 mediaDownloadComplete(file, mediaType: fileType)
@@ -417,8 +422,8 @@ extension SyncController : SyncServerDelegate {
         mediaDownloadComplete(file, mediaType: .image)
     }
     
-    // For a) first downloads and b) updates (error cases and new content) of the same auxillary file.
-    private func auxillaryFileDownloadComplete(_ file: FileDownloadComplete, fileType: Files.FileType) {
+    // For a) first downloads and b) updates (error cases and new content) of the same auxilary file.
+    private func auxilaryFileDownloadComplete(_ file: FileDownloadComplete, fileType: Files.FileType) {
         var attr: SyncAttributes!
         var url: SMRelativeLocalURL?
         
@@ -440,7 +445,7 @@ extension SyncController : SyncServerDelegate {
         }
 
         let auxFileData = FileData(url: url, mimeType: attr.mimeType, fileUUID: attr.fileUUID, sharingGroupUUID: attr.sharingGroupUUID, gone: attr.gone)
-        delegate.addLocalAuxillaryFile(syncController: self, fileData: auxFileData, attr: attr, fileType: fileType)
+        delegate.addLocalAuxilaryFile(syncController: self, fileData: auxFileData, attr: attr, fileType: fileType)
         
         Progress.session.next()
     }

@@ -18,7 +18,7 @@ class AlbumCell: UIView, XibBasics {
     var startEditing:(()->())?
     var endEditing:(()->())?
     var albumSyncAction:(()->())?
-    @IBOutlet weak var image: UIImageView!
+    @IBOutlet weak var mediaViewContainer: MediaViewContainer!
     private let unreadCountBadge = BadgeSwift()
     @IBOutlet weak var albumName: UITextField!
     private var sharingGroup: SyncServer.SharingGroup!
@@ -42,32 +42,41 @@ class AlbumCell: UIView, XibBasics {
         }
     }
     
-    func setup(sharingGroup: SyncServer.SharingGroup, enableGroupNameEditing: Bool, sharingOn: Bool, sharingReallyOn:Bool) {
+    private let urlBackgroundColor = UIColor(white: 0.9, alpha: 1)
+    
+    func setup(sharingGroup: SyncServer.SharingGroup, cache: LRUCache<ImageMediaObject>, enableGroupNameEditing: Bool, sharingOn: Bool, sharingReallyOn:Bool) {
         self.sharingGroup = sharingGroup
         self.sharingOn = sharingOn
         self.sharingReallyOn = sharingReallyOn
         
+        // The reason for this background color is to have a solid background color when URL preview's change to non-icon's-- they look odd otherwise.
+        backgroundColor = urlBackgroundColor
+
         setAlbumName()
         
         albumName.isEnabled = enableGroupNameEditing
-        
-        self.image.image = nil
         unreadCountBadge.removeFromSuperview()
         
-        if let images = ImageMediaObject.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), images.count > 0 {
-            self.getImageForCell(images: images)
-            self.setUnreadCount(images: images)
+        if let media = FileMediaObject.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), media.count > 0,
+            let mediaObject = media.first! as? MediaType {
+            mediaViewContainer.setup(with: mediaObject, cache: cache, backgroundColor: urlBackgroundColor, albumsView: true)
+            mediaViewContainer.mediaView?.showWith(size: bounds.size)
+            self.setUnreadCount(media: media)
+        }
+        else {
+            mediaViewContainer.mediaView = nil
+            mediaViewContainer.backgroundColor = urlBackgroundColor
         }
         
         setSyncNeeded()
         
         UIView.animate(withDuration: 0.2) {[unowned self] in
             if sharingReallyOn {
-                self.image.alpha = 0.75
+                self.mediaViewContainer.alpha = 0.75
                 self.shareImage.alpha = 0.5
             }
             else {
-                self.image.alpha = 1.0
+                self.mediaViewContainer.alpha = 1.0
                 self.shareImage.alpha = 0
             }
         }
@@ -92,32 +101,17 @@ class AlbumCell: UIView, XibBasics {
         albumSyncNeeded.isHidden = !sharingGroup.syncNeeded!
     }
     
-    private func getImageForCell(images: [ImageMediaObject]) {
-        if let imageURL = images[0].url {
-            var image: UIImage!
-            do {
-                let imageData = try Data(contentsOf: imageURL as URL)
-                image = UIImage(data: imageData)
-            } catch {
-                print("Error loading image : \(error)")
-                return
-            }
-            
-            self.image.image = image
-        }
-    }
-    
-    private func setUnreadCount(images: [ImageMediaObject]) {
+    private func setUnreadCount(media: [FileMediaObject]) {
         var unreadCount = 0
-        images.forEach { image in
-            if let discussion = image.discussion {
+        media.forEach { mediaObj in
+            if let discussion = mediaObj.discussion {
                 unreadCount += Int(discussion.unreadCount)
             }
         }
         
         if unreadCount > 0 {
             unreadCountBadge.format(withUnreadCount: unreadCount)
-            image.addSubview(unreadCountBadge)
+            mediaViewContainer.addSubview(unreadCountBadge)
         }
     }
     

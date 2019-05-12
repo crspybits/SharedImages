@@ -34,6 +34,8 @@ class URLMediaView: UIView, MediaView {
         }
     }
     
+    private var albumsView: Bool = false
+    
     let minimimPreviewSize: CGFloat = 150
     var linkTapAction:((URL)->())?
     
@@ -89,6 +91,8 @@ class URLMediaView: UIView, MediaView {
                 let filePath = previewImageURL.path {
                 // TODO: Loading needs to be async
                 iconView?.image.image = UIImage(contentsOfFile: filePath)
+                
+                iconView.linkIcon.isHidden = albumsView
             }
 
         case .preview:
@@ -127,10 +131,11 @@ class URLMediaView: UIView, MediaView {
         }
     }
     
-    func setupWith(media: URLMediaObject) {
+    func setupWith(media: URLMediaObject, albumsView: Bool) {
         self.media = media
         backgroundColor = .white
         createContentViewIfNeeded()
+        self.albumsView = albumsView
     }
     
     func showWith(size: CGSize) {

@@ -28,6 +28,10 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
         return MediaHandler.session
     }
     
+    private var imageCache:LRUCache<ImageMediaObject> {
+        return ImageExtras.imageCache
+    }
+    
     private var shouldLayoutSubviews = true
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     private var addAlbum:UIBarButtonItem!
@@ -344,7 +348,7 @@ extension AlbumsVC : UICollectionViewDataSource {
             }
         }
         
-        albumCell.setup(sharingGroup: sharingGroup, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingOn, sharingReallyOn: sharingReallyOn)
+        albumCell.setup(sharingGroup: sharingGroup, cache: imageCache, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingOn, sharingReallyOn: sharingReallyOn)
         albumCell.tapAction = {
             tapAction()
         }

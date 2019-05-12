@@ -11,4 +11,5 @@ import UIKit
 class URLIcon: UIView, XibBasics {
     typealias ViewType = URLIcon
     @IBOutlet weak var image: UIImageView!
+    @IBOutlet weak var linkIcon: UIImageView!
 }

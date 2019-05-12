@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,9 +16,10 @@
             <rect key="frame" x="0.0" y="0.0" width="201" height="169"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HXN-Ws-zUd">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Wb-3E-vSr" customClass="MediaViewContainer" customModule="Neebla" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="0.0" width="201" height="139"/>
-                </imageView>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jso-OR-DWd">
                     <rect key="frame" x="0.0" y="0.0" width="201" height="144"/>
                     <connections>
@@ -69,19 +70,19 @@
             </subviews>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
+                <constraint firstItem="7Wb-3E-vSr" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="01G-xf-5nD"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="nyd-vk-Npg" secondAttribute="bottom" constant="5" id="3Oq-zW-eQr"/>
-                <constraint firstItem="HXN-Ws-zUd" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="499-6h-Vfz"/>
                 <constraint firstItem="Jso-OR-DWd" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="4jr-MB-d5G"/>
                 <constraint firstItem="Jso-OR-DWd" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="76l-X6-3xu"/>
-                <constraint firstItem="HXN-Ws-zUd" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="Buq-pj-SrC"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="nyd-vk-Npg" secondAttribute="trailing" constant="10" id="CL2-rI-sag"/>
-                <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="HXN-Ws-zUd" secondAttribute="bottom" constant="5" id="COj-o5-EJE"/>
                 <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="Jso-OR-DWd" secondAttribute="bottom" id="FYu-KV-9TJ"/>
                 <constraint firstItem="422-UX-rmv" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="Gl6-9L-eCO"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="9Ad-1S-XSx" secondAttribute="trailing" id="HCX-vK-BIe"/>
                 <constraint firstItem="Jso-OR-DWd" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="JM8-va-sRJ"/>
+                <constraint firstItem="nyd-vk-Npg" firstAttribute="top" secondItem="7Wb-3E-vSr" secondAttribute="bottom" constant="5" id="PQp-Sw-YsU"/>
+                <constraint firstItem="7Wb-3E-vSr" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="RgV-5D-OG7"/>
                 <constraint firstItem="nyd-vk-Npg" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="a3m-et-QC8"/>
-                <constraint firstItem="HXN-Ws-zUd" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="p44-UB-2LV"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="7Wb-3E-vSr" secondAttribute="trailing" id="i3a-Ea-n1G"/>
                 <constraint firstItem="9Ad-1S-XSx" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="pLp-ez-4VN"/>
                 <constraint firstItem="422-UX-rmv" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="s3T-CC-na9"/>
             </constraints>
@@ -90,7 +91,7 @@
             <connections>
                 <outlet property="albumName" destination="nyd-vk-Npg" id="396-BD-zeW"/>
                 <outlet property="albumSyncNeeded" destination="9Ad-1S-XSx" id="bvf-lM-zeQ"/>
-                <outlet property="image" destination="HXN-Ws-zUd" id="XyY-8F-m6V"/>
+                <outlet property="mediaViewContainer" destination="7Wb-3E-vSr" id="vy7-GD-YvV"/>
                 <outlet property="shareImage" destination="422-UX-rmv" id="XqY-zr-pRk"/>
             </connections>
             <point key="canvasLocation" x="-66.400000000000006" y="-92.203898050974516"/>

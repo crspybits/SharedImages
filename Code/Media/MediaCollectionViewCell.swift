@@ -24,7 +24,6 @@ class MediaCollectionViewCell : UICollectionViewCell {
     fileprivate var switchedToFullScaleImageForZooming = false
 
     @IBOutlet weak var mediaViewContainer: MediaViewContainer!
-    var mediaView: MediaView!
     
     // These are oversized to give space for padding.
     static let smallTitleHeight:CGFloat = 15
@@ -37,8 +36,6 @@ class MediaCollectionViewCell : UICollectionViewCell {
     @IBOutlet weak var selectedIcon: UIImageView!
     
     private(set) var media:MediaType!
-    private(set) weak var syncController:SyncController!
-    weak var imageCache:LRUCache<ImageMediaObject>?
     
     weak var delegate:LargeMediaCellDelegate?
     var originalSize:CGSize!
@@ -94,48 +91,12 @@ class MediaCollectionViewCell : UICollectionViewCell {
         badge.removeFromSuperview()
     }
     
-    func setProperties(media:MediaType, syncController:SyncController, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
+    func setProperties(media:MediaType, cache: LRUCache<ImageMediaObject>, imageTapBehavior:(()->())? = nil) {
         selectedState = nil
         self.media = media
-        self.syncController = syncController
         title.text = media.title
-        imageCache = cache
         
-        switch media {
-        case is ImageMediaObject:
-            let imageView:ImageMediaView
-            if let imv = mediaViewContainer.mediaView as? ImageMediaView {
-                imageView = imv
-            }
-            else {
-                imageView = ImageMediaView()
-                mediaViewContainer.mediaView = imageView
-            }
-            
-            if let imageCache = imageCache {
-                imageView.setupWith(media: media as! ImageMediaObject, imageCache: imageCache)
-            }
-            self.mediaView = imageView
-            
-        case is URLMediaObject:
-            let urlView:URLMediaView
-            if let umv = mediaViewContainer.mediaView as? URLMediaView {
-                urlView = umv
-            }
-            else {
-                urlView = URLMediaView()
-                mediaViewContainer.mediaView = urlView
-            }
-            
-            urlView.setupWith(media: media as! URLMediaObject)
-            urlView.linkTapAction = { url in
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
-            self.mediaView = urlView
-            
-        default:
-            assert(false)
-        }
+        mediaViewContainer.setup(with: media, cache: cache)
         
         if let _ = errorImageView {
             var showError = false
@@ -208,7 +169,7 @@ class MediaCollectionViewCell : UICollectionViewCell {
         
         let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: size)
         
-        mediaView.showWith(size: smallerSize)
+        mediaViewContainer.mediaView?.showWith(size: smallerSize)
 
         originalSize = smallerSize
     }
@@ -226,7 +187,7 @@ extension MediaCollectionViewCell : UIScrollViewDelegate {
             switchedToFullScaleImageForZooming = true
 
             // Load full scale media to give the user better resolution when zooming in.
-            mediaView.changeToFullsizedMediaForZooming()
+            mediaViewContainer.mediaView?.changeToFullsizedMediaForZooming()
         }
     }
 }

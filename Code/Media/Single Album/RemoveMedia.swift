@@ -30,51 +30,7 @@ class RemoveMedia {
     func start(completion:(()->())? = nil) {
         self.completion = completion
         
-        let mediaTypes = self.media.compactMap {
-            MediaTypeExtras.mediaType(forUUID: $0.uuid!)
-        }
-        
-        var numberTypes = 0
-        for (mediaType, _) in MediaTypeExtras.mediaTypes {
-            let allOfType = mediaTypes.filter {$0 == mediaType}
-            if allOfType.isEmpty {
-                continue
-            }
-            
-            numberTypes += 1
-        }
-        
-        var description = ""
-        var count = 0
-        
-        for (mediaType, name) in MediaTypeExtras.mediaTypes {
-            let allOfType = mediaTypes.filter {$0 == mediaType}
-            if allOfType.isEmpty {
-                continue
-            }
-            
-            count += 1
-
-            var typeTerm = name
-            
-            if allOfType.count > 1 {
-                typeTerm += "s"
-            }
-            
-            if !description.isEmpty {
-                description += " "
-            }
-            
-            if count == numberTypes && count > 1 {
-                description += "and \(typeTerm)"
-            }
-            else if count > 2 {
-                description += "\(typeTerm),"
-            }
-            else {
-                description += "\(typeTerm)"
-            }
-        }
+        let description = MediaTypeExtras.namesFor(media: self.media)
 
         let alert = AlertController(title: "Delete selected \(description)?", message: nil, preferredStyle: .alert)
         alert.behaviors = [.dismissOnOutsideTap]
@@ -107,7 +63,7 @@ class RemoveMedia {
         // 12/2/17, 12/25/17; This is tricky. See https://github.com/crspybits/SharedImages/issues/61 and https://stackoverflow.com/questions/47614583/delete-multiple-core-data-objects-issue-with-nsfetchedresultscontroller
         // I'm dealing with this below. See the reference to this SO issue below.
         for mediaObj in media {
-            // This also removes any associated discussion.
+            // This also removes associated file(s) -- e.g., discussion, preview image.
             do {
                 try mediaObj.remove()
             }

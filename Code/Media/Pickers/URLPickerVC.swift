@@ -9,13 +9,14 @@
 import UIKit
 import Presentr
 import SMLinkPreview
+import NVActivityIndicatorView
 
 protocol URLPickerDelegate: AnyObject {
     // Called when "Add" method on the picker is tapped.
     func urlPicker(_ picker: URLPickerVC, urlSelected: URLPickerVC.SelectedURL)
 }
 
-class URLPickerVC: UIViewController {
+class URLPickerVC: UIViewController, NVActivityIndicatorViewable {
     struct SelectedURL {
         let data: LinkData
         let image: LinkPreview.LoadedImage?
@@ -89,10 +90,6 @@ class URLPickerVC: UIViewController {
             dismiss(animated: true, completion: nil)
         }
     }
-
-    @IBAction func useHttpsSwitchAction(_ sender: Any) {
-        processURL(searchBar: searchBar)
-    }
     
     private func updateScheme(urlString: String) -> String? {
         guard let url = URL(string: urlString),
@@ -122,7 +119,9 @@ class URLPickerVC: UIViewController {
             return
         }
         
+        startAnimating()
         PreviewManager.session.getLinkData(url: url) { linkData in
+            self.stopAnimating()
             if let linkData = linkData {
                 self.linkPreview.removeAllSubviews()
                 self.linkPreviewContainer.isHidden = false

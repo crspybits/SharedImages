@@ -235,13 +235,11 @@ extension LargeMediaVC : UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! MediaCollectionViewCell
         
-        if let syncController = mediaHandler?.syncController,
-            let media = self.coreDataSource.object(at: indexPath) as? MediaType {
-            cell.setProperties(media: media, syncController: syncController, cache: imageCache, imageTapBehavior: { [unowned self] in
+        if let media = self.coreDataSource.object(at: indexPath) as? MediaType {
+            cell.setProperties(media: media, cache: imageCache, imageTapBehavior: { [unowned self] in
                 self.showDiscussionIfPresent(media: media)
             })
         }
-        
         return cell
     }
     
