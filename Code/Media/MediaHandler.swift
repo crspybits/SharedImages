@@ -35,13 +35,50 @@ class MediaHandler {
     func appDidEnterBackground() {
         syncController.appDidEnterBackground()
     }
+
+    func addAuxilaryFile(fileData: FileData, attr: SyncAttributes, fileType: Files.FileType) {
+    
+        // Create object reflecting downloaded URL Preview image from server
+        let urlPreview = URLPreviewImageObject.newObjectAndMakeUUID(makeUUID: false) as! URLPreviewImageObject
+        
+        urlPreview.url = fileData.url
+        urlPreview.mimeType = fileData.mimeType.rawValue
+        urlPreview.uuid = fileData.fileUUID
+        urlPreview.sharingGroupUUID = fileData.sharingGroupUUID
+        urlPreview.fileGroupUUID = attr.fileGroupUUID
+        urlPreview.gone = fileData.gone
+        
+        if let gone = fileData.gone {
+            urlPreview.gone = gone
+        }
+        else if let urlPreviewDataURL = fileData.url,
+            let filePath = urlPreviewDataURL.path,
+            let _ = UIImage(contentsOfFile: filePath) {
+            urlPreview.gone = nil
+            urlPreview.readProblem = false
+        }
+        else {
+            urlPreview.readProblem = true
+            Log.error("Some error loading new server url preview.")
+        }
+        
+        // Will need to generalize this once we get additional auxilary file types
+        assert(fileType == .urlPreviewImage)
+        
+        // Search for the associated `urlMedia` object and link it if we find it.
+        if let urlMedia = URLMediaObject.fetchObjectWithFileGroupUUID(attr.fileGroupUUID!) as? URLMediaObject {
+            urlPreview.urlMedia = urlMedia
+        }
+        
+        urlPreview.save()
+    }
     
     @discardableResult
     func addOrUpdateLocalMedia(newMediaData: MediaData, fileGroupUUID: String?) -> FileMediaObject {
         var theMedia:MediaType!
         
         if newMediaData.file.fileUUID == nil {
-            // We're creating a new image at the local user's request.
+            // We're creating a new media object (e.g., URL or image) at the local user's request.
             theMedia = newMediaData.mediaType.newObjectAndMakeUUID(makeUUID: true, creationDate: newMediaData.creationDate) as? MediaType
         }
         else {
@@ -51,7 +88,7 @@ class MediaHandler {
             */
             theMedia = newMediaData.mediaType.fetchObjectWithUUID(newMediaData.file.fileUUID!) as? MediaType
             if theMedia == nil {
-                // No existing local image. Must be a first download case from the server.
+                // No existing local media. Must be a first download case from the server.
                 theMedia = newMediaData.mediaType.newObjectAndMakeUUID(makeUUID: false, creationDate: newMediaData.creationDate) as? MediaType
                 theMedia.uuid = newMediaData.file.fileUUID
             }
@@ -307,8 +344,7 @@ extension MediaHandler: SyncControllerDelegate {
     }
     
     func addLocalAuxilaryFile(syncController:SyncController, fileData: FileData, attr: SyncAttributes, fileType: Files.FileType) {
-        // TODO!!!
-        assert(false)
+        addAuxilaryFile(fileData: fileData, attr: attr, fileType: fileType)
     }
     
     func updateUploadedMediaDate(syncController:SyncController, uuid: String, creationDate: NSDate) {

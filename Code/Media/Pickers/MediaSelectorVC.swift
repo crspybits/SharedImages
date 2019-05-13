@@ -21,7 +21,7 @@ class MediaSelectorVC: UIViewController {
     private var acquireImages:AcquireImages!
     
     private let presenter: Presentr = {
-        let customPresenter = Presentr(presentationType: .bottomHalf)
+        let customPresenter = Presentr(presentationType: MediaSelectorVC.customType)
         customPresenter.transitionType = .coverVertical
         customPresenter.dismissTransitionType = .coverVertical
         customPresenter.roundCorners = true
@@ -32,10 +32,9 @@ class MediaSelectorVC: UIViewController {
         return customPresenter
     }()
     
-    private static let customTypePortrait: PresentationType = {
+    private static let customType: PresentationType = {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            let center = ModalCenterPosition.center
-            let customType = PresentationType.custom(width: .default, height: .default, center: center)
+            let customType = PresentationType.custom(width: .half, height: .half, center: .bottomCenter)
             return customType
         }
         else {
