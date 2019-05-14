@@ -15,6 +15,8 @@ class ImageMediaView: UIImageView, MediaView {
     func setupWith(media: ImageMediaObject, imageCache: LRUCache<ImageMediaObject>) {
         self.imageCache = imageCache
         self.media = media
+        contentMode = .scaleAspectFill
+        clipsToBounds = true
     }
     
     func showWith(size: CGSize) {
