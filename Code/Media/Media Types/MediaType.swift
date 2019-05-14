@@ -66,6 +66,19 @@ struct MediaTypeExtras {
         return "media"
     }
     
+    static func numberTerm(count: UInt) -> String {
+        switch count {
+        case 1:
+            return "one"
+        case 2:
+            return "two"
+        case 3:
+            return "three"
+        default:
+            return "\(count)"
+        }
+    }
+    
     // Gives a list of media terms summarizing the media. E.g., "urls and image"
     // If includeCounts is true prefixes each term with a count. E.g., "2 urls and 1 image"
     static func namesFor(media: [FileMediaObject], includeCounts: Bool = false) -> String {
@@ -94,9 +107,11 @@ struct MediaTypeExtras {
             
             count += 1
 
+            let countTerm = numberTerm(count: UInt(allOfType.count))
+            
             var typeTerm = name
             if includeCounts {
-                typeTerm = "\(allOfType.count) \(typeTerm)"
+                typeTerm = "\(countTerm) \(typeTerm)"
             }
             
             if allOfType.count > 1 {
