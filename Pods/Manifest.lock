@@ -7,10 +7,10 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Crashlytics (3.12.0):
-    - Fabric (~> 1.9.0)
+  - Crashlytics (3.13.0):
+    - Fabric (~> 1.10.0)
   - DropDown (2.3.13)
-  - Fabric (1.9.0)
+  - Fabric (1.10.0)
   - FacebookCore (0.5.0):
     - Bolts (~> 1.9)
     - FBSDKCoreKit (~> 4.37)
@@ -118,7 +118,7 @@ DEPENDENCIES:
   - rosterdev (~> 0.1)
   - SDCAlertView (~> 9.0)
   - SMCoreLib (~> 2.0)
-  - SMLinkPreview (from `../SMLinkPreview`)
+  - SMLinkPreview (~> 0.1)
   - SyncServer (~> 19.3.0)
   - SyncServer/Dropbox (~> 19.3.0)
   - SyncServer/Facebook (~> 19.3.0)
@@ -152,6 +152,7 @@ SPEC REPOS:
     - Reachability
     - rosterdev
     - SDCAlertView
+    - SMLinkPreview
     - SwiftyBeaver
     - SwiftyDropbox
     - SwiftyUserDefaults
@@ -169,8 +170,6 @@ EXTERNAL SOURCES:
     :git: https://github.com/crspybits/NohanaImagePicker.git
   ODRefreshControl:
     :git: https://github.com/crspybits/ODRefreshControl.git
-  SMLinkPreview:
-    :path: "../SMLinkPreview"
 
 CHECKOUT OPTIONS:
   NohanaImagePicker:
@@ -184,9 +183,9 @@ SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   BadgeSwift: 69080f6776cb812b905d46effe8263600da1bdbd
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
+  Crashlytics: 1f5f752c7feac0add0cc1774756f96444fa3b1a7
   DropDown: 8a2116376c1981888557f72ec2ffc9a5e0e456ec
-  Fabric: f988e33c97f08930a413e08123064d2e5f68d655
+  Fabric: 09de1e053eb7dc415593166ad3e53d4c88123405
   FacebookCore: 74288d0add931d361b1596beae787ab72c438249
   FacebookLogin: ebcf34714a1cb9f0759d9f071cfb01ed500996cf
   FBSDKCoreKit: a823ae35bdb60ebb8d7a7e51abe7c5d87d2bfced
@@ -212,7 +211,7 @@ SPEC CHECKSUMS:
   SDCAlertView: f24c447279278dca39d41562b414276980b066d8
   SMCoreLib: bd3abc52cf9e0e30827da9b8a7cdbdf06a2944eb
   SMGoogleSignIn: de1b8302583b61df51b71b81e349cbe487cbbda3
-  SMLinkPreview: 196ea069d59b608e1d18808b33a0c8eba45f7bc6
+  SMLinkPreview: 107d6aa88070196747bf493474c72928c2d68dfa
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
   SwiftyDropbox: 378b4425a2e8d0cb24c7b0f2e3af72bfbaaf1e73
   SwiftyUserDefaults: 3d273b1739b68ada3145dc754a70ec775bc5c8be
@@ -220,6 +219,6 @@ SPEC CHECKSUMS:
   SyncServer-Shared: 3bce6222b4a6cee43445c7f9c446aeb6d4437926
   XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
 
-PODFILE CHECKSUM: 3beafa8b02c66d5f9f5fdf92915384c5619a595f
+PODFILE CHECKSUM: 60db376ab783897f62bbec3be07ace98ab0cc317
 
 COCOAPODS: 1.6.1

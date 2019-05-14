@@ -87,12 +87,16 @@ class URLMediaView: UIView, MediaView {
     private func loadContentIntoView(contentType: ContentType) {
         switch contentType {
         case .icon:
+            iconView.linkIcon.isHidden = albumsView
+            
             if let previewImageURL = media.previewImage?.url,
                 let filePath = previewImageURL.path {
                 // TODO: Loading needs to be async
                 iconView?.image.image = UIImage(contentsOfFile: filePath)
-                
-                iconView.linkIcon.isHidden = albumsView
+            }
+            else {
+                // No image; reset it so we don't have a lingering other image.
+                iconView?.image.image = nil
             }
 
         case .preview:
