@@ -129,9 +129,9 @@ class MediaVC: UIViewController {
     }
     
     @objc private func removeImagesAction() {
-        var objects = [FileMediaObject]()
+        var objects = [MediaType]()
         for uuidString in selectedMedia {
-            if let fileObj = FileMediaObject.fetchObjectWithUUID(uuidString) as? FileMediaObject {
+            if let fileObj = FileMediaObject.fetchObjectWithUUID(uuidString) as? MediaType {
                 objects.append(fileObj)
             }
         }

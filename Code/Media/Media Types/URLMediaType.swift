@@ -11,6 +11,15 @@ import SMCoreLib
 
 extension URLMediaObject: MediaType {
     var mediaTypeSize: MediaTypeSize {return .fit}
+    var auxilaryFileUUIDs:[String] {
+        if let preview = previewImage {
+            return [preview.uuid!]
+        }
+        else {
+            return []
+        }
+    }
+
     var originalSize: CGSize? {
         return nil
     }

@@ -250,10 +250,15 @@ class SyncController {
     }
     
     // Also removes associated discussions, on the server. The media must be in the same sharing group.
-    func remove(media:[FileMediaObject], sharingGroupUUID: String) -> Bool {
+    func remove(media:[MediaType], sharingGroupUUID: String) -> Bool {
         let mediaUuids = media.map({$0.uuid!})
         let mediaWithDiscussions = media.filter({$0.discussion != nil && $0.discussion!.uuid != nil})
         let discussionUuids = mediaWithDiscussions.map({$0.discussion!.uuid!})
+        
+        var auxilaryUUIDs = [String]()
+        for mediaObject in media {
+            auxilaryUUIDs += mediaObject.auxilaryFileUUIDs
+        }
         
         // 2017-11-27 02:51:29 +0000: An error occurred: fileAlreadyDeleted [remove(images:) in SyncController.swift, line 64]
 
@@ -261,7 +266,7 @@ class SyncController {
         let pushNotificationMessage = "Removed \(description)."
         
         do {
-            try SyncServer.session.delete(filesWithUUIDs: mediaUuids + discussionUuids)
+            try SyncServer.session.delete(filesWithUUIDs: mediaUuids + discussionUuids + auxilaryUUIDs)
             try SyncServer.session.sync(sharingGroupUUID: sharingGroupUUID, pushNotificationMessage: pushNotificationMessage)
         } catch (let error) {
             Log.error("An error occurred: \(error)")
@@ -400,6 +405,7 @@ extension SyncController : SyncServerDelegate {
         
         if let fileTypeString = fileTypeString {
             guard let fileType = fileType else {
+                SMCoreLib.Alert.show(withTitle: "Unknown file type", message: "Neebla may have a new version-- Please try to update on the App Store.")
                 Log.error("Unknown file type: \(fileTypeString)")
                 return
             }
@@ -583,6 +589,10 @@ extension SyncController : SyncServerDelegate {
         case .badServerVersion(let actualServerVersion):
             let version = actualServerVersion == nil ? "nil" : actualServerVersion!.rawValue
             SMCoreLib.Alert.show(withTitle: "Bad server version", message: "actualServerVersion: \(version)")
+            return
+            
+        case .badMimeType:
+            SMCoreLib.Alert.show(withTitle: "Unknown mime type", message: "Neebla may have a new version-- Please try to update on the App Store.")
             return
             
         default:

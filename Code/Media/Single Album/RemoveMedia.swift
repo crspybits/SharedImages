@@ -13,13 +13,13 @@ import SyncServer
 import SDCAlertView
 
 class RemoveMedia {
-    private let media: [FileMediaObject]!
+    private let media: [MediaType]!
     private weak var parentVC: UIViewController!
     private let syncController: SyncController!
     private let sharingGroup: SyncServer.SharingGroup!
     private var completion:(()->())?
     
-    init(_ media: [FileMediaObject], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
+    init(_ media: [MediaType], syncController: SyncController, sharingGroup: SyncServer.SharingGroup, withParentVC parentVC: UIViewController) {
         self.media = media
         self.parentVC = parentVC
         self.syncController = syncController
@@ -65,7 +65,7 @@ class RemoveMedia {
         for mediaObj in media {
             // This also removes associated file(s) -- e.g., discussion, preview image.
             do {
-                try mediaObj.remove()
+                try (mediaObj as FileMediaObject).remove()
             }
             catch (let error) {
                 Log.error("Could not remove media: \(error)")

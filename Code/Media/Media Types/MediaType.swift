@@ -32,6 +32,8 @@ protocol MediaType: FileMediaObjectProtocol where Self: FileMediaObject  {
     
     // Some/all of the uuid's may be for other type objects
     static func loadMediaForActivityViewController(uuids: [String]) -> [Any]
+    
+    var auxilaryFileUUIDs:[String] {get}
 }
 
 // Change this when you add a new MediaType

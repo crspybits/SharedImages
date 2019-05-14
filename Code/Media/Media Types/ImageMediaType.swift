@@ -13,6 +13,9 @@ import SyncServer
 
 extension ImageMediaObject: MediaType {
     var mediaTypeSize: MediaTypeSize {return .large}
+    var auxilaryFileUUIDs:[String] {
+        return []
+    }
 
     func checkForReadProblem(mediaData: MediaData) -> Bool {
         if let imageFilePath = mediaData.file.url?.path {
