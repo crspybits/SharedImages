@@ -95,9 +95,9 @@ class MediaCollectionViewCell : UICollectionViewCell {
         selectedState = nil
         self.media = media
         title.text = media.title
-        
+
         mediaViewContainer.setup(with: media, cache: cache)
-        
+
         if let _ = errorImageView {
             var showError = false
             if let _ = self.media.url {

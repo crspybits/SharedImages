@@ -67,8 +67,6 @@
 		83C1D59322754A6600C91867 /* URLPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57322754A6600C91867 /* URLPickerVC.swift */; };
 		83C1D59422754A6600C91867 /* MediaSelectorVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83C1D57422754A6600C91867 /* MediaSelectorVC.xib */; };
 		83C1D59522754A6600C91867 /* AlbumsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57622754A6600C91867 /* AlbumsVC.swift */; };
-		83C1D59622754A6600C91867 /* AlbumCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57722754A6600C91867 /* AlbumCell.swift */; };
-		83C1D59722754A6600C91867 /* AlbumCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83C1D57822754A6600C91867 /* AlbumCell.xib */; };
 		83C1D59822754A6600C91867 /* MediaCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57922754A6600C91867 /* MediaCollectionViewCell.swift */; };
 		83C1D59922754A6600C91867 /* ImagesTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C1D57B22754A6600C91867 /* ImagesTitle.swift */; };
 		83C1D59A22754A6600C91867 /* ImagesTitle.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83C1D57C22754A6600C91867 /* ImagesTitle.xib */; };
@@ -127,6 +125,8 @@
 		83F882671E74A600008F644A /* Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83F882661E74A600008F644A /* Server.plist */; };
 		83FA7730227E59EE00F193E1 /* URLPreviewImageObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA772C227E59EE00F193E1 /* URLPreviewImageObject.swift */; };
 		83FA7731227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA772D227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift */; };
+		83FA77E9228B9B7600F193E1 /* AlbumCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FA77E7228B9B7600F193E1 /* AlbumCollectionViewCell.swift */; };
+		83FA77EA228B9B7600F193E1 /* AlbumCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83FA77E8228B9B7600F193E1 /* AlbumCollectionViewCell.xib */; };
 		AA5F5883AFFEFD22ED447A41 /* Pods_NeeblaTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D41485B287C3303E5E4A0862 /* Pods_NeeblaTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -209,8 +209,6 @@
 		83C1D57322754A6600C91867 /* URLPickerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLPickerVC.swift; sourceTree = "<group>"; };
 		83C1D57422754A6600C91867 /* MediaSelectorVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MediaSelectorVC.xib; sourceTree = "<group>"; };
 		83C1D57622754A6600C91867 /* AlbumsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumsVC.swift; sourceTree = "<group>"; };
-		83C1D57722754A6600C91867 /* AlbumCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumCell.swift; sourceTree = "<group>"; };
-		83C1D57822754A6600C91867 /* AlbumCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AlbumCell.xib; sourceTree = "<group>"; };
 		83C1D57922754A6600C91867 /* MediaCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaCollectionViewCell.swift; sourceTree = "<group>"; };
 		83C1D57B22754A6600C91867 /* ImagesTitle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagesTitle.swift; sourceTree = "<group>"; };
 		83C1D57C22754A6600C91867 /* ImagesTitle.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ImagesTitle.xib; sourceTree = "<group>"; };
@@ -276,6 +274,8 @@
 		83F882661E74A600008F644A /* Server.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Server.plist; path = Resources/Server.plist; sourceTree = "<group>"; };
 		83FA772C227E59EE00F193E1 /* URLPreviewImageObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = URLPreviewImageObject.swift; path = "Core Data/URLPreviewImageObject.swift"; sourceTree = "<group>"; };
 		83FA772D227E59EE00F193E1 /* URLPreviewImageObject+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "URLPreviewImageObject+CoreDataProperties.swift"; path = "Core Data/URLPreviewImageObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		83FA77E7228B9B7600F193E1 /* AlbumCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumCollectionViewCell.swift; sourceTree = "<group>"; };
+		83FA77E8228B9B7600F193E1 /* AlbumCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumCollectionViewCell.xib; sourceTree = "<group>"; };
 		854FB9347E2A443E983D7504 /* Pods-NeeblaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NeeblaTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NeeblaTests/Pods-NeeblaTests.release.xcconfig"; sourceTree = "<group>"; };
 		A1A9F2364274678096FAE708 /* Pods-SharedImages.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImages.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImages/Pods-SharedImages.release.xcconfig"; sourceTree = "<group>"; };
 		AB86EA543F8CCCC9287144E0 /* Pods-SharedImagesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharedImagesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharedImagesTests/Pods-SharedImagesTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -512,8 +512,8 @@
 			isa = PBXGroup;
 			children = (
 				83C1D57622754A6600C91867 /* AlbumsVC.swift */,
-				83C1D57722754A6600C91867 /* AlbumCell.swift */,
-				83C1D57822754A6600C91867 /* AlbumCell.xib */,
+				83FA77E7228B9B7600F193E1 /* AlbumCollectionViewCell.swift */,
+				83FA77E8228B9B7600F193E1 /* AlbumCollectionViewCell.xib */,
 			);
 			path = Albums;
 			sourceTree = "<group>";
@@ -756,7 +756,7 @@
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = BH68R29JBE;
 						LastSwiftMigration = 0900;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 1;
@@ -809,13 +809,13 @@
 				83A2E6AB1F76F84500A2E303 /* C.json in Resources */,
 				83F882671E74A600008F644A /* Server.plist in Resources */,
 				83C1D58322754A6600C91867 /* URLIcon.xib in Resources */,
+				83FA77EA228B9B7600F193E1 /* AlbumCollectionViewCell.xib in Resources */,
 				83CE2F1B2255740600E6EFD7 /* SharingInvitationHelp.html in Resources */,
 				83A2E6AE1F76F84500A2E303 /* R.json in Resources */,
 				83A2E6AD1F76F84500A2E303 /* N.json in Resources */,
 				83C1D5C622754BAC00C91867 /* ShareAlbumAllowSocialCell.xib in Resources */,
 				83F882651E74A3C5008F644A /* GoogleService-Info.plist in Resources */,
 				83C1D59122754A6600C91867 /* URLPickerVC.xib in Resources */,
-				83C1D59722754A6600C91867 /* AlbumCell.xib in Resources */,
 				834A7E7F2037858800969B18 /* ProgressView.xib in Resources */,
 				83F882451E711FC6008F644A /* Assets.xcassets in Resources */,
 				83F882461E711FC6008F644A /* LaunchScreen.storyboard in Resources */,
@@ -1040,6 +1040,7 @@
 				83DA1E85225A10FE0064E817 /* AlbumSharingVC.swift in Sources */,
 				83C1D58822754A6600C91867 /* SortControl.swift in Sources */,
 				830386E822694E3A00DB598D /* URLMediaObject+CoreDataProperties.swift in Sources */,
+				83FA77E9228B9B7600F193E1 /* AlbumCollectionViewCell.swift in Sources */,
 				83EACE772087083000C40AA3 /* DiscussionKeys.swift in Sources */,
 				834A7E7D2037858800969B18 /* Progress.swift in Sources */,
 				83DA1E82225974630064E817 /* AddressNavigation.swift in Sources */,
@@ -1107,7 +1108,6 @@
 				834A7E7C2037858800969B18 /* AppBadge.swift in Sources */,
 				83C1D5CE22754BFA00C91867 /* Badge+Extras.swift in Sources */,
 				83C1D5EC227BD4ED00C91867 /* URLMediaView.swift in Sources */,
-				83C1D59622754A6600C91867 /* AlbumCell.swift in Sources */,
 				83C1D59822754A6600C91867 /* MediaCollectionViewCell.swift in Sources */,
 				83C1D5E422768AA300C91867 /* URLMediaType.swift in Sources */,
 				830386E1226949AF00DB598D /* FileObject.swift in Sources */,
@@ -1318,9 +1318,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BH68R29JBE;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -1329,7 +1329,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = Neebla;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
@@ -1342,9 +1342,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SharedImages.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BH68R29JBE;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -1353,7 +1353,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = biz.SpasticMuffin.SharedImages;
 				PRODUCT_NAME = Neebla;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "Shared Images App Store";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = Code/BridgingHeader.h;
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;

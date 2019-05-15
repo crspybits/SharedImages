@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="AlbumCollectionViewCell" customModule="Neebla" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="201" height="169"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="201" height="169"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="2eA-gE-t9h" customClass="MediaViewContainer" customModule="Neebla" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="201" height="139"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="sFP-M2-vch"/>
+                    </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="npH-PV-XQ7">
+                        <rect key="frame" x="0.0" y="0.0" width="201" height="144"/>
+                        <connections>
+                            <action selector="tapAction:" destination="gTV-IL-0wX" eventType="touchUpInside" id="hqo-tr-Jr9"/>
+                        </connections>
+                    </button>
+                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" text="Album" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fpN-sB-i1K">
+                        <rect key="frame" x="10" y="144" width="181" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="QeK-cY-L5Y"/>
+                        </constraints>
+                        <nil key="textColor"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <textInputTraits key="textInputTraits"/>
+                    </textField>
+                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MgR-M4-3Yz" userLabel="Album Sync Needed">
+                        <rect key="frame" x="161" y="0.0" width="40" height="35"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="download" translatesAutoresizingMaskIntoConstraints="NO" id="gst-Dv-sze">
+                                <rect key="frame" x="3" y="9" width="30" height="23"/>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HRx-xe-b3y">
+                                <rect key="frame" x="-10" y="0.0" width="50" height="45"/>
+                                <connections>
+                                    <action selector="albumSyncAction:" destination="gTV-IL-0wX" eventType="touchUpInside" id="xYi-FG-OCk"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="0.57692101880000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="gst-Dv-sze" secondAttribute="bottom" constant="3" id="5Xh-Ua-2oz"/>
+                            <constraint firstAttribute="trailing" secondItem="HRx-xe-b3y" secondAttribute="trailing" id="8hD-Vo-gg2"/>
+                            <constraint firstAttribute="height" constant="35" id="GS6-25-6Cd"/>
+                            <constraint firstItem="HRx-xe-b3y" firstAttribute="top" secondItem="MgR-M4-3Yz" secondAttribute="top" id="ICX-07-6WB"/>
+                            <constraint firstAttribute="bottom" secondItem="HRx-xe-b3y" secondAttribute="bottom" constant="-10" id="V3g-9D-pDf"/>
+                            <constraint firstAttribute="width" constant="40" id="bQA-Gp-CTM"/>
+                            <constraint firstItem="HRx-xe-b3y" firstAttribute="leading" secondItem="MgR-M4-3Yz" secondAttribute="leading" constant="-10" id="dSq-99-7ID"/>
+                            <constraint firstItem="gst-Dv-sze" firstAttribute="leading" secondItem="MgR-M4-3Yz" secondAttribute="leading" constant="3" id="uSC-PH-aSZ"/>
+                        </constraints>
+                    </view>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Share-Large" translatesAutoresizingMaskIntoConstraints="NO" id="rSf-12-XCh" userLabel="Share">
+                        <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="60" id="GN2-3s-EjO"/>
+                            <constraint firstAttribute="width" constant="60" id="Y1g-ZB-0i9"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+            </view>
+            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="2eA-gE-t9h" secondAttribute="trailing" id="3SF-vl-ekJ"/>
+                <constraint firstAttribute="trailing" secondItem="MgR-M4-3Yz" secondAttribute="trailing" id="5RR-Fs-mdQ"/>
+                <constraint firstItem="rSf-12-XCh" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="7lJ-8R-WmC"/>
+                <constraint firstItem="npH-PV-XQ7" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="Hn2-VS-gFs"/>
+                <constraint firstItem="fpN-sB-i1K" firstAttribute="top" secondItem="2eA-gE-t9h" secondAttribute="bottom" constant="5" id="Hsa-lW-87O"/>
+                <constraint firstItem="rSf-12-XCh" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="IPE-lH-QY5"/>
+                <constraint firstItem="fpN-sB-i1K" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="10" id="Iva-IX-181"/>
+                <constraint firstItem="npH-PV-XQ7" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Xvx-WS-Yj9"/>
+                <constraint firstAttribute="bottom" secondItem="fpN-sB-i1K" secondAttribute="bottom" constant="5" id="aBD-F9-Rf8"/>
+                <constraint firstItem="2eA-gE-t9h" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="aqB-no-ALH"/>
+                <constraint firstItem="2eA-gE-t9h" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="fJt-2Q-ir1"/>
+                <constraint firstItem="fpN-sB-i1K" firstAttribute="top" secondItem="npH-PV-XQ7" secondAttribute="bottom" id="kD6-Lo-xNf"/>
+                <constraint firstAttribute="trailing" secondItem="npH-PV-XQ7" secondAttribute="trailing" id="mJw-aY-b8V"/>
+                <constraint firstAttribute="trailing" secondItem="fpN-sB-i1K" secondAttribute="trailing" constant="10" id="sSz-uo-3J2"/>
+                <constraint firstItem="MgR-M4-3Yz" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="toi-Ys-yCK"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <connections>
+                <outlet property="albumName" destination="fpN-sB-i1K" id="CWY-1O-b1I"/>
+                <outlet property="albumSyncNeeded" destination="MgR-M4-3Yz" id="AGg-pC-5pN"/>
+                <outlet property="mediaViewContainer" destination="2eA-gE-t9h" id="HLw-5G-bwk"/>
+                <outlet property="shareImage" destination="rSf-12-XCh" id="M6k-lT-tTF"/>
+            </connections>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="Share-Large" width="60" height="60"/>
+        <image name="download" width="30" height="23"/>
+    </resources>
+</document>
