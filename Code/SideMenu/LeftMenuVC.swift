@@ -57,7 +57,7 @@ class LeftMenuVC: UIViewController {
         }
         
         let topMenuItems = [
-            Menu.MenuItem(name: "Images", icon: #imageLiteral(resourceName: "albums"), badgeValueGetter: numberUnreadDiscussions),
+            Menu.MenuItem(name: "Albums", icon: #imageLiteral(resourceName: "albums"), badgeValueGetter: numberUnreadDiscussions),
             Menu.MenuItem(name: "Album Sharing", icon: #imageLiteral(resourceName: "Share")),
         ]
 
