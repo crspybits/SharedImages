@@ -1,6 +1,6 @@
 SharedImages
 
-Version 1.5.0
+Version 1.5.0 (5/16/19)
 	* Added acknowledgments for open source libraries and for image assets (see the Apple Settings app).
 	* Bumped minimim iOS version to iOS 11 (from iOS 10).
 	* Fixed nav bar layout issue at the top of the nav bar on iPhone Xr on sharing invitation creation modal (a white line would appear).
