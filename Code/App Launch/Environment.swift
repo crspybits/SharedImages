@@ -30,7 +30,7 @@ struct Environment {
     }
     
     static func setup() {
-        current = .local
+        // current = .local
     }
 }
 

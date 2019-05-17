@@ -19,7 +19,6 @@ private class FlowLayout: UICollectionViewFlowLayout {
 
 class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     @IBOutlet weak var collectionView: UICollectionView!
-    let reuseIdentifier = "CollectionViewCell"
     let numberOfItemsPerRow = 2
     private var sharingGroups:[SyncServer.SharingGroup]!
 
@@ -41,6 +40,7 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
     
     // To enable pulling down on the table view to initiate a sync with server. This spinner is displayed only momentarily, but you can always do the pull down to sync/refresh.
     var refreshControl:ODRefreshControl!
+    let reuseId = "ReuseId"
     
     private var sharingOn: Bool = false {
         didSet {
@@ -71,6 +71,8 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
         
         // We need this for the refresh.
         collectionView.alwaysBounceVertical = true
+        
+        collectionView.register(UINib(nibName: "AlbumCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: reuseId)
         
         addAlbum = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addAlbumAction))
         shareAlbums = UIBarButtonItem(image: #imageLiteral(resourceName: "Share"), style: .plain, target: self, action: #selector(shareAction))
@@ -258,7 +260,6 @@ class AlbumsVC: UIViewController, NVActivityIndicatorViewable {
         layout.viewSize = collectionView.boundsSize
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         collectionView.collectionViewLayout = layout
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         originalCollectionViewBottom = collectionViewBottom.constant
     }
     
@@ -311,58 +312,49 @@ extension AlbumsVC : UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseId, for: indexPath) as! AlbumCollectionViewCell
         let sharingGroup = sharingGroups[indexPath.row]
-        
-        var albumCell: AlbumCell!
-        if cell.contentView.subviews.count > 0,
-            let ac = cell.contentView.subviews[0] as? AlbumCell {
-            albumCell = ac
-        }
-        else {
-            albumCell = AlbumCell.create()!
-            cell.contentView.addSubview(albumCell)
-            albumCell.frameSize = cell.contentView.frameSize
-            
-            // This is critical or we get really odd cell-sizing behavior in rotation of the device.
-            albumCell.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        }
 
         let sharingReallyOn = sharingGroup.permission.hasMinimumPermission(.admin) && sharingOn
 
         func tapAction(initialSync: Bool = false) {
-            unowned let unownedSelf = self
+            weak var weakSelf = self
+            guard let self = weakSelf else {
+                return
+            }
+            
             if sharingOn {
                 if sharingReallyOn {
                     // Before starting the sharing process, briefly flash the sharing icon to show user that they're selecting the specific album.
-                    albumCell.flashSharingIcon { [unowned self] in
-                        unownedSelf.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: albumCell, viewController: self, sharingButton: self.shareAlbums)
-                        unownedSelf.sharingOn = false
-                        unownedSelf.collectionView.reloadData()
-                        unownedSelf.shareAlbum.start()
+                    cell.flashSharingIcon {
+                        self.shareAlbum = ShareAlbum(sharingGroup: sharingGroup, fromView: cell, viewController: self, sharingButton: self.shareAlbums)
+                        self.sharingOn = false
+                        self.collectionView.reloadData()
+                        self.shareAlbum.start()
                     }
                 }
             }
             else {
-                unownedSelf.gotoAlbum(sharingGroup: sharingGroup, initialSync: initialSync)
+                self.gotoAlbum(sharingGroup: sharingGroup, initialSync: initialSync)
             }
         }
         
-        albumCell.setup(sharingGroup: sharingGroup, cache: imageCache, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingOn, sharingReallyOn: sharingReallyOn)
-        albumCell.tapAction = {
+        cell.setup(sharingGroup: sharingGroup, cache: imageCache, enableGroupNameEditing: sharingGroup.permission.hasMinimumPermission(.write), sharingOn: sharingOn, sharingReallyOn: sharingReallyOn)
+    
+        cell.tapAction = {
             tapAction()
         }
-        albumCell.albumSyncAction = {
+        cell.albumSyncAction = {
             tapAction(initialSync: true)
         }
-        albumCell.saveAction = {[unowned self] newName in
-            self.saveNewSharingGroupName(sharingGroupUUID: sharingGroup.sharingGroupUUID, newName: newName)
+        cell.saveAction = {[weak self] newName in
+            self?.saveNewSharingGroupName(sharingGroupUUID: sharingGroup.sharingGroupUUID, newName: newName)
         }
-        albumCell.startEditing = {[unowned self] in
-            self.addAlbum.isEnabled = false
+        cell.startEditing = {[weak self] in
+            self?.addAlbum.isEnabled = false
         }
-        albumCell.endEditing = {[unowned self] in
-            self.addAlbum.isEnabled = true
+        cell.endEditing = {[weak self] in
+            self?.addAlbum.isEnabled = true
         }
         
         return cell

@@ -1,9 +1,9 @@
 //
-//  AlbumCell.swift
+//  AlbumCollectionViewCell.swift
 //  SharedImages
 //
-//  Created by Christopher G Prince on 9/29/18.
-//  Copyright © 2018 Spastic Muffin, LLC. All rights reserved.
+//  Created by Christopher G Prince on 5/14/19.
+//  Copyright © 2019 Spastic Muffin, LLC. All rights reserved.
 //
 
 import UIKit
@@ -11,8 +11,7 @@ import SyncServer
 import SMCoreLib
 import BadgeSwift
 
-class AlbumCell: UIView, XibBasics {
-    typealias ViewType = AlbumCell
+class AlbumCollectionViewCell: UICollectionViewCell {
     var tapAction:(()->())?
     var saveAction:((_ newSharingGroupName: String)->())?
     var startEditing:(()->())?
@@ -30,7 +29,7 @@ class AlbumCell: UIView, XibBasics {
     override func awakeFromNib() {
         super.awakeFromNib()
         albumName.delegate = self
-        albumName.inputAccessoryView = AlbumCell.makeToolBar(doneAction: Action(target: self, selector: #selector(save)), cancelAction: Action(target: self, selector: #selector(cancel)))
+        albumName.inputAccessoryView = AlbumCollectionViewCell.makeToolBar(doneAction: Action(target: self, selector: #selector(save)), cancelAction: Action(target: self, selector: #selector(cancel)))
     }
     
     private func setAlbumName() {
@@ -60,7 +59,12 @@ class AlbumCell: UIView, XibBasics {
         if let media = FileMediaObject.fetchObjectsWithSharingGroupUUID(sharingGroup.sharingGroupUUID), media.count > 0,
             let mediaObject = media.first! as? MediaType {
             mediaViewContainer.setup(with: mediaObject, cache: cache, backgroundColor: urlBackgroundColor, albumsView: true)
-            mediaViewContainer.mediaView?.showWith(size: bounds.size)
+
+            if let mediaOriginalSize = mediaObject.originalSize  {
+                let smallerSize = ImageExtras.boundingImageSizeFor(originalSize: mediaOriginalSize, boundingSize: frameSize)
+                mediaViewContainer.mediaView?.showWith(size: smallerSize)
+            }
+            
             self.setUnreadCount(media: media)
         }
         else {
@@ -161,7 +165,7 @@ class AlbumCell: UIView, XibBasics {
     }
 }
 
-extension AlbumCell: UITextFieldDelegate {
+extension AlbumCollectionViewCell: UITextFieldDelegate {
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         if sharingOn {
             // So user can't edit name while in sharing mode. Which is a little strange.

@@ -9,7 +9,9 @@
 import UIKit
 
 protocol MediaView where Self: UIView {
-    func showWith(size: CGSize)    
+    // The size needs to be computed to preserve the aspect ratio of the media you are rendering.
+    func showWith(size: CGSize)
+    
     func changeToFullsizedMediaForZooming()
 }
 
