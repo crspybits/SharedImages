@@ -1,5 +1,7 @@
 # SharedImages
 
+This is *deprecated*: See http://github.com/SyncServerII/Neebla.git
+
 ## Screen grabs
 
 <kbd>
